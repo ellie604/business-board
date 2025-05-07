@@ -6,10 +6,10 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-  console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+  console.log("Backend URL:", BACKEND_URL);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +32,10 @@ const Login: React.FC = () => {
       else if (role === 'SELLER') navigate('/dashboard/seller');
       else if (role === 'BUYER') navigate('/dashboard/buyer');
       else setError('Unknown user role');
-  }   catch (err: any) {
+    } catch (err: any) {
       setError(err.message || 'Something went wrong');
-  }
-};
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

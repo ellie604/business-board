@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient } from '../../generated/prisma';
 import express, { Request, Response, Router, RequestHandler } from 'express';
 
 const prisma = new PrismaClient();
@@ -19,4 +19,3 @@ const loginHandler = (async (req: Request, res: Response) => {
 router.post('/login', loginHandler);
 
 export default router;
-

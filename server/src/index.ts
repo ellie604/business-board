@@ -1,19 +1,23 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import authRouter from './routes/auth';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import authRouter from './routes/auth';
 
+
+dotenv.config();
 
 const app = express();
-// app.use(cors());
+const PORT = process.env.PORT || 3000;
+
 app.use(cors({
   origin: 'https://business-board.vercel.app',
-  credentials: true
+  credentials: true,
 }));
 
 app.use(bodyParser.json());
 app.use('/api', authRouter);
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
