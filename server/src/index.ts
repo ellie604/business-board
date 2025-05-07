@@ -15,9 +15,10 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: '*',  
   credentials: true
 }));
+
 
 app.use(bodyParser.json());
 app.use('/api', authRouter);
