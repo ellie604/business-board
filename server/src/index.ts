@@ -9,13 +9,14 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const allowedOrigins = [
+  'https://business-board-lsaip54ym-xinyis-projects-6c0795d6.vercel.app',
+  'https://business-board.vercel.app'
+];
 
 app.use(cors({
-  origin: [
-    'https://business-board-bw37avn7e-xinyis-projects-6c0795d6.vercel.app',
-    'https://business-board-backend.onrender.com'
-  ],
-  credentials: true,
+  origin: allowedOrigins,
+  credentials: true
 }));
 
 app.use(bodyParser.json());
