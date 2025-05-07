@@ -11,7 +11,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: 'https://business-board.vercel.app',
+  origin: [
+    'https://business-board-bw37avn7e-xinyis-projects-6c0795d6.vercel.app',
+    'https://business-board-backend.onrender.com'
+  ],
   credentials: true,
 }));
 
