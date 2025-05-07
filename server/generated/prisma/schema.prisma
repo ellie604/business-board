@@ -1,12 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -15,15 +10,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  role      Role     @default(BUYER)
-  createdAt DateTime @default(now())
-
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  password   String
+  role       Role      @default(BUYER)
+  createdAt  DateTime  @default(now())
+  brokerId   Int?
   listings   Listing[] @relation("SellerListings")
   assignedBy Broker?   @relation("BrokerAssignedUsers", fields: [brokerId], references: [id])
-  brokerId   Int?
 }
 
 model Listing {
@@ -32,8 +26,8 @@ model Listing {
   description String
   price       Float
   sellerId    Int
-  seller      User     @relation("SellerListings", fields: [sellerId], references: [id])
   createdAt   DateTime @default(now())
+  seller      User     @relation("SellerListings", fields: [sellerId], references: [id])
 }
 
 model Broker {
