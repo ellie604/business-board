@@ -1,0 +1,332 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Welcome {Broker Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          435.75,
+          76.48634172469202
+        ],
+        [
+          1062.75,
+          76.48634172469202
+        ],
+        [
+          1062.75,
+          110.98018211033744
+        ],
+        [
+          435.75,
+          110.98018211033744
+        ]
+      ]
+    },
+    {
+      "title": "Table below will be scrollable",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          561.0,
+          162.72094268880556
+        ],
+        [
+          783.75,
+          162.72094268880556
+        ],
+        [
+          783.75,
+          184.6136009878313
+        ],
+        [
+          561.0,
+          186.37109964878468
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {Broker/Agent Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          400.5,
+          61.00236124448362
+        ],
+        [
+          1099.5,
+          61.00236124448362
+        ],
+        [
+          1099.5,
+          93.11964630633672
+        ],
+        [
+          400.5,
+          93.11964630633672
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {Broker/Agent Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          402.0,
+          60.95587345260187
+        ],
+        [
+          1098.75,
+          60.95587345260187
+        ],
+        [
+          1098.75,
+          93.31067935246864
+        ],
+        [
+          402.0,
+          93.31067935246864
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {seller Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          443.03373098373413,
+          475.49419117024956
+        ],
+        [
+          1052.6247024536133,
+          475.49419117024956
+        ],
+        [
+          1050.2809524536133,
+          507.51522893757505
+        ],
+        [
+          440.68998098373413,
+          507.51522893757505
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {Broker/Agent Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 4,
+      "polygon": [
+        [
+          402.75,
+          60.983173465371195
+        ],
+        [
+          1097.25,
+          60.983173465371195
+        ],
+        [
+          1097.25,
+          93.13426173556981
+        ],
+        [
+          402.75,
+          93.13426173556981
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          45
+        ],
+        [
+          "TableCell",
+          21
+        ],
+        [
+          "Line",
+          12
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Table",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Text",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          15
+        ],
+        [
+          "Line",
+          8
+        ],
+        [
+          "Picture",
+          2
+        ],
+        [
+          "PageHeader",
+          1
+        ],
+        [
+          "Text",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "TableCell",
+          135
+        ],
+        [
+          "Span",
+          38
+        ],
+        [
+          "Line",
+          11
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Table",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          74
+        ],
+        [
+          "TableCell",
+          57
+        ],
+        [
+          "Line",
+          33
+        ],
+        [
+          "Text",
+          13
+        ],
+        [
+          "Picture",
+          3
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Table",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          80
+        ],
+        [
+          "TableCell",
+          57
+        ],
+        [
+          "Line",
+          37
+        ],
+        [
+          "Text",
+          15
+        ],
+        [
+          "Picture",
+          3
+        ],
+        [
+          "Table",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/BrokerDashboard"
+}

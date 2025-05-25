@@ -1,0 +1,289 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Welcome {Agent Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          439.5,
+          76.48634172469202
+        ],
+        [
+          1058.25,
+          76.48634172469202
+        ],
+        [
+          1058.25,
+          111.73004820567756
+        ],
+        [
+          439.5,
+          111.73004820567756
+        ]
+      ]
+    },
+    {
+      "title": "Table below will be scrollable",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          560.25,
+          163.47080878414567
+        ],
+        [
+          782.25,
+          163.47080878414567
+        ],
+        [
+          782.25,
+          185.30806182346436
+        ],
+        [
+          560.25,
+          185.30806182346436
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {Broker/Agent Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          402.0,
+          60.958173036192214
+        ],
+        [
+          1098.75,
+          60.958173036192214
+        ],
+        [
+          1098.75,
+          93.27586379099735
+        ],
+        [
+          402.0,
+          93.27586379099735
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {seller Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          443.00951957702637,
+          475.43020508924013
+        ],
+        [
+          1052.9633045196533,
+          475.43020508924013
+        ],
+        [
+          1050.6195545196533,
+          507.17330834542486
+        ],
+        [
+          440.66576957702637,
+          507.17330834542486
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {Broker/Agent Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          402.0,
+          61.16321141795162
+        ],
+        [
+          1098.75,
+          61.16321141795162
+        ],
+        [
+          1098.75,
+          93.41601771215225
+        ],
+        [
+          402.0,
+          93.41601771215225
+        ]
+      ]
+    },
+    {
+      "title": "Welcome {Buyer's Name} to Your Customized Dashboard",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          428.9302468299866,
+          471.9580081802801
+        ],
+        [
+          1059.7473621368408,
+          471.9580081802801
+        ],
+        [
+          1057.5,
+          503.11488522906063
+        ],
+        [
+          426.5864968299866,
+          503.11488522906063
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          43
+        ],
+        [
+          "TableCell",
+          24
+        ],
+        [
+          "Line",
+          11
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Table",
+          1
+        ],
+        [
+          "Text",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          13
+        ],
+        [
+          "Line",
+          7
+        ],
+        [
+          "Picture",
+          2
+        ],
+        [
+          "Text",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          72
+        ],
+        [
+          "TableCell",
+          52
+        ],
+        [
+          "Line",
+          32
+        ],
+        [
+          "Text",
+          13
+        ],
+        [
+          "Picture",
+          3
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Table",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          74
+        ],
+        [
+          "TableCell",
+          43
+        ],
+        [
+          "Line",
+          34
+        ],
+        [
+          "Text",
+          14
+        ],
+        [
+          "Picture",
+          3
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Table",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/AgentDashboard"
+}
