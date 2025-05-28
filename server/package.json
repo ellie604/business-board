@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "nodemon dist/index.js",
     "build": "tsc -p tsconfig.server.json",
-    "start": "node dist/index.js" 
+    "start": "node dist/index.js",
+    "seed:preview": "npx ts-node -T --project tsconfig.server.json seed.preview.ts",
+    "seed:production": "npx ts-node -T --project tsconfig.server.json seed.production.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
@@ -22,9 +24,9 @@
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
-    "@types/node": "^22.15.14",
+    "@types/node": "^22.15.23",
+    "nodemon": "^2.0.22",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "nodemon": "^2.0.22" 
+    "typescript": "^5.8.3"
   }
 }
