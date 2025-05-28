@@ -22,7 +22,14 @@
 
 // server/src/routes/auth.ts
 import express, { Request, Response, Router, RequestHandler } from 'express';
-import { prisma } from '../../database.mts';  
+// import { prisma } from '../../database.mts';  
+// server/database.ts
+import { PrismaClient as ProductionPrismaClient } from '../..//generated/prisma-production';
+import { PrismaClient as PreviewPrismaClient } from '../..//generated/prisma-preview';
+
+export const prisma = process.env.NODE_ENV === 'preview'
+  ? new PreviewPrismaClient()
+  : new ProductionPrismaClient();
 
 const router: Router = express.Router();
 
