@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model Document
+ * 
+ */
+export type Document = $Result.DefaultSelection<Prisma.$DocumentPayload>
+/**
  * Model User
  * 
  */
@@ -23,30 +28,52 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  * 
  */
 export type Listing = $Result.DefaultSelection<Prisma.$ListingPayload>
-/**
- * Model Broker
- * 
- */
-export type Broker = $Result.DefaultSelection<Prisma.$BrokerPayload>
 
 /**
  * Enums
  */
 export namespace $Enums {
-  export const Role: {
-  BUYER: 'BUYER',
-  SELLER: 'SELLER',
+  export const UserRole: {
+  BROKER: 'BROKER',
   AGENT: 'AGENT',
-  BROKER: 'BROKER'
+  SELLER: 'SELLER',
+  BUYER: 'BUYER'
 };
 
-export type Role = (typeof Role)[keyof typeof Role]
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const ListingStatus: {
+  ACTIVE: 'ACTIVE',
+  UNDER_CONTRACT: 'UNDER_CONTRACT',
+  CLOSED: 'CLOSED'
+};
+
+export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
+
+
+export const DocumentType: {
+  NDA: 'NDA',
+  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
+  FINANCIAL_STATEMENT: 'FINANCIAL_STATEMENT',
+  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT'
+};
+
+export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
 
 }
 
-export type Role = $Enums.Role
+export type UserRole = $Enums.UserRole
 
-export const Role: typeof $Enums.Role
+export const UserRole: typeof $Enums.UserRole
+
+export type ListingStatus = $Enums.ListingStatus
+
+export const ListingStatus: typeof $Enums.ListingStatus
+
+export type DocumentType = $Enums.DocumentType
+
+export const DocumentType: typeof $Enums.DocumentType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -55,8 +82,8 @@ export const Role: typeof $Enums.Role
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more Documents
+ * const documents = await prisma.document.findMany()
  * ```
  *
  *
@@ -76,8 +103,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Users
-   * const users = await prisma.user.findMany()
+   * // Fetch zero or more Documents
+   * const documents = await prisma.document.findMany()
    * ```
    *
    *
@@ -174,6 +201,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.document`: Exposes CRUD operations for the **Document** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Documents
+    * const documents = await prisma.document.findMany()
+    * ```
+    */
+  get document(): Prisma.DocumentDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
     * Example usage:
     * ```ts
@@ -192,16 +229,6 @@ export class PrismaClient<
     * ```
     */
   get listing(): Prisma.ListingDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.broker`: Exposes CRUD operations for the **Broker** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Brokers
-    * const brokers = await prisma.broker.findMany()
-    * ```
-    */
-  get broker(): Prisma.BrokerDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -642,9 +669,9 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    Document: 'Document',
     User: 'User',
-    Listing: 'Listing',
-    Broker: 'Broker'
+    Listing: 'Listing'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -663,10 +690,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "listing" | "broker"
+      modelProps: "document" | "user" | "listing"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      Document: {
+        payload: Prisma.$DocumentPayload<ExtArgs>
+        fields: Prisma.DocumentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DocumentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DocumentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          findFirst: {
+            args: Prisma.DocumentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DocumentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          findMany: {
+            args: Prisma.DocumentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>[]
+          }
+          create: {
+            args: Prisma.DocumentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          createMany: {
+            args: Prisma.DocumentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DocumentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>[]
+          }
+          delete: {
+            args: Prisma.DocumentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          update: {
+            args: Prisma.DocumentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DocumentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DocumentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DocumentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>[]
+          }
+          upsert: {
+            args: Prisma.DocumentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          aggregate: {
+            args: Prisma.DocumentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDocument>
+          }
+          groupBy: {
+            args: Prisma.DocumentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DocumentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DocumentCountArgs<ExtArgs>
+            result: $Utils.Optional<DocumentCountAggregateOutputType> | number
+          }
+        }
+      }
       User: {
         payload: Prisma.$UserPayload<ExtArgs>
         fields: Prisma.UserFieldRefs
@@ -815,80 +916,6 @@ export namespace Prisma {
           }
         }
       }
-      Broker: {
-        payload: Prisma.$BrokerPayload<ExtArgs>
-        fields: Prisma.BrokerFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.BrokerFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.BrokerFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>
-          }
-          findFirst: {
-            args: Prisma.BrokerFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.BrokerFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>
-          }
-          findMany: {
-            args: Prisma.BrokerFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>[]
-          }
-          create: {
-            args: Prisma.BrokerCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>
-          }
-          createMany: {
-            args: Prisma.BrokerCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.BrokerCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>[]
-          }
-          delete: {
-            args: Prisma.BrokerDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>
-          }
-          update: {
-            args: Prisma.BrokerUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>
-          }
-          deleteMany: {
-            args: Prisma.BrokerDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.BrokerUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.BrokerUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>[]
-          }
-          upsert: {
-            args: Prisma.BrokerUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$BrokerPayload>
-          }
-          aggregate: {
-            args: Prisma.BrokerAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateBroker>
-          }
-          groupBy: {
-            args: Prisma.BrokerGroupByArgs<ExtArgs>
-            result: $Utils.Optional<BrokerGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.BrokerCountArgs<ExtArgs>
-            result: $Utils.Optional<BrokerCountAggregateOutputType> | number
-          }
-        }
-      }
     }
   } & {
     other: {
@@ -973,9 +1000,9 @@ export namespace Prisma {
     omit?: Prisma.GlobalOmitConfig
   }
   export type GlobalOmitConfig = {
+    document?: DocumentOmit
     user?: UserOmit
     listing?: ListingOmit
-    broker?: BrokerOmit
   }
 
   /* Types for Logging */
@@ -1070,10 +1097,12 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
+    managing: number
     listings: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    managing?: boolean | UserCountOutputTypeCountManagingArgs
     listings?: boolean | UserCountOutputTypeCountListingsArgs
   }
 
@@ -1091,39 +1120,15 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountManagingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ListingWhereInput
-  }
-
-
-  /**
-   * Count Type BrokerCountOutputType
-   */
-
-  export type BrokerCountOutputType = {
-    assigned: number
-  }
-
-  export type BrokerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    assigned?: boolean | BrokerCountOutputTypeCountAssignedArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * BrokerCountOutputType without action
-   */
-  export type BrokerCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the BrokerCountOutputType
-     */
-    select?: BrokerCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * BrokerCountOutputType without action
-   */
-  export type BrokerCountOutputTypeCountAssignedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserWhereInput
   }
 
 
@@ -1132,91 +1137,1063 @@ export namespace Prisma {
    */
 
   /**
+   * Model Document
+   */
+
+  export type AggregateDocument = {
+    _count: DocumentCountAggregateOutputType | null
+    _min: DocumentMinAggregateOutputType | null
+    _max: DocumentMaxAggregateOutputType | null
+  }
+
+  export type DocumentMinAggregateOutputType = {
+    id: string | null
+    type: $Enums.DocumentType | null
+    url: string | null
+    createdAt: Date | null
+  }
+
+  export type DocumentMaxAggregateOutputType = {
+    id: string | null
+    type: $Enums.DocumentType | null
+    url: string | null
+    createdAt: Date | null
+  }
+
+  export type DocumentCountAggregateOutputType = {
+    id: number
+    type: number
+    url: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DocumentMinAggregateInputType = {
+    id?: true
+    type?: true
+    url?: true
+    createdAt?: true
+  }
+
+  export type DocumentMaxAggregateInputType = {
+    id?: true
+    type?: true
+    url?: true
+    createdAt?: true
+  }
+
+  export type DocumentCountAggregateInputType = {
+    id?: true
+    type?: true
+    url?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DocumentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Document to aggregate.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Documents
+    **/
+    _count?: true | DocumentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DocumentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DocumentMaxAggregateInputType
+  }
+
+  export type GetDocumentAggregateType<T extends DocumentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDocument]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDocument[P]>
+      : GetScalarType<T[P], AggregateDocument[P]>
+  }
+
+
+
+
+  export type DocumentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithAggregationInput | DocumentOrderByWithAggregationInput[]
+    by: DocumentScalarFieldEnum[] | DocumentScalarFieldEnum
+    having?: DocumentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DocumentCountAggregateInputType | true
+    _min?: DocumentMinAggregateInputType
+    _max?: DocumentMaxAggregateInputType
+  }
+
+  export type DocumentGroupByOutputType = {
+    id: string
+    type: $Enums.DocumentType
+    url: string
+    createdAt: Date
+    _count: DocumentCountAggregateOutputType | null
+    _min: DocumentMinAggregateOutputType | null
+    _max: DocumentMaxAggregateOutputType | null
+  }
+
+  type GetDocumentGroupByPayload<T extends DocumentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DocumentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DocumentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DocumentGroupByOutputType[P]>
+            : GetScalarType<T[P], DocumentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DocumentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    type?: boolean
+    url?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["document"]>
+
+  export type DocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    type?: boolean
+    url?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["document"]>
+
+  export type DocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    type?: boolean
+    url?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["document"]>
+
+  export type DocumentSelectScalar = {
+    id?: boolean
+    type?: boolean
+    url?: boolean
+    createdAt?: boolean
+  }
+
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "url" | "createdAt", ExtArgs["result"]["document"]>
+
+  export type $DocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Document"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      type: $Enums.DocumentType
+      url: string
+      createdAt: Date
+    }, ExtArgs["result"]["document"]>
+    composites: {}
+  }
+
+  type DocumentGetPayload<S extends boolean | null | undefined | DocumentDefaultArgs> = $Result.GetResult<Prisma.$DocumentPayload, S>
+
+  type DocumentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DocumentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DocumentCountAggregateInputType | true
+    }
+
+  export interface DocumentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Document'], meta: { name: 'Document' } }
+    /**
+     * Find zero or one Document that matches the filter.
+     * @param {DocumentFindUniqueArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DocumentFindUniqueArgs>(args: SelectSubset<T, DocumentFindUniqueArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Document that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DocumentFindUniqueOrThrowArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DocumentFindUniqueOrThrowArgs>(args: SelectSubset<T, DocumentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Document that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentFindFirstArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DocumentFindFirstArgs>(args?: SelectSubset<T, DocumentFindFirstArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Document that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentFindFirstOrThrowArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DocumentFindFirstOrThrowArgs>(args?: SelectSubset<T, DocumentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Documents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Documents
+     * const documents = await prisma.document.findMany()
+     * 
+     * // Get first 10 Documents
+     * const documents = await prisma.document.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const documentWithIdOnly = await prisma.document.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DocumentFindManyArgs>(args?: SelectSubset<T, DocumentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Document.
+     * @param {DocumentCreateArgs} args - Arguments to create a Document.
+     * @example
+     * // Create one Document
+     * const Document = await prisma.document.create({
+     *   data: {
+     *     // ... data to create a Document
+     *   }
+     * })
+     * 
+     */
+    create<T extends DocumentCreateArgs>(args: SelectSubset<T, DocumentCreateArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Documents.
+     * @param {DocumentCreateManyArgs} args - Arguments to create many Documents.
+     * @example
+     * // Create many Documents
+     * const document = await prisma.document.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DocumentCreateManyArgs>(args?: SelectSubset<T, DocumentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Documents and returns the data saved in the database.
+     * @param {DocumentCreateManyAndReturnArgs} args - Arguments to create many Documents.
+     * @example
+     * // Create many Documents
+     * const document = await prisma.document.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Documents and only return the `id`
+     * const documentWithIdOnly = await prisma.document.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DocumentCreateManyAndReturnArgs>(args?: SelectSubset<T, DocumentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Document.
+     * @param {DocumentDeleteArgs} args - Arguments to delete one Document.
+     * @example
+     * // Delete one Document
+     * const Document = await prisma.document.delete({
+     *   where: {
+     *     // ... filter to delete one Document
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DocumentDeleteArgs>(args: SelectSubset<T, DocumentDeleteArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Document.
+     * @param {DocumentUpdateArgs} args - Arguments to update one Document.
+     * @example
+     * // Update one Document
+     * const document = await prisma.document.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DocumentUpdateArgs>(args: SelectSubset<T, DocumentUpdateArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Documents.
+     * @param {DocumentDeleteManyArgs} args - Arguments to filter Documents to delete.
+     * @example
+     * // Delete a few Documents
+     * const { count } = await prisma.document.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DocumentDeleteManyArgs>(args?: SelectSubset<T, DocumentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Documents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Documents
+     * const document = await prisma.document.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DocumentUpdateManyArgs>(args: SelectSubset<T, DocumentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Documents and returns the data updated in the database.
+     * @param {DocumentUpdateManyAndReturnArgs} args - Arguments to update many Documents.
+     * @example
+     * // Update many Documents
+     * const document = await prisma.document.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Documents and only return the `id`
+     * const documentWithIdOnly = await prisma.document.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DocumentUpdateManyAndReturnArgs>(args: SelectSubset<T, DocumentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Document.
+     * @param {DocumentUpsertArgs} args - Arguments to update or create a Document.
+     * @example
+     * // Update or create a Document
+     * const document = await prisma.document.upsert({
+     *   create: {
+     *     // ... data to create a Document
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Document we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DocumentUpsertArgs>(args: SelectSubset<T, DocumentUpsertArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Documents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentCountArgs} args - Arguments to filter Documents to count.
+     * @example
+     * // Count the number of Documents
+     * const count = await prisma.document.count({
+     *   where: {
+     *     // ... the filter for the Documents we want to count
+     *   }
+     * })
+    **/
+    count<T extends DocumentCountArgs>(
+      args?: Subset<T, DocumentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DocumentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Document.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DocumentAggregateArgs>(args: Subset<T, DocumentAggregateArgs>): Prisma.PrismaPromise<GetDocumentAggregateType<T>>
+
+    /**
+     * Group by Document.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DocumentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DocumentGroupByArgs['orderBy'] }
+        : { orderBy?: DocumentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DocumentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDocumentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Document model
+   */
+  readonly fields: DocumentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Document.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DocumentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Document model
+   */
+  interface DocumentFieldRefs {
+    readonly id: FieldRef<"Document", 'String'>
+    readonly type: FieldRef<"Document", 'DocumentType'>
+    readonly url: FieldRef<"Document", 'String'>
+    readonly createdAt: FieldRef<"Document", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Document findUnique
+   */
+  export type DocumentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document findUniqueOrThrow
+   */
+  export type DocumentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document findFirst
+   */
+  export type DocumentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Documents.
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Documents.
+     */
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Document findFirstOrThrow
+   */
+  export type DocumentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Documents.
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Documents.
+     */
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Document findMany
+   */
+  export type DocumentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Filter, which Documents to fetch.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Documents.
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Document create
+   */
+  export type DocumentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Document.
+     */
+    data: XOR<DocumentCreateInput, DocumentUncheckedCreateInput>
+  }
+
+  /**
+   * Document createMany
+   */
+  export type DocumentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Documents.
+     */
+    data: DocumentCreateManyInput | DocumentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Document createManyAndReturn
+   */
+  export type DocumentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The data used to create many Documents.
+     */
+    data: DocumentCreateManyInput | DocumentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Document update
+   */
+  export type DocumentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Document.
+     */
+    data: XOR<DocumentUpdateInput, DocumentUncheckedUpdateInput>
+    /**
+     * Choose, which Document to update.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document updateMany
+   */
+  export type DocumentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Documents.
+     */
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyInput>
+    /**
+     * Filter which Documents to update
+     */
+    where?: DocumentWhereInput
+    /**
+     * Limit how many Documents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Document updateManyAndReturn
+   */
+  export type DocumentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The data used to update Documents.
+     */
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyInput>
+    /**
+     * Filter which Documents to update
+     */
+    where?: DocumentWhereInput
+    /**
+     * Limit how many Documents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Document upsert
+   */
+  export type DocumentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Document to update in case it exists.
+     */
+    where: DocumentWhereUniqueInput
+    /**
+     * In case the Document found by the `where` argument doesn't exist, create a new Document with this data.
+     */
+    create: XOR<DocumentCreateInput, DocumentUncheckedCreateInput>
+    /**
+     * In case the Document was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DocumentUpdateInput, DocumentUncheckedUpdateInput>
+  }
+
+  /**
+   * Document delete
+   */
+  export type DocumentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Filter which Document to delete.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document deleteMany
+   */
+  export type DocumentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Documents to delete
+     */
+    where?: DocumentWhereInput
+    /**
+     * Limit how many Documents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Document without action
+   */
+  export type DocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model User
    */
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
-    _avg: UserAvgAggregateOutputType | null
-    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
 
-  export type UserAvgAggregateOutputType = {
-    id: number | null
-    brokerId: number | null
-  }
-
-  export type UserSumAggregateOutputType = {
-    id: number | null
-    brokerId: number | null
-  }
-
   export type UserMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     email: string | null
     password: string | null
-    role: $Enums.Role | null
+    name: string | null
+    role: $Enums.UserRole | null
     createdAt: Date | null
-    brokerId: number | null
+    updatedAt: Date | null
+    managerId: string | null
   }
 
   export type UserMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     email: string | null
     password: string | null
-    role: $Enums.Role | null
+    name: string | null
+    role: $Enums.UserRole | null
     createdAt: Date | null
-    brokerId: number | null
+    updatedAt: Date | null
+    managerId: string | null
   }
 
   export type UserCountAggregateOutputType = {
     id: number
     email: number
     password: number
+    name: number
     role: number
     createdAt: number
-    brokerId: number
+    updatedAt: number
+    managerId: number
     _all: number
   }
 
-
-  export type UserAvgAggregateInputType = {
-    id?: true
-    brokerId?: true
-  }
-
-  export type UserSumAggregateInputType = {
-    id?: true
-    brokerId?: true
-  }
 
   export type UserMinAggregateInputType = {
     id?: true
     email?: true
     password?: true
+    name?: true
     role?: true
     createdAt?: true
-    brokerId?: true
+    updatedAt?: true
+    managerId?: true
   }
 
   export type UserMaxAggregateInputType = {
     id?: true
     email?: true
     password?: true
+    name?: true
     role?: true
     createdAt?: true
-    brokerId?: true
+    updatedAt?: true
+    managerId?: true
   }
 
   export type UserCountAggregateInputType = {
     id?: true
     email?: true
     password?: true
+    name?: true
     role?: true
     createdAt?: true
-    brokerId?: true
+    updatedAt?: true
+    managerId?: true
     _all?: true
   }
 
@@ -1258,18 +2235,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: UserAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: UserSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -1300,22 +2265,20 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
-    _avg?: UserAvgAggregateInputType
-    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
 
   export type UserGroupByOutputType = {
-    id: number
+    id: string
     email: string
     password: string
-    role: $Enums.Role
+    name: string
+    role: $Enums.UserRole
     createdAt: Date
-    brokerId: number | null
+    updatedAt: Date
+    managerId: string | null
     _count: UserCountAggregateOutputType | null
-    _avg: UserAvgAggregateOutputType | null
-    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -1338,11 +2301,14 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     password?: boolean
+    name?: boolean
     role?: boolean
     createdAt?: boolean
-    brokerId?: boolean
+    updatedAt?: boolean
+    managerId?: boolean
+    managedBy?: boolean | User$managedByArgs<ExtArgs>
+    managing?: boolean | User$managingArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
-    assignedBy?: boolean | User$assignedByArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1350,57 +2316,67 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     password?: boolean
+    name?: boolean
     role?: boolean
     createdAt?: boolean
-    brokerId?: boolean
-    assignedBy?: boolean | User$assignedByArgs<ExtArgs>
+    updatedAt?: boolean
+    managerId?: boolean
+    managedBy?: boolean | User$managedByArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
     password?: boolean
+    name?: boolean
     role?: boolean
     createdAt?: boolean
-    brokerId?: boolean
-    assignedBy?: boolean | User$assignedByArgs<ExtArgs>
+    updatedAt?: boolean
+    managerId?: boolean
+    managedBy?: boolean | User$managedByArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
     id?: boolean
     email?: boolean
     password?: boolean
+    name?: boolean
     role?: boolean
     createdAt?: boolean
-    brokerId?: boolean
+    updatedAt?: boolean
+    managerId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "role" | "createdAt" | "brokerId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "createdAt" | "updatedAt" | "managerId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    managedBy?: boolean | User$managedByArgs<ExtArgs>
+    managing?: boolean | User$managingArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
-    assignedBy?: boolean | User$assignedByArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    assignedBy?: boolean | User$assignedByArgs<ExtArgs>
+    managedBy?: boolean | User$managedByArgs<ExtArgs>
   }
   export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    assignedBy?: boolean | User$assignedByArgs<ExtArgs>
+    managedBy?: boolean | User$managedByArgs<ExtArgs>
   }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
+      managedBy: Prisma.$UserPayload<ExtArgs> | null
+      managing: Prisma.$UserPayload<ExtArgs>[]
       listings: Prisma.$ListingPayload<ExtArgs>[]
-      assignedBy: Prisma.$BrokerPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       email: string
       password: string
-      role: $Enums.Role
+      name: string
+      role: $Enums.UserRole
       createdAt: Date
-      brokerId: number | null
+      updatedAt: Date
+      managerId: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1795,8 +2771,9 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    managedBy<T extends User$managedByArgs<ExtArgs> = {}>(args?: Subset<T, User$managedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    managing<T extends User$managingArgs<ExtArgs> = {}>(args?: Subset<T, User$managingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     listings<T extends User$listingsArgs<ExtArgs> = {}>(args?: Subset<T, User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    assignedBy<T extends User$assignedByArgs<ExtArgs> = {}>(args?: Subset<T, User$assignedByArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1826,12 +2803,14 @@ export namespace Prisma {
    * Fields of the User model
    */
   interface UserFieldRefs {
-    readonly id: FieldRef<"User", 'Int'>
+    readonly id: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
-    readonly role: FieldRef<"User", 'Role'>
+    readonly name: FieldRef<"User", 'String'>
+    readonly role: FieldRef<"User", 'UserRole'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
-    readonly brokerId: FieldRef<"User", 'Int'>
+    readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly managerId: FieldRef<"User", 'String'>
   }
     
 
@@ -2228,6 +3207,49 @@ export namespace Prisma {
   }
 
   /**
+   * User.managedBy
+   */
+  export type User$managedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * User.managing
+   */
+  export type User$managingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+  }
+
+  /**
    * User.listings
    */
   export type User$listingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2249,25 +3271,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ListingScalarFieldEnum | ListingScalarFieldEnum[]
-  }
-
-  /**
-   * User.assignedBy
-   */
-  export type User$assignedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    where?: BrokerWhereInput
   }
 
   /**
@@ -2302,33 +3305,31 @@ export namespace Prisma {
   }
 
   export type ListingAvgAggregateOutputType = {
-    id: number | null
     price: number | null
-    sellerId: number | null
   }
 
   export type ListingSumAggregateOutputType = {
-    id: number | null
     price: number | null
-    sellerId: number | null
   }
 
   export type ListingMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     title: string | null
     description: string | null
     price: number | null
-    sellerId: number | null
+    status: $Enums.ListingStatus | null
     createdAt: Date | null
+    sellerId: string | null
   }
 
   export type ListingMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     title: string | null
     description: string | null
     price: number | null
-    sellerId: number | null
+    status: $Enums.ListingStatus | null
     createdAt: Date | null
+    sellerId: string | null
   }
 
   export type ListingCountAggregateOutputType = {
@@ -2336,22 +3337,19 @@ export namespace Prisma {
     title: number
     description: number
     price: number
-    sellerId: number
+    status: number
     createdAt: number
+    sellerId: number
     _all: number
   }
 
 
   export type ListingAvgAggregateInputType = {
-    id?: true
     price?: true
-    sellerId?: true
   }
 
   export type ListingSumAggregateInputType = {
-    id?: true
     price?: true
-    sellerId?: true
   }
 
   export type ListingMinAggregateInputType = {
@@ -2359,8 +3357,9 @@ export namespace Prisma {
     title?: true
     description?: true
     price?: true
-    sellerId?: true
+    status?: true
     createdAt?: true
+    sellerId?: true
   }
 
   export type ListingMaxAggregateInputType = {
@@ -2368,8 +3367,9 @@ export namespace Prisma {
     title?: true
     description?: true
     price?: true
-    sellerId?: true
+    status?: true
     createdAt?: true
+    sellerId?: true
   }
 
   export type ListingCountAggregateInputType = {
@@ -2377,8 +3377,9 @@ export namespace Prisma {
     title?: true
     description?: true
     price?: true
-    sellerId?: true
+    status?: true
     createdAt?: true
+    sellerId?: true
     _all?: true
   }
 
@@ -2469,12 +3470,13 @@ export namespace Prisma {
   }
 
   export type ListingGroupByOutputType = {
-    id: number
+    id: string
     title: string
     description: string
     price: number
-    sellerId: number
+    status: $Enums.ListingStatus
     createdAt: Date
+    sellerId: string
     _count: ListingCountAggregateOutputType | null
     _avg: ListingAvgAggregateOutputType | null
     _sum: ListingSumAggregateOutputType | null
@@ -2501,8 +3503,9 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     price?: boolean
-    sellerId?: boolean
+    status?: boolean
     createdAt?: boolean
+    sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
@@ -2511,8 +3514,9 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     price?: boolean
-    sellerId?: boolean
+    status?: boolean
     createdAt?: boolean
+    sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
@@ -2521,8 +3525,9 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     price?: boolean
-    sellerId?: boolean
+    status?: boolean
     createdAt?: boolean
+    sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
@@ -2531,11 +3536,12 @@ export namespace Prisma {
     title?: boolean
     description?: boolean
     price?: boolean
-    sellerId?: boolean
+    status?: boolean
     createdAt?: boolean
+    sellerId?: boolean
   }
 
-  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "price" | "sellerId" | "createdAt", ExtArgs["result"]["listing"]>
+  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "price" | "status" | "createdAt" | "sellerId", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -2552,12 +3558,13 @@ export namespace Prisma {
       seller: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       title: string
       description: string
       price: number
-      sellerId: number
+      status: $Enums.ListingStatus
       createdAt: Date
+      sellerId: string
     }, ExtArgs["result"]["listing"]>
     composites: {}
   }
@@ -2982,12 +3989,13 @@ export namespace Prisma {
    * Fields of the Listing model
    */
   interface ListingFieldRefs {
-    readonly id: FieldRef<"Listing", 'Int'>
+    readonly id: FieldRef<"Listing", 'String'>
     readonly title: FieldRef<"Listing", 'String'>
     readonly description: FieldRef<"Listing", 'String'>
     readonly price: FieldRef<"Listing", 'Float'>
-    readonly sellerId: FieldRef<"Listing", 'Int'>
+    readonly status: FieldRef<"Listing", 'ListingStatus'>
     readonly createdAt: FieldRef<"Listing", 'DateTime'>
+    readonly sellerId: FieldRef<"Listing", 'String'>
   }
     
 
@@ -3403,1097 +4411,6 @@ export namespace Prisma {
 
 
   /**
-   * Model Broker
-   */
-
-  export type AggregateBroker = {
-    _count: BrokerCountAggregateOutputType | null
-    _avg: BrokerAvgAggregateOutputType | null
-    _sum: BrokerSumAggregateOutputType | null
-    _min: BrokerMinAggregateOutputType | null
-    _max: BrokerMaxAggregateOutputType | null
-  }
-
-  export type BrokerAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type BrokerSumAggregateOutputType = {
-    id: number | null
-  }
-
-  export type BrokerMinAggregateOutputType = {
-    id: number | null
-    name: string | null
-    email: string | null
-    password: string | null
-  }
-
-  export type BrokerMaxAggregateOutputType = {
-    id: number | null
-    name: string | null
-    email: string | null
-    password: string | null
-  }
-
-  export type BrokerCountAggregateOutputType = {
-    id: number
-    name: number
-    email: number
-    password: number
-    _all: number
-  }
-
-
-  export type BrokerAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type BrokerSumAggregateInputType = {
-    id?: true
-  }
-
-  export type BrokerMinAggregateInputType = {
-    id?: true
-    name?: true
-    email?: true
-    password?: true
-  }
-
-  export type BrokerMaxAggregateInputType = {
-    id?: true
-    name?: true
-    email?: true
-    password?: true
-  }
-
-  export type BrokerCountAggregateInputType = {
-    id?: true
-    name?: true
-    email?: true
-    password?: true
-    _all?: true
-  }
-
-  export type BrokerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Broker to aggregate.
-     */
-    where?: BrokerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Brokers to fetch.
-     */
-    orderBy?: BrokerOrderByWithRelationInput | BrokerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: BrokerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Brokers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Brokers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Brokers
-    **/
-    _count?: true | BrokerCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: BrokerAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: BrokerSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: BrokerMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: BrokerMaxAggregateInputType
-  }
-
-  export type GetBrokerAggregateType<T extends BrokerAggregateArgs> = {
-        [P in keyof T & keyof AggregateBroker]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateBroker[P]>
-      : GetScalarType<T[P], AggregateBroker[P]>
-  }
-
-
-
-
-  export type BrokerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: BrokerWhereInput
-    orderBy?: BrokerOrderByWithAggregationInput | BrokerOrderByWithAggregationInput[]
-    by: BrokerScalarFieldEnum[] | BrokerScalarFieldEnum
-    having?: BrokerScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: BrokerCountAggregateInputType | true
-    _avg?: BrokerAvgAggregateInputType
-    _sum?: BrokerSumAggregateInputType
-    _min?: BrokerMinAggregateInputType
-    _max?: BrokerMaxAggregateInputType
-  }
-
-  export type BrokerGroupByOutputType = {
-    id: number
-    name: string
-    email: string
-    password: string
-    _count: BrokerCountAggregateOutputType | null
-    _avg: BrokerAvgAggregateOutputType | null
-    _sum: BrokerSumAggregateOutputType | null
-    _min: BrokerMinAggregateOutputType | null
-    _max: BrokerMaxAggregateOutputType | null
-  }
-
-  type GetBrokerGroupByPayload<T extends BrokerGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<BrokerGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof BrokerGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], BrokerGroupByOutputType[P]>
-            : GetScalarType<T[P], BrokerGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type BrokerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    name?: boolean
-    email?: boolean
-    password?: boolean
-    assigned?: boolean | Broker$assignedArgs<ExtArgs>
-    _count?: boolean | BrokerCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["broker"]>
-
-  export type BrokerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    name?: boolean
-    email?: boolean
-    password?: boolean
-  }, ExtArgs["result"]["broker"]>
-
-  export type BrokerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    name?: boolean
-    email?: boolean
-    password?: boolean
-  }, ExtArgs["result"]["broker"]>
-
-  export type BrokerSelectScalar = {
-    id?: boolean
-    name?: boolean
-    email?: boolean
-    password?: boolean
-  }
-
-  export type BrokerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password", ExtArgs["result"]["broker"]>
-  export type BrokerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    assigned?: boolean | Broker$assignedArgs<ExtArgs>
-    _count?: boolean | BrokerCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type BrokerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type BrokerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-
-  export type $BrokerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Broker"
-    objects: {
-      assigned: Prisma.$UserPayload<ExtArgs>[]
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: number
-      name: string
-      email: string
-      password: string
-    }, ExtArgs["result"]["broker"]>
-    composites: {}
-  }
-
-  type BrokerGetPayload<S extends boolean | null | undefined | BrokerDefaultArgs> = $Result.GetResult<Prisma.$BrokerPayload, S>
-
-  type BrokerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<BrokerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: BrokerCountAggregateInputType | true
-    }
-
-  export interface BrokerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Broker'], meta: { name: 'Broker' } }
-    /**
-     * Find zero or one Broker that matches the filter.
-     * @param {BrokerFindUniqueArgs} args - Arguments to find a Broker
-     * @example
-     * // Get one Broker
-     * const broker = await prisma.broker.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends BrokerFindUniqueArgs>(args: SelectSubset<T, BrokerFindUniqueArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Broker that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {BrokerFindUniqueOrThrowArgs} args - Arguments to find a Broker
-     * @example
-     * // Get one Broker
-     * const broker = await prisma.broker.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends BrokerFindUniqueOrThrowArgs>(args: SelectSubset<T, BrokerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Broker that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerFindFirstArgs} args - Arguments to find a Broker
-     * @example
-     * // Get one Broker
-     * const broker = await prisma.broker.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends BrokerFindFirstArgs>(args?: SelectSubset<T, BrokerFindFirstArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Broker that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerFindFirstOrThrowArgs} args - Arguments to find a Broker
-     * @example
-     * // Get one Broker
-     * const broker = await prisma.broker.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends BrokerFindFirstOrThrowArgs>(args?: SelectSubset<T, BrokerFindFirstOrThrowArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Brokers that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Brokers
-     * const brokers = await prisma.broker.findMany()
-     * 
-     * // Get first 10 Brokers
-     * const brokers = await prisma.broker.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const brokerWithIdOnly = await prisma.broker.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends BrokerFindManyArgs>(args?: SelectSubset<T, BrokerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Broker.
-     * @param {BrokerCreateArgs} args - Arguments to create a Broker.
-     * @example
-     * // Create one Broker
-     * const Broker = await prisma.broker.create({
-     *   data: {
-     *     // ... data to create a Broker
-     *   }
-     * })
-     * 
-     */
-    create<T extends BrokerCreateArgs>(args: SelectSubset<T, BrokerCreateArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Brokers.
-     * @param {BrokerCreateManyArgs} args - Arguments to create many Brokers.
-     * @example
-     * // Create many Brokers
-     * const broker = await prisma.broker.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends BrokerCreateManyArgs>(args?: SelectSubset<T, BrokerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Brokers and returns the data saved in the database.
-     * @param {BrokerCreateManyAndReturnArgs} args - Arguments to create many Brokers.
-     * @example
-     * // Create many Brokers
-     * const broker = await prisma.broker.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Brokers and only return the `id`
-     * const brokerWithIdOnly = await prisma.broker.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends BrokerCreateManyAndReturnArgs>(args?: SelectSubset<T, BrokerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Broker.
-     * @param {BrokerDeleteArgs} args - Arguments to delete one Broker.
-     * @example
-     * // Delete one Broker
-     * const Broker = await prisma.broker.delete({
-     *   where: {
-     *     // ... filter to delete one Broker
-     *   }
-     * })
-     * 
-     */
-    delete<T extends BrokerDeleteArgs>(args: SelectSubset<T, BrokerDeleteArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Broker.
-     * @param {BrokerUpdateArgs} args - Arguments to update one Broker.
-     * @example
-     * // Update one Broker
-     * const broker = await prisma.broker.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends BrokerUpdateArgs>(args: SelectSubset<T, BrokerUpdateArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Brokers.
-     * @param {BrokerDeleteManyArgs} args - Arguments to filter Brokers to delete.
-     * @example
-     * // Delete a few Brokers
-     * const { count } = await prisma.broker.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends BrokerDeleteManyArgs>(args?: SelectSubset<T, BrokerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Brokers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Brokers
-     * const broker = await prisma.broker.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends BrokerUpdateManyArgs>(args: SelectSubset<T, BrokerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Brokers and returns the data updated in the database.
-     * @param {BrokerUpdateManyAndReturnArgs} args - Arguments to update many Brokers.
-     * @example
-     * // Update many Brokers
-     * const broker = await prisma.broker.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Brokers and only return the `id`
-     * const brokerWithIdOnly = await prisma.broker.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends BrokerUpdateManyAndReturnArgs>(args: SelectSubset<T, BrokerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Broker.
-     * @param {BrokerUpsertArgs} args - Arguments to update or create a Broker.
-     * @example
-     * // Update or create a Broker
-     * const broker = await prisma.broker.upsert({
-     *   create: {
-     *     // ... data to create a Broker
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Broker we want to update
-     *   }
-     * })
-     */
-    upsert<T extends BrokerUpsertArgs>(args: SelectSubset<T, BrokerUpsertArgs<ExtArgs>>): Prisma__BrokerClient<$Result.GetResult<Prisma.$BrokerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Brokers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerCountArgs} args - Arguments to filter Brokers to count.
-     * @example
-     * // Count the number of Brokers
-     * const count = await prisma.broker.count({
-     *   where: {
-     *     // ... the filter for the Brokers we want to count
-     *   }
-     * })
-    **/
-    count<T extends BrokerCountArgs>(
-      args?: Subset<T, BrokerCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], BrokerCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Broker.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends BrokerAggregateArgs>(args: Subset<T, BrokerAggregateArgs>): Prisma.PrismaPromise<GetBrokerAggregateType<T>>
-
-    /**
-     * Group by Broker.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {BrokerGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends BrokerGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: BrokerGroupByArgs['orderBy'] }
-        : { orderBy?: BrokerGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, BrokerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBrokerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Broker model
-   */
-  readonly fields: BrokerFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Broker.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__BrokerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    assigned<T extends Broker$assignedArgs<ExtArgs> = {}>(args?: Subset<T, Broker$assignedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Broker model
-   */
-  interface BrokerFieldRefs {
-    readonly id: FieldRef<"Broker", 'Int'>
-    readonly name: FieldRef<"Broker", 'String'>
-    readonly email: FieldRef<"Broker", 'String'>
-    readonly password: FieldRef<"Broker", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Broker findUnique
-   */
-  export type BrokerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * Filter, which Broker to fetch.
-     */
-    where: BrokerWhereUniqueInput
-  }
-
-  /**
-   * Broker findUniqueOrThrow
-   */
-  export type BrokerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * Filter, which Broker to fetch.
-     */
-    where: BrokerWhereUniqueInput
-  }
-
-  /**
-   * Broker findFirst
-   */
-  export type BrokerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * Filter, which Broker to fetch.
-     */
-    where?: BrokerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Brokers to fetch.
-     */
-    orderBy?: BrokerOrderByWithRelationInput | BrokerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Brokers.
-     */
-    cursor?: BrokerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Brokers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Brokers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Brokers.
-     */
-    distinct?: BrokerScalarFieldEnum | BrokerScalarFieldEnum[]
-  }
-
-  /**
-   * Broker findFirstOrThrow
-   */
-  export type BrokerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * Filter, which Broker to fetch.
-     */
-    where?: BrokerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Brokers to fetch.
-     */
-    orderBy?: BrokerOrderByWithRelationInput | BrokerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Brokers.
-     */
-    cursor?: BrokerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Brokers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Brokers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Brokers.
-     */
-    distinct?: BrokerScalarFieldEnum | BrokerScalarFieldEnum[]
-  }
-
-  /**
-   * Broker findMany
-   */
-  export type BrokerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * Filter, which Brokers to fetch.
-     */
-    where?: BrokerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Brokers to fetch.
-     */
-    orderBy?: BrokerOrderByWithRelationInput | BrokerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Brokers.
-     */
-    cursor?: BrokerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Brokers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Brokers.
-     */
-    skip?: number
-    distinct?: BrokerScalarFieldEnum | BrokerScalarFieldEnum[]
-  }
-
-  /**
-   * Broker create
-   */
-  export type BrokerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Broker.
-     */
-    data: XOR<BrokerCreateInput, BrokerUncheckedCreateInput>
-  }
-
-  /**
-   * Broker createMany
-   */
-  export type BrokerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Brokers.
-     */
-    data: BrokerCreateManyInput | BrokerCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Broker createManyAndReturn
-   */
-  export type BrokerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * The data used to create many Brokers.
-     */
-    data: BrokerCreateManyInput | BrokerCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Broker update
-   */
-  export type BrokerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Broker.
-     */
-    data: XOR<BrokerUpdateInput, BrokerUncheckedUpdateInput>
-    /**
-     * Choose, which Broker to update.
-     */
-    where: BrokerWhereUniqueInput
-  }
-
-  /**
-   * Broker updateMany
-   */
-  export type BrokerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Brokers.
-     */
-    data: XOR<BrokerUpdateManyMutationInput, BrokerUncheckedUpdateManyInput>
-    /**
-     * Filter which Brokers to update
-     */
-    where?: BrokerWhereInput
-    /**
-     * Limit how many Brokers to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * Broker updateManyAndReturn
-   */
-  export type BrokerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * The data used to update Brokers.
-     */
-    data: XOR<BrokerUpdateManyMutationInput, BrokerUncheckedUpdateManyInput>
-    /**
-     * Filter which Brokers to update
-     */
-    where?: BrokerWhereInput
-    /**
-     * Limit how many Brokers to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * Broker upsert
-   */
-  export type BrokerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Broker to update in case it exists.
-     */
-    where: BrokerWhereUniqueInput
-    /**
-     * In case the Broker found by the `where` argument doesn't exist, create a new Broker with this data.
-     */
-    create: XOR<BrokerCreateInput, BrokerUncheckedCreateInput>
-    /**
-     * In case the Broker was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<BrokerUpdateInput, BrokerUncheckedUpdateInput>
-  }
-
-  /**
-   * Broker delete
-   */
-  export type BrokerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-    /**
-     * Filter which Broker to delete.
-     */
-    where: BrokerWhereUniqueInput
-  }
-
-  /**
-   * Broker deleteMany
-   */
-  export type BrokerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Brokers to delete
-     */
-    where?: BrokerWhereInput
-    /**
-     * Limit how many Brokers to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * Broker.assigned
-   */
-  export type Broker$assignedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the User
-     */
-    omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
-    cursor?: UserWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
-  }
-
-  /**
-   * Broker without action
-   */
-  export type BrokerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Broker
-     */
-    select?: BrokerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Broker
-     */
-    omit?: BrokerOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BrokerInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Enums
    */
 
@@ -4507,13 +4424,25 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const DocumentScalarFieldEnum: {
+    id: 'id',
+    type: 'type',
+    url: 'url',
+    createdAt: 'createdAt'
+  };
+
+  export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
+
+
   export const UserScalarFieldEnum: {
     id: 'id',
     email: 'email',
     password: 'password',
+    name: 'name',
     role: 'role',
     createdAt: 'createdAt',
-    brokerId: 'brokerId'
+    updatedAt: 'updatedAt',
+    managerId: 'managerId'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -4524,21 +4453,12 @@ export namespace Prisma {
     title: 'title',
     description: 'description',
     price: 'price',
-    sellerId: 'sellerId',
-    createdAt: 'createdAt'
+    status: 'status',
+    createdAt: 'createdAt',
+    sellerId: 'sellerId'
   };
 
   export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
-
-
-  export const BrokerScalarFieldEnum: {
-    id: 'id',
-    name: 'name',
-    email: 'email',
-    password: 'password'
-  };
-
-  export type BrokerScalarFieldEnum = (typeof BrokerScalarFieldEnum)[keyof typeof BrokerScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -4571,20 +4491,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
@@ -4599,16 +4505,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Role'
+   * Reference to a field of type 'DocumentType'
    */
-  export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
+  export type EnumDocumentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentType'>
     
 
 
   /**
-   * Reference to a field of type 'Role[]'
+   * Reference to a field of type 'DocumentType[]'
    */
-  export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
+  export type ListEnumDocumentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentType[]'>
     
 
 
@@ -4627,6 +4533,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'UserRole'
+   */
+  export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+  /**
+   * Reference to a field of type 'UserRole[]'
+   */
+  export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4638,86 +4558,173 @@ export namespace Prisma {
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
+
+
+  /**
+   * Reference to a field of type 'ListingStatus'
+   */
+  export type EnumListingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ListingStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ListingStatus[]'
+   */
+  export type ListEnumListingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ListingStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
   /**
    * Deep Input Types
    */
 
 
+  export type DocumentWhereInput = {
+    AND?: DocumentWhereInput | DocumentWhereInput[]
+    OR?: DocumentWhereInput[]
+    NOT?: DocumentWhereInput | DocumentWhereInput[]
+    id?: StringFilter<"Document"> | string
+    type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
+    url?: StringFilter<"Document"> | string
+    createdAt?: DateTimeFilter<"Document"> | Date | string
+  }
+
+  export type DocumentOrderByWithRelationInput = {
+    id?: SortOrder
+    type?: SortOrder
+    url?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DocumentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DocumentWhereInput | DocumentWhereInput[]
+    OR?: DocumentWhereInput[]
+    NOT?: DocumentWhereInput | DocumentWhereInput[]
+    type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
+    url?: StringFilter<"Document"> | string
+    createdAt?: DateTimeFilter<"Document"> | Date | string
+  }, "id">
+
+  export type DocumentOrderByWithAggregationInput = {
+    id?: SortOrder
+    type?: SortOrder
+    url?: SortOrder
+    createdAt?: SortOrder
+    _count?: DocumentCountOrderByAggregateInput
+    _max?: DocumentMaxOrderByAggregateInput
+    _min?: DocumentMinOrderByAggregateInput
+  }
+
+  export type DocumentScalarWhereWithAggregatesInput = {
+    AND?: DocumentScalarWhereWithAggregatesInput | DocumentScalarWhereWithAggregatesInput[]
+    OR?: DocumentScalarWhereWithAggregatesInput[]
+    NOT?: DocumentScalarWhereWithAggregatesInput | DocumentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Document"> | string
+    type?: EnumDocumentTypeWithAggregatesFilter<"Document"> | $Enums.DocumentType
+    url?: StringWithAggregatesFilter<"Document"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
+  }
+
   export type UserWhereInput = {
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
-    id?: IntFilter<"User"> | number
+    id?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
-    role?: EnumRoleFilter<"User"> | $Enums.Role
+    name?: StringFilter<"User"> | string
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeFilter<"User"> | Date | string
-    brokerId?: IntNullableFilter<"User"> | number | null
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+    managerId?: StringNullableFilter<"User"> | string | null
+    managedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    managing?: UserListRelationFilter
     listings?: ListingListRelationFilter
-    assignedBy?: XOR<BrokerNullableScalarRelationFilter, BrokerWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    name?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
-    brokerId?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    managerId?: SortOrderInput | SortOrder
+    managedBy?: UserOrderByWithRelationInput
+    managing?: UserOrderByRelationAggregateInput
     listings?: ListingOrderByRelationAggregateInput
-    assignedBy?: BrokerOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     email?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     password?: StringFilter<"User"> | string
-    role?: EnumRoleFilter<"User"> | $Enums.Role
+    name?: StringFilter<"User"> | string
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeFilter<"User"> | Date | string
-    brokerId?: IntNullableFilter<"User"> | number | null
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+    managerId?: StringNullableFilter<"User"> | string | null
+    managedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    managing?: UserListRelationFilter
     listings?: ListingListRelationFilter
-    assignedBy?: XOR<BrokerNullableScalarRelationFilter, BrokerWhereInput> | null
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    name?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
-    brokerId?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    managerId?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
-    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
-    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
     AND?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"User"> | number
+    id?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
     password?: StringWithAggregatesFilter<"User"> | string
-    role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
+    name?: StringWithAggregatesFilter<"User"> | string
+    role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-    brokerId?: IntNullableWithAggregatesFilter<"User"> | number | null
+    updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    managerId?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type ListingWhereInput = {
     AND?: ListingWhereInput | ListingWhereInput[]
     OR?: ListingWhereInput[]
     NOT?: ListingWhereInput | ListingWhereInput[]
-    id?: IntFilter<"Listing"> | number
+    id?: StringFilter<"Listing"> | string
     title?: StringFilter<"Listing"> | string
     description?: StringFilter<"Listing"> | string
     price?: FloatFilter<"Listing"> | number
-    sellerId?: IntFilter<"Listing"> | number
+    status?: EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
     createdAt?: DateTimeFilter<"Listing"> | Date | string
+    sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -4726,21 +4733,23 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    sellerId?: SortOrder
     seller?: UserOrderByWithRelationInput
   }
 
   export type ListingWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: ListingWhereInput | ListingWhereInput[]
     OR?: ListingWhereInput[]
     NOT?: ListingWhereInput | ListingWhereInput[]
     title?: StringFilter<"Listing"> | string
     description?: StringFilter<"Listing"> | string
     price?: FloatFilter<"Listing"> | number
-    sellerId?: IntFilter<"Listing"> | number
+    status?: EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
     createdAt?: DateTimeFilter<"Listing"> | Date | string
+    sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
@@ -4749,8 +4758,9 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    sellerId?: SortOrder
     _count?: ListingCountOrderByAggregateInput
     _avg?: ListingAvgOrderByAggregateInput
     _max?: ListingMaxOrderByAggregateInput
@@ -4762,247 +4772,215 @@ export namespace Prisma {
     AND?: ListingScalarWhereWithAggregatesInput | ListingScalarWhereWithAggregatesInput[]
     OR?: ListingScalarWhereWithAggregatesInput[]
     NOT?: ListingScalarWhereWithAggregatesInput | ListingScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Listing"> | number
+    id?: StringWithAggregatesFilter<"Listing"> | string
     title?: StringWithAggregatesFilter<"Listing"> | string
     description?: StringWithAggregatesFilter<"Listing"> | string
     price?: FloatWithAggregatesFilter<"Listing"> | number
-    sellerId?: IntWithAggregatesFilter<"Listing"> | number
+    status?: EnumListingStatusWithAggregatesFilter<"Listing"> | $Enums.ListingStatus
     createdAt?: DateTimeWithAggregatesFilter<"Listing"> | Date | string
+    sellerId?: StringWithAggregatesFilter<"Listing"> | string
   }
 
-  export type BrokerWhereInput = {
-    AND?: BrokerWhereInput | BrokerWhereInput[]
-    OR?: BrokerWhereInput[]
-    NOT?: BrokerWhereInput | BrokerWhereInput[]
-    id?: IntFilter<"Broker"> | number
-    name?: StringFilter<"Broker"> | string
-    email?: StringFilter<"Broker"> | string
-    password?: StringFilter<"Broker"> | string
-    assigned?: UserListRelationFilter
+  export type DocumentCreateInput = {
+    id?: string
+    type: $Enums.DocumentType
+    url: string
+    createdAt?: Date | string
   }
 
-  export type BrokerOrderByWithRelationInput = {
-    id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
-    assigned?: UserOrderByRelationAggregateInput
+  export type DocumentUncheckedCreateInput = {
+    id?: string
+    type: $Enums.DocumentType
+    url: string
+    createdAt?: Date | string
   }
 
-  export type BrokerWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
-    email?: string
-    AND?: BrokerWhereInput | BrokerWhereInput[]
-    OR?: BrokerWhereInput[]
-    NOT?: BrokerWhereInput | BrokerWhereInput[]
-    name?: StringFilter<"Broker"> | string
-    password?: StringFilter<"Broker"> | string
-    assigned?: UserListRelationFilter
-  }, "id" | "email">
-
-  export type BrokerOrderByWithAggregationInput = {
-    id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
-    _count?: BrokerCountOrderByAggregateInput
-    _avg?: BrokerAvgOrderByAggregateInput
-    _max?: BrokerMaxOrderByAggregateInput
-    _min?: BrokerMinOrderByAggregateInput
-    _sum?: BrokerSumOrderByAggregateInput
+  export type DocumentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    url?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type BrokerScalarWhereWithAggregatesInput = {
-    AND?: BrokerScalarWhereWithAggregatesInput | BrokerScalarWhereWithAggregatesInput[]
-    OR?: BrokerScalarWhereWithAggregatesInput[]
-    NOT?: BrokerScalarWhereWithAggregatesInput | BrokerScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Broker"> | number
-    name?: StringWithAggregatesFilter<"Broker"> | string
-    email?: StringWithAggregatesFilter<"Broker"> | string
-    password?: StringWithAggregatesFilter<"Broker"> | string
+  export type DocumentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    url?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentCreateManyInput = {
+    id?: string
+    type: $Enums.DocumentType
+    url: string
+    createdAt?: Date | string
+  }
+
+  export type DocumentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    url?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    url?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserCreateInput = {
+    id?: string
     email: string
     password: string
-    role?: $Enums.Role
+    name?: string
+    role?: $Enums.UserRole
     createdAt?: Date | string
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
-    assignedBy?: BrokerCreateNestedOneWithoutAssignedInput
   }
 
   export type UserUncheckedCreateInput = {
-    id?: number
+    id?: string
     email: string
     password: string
-    role?: $Enums.Role
+    name?: string
+    role?: $Enums.UserRole
     createdAt?: Date | string
-    brokerId?: number | null
+    updatedAt?: Date | string
+    managerId?: string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
-    assignedBy?: BrokerUpdateOneWithoutAssignedNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    brokerId?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyInput = {
-    id?: number
+    id?: string
     email: string
     password: string
-    role?: $Enums.Role
+    name?: string
+    role?: $Enums.UserRole
     createdAt?: Date | string
-    brokerId?: number | null
+    updatedAt?: Date | string
+    managerId?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    brokerId?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ListingCreateInput = {
+    id?: string
     title: string
     description: string
     price: number
+    status?: $Enums.ListingStatus
     createdAt?: Date | string
     seller: UserCreateNestedOneWithoutListingsInput
   }
 
   export type ListingUncheckedCreateInput = {
-    id?: number
+    id?: string
     title: string
     description: string
     price: number
-    sellerId: number
+    status?: $Enums.ListingStatus
     createdAt?: Date | string
+    sellerId: string
   }
 
   export type ListingUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutListingsNestedInput
   }
 
   export type ListingUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
-    sellerId?: IntFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ListingCreateManyInput = {
-    id?: number
+    id?: string
     title: string
     description: string
     price: number
-    sellerId: number
+    status?: $Enums.ListingStatus
     createdAt?: Date | string
+    sellerId: string
   }
 
   export type ListingUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ListingUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
-    sellerId?: IntFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type BrokerCreateInput = {
-    name: string
-    email: string
-    password: string
-    assigned?: UserCreateNestedManyWithoutAssignedByInput
-  }
-
-  export type BrokerUncheckedCreateInput = {
-    id?: number
-    name: string
-    email: string
-    password: string
-    assigned?: UserUncheckedCreateNestedManyWithoutAssignedByInput
-  }
-
-  export type BrokerUpdateInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    assigned?: UserUpdateManyWithoutAssignedByNestedInput
-  }
-
-  export type BrokerUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    assigned?: UserUncheckedUpdateManyWithoutAssignedByNestedInput
-  }
-
-  export type BrokerCreateManyInput = {
-    id?: number
-    name: string
-    email: string
-    password: string
-  }
-
-  export type BrokerUpdateManyMutationInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type BrokerUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+    sellerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -5020,11 +4998,11 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type EnumRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
+  export type EnumDocumentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentType | EnumDocumentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentTypeFilter<$PrismaModel> | $Enums.DocumentType
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -5038,88 +5016,25 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type ListingListRelationFilter = {
-    every?: ListingWhereInput
-    some?: ListingWhereInput
-    none?: ListingWhereInput
-  }
-
-  export type BrokerNullableScalarRelationFilter = {
-    is?: BrokerWhereInput | null
-    isNot?: BrokerWhereInput | null
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
-  export type ListingOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserCountOrderByAggregateInput = {
+  export type DocumentCountOrderByAggregateInput = {
     id?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
-    role?: SortOrder
+    type?: SortOrder
+    url?: SortOrder
     createdAt?: SortOrder
-    brokerId?: SortOrder
   }
 
-  export type UserAvgOrderByAggregateInput = {
+  export type DocumentMaxOrderByAggregateInput = {
     id?: SortOrder
-    brokerId?: SortOrder
-  }
-
-  export type UserMaxOrderByAggregateInput = {
-    id?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
-    role?: SortOrder
+    type?: SortOrder
+    url?: SortOrder
     createdAt?: SortOrder
-    brokerId?: SortOrder
   }
 
-  export type UserMinOrderByAggregateInput = {
+  export type DocumentMinOrderByAggregateInput = {
     id?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
-    role?: SortOrder
+    type?: SortOrder
+    url?: SortOrder
     createdAt?: SortOrder
-    brokerId?: SortOrder
-  }
-
-  export type UserSumOrderByAggregateInput = {
-    id?: SortOrder
-    brokerId?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5140,14 +5055,14 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
+  export type EnumDocumentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentType | EnumDocumentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentTypeWithAggregatesFilter<$PrismaModel> | $Enums.DocumentType
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumRoleFilter<$PrismaModel>
-    _max?: NestedEnumRoleFilter<$PrismaModel>
+    _min?: NestedEnumDocumentTypeFilter<$PrismaModel>
+    _max?: NestedEnumDocumentTypeFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -5164,20 +5079,117 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+  export type EnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type UserListRelationFilter = {
+    every?: UserWhereInput
+    some?: UserWhereInput
+    none?: UserWhereInput
+  }
+
+  export type ListingListRelationFilter = {
+    every?: ListingWhereInput
+    some?: ListingWhereInput
+    none?: ListingWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ListingOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UserCountOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    password?: SortOrder
+    name?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    managerId?: SortOrder
+  }
+
+  export type UserMaxOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    password?: SortOrder
+    name?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    managerId?: SortOrder
+  }
+
+  export type UserMinOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    password?: SortOrder
+    name?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    managerId?: SortOrder
+  }
+
+  export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -5191,6 +5203,13 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type EnumListingStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ListingStatus | EnumListingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -5201,14 +5220,13 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    sellerId?: SortOrder
   }
 
   export type ListingAvgOrderByAggregateInput = {
-    id?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
   }
 
   export type ListingMaxOrderByAggregateInput = {
@@ -5216,8 +5234,9 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    sellerId?: SortOrder
   }
 
   export type ListingMinOrderByAggregateInput = {
@@ -5225,14 +5244,13 @@ export namespace Prisma {
     title?: SortOrder
     description?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    sellerId?: SortOrder
   }
 
   export type ListingSumOrderByAggregateInput = {
-    id?: SortOrder
     price?: SortOrder
-    sellerId?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -5251,43 +5269,39 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
-  export type UserListRelationFilter = {
-    every?: UserWhereInput
-    some?: UserWhereInput
-    none?: UserWhereInput
+  export type EnumListingStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ListingStatus | EnumListingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumListingStatusWithAggregatesFilter<$PrismaModel> | $Enums.ListingStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumListingStatusFilter<$PrismaModel>
+    _max?: NestedEnumListingStatusFilter<$PrismaModel>
   }
 
-  export type UserOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
   }
 
-  export type BrokerCountOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
+  export type EnumDocumentTypeFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentType
   }
 
-  export type BrokerAvgOrderByAggregateInput = {
-    id?: SortOrder
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
   }
 
-  export type BrokerMaxOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
+  export type UserCreateNestedOneWithoutManagingInput = {
+    create?: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
+    connectOrCreate?: UserCreateOrConnectWithoutManagingInput
+    connect?: UserWhereUniqueInput
   }
 
-  export type BrokerMinOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
-  }
-
-  export type BrokerSumOrderByAggregateInput = {
-    id?: SortOrder
+  export type UserCreateNestedManyWithoutManagedByInput = {
+    create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
+    createMany?: UserCreateManyManagedByInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type ListingCreateNestedManyWithoutSellerInput = {
@@ -5297,10 +5311,11 @@ export namespace Prisma {
     connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
   }
 
-  export type BrokerCreateNestedOneWithoutAssignedInput = {
-    create?: XOR<BrokerCreateWithoutAssignedInput, BrokerUncheckedCreateWithoutAssignedInput>
-    connectOrCreate?: BrokerCreateOrConnectWithoutAssignedInput
-    connect?: BrokerWhereUniqueInput
+  export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
+    create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
+    createMany?: UserCreateManyManagedByInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type ListingUncheckedCreateNestedManyWithoutSellerInput = {
@@ -5310,16 +5325,32 @@ export namespace Prisma {
     connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
+  export type EnumUserRoleFieldUpdateOperationsInput = {
+    set?: $Enums.UserRole
   }
 
-  export type EnumRoleFieldUpdateOperationsInput = {
-    set?: $Enums.Role
+  export type UserUpdateOneWithoutManagingNestedInput = {
+    create?: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
+    connectOrCreate?: UserCreateOrConnectWithoutManagingInput
+    upsert?: UserUpsertWithoutManagingInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutManagingInput, UserUpdateWithoutManagingInput>, UserUncheckedUpdateWithoutManagingInput>
   }
 
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
+  export type UserUpdateManyWithoutManagedByNestedInput = {
+    create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutManagedByInput | UserUpsertWithWhereUniqueWithoutManagedByInput[]
+    createMany?: UserCreateManyManagedByInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutManagedByInput | UserUpdateWithWhereUniqueWithoutManagedByInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutManagedByInput | UserUpdateManyWithWhereWithoutManagedByInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type ListingUpdateManyWithoutSellerNestedInput = {
@@ -5336,30 +5367,22 @@ export namespace Prisma {
     deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
   }
 
-  export type BrokerUpdateOneWithoutAssignedNestedInput = {
-    create?: XOR<BrokerCreateWithoutAssignedInput, BrokerUncheckedCreateWithoutAssignedInput>
-    connectOrCreate?: BrokerCreateOrConnectWithoutAssignedInput
-    upsert?: BrokerUpsertWithoutAssignedInput
-    disconnect?: BrokerWhereInput | boolean
-    delete?: BrokerWhereInput | boolean
-    connect?: BrokerWhereUniqueInput
-    update?: XOR<XOR<BrokerUpdateToOneWithWhereWithoutAssignedInput, BrokerUpdateWithoutAssignedInput>, BrokerUncheckedUpdateWithoutAssignedInput>
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
+    create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutManagedByInput | UserUpsertWithWhereUniqueWithoutManagedByInput[]
+    createMany?: UserCreateManyManagedByInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutManagedByInput | UserUpdateWithWhereUniqueWithoutManagedByInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutManagedByInput | UserUpdateManyWithWhereWithoutManagedByInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type ListingUncheckedUpdateManyWithoutSellerNestedInput = {
@@ -5390,65 +5413,16 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type EnumListingStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ListingStatus
+  }
+
   export type UserUpdateOneRequiredWithoutListingsNestedInput = {
     create?: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
     connectOrCreate?: UserCreateOrConnectWithoutListingsInput
     upsert?: UserUpsertWithoutListingsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutListingsInput, UserUpdateWithoutListingsInput>, UserUncheckedUpdateWithoutListingsInput>
-  }
-
-  export type UserCreateNestedManyWithoutAssignedByInput = {
-    create?: XOR<UserCreateWithoutAssignedByInput, UserUncheckedCreateWithoutAssignedByInput> | UserCreateWithoutAssignedByInput[] | UserUncheckedCreateWithoutAssignedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutAssignedByInput | UserCreateOrConnectWithoutAssignedByInput[]
-    createMany?: UserCreateManyAssignedByInputEnvelope
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-  }
-
-  export type UserUncheckedCreateNestedManyWithoutAssignedByInput = {
-    create?: XOR<UserCreateWithoutAssignedByInput, UserUncheckedCreateWithoutAssignedByInput> | UserCreateWithoutAssignedByInput[] | UserUncheckedCreateWithoutAssignedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutAssignedByInput | UserCreateOrConnectWithoutAssignedByInput[]
-    createMany?: UserCreateManyAssignedByInputEnvelope
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-  }
-
-  export type UserUpdateManyWithoutAssignedByNestedInput = {
-    create?: XOR<UserCreateWithoutAssignedByInput, UserUncheckedCreateWithoutAssignedByInput> | UserCreateWithoutAssignedByInput[] | UserUncheckedCreateWithoutAssignedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutAssignedByInput | UserCreateOrConnectWithoutAssignedByInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutAssignedByInput | UserUpsertWithWhereUniqueWithoutAssignedByInput[]
-    createMany?: UserCreateManyAssignedByInputEnvelope
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutAssignedByInput | UserUpdateWithWhereUniqueWithoutAssignedByInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutAssignedByInput | UserUpdateManyWithWhereWithoutAssignedByInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
-  }
-
-  export type UserUncheckedUpdateManyWithoutAssignedByNestedInput = {
-    create?: XOR<UserCreateWithoutAssignedByInput, UserUncheckedCreateWithoutAssignedByInput> | UserCreateWithoutAssignedByInput[] | UserUncheckedCreateWithoutAssignedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutAssignedByInput | UserCreateOrConnectWithoutAssignedByInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutAssignedByInput | UserUpsertWithWhereUniqueWithoutAssignedByInput[]
-    createMany?: UserCreateManyAssignedByInputEnvelope
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutAssignedByInput | UserUpdateWithWhereUniqueWithoutAssignedByInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutAssignedByInput | UserUpdateManyWithWhereWithoutAssignedByInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -5465,11 +5439,11 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedEnumRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
+  export type NestedEnumDocumentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentType | EnumDocumentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentTypeFilter<$PrismaModel> | $Enums.DocumentType
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -5481,44 +5455,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5538,14 +5474,25 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedEnumRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumDocumentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentType | EnumDocumentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentTypeWithAggregatesFilter<$PrismaModel> | $Enums.DocumentType
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumRoleFilter<$PrismaModel>
-    _max?: NestedEnumRoleFilter<$PrismaModel>
+    _min?: NestedEnumDocumentTypeFilter<$PrismaModel>
+    _max?: NestedEnumDocumentTypeFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -5562,7 +5509,55 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -5570,23 +5565,25 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumListingStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ListingStatus | EnumListingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -5605,18 +5602,94 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type NestedEnumListingStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ListingStatus | EnumListingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumListingStatusWithAggregatesFilter<$PrismaModel> | $Enums.ListingStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumListingStatusFilter<$PrismaModel>
+    _max?: NestedEnumListingStatusFilter<$PrismaModel>
+  }
+
+  export type UserCreateWithoutManagingInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutManagingInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutManagingInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
+  }
+
+  export type UserCreateWithoutManagedByInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutManagedByInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutManagedByInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput>
+  }
+
+  export type UserCreateManyManagedByInputEnvelope = {
+    data: UserCreateManyManagedByInput | UserCreateManyManagedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ListingCreateWithoutSellerInput = {
+    id?: string
     title: string
     description: string
     price: number
+    status?: $Enums.ListingStatus
     createdAt?: Date | string
   }
 
   export type ListingUncheckedCreateWithoutSellerInput = {
-    id?: number
+    id?: string
     title: string
     description: string
     price: number
+    status?: $Enums.ListingStatus
     createdAt?: Date | string
   }
 
@@ -5630,22 +5703,69 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type BrokerCreateWithoutAssignedInput = {
-    name: string
-    email: string
-    password: string
+  export type UserUpsertWithoutManagingInput = {
+    update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
+    create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
+    where?: UserWhereInput
   }
 
-  export type BrokerUncheckedCreateWithoutAssignedInput = {
-    id?: number
-    name: string
-    email: string
-    password: string
+  export type UserUpdateToOneWithWhereWithoutManagingInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
   }
 
-  export type BrokerCreateOrConnectWithoutAssignedInput = {
-    where: BrokerWhereUniqueInput
-    create: XOR<BrokerCreateWithoutAssignedInput, BrokerUncheckedCreateWithoutAssignedInput>
+  export type UserUpdateWithoutManagingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutManagingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutManagedByInput, UserUncheckedUpdateWithoutManagedByInput>
+    create: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutManagedByInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutManagedByInput, UserUncheckedUpdateWithoutManagedByInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutManagedByInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutManagedByInput>
+  }
+
+  export type UserScalarWhereInput = {
+    AND?: UserScalarWhereInput | UserScalarWhereInput[]
+    OR?: UserScalarWhereInput[]
+    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
+    id?: StringFilter<"User"> | string
+    email?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
+    name?: StringFilter<"User"> | string
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
+    createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+    managerId?: StringNullableFilter<"User"> | string | null
   }
 
   export type ListingUpsertWithWhereUniqueWithoutSellerInput = {
@@ -5668,53 +5788,37 @@ export namespace Prisma {
     AND?: ListingScalarWhereInput | ListingScalarWhereInput[]
     OR?: ListingScalarWhereInput[]
     NOT?: ListingScalarWhereInput | ListingScalarWhereInput[]
-    id?: IntFilter<"Listing"> | number
+    id?: StringFilter<"Listing"> | string
     title?: StringFilter<"Listing"> | string
     description?: StringFilter<"Listing"> | string
     price?: FloatFilter<"Listing"> | number
-    sellerId?: IntFilter<"Listing"> | number
+    status?: EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
     createdAt?: DateTimeFilter<"Listing"> | Date | string
-  }
-
-  export type BrokerUpsertWithoutAssignedInput = {
-    update: XOR<BrokerUpdateWithoutAssignedInput, BrokerUncheckedUpdateWithoutAssignedInput>
-    create: XOR<BrokerCreateWithoutAssignedInput, BrokerUncheckedCreateWithoutAssignedInput>
-    where?: BrokerWhereInput
-  }
-
-  export type BrokerUpdateToOneWithWhereWithoutAssignedInput = {
-    where?: BrokerWhereInput
-    data: XOR<BrokerUpdateWithoutAssignedInput, BrokerUncheckedUpdateWithoutAssignedInput>
-  }
-
-  export type BrokerUpdateWithoutAssignedInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type BrokerUncheckedUpdateWithoutAssignedInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFilter<"Listing"> | string
   }
 
   export type UserCreateWithoutListingsInput = {
+    id?: string
     email: string
     password: string
-    role?: $Enums.Role
+    name?: string
+    role?: $Enums.UserRole
     createdAt?: Date | string
-    assignedBy?: BrokerCreateNestedOneWithoutAssignedInput
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
-    id?: number
+    id?: string
     email: string
     password: string
-    role?: $Enums.Role
+    name?: string
+    role?: $Enums.UserRole
     createdAt?: Date | string
-    brokerId?: number | null
+    updatedAt?: Date | string
+    managerId?: string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
@@ -5734,138 +5838,106 @@ export namespace Prisma {
   }
 
   export type UserUpdateWithoutListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    assignedBy?: BrokerUpdateOneWithoutAssignedNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    brokerId?: NullableIntFieldUpdateOperationsInput | number | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
   }
 
-  export type UserCreateWithoutAssignedByInput = {
+  export type UserCreateManyManagedByInput = {
+    id?: string
     email: string
     password: string
-    role?: $Enums.Role
+    name?: string
+    role?: $Enums.UserRole
     createdAt?: Date | string
-    listings?: ListingCreateNestedManyWithoutSellerInput
-  }
-
-  export type UserUncheckedCreateWithoutAssignedByInput = {
-    id?: number
-    email: string
-    password: string
-    role?: $Enums.Role
-    createdAt?: Date | string
-    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
-  }
-
-  export type UserCreateOrConnectWithoutAssignedByInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutAssignedByInput, UserUncheckedCreateWithoutAssignedByInput>
-  }
-
-  export type UserCreateManyAssignedByInputEnvelope = {
-    data: UserCreateManyAssignedByInput | UserCreateManyAssignedByInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type UserUpsertWithWhereUniqueWithoutAssignedByInput = {
-    where: UserWhereUniqueInput
-    update: XOR<UserUpdateWithoutAssignedByInput, UserUncheckedUpdateWithoutAssignedByInput>
-    create: XOR<UserCreateWithoutAssignedByInput, UserUncheckedCreateWithoutAssignedByInput>
-  }
-
-  export type UserUpdateWithWhereUniqueWithoutAssignedByInput = {
-    where: UserWhereUniqueInput
-    data: XOR<UserUpdateWithoutAssignedByInput, UserUncheckedUpdateWithoutAssignedByInput>
-  }
-
-  export type UserUpdateManyWithWhereWithoutAssignedByInput = {
-    where: UserScalarWhereInput
-    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutAssignedByInput>
-  }
-
-  export type UserScalarWhereInput = {
-    AND?: UserScalarWhereInput | UserScalarWhereInput[]
-    OR?: UserScalarWhereInput[]
-    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
-    id?: IntFilter<"User"> | number
-    email?: StringFilter<"User"> | string
-    password?: StringFilter<"User"> | string
-    role?: EnumRoleFilter<"User"> | $Enums.Role
-    createdAt?: DateTimeFilter<"User"> | Date | string
-    brokerId?: IntNullableFilter<"User"> | number | null
+    updatedAt?: Date | string
   }
 
   export type ListingCreateManySellerInput = {
-    id?: number
+    id?: string
     title: string
     description: string
     price: number
+    status?: $Enums.ListingStatus
     createdAt?: Date | string
   }
 
+  export type UserUpdateWithoutManagedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutManagedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutManagedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ListingUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ListingUncheckedUpdateWithoutSellerInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ListingUncheckedUpdateManyWithoutSellerInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserCreateManyAssignedByInput = {
-    id?: number
-    email: string
-    password: string
-    role?: $Enums.Role
-    createdAt?: Date | string
-  }
-
-  export type UserUpdateWithoutAssignedByInput = {
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    listings?: ListingUpdateManyWithoutSellerNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutAssignedByInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
-  }
-
-  export type UserUncheckedUpdateManyWithoutAssignedByInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

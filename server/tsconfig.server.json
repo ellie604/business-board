@@ -13,9 +13,14 @@
       "noEmit": false,
       "outDir": "./dist",
       "types": ["node"],
-      "forceConsistentCasingInFileNames": true
+      "forceConsistentCasingInFileNames": true,
+      "baseUrl": ".",
+      "paths": {
+        "*": ["*", "*.ts"]
+      },
+      "typeRoots": ["./src/types", "./node_modules/@types"]
     },
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*.ts", "*.ts"],
     "exclude": ["node_modules"]
   }
   

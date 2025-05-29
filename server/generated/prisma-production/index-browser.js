@@ -120,6 +120,13 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.DocumentScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  url: 'url',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -159,6 +166,13 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.DocumentType = exports.$Enums.DocumentType = {
+  NDA: 'NDA',
+  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
+  FINANCIAL_STATEMENT: 'FINANCIAL_STATEMENT',
+  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT'
+};
+
 exports.Role = exports.$Enums.Role = {
   BUYER: 'BUYER',
   SELLER: 'SELLER',
@@ -167,6 +181,7 @@ exports.Role = exports.$Enums.Role = {
 };
 
 exports.Prisma.ModelName = {
+  Document: 'Document',
   User: 'User',
   Listing: 'Listing',
   Broker: 'Broker'

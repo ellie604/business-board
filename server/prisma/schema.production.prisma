@@ -9,6 +9,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum DocumentType {
+  NDA
+  LISTING_AGREEMENT
+  FINANCIAL_STATEMENT
+  PURCHASE_CONTRACT
+}
+
+model Document {
+  id        String      @id @default(uuid())
+  type      DocumentType
+  url       String
+  createdAt DateTime    @default(now())
+}
+
+
 model User {
   id         Int       @id @default(autoincrement())
   email      String    @unique

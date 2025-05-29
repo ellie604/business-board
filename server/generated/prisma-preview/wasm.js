@@ -120,13 +120,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.DocumentScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  url: 'url',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   password: 'password',
+  name: 'name',
   role: 'role',
   createdAt: 'createdAt',
-  brokerId: 'brokerId'
+  updatedAt: 'updatedAt',
+  managerId: 'managerId'
 };
 
 exports.Prisma.ListingScalarFieldEnum = {
@@ -134,15 +143,9 @@ exports.Prisma.ListingScalarFieldEnum = {
   title: 'title',
   description: 'description',
   price: 'price',
-  sellerId: 'sellerId',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.BrokerScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  email: 'email',
-  password: 'password'
+  status: 'status',
+  createdAt: 'createdAt',
+  sellerId: 'sellerId'
 };
 
 exports.Prisma.SortOrder = {
@@ -159,17 +162,30 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-exports.Role = exports.$Enums.Role = {
-  BUYER: 'BUYER',
-  SELLER: 'SELLER',
+exports.DocumentType = exports.$Enums.DocumentType = {
+  NDA: 'NDA',
+  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
+  FINANCIAL_STATEMENT: 'FINANCIAL_STATEMENT',
+  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT'
+};
+
+exports.UserRole = exports.$Enums.UserRole = {
+  BROKER: 'BROKER',
   AGENT: 'AGENT',
-  BROKER: 'BROKER'
+  SELLER: 'SELLER',
+  BUYER: 'BUYER'
+};
+
+exports.ListingStatus = exports.$Enums.ListingStatus = {
+  ACTIVE: 'ACTIVE',
+  UNDER_CONTRACT: 'UNDER_CONTRACT',
+  CLOSED: 'CLOSED'
 };
 
 exports.Prisma.ModelName = {
+  Document: 'Document',
   User: 'User',
-  Listing: 'Listing',
-  Broker: 'Broker'
+  Listing: 'Listing'
 };
 
 /**

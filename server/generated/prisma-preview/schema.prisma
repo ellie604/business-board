@@ -1,3 +1,5 @@
+// server/prisma/schema.preview.prisma
+
 generator client {
   provider      = "prisma-client-js"
   output        = "../generated/prisma-preview"
@@ -9,38 +11,54 @@ datasource db {
   url      = env("PREVIEW_DATABASE_URL")
 }
 
+enum UserRole {
+  BROKER
+  AGENT
+  SELLER
+  BUYER
+}
+
+enum ListingStatus {
+  ACTIVE
+  UNDER_CONTRACT
+  CLOSED
+}
+
+enum DocumentType {
+  NDA
+  LISTING_AGREEMENT
+  FINANCIAL_STATEMENT
+  PURCHASE_CONTRACT
+}
+
+model Document {
+  id        String       @id @default(uuid())
+  type      DocumentType
+  url       String
+  createdAt DateTime     @default(now())
+}
+
 model User {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
-  password   String
-  role       Role      @default(BUYER)
-  createdAt  DateTime  @default(now())
-  brokerId   Int?
-  listings   Listing[] @relation("SellerListings")
-  assignedBy Broker?   @relation("BrokerAssignedUsers", fields: [brokerId], references: [id])
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String    @default("")
+  role      UserRole  @default(BUYER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  managedBy User?     @relation("UserManagement", fields: [managerId], references: [id])
+  managerId String?
+  managing  User[]    @relation("UserManagement")
+  listings  Listing[] @relation("SellerListings")
 }
 
 model Listing {
-  id          Int      @id @default(autoincrement())
+  id          String        @id @default(uuid())
   title       String
   description String
   price       Float
-  sellerId    Int
-  createdAt   DateTime @default(now())
-  seller      User     @relation("SellerListings", fields: [sellerId], references: [id])
-}
-
-model Broker {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
-  assigned User[] @relation("BrokerAssignedUsers")
-}
-
-enum Role {
-  BUYER
-  SELLER
-  AGENT
-  BROKER
+  status      ListingStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  sellerId    String
+  seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
 }
