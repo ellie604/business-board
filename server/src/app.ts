@@ -16,8 +16,8 @@ const getAllowedOrigins = () => {
     case 'production':
       return 'https://business-board.vercel.app';
     case 'preview':
-      // Vercel Preview 部署的域名模式
-      return /https:\/\/business-board-git-.*-xinyis-projects-6c0795d6\.vercel\.app/;
+      // 匹配任何包含 business-board 的 vercel.app 域名
+      return /https:\/\/business-board[a-zA-Z0-9-]+\.vercel\.app$/;
     default:
       return ['http://localhost:5174', 'http://localhost:5173'];
   }
