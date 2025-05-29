@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "NODE_ENV=development SESSION_SECRET=dev-secret nodemon --exec ts-node --project tsconfig.server.json src/index.ts",
     "build": "tsc -p tsconfig.server.json",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "seed:preview": "npx ts-node -T --project tsconfig.server.json seed.preview.ts",
     "seed:production": "npx ts-node -T --project tsconfig.server.json seed.production.ts"
   },
