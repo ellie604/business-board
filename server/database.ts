@@ -6,14 +6,16 @@ import { PrismaClient as ProductionPrismaClient } from './generated/prisma-produ
 import { PrismaClient as PreviewPrismaClient } from './generated/prisma-preview';
 
 // 创建一个全局的 prisma 实例
-let prisma: PreviewPrismaClient | null = null;
+let prisma: any = null;
 
 // 获取 prisma 实例的函数
 export function getPrisma() {
   if (!prisma) {
-    prisma = (process.env.NODE_ENV === 'production'
-      ? new ProductionPrismaClient()
-      : new PreviewPrismaClient()) as PreviewPrismaClient;
+    if (process.env.NODE_ENV === 'production') {
+      prisma = new ProductionPrismaClient();
+    } else {
+      prisma = new PreviewPrismaClient();
+    }
   }
   return prisma;
 }
