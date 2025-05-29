@@ -25,7 +25,7 @@ const getDashboardStats: RequestHandler = async (req: AuthenticatedRequest, res,
       },
     });
 
-    const agentIds = managedAgents.map((agent) => agent.id);
+    const agentIds = managedAgents.map((agent: { id: string }) => agent.id);
 
     const [activeListings, underContract, newListings, ndaCount, closedDeals] =
       await Promise.all([
