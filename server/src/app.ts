@@ -16,8 +16,8 @@ const getAllowedOrigins = () => {
     case 'production':
       return 'https://business-board.vercel.app';
     case 'preview':
-      // 匹配任何包含 business-board 的 vercel.app 域名
-      return /https:\/\/business-board[a-zA-Z0-9-]+\.vercel\.app$/;
+      // Vercel Preview 部署的域名模式
+      return /https:\/\/business-board-.*-xinyis-projects-6c0795d6\.vercel\.app/;
     default:
       return ['http://localhost:5174', 'http://localhost:5173'];
   }
@@ -27,10 +27,8 @@ const getAllowedOrigins = () => {
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigin = getAllowedOrigins();
-    console.log('\n=== CORS Debug Info ===');
     console.log('Request origin:', origin);
-    console.log('Current environment:', process.env.NODE_ENV);
-    console.log('Allowed origin pattern:', allowedOrigin);
+    console.log('Allowed origin:', allowedOrigin);
     
     // 允许没有 origin 的请求（比如同源请求）
     if (!origin) {
@@ -40,23 +38,18 @@ app.use(cors({
 
     // 如果 allowedOrigin 是正则表达式（preview 环境）
     if (allowedOrigin instanceof RegExp) {
-      const matches = allowedOrigin.test(origin);
-      console.log('Testing against regex:', allowedOrigin);
-      console.log('Matches regex?', matches);
-      if (matches) {
+      if (allowedOrigin.test(origin)) {
         console.log('Origin matched preview pattern');
         return callback(null, origin);
       }
     } else if (Array.isArray(allowedOrigin)) {
       // 如果是数组（开发环境），检查是否包含在允许的域名列表中
-      console.log('Checking against array:', allowedOrigin);
       if (allowedOrigin.includes(origin)) {
         console.log('Origin found in allowed origins array');
         return callback(null, origin);
       }
     } else {
       // 生产环境的精确匹配
-      console.log('Checking exact match with:', allowedOrigin);
       if (origin === allowedOrigin) {
         console.log('Origin exactly matched allowed origin');
         return callback(null, origin);
@@ -64,7 +57,6 @@ app.use(cors({
     }
 
     console.log('Origin not allowed');
-    console.log('=== End CORS Debug Info ===\n');
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
