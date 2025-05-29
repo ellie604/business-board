@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.server.json && cp -r generated dist/",
     "start": "node dist/src/index.js",
     "seed:preview": "npx ts-node -T --project tsconfig.server.json seed.preview.ts",
-    "seed:production": "npx ts-node -T --project tsconfig.server.json seed.production.ts"
+    "seed:production": "npx ts-node -T --project tsconfig.server.json seed.production.ts",
+    "prepare": "npm install typescript @types/express @types/express-session @types/cors @types/body-parser --no-save && npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",

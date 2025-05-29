@@ -1,17 +1,18 @@
-import { RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
 
 const prisma = getPrisma();
 
-export const authenticateBroker: RequestHandler = async (
-  req: AuthenticatedRequest,
-  res,
-  next
+export const authenticateBroker = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
   try {
+    const typedReq = req as AuthenticatedRequest;
     // 从 session 中获取用户信息
-    const user = req.session?.user;
+    const user = typedReq.session?.user;
     if (!user?.id) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -28,7 +29,7 @@ export const authenticateBroker: RequestHandler = async (
       return;
     }
 
-    req.user = dbUser;
+    typedReq.user = dbUser;
     next();
   } catch (error) {
     console.error('Authentication error:', error);

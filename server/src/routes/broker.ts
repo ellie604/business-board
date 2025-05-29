@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
 import { getPrisma } from '../../database';
 import { authenticateBroker } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types/custom';
@@ -7,13 +7,10 @@ const router = Router();
 const prisma = getPrisma();
 
 // 获取仪表板统计数据
-const getDashboardStats = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const getDashboardStats: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
   try {
-    const brokerId = req.user?.id;
+    const brokerId = typedReq.user?.id;
     if (!brokerId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -85,13 +82,10 @@ const getDashboardStats = async (
 };
 
 // 获取经纪人管理的代理列表
-const getAgents = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const getAgents: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
   try {
-    const brokerId = req.user?.id;
+    const brokerId = typedReq.user?.id;
     if (!brokerId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;

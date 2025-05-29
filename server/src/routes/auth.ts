@@ -21,21 +21,19 @@
 // export default router;
 
 // server/src/routes/auth.ts
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
 import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
 
 const router = Router();
 const prisma = getPrisma();
 
-const loginHandler = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
-  console.log('Login request received - Body:', req.body);
-  console.log('Session before login:', req.session);
+const loginHandler: RequestHandler = async (req, res) => {
+  const typedReq = req as AuthenticatedRequest;
+  console.log('Login request received - Body:', typedReq.body);
+  console.log('Session before login:', typedReq.session);
   
-  const { email, password } = req.body;
+  const { email, password } = typedReq.body;
   
   if (!email || !password) {
     console.error('Missing email or password in request');
@@ -87,20 +85,20 @@ const loginHandler = async (
     console.log('Login successful for:', email, 'with role:', user.role);
     
     // 设置 session
-    req.session.user = {
+    typedReq.session.user = {
       id: user.id,
       role: user.role
     };
 
     // 确保 session 被保存
-    req.session.save((error: Error | null) => {
+    typedReq.session.save((error: Error | null) => {
       if (error) {
         console.error('Session save error:', error);
         res.status(500).json({ message: 'Failed to save session' });
         return;
       }
 
-      console.log('Session after login:', req.session);
+      console.log('Session after login:', typedReq.session);
     
       res.json({ 
         message: 'Login successful',
@@ -125,10 +123,7 @@ const loginHandler = async (
 };
 
 // 测试路由 - 用于验证数据库连接
-const testUsersHandler = async (
-  req: Request,
-  res: Response
-) => {
+const testUsersHandler: RequestHandler = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
