@@ -1,4 +1,4 @@
-import { Router, RequestHandler } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { getPrisma } from '../../database';
 import { authenticateBroker } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types/custom';
@@ -7,7 +7,11 @@ const router = Router();
 const prisma = getPrisma();
 
 // 获取仪表板统计数据
-const getDashboardStats: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+const getDashboardStats = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const brokerId = req.user?.id;
     if (!brokerId) {
@@ -81,7 +85,11 @@ const getDashboardStats: RequestHandler = async (req: AuthenticatedRequest, res,
 };
 
 // 获取经纪人管理的代理列表
-const getAgents: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+const getAgents = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const brokerId = req.user?.id;
     if (!brokerId) {
@@ -111,7 +119,6 @@ const getAgents: RequestHandler = async (req: AuthenticatedRequest, res, next) =
   }
 };
 
-// 无需类型断言了
 router.get('/dashboard', authenticateBroker, getDashboardStats);
 router.get('/agents', authenticateBroker, getAgents);
 

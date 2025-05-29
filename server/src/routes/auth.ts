@@ -21,14 +21,17 @@
 // export default router;
 
 // server/src/routes/auth.ts
-import { Router, RequestHandler } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
 
 const router = Router();
 const prisma = getPrisma();
 
-const loginHandler: RequestHandler = async (req: AuthenticatedRequest, res) => {
+const loginHandler = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   console.log('Login request received - Body:', req.body);
   console.log('Session before login:', req.session);
   
@@ -90,29 +93,29 @@ const loginHandler: RequestHandler = async (req: AuthenticatedRequest, res) => {
     };
 
     // 确保 session 被保存
-    req.session.save((err) => {
-      if (err) {
-        console.error('Session save error:', err);
+    req.session.save((error: Error | null) => {
+      if (error) {
+        console.error('Session save error:', error);
         res.status(500).json({ message: 'Failed to save session' });
         return;
       }
 
       console.log('Session after login:', req.session);
     
-    res.json({ 
-      message: 'Login successful',
-      role: user.role,
-      redirect: `/dashboard/${user.role.toLowerCase()}`,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+      res.json({ 
+        message: 'Login successful',
         role: user.role,
-        managing: user.managing
-      }
+        redirect: `/dashboard/${user.role.toLowerCase()}`,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          managing: user.managing
+        }
       });
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login error:', error);
     res.status(500).json({ 
       message: 'Server error during login', 
@@ -122,7 +125,10 @@ const loginHandler: RequestHandler = async (req: AuthenticatedRequest, res) => {
 };
 
 // 测试路由 - 用于验证数据库连接
-const testUsersHandler: RequestHandler = async (req, res) => {
+const testUsersHandler = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -142,7 +148,7 @@ const testUsersHandler: RequestHandler = async (req, res) => {
     
     console.log('All users:', users);
     res.json({ users });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching users:', error);
     res.status(500).json({ 
       message: 'Failed to fetch users',
