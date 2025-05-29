@@ -22,10 +22,11 @@
 
 // server/src/routes/auth.ts
 import { Router, RequestHandler } from 'express';
-import { prisma } from '../../database';
+import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
 
 const router = Router();
+const prisma = getPrisma();
 
 const loginHandler: RequestHandler = async (req: AuthenticatedRequest, res) => {
   console.log('Login request received - Body:', req.body);
@@ -97,18 +98,18 @@ const loginHandler: RequestHandler = async (req: AuthenticatedRequest, res) => {
       }
 
       console.log('Session after login:', req.session);
-      
-      res.json({ 
-        message: 'Login successful',
+    
+    res.json({ 
+      message: 'Login successful',
+      role: user.role,
+      redirect: `/dashboard/${user.role.toLowerCase()}`,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
         role: user.role,
-        redirect: `/dashboard/${user.role.toLowerCase()}`,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          managing: user.managing
-        }
+        managing: user.managing
+      }
       });
     });
   } catch (error: any) {

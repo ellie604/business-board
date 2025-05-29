@@ -1,31 +1,28 @@
-import { PrismaClient as ProductionPrismaClient } from './generated/prisma-production';
-import { PrismaClient as PreviewPrismaClient } from './generated/prisma-preview';
-
-// 使用 Preview 类型作为基准类型
-const prisma = (process.env.NODE_ENV === 'production'
-  ? new ProductionPrismaClient()
-  : new PreviewPrismaClient()) as PreviewPrismaClient;
+import { getPrisma, disconnectPrisma } from './database';
 
 async function testDatabase() {
   try {
-    console.log('Current NODE_ENV:', process.env.NODE_ENV);
+    console.log('Testing database connection...');
+    console.log('Environment:', process.env.NODE_ENV);
     
+    const prisma = getPrisma();
+    
+    // 尝试一个简单的查询
     const users = await prisma.user.findMany({
       select: {
+        id: true,
         email: true,
-        role: true,
-        password: true
+        role: true
       }
     });
     
-    console.log('Connected to database successfully');
-    console.log('Users in database:', users);
+    console.log('Database connection successful!');
+    console.log('Found users:', users);
   } catch (error) {
     console.error('Database connection error:', error);
   } finally {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   }
 }
 
-console.log('Starting database test...');
 testDatabase(); 

@@ -1,9 +1,10 @@
 import { Router, RequestHandler } from 'express';
-import { prisma } from '../../database';
+import { getPrisma } from '../../database';
 import { authenticateBroker } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types/custom';
 
 const router = Router();
+const prisma = getPrisma();
 
 // 获取仪表板统计数据
 const getDashboardStats: RequestHandler = async (req: AuthenticatedRequest, res, next) => {

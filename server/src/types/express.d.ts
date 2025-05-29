@@ -5,6 +5,6 @@ declare module 'express-session' {
     user?: {
       id: string;
       role: string;
-    }
   }
-}
+  }
+} 

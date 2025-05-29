@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express';
-import { prisma } from '../../database';
+import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
+
+const prisma = getPrisma();
 
 export const authenticateBroker: RequestHandler = async (
   req: AuthenticatedRequest,
