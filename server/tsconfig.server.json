@@ -12,13 +12,13 @@
       "strict": true,
       "noEmit": false,
       "outDir": "./dist",
-      "types": ["node"],
+      "types": ["node", "express", "express-session"],
       "forceConsistentCasingInFileNames": true,
       "baseUrl": ".",
       "paths": {
         "*": ["*", "*.ts"]
       },
-      "typeRoots": ["./src/types", "./node_modules/@types"]
+      "typeRoots": ["./node_modules/@types"]
     },
     "include": ["src/**/*.ts", "*.ts", "generated/**/*"],
     "exclude": ["node_modules"]
