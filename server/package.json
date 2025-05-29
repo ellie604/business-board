@@ -2,9 +2,12 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "NODE_ENV=development SESSION_SECRET=dev-secret nodemon --exec ts-node --project tsconfig.server.json src/index.ts",
-    "build": "npm install --save-dev typescript @types/express @types/express-session @types/cors @types/body-parser && npx prisma generate --schema=./prisma/schema.preview.prisma && npx prisma generate --schema=./prisma/schema.production.prisma && tsc -p tsconfig.server.json && cp -r generated dist/",
+    "build": "npx prisma generate --schema=./prisma/schema.${NODE_ENV:-production}.prisma && tsc -p tsconfig.server.json && cp -r generated dist/",
     "start": "node dist/src/index.js",
     "seed:preview": "npx ts-node -T --project tsconfig.server.json seed.preview.ts",
     "seed:production": "npx ts-node -T --project tsconfig.server.json seed.production.ts",
@@ -12,6 +15,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
+    "@types/express": "^5.0.1",
+    "@types/express-session": "^1.18.1",
+    "@types/cors": "^2.8.17",
+    "@types/body-parser": "^1.19.5",
+    "typescript": "^5.8.3",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "connect-redis": "^8.1.0",
@@ -26,13 +34,8 @@
   },
   "devDependencies": {
     "@swc/core": "^1.11.24",
-    "@types/body-parser": "^1.19.5",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
-    "@types/express-session": "^1.18.1",
     "@types/node": "^22.15.23",
     "nodemon": "^2.0.22",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "ts-node": "^10.9.2"
   }
 }

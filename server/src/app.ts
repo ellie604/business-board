@@ -1,4 +1,4 @@
-import express, { Request } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
@@ -6,10 +6,13 @@ import authRouter from './routes/auth';
 import brokerRouter from './routes/broker';
 
 // 扩展 Express 的 Request 类型
-declare module 'express-session' {
-  interface SessionData {
-    userId?: string;
-    isAuthenticated?: boolean;
+declare module 'express' {
+  interface Request {
+    session: session.Session & {
+      userId?: string;
+      isAuthenticated?: boolean;
+    };
+    sessionID: string;
   }
 }
 
@@ -98,7 +101,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use(session(sessionConfig));
 
 // 添加调试中间件
-app.use((req: Request & { session: session.Session }, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   console.log('=== Session Debug Info ===');
   console.log('Session ID:', req.sessionID);
   console.log('Session:', req.session);
