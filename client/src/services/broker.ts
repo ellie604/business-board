@@ -27,10 +27,8 @@ interface AgentsResponse {
 }
 
 class BrokerService {
-  private baseUrl = API_BASE_URL;
-
   async getDashboardStats(): Promise<DashboardResponse> {
-    const response = await fetch(`${this.baseUrl}/api/broker/dashboard`, {
+    const response = await fetch(`${API_BASE_URL}/broker/dashboard`, {
       credentials: 'include',
     });
 
@@ -42,7 +40,7 @@ class BrokerService {
   }
 
   async getAgents(): Promise<AgentsResponse> {
-    const response = await fetch(`${this.baseUrl}/api/broker/agents`, {
+    const response = await fetch(`${API_BASE_URL}/broker/agents`, {
       credentials: 'include',
     });
 

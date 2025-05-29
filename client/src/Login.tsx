@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from './services/auth';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -7,52 +8,14 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // 根据环境获取后端 URL
-  const getBackendUrl = () => {
-    const env = import.meta.env.MODE;
-    switch(env) {
-      case 'production':
-        return 'https://business-board.vercel.app/api';
-      case 'preview':
-        // 从当前域名构建后端 URL
-        const domain = window.location.hostname;
-        if (domain.includes('-xinyis-projects-6c0795d6.vercel.app')) {
-          return `https://${domain}/api`;
-        }
-        return 'http://localhost:3000/api';
-      default:
-        return 'http://localhost:3000/api';
-    }
-  };
-
-  const BACKEND_URL = getBackendUrl();
-  console.log("Environment:", import.meta.env.MODE);
-  console.log("Backend URL:", BACKEND_URL);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     console.log('Attempting login with email:', email);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
-        mode: 'cors',
-        body: JSON.stringify({ email, password }),
-      });
-
-      console.log('Response status:', res.status);
-      const data = await res.json();
+      const data = await authService.login(email, password);
       console.log('Full login response:', data);
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
 
       const role = (data.role || '').toUpperCase();
       console.log('Processing role:', role);
