@@ -52,9 +52,9 @@ export function BrokerDashboard() {
   return (
     <div className="flex w-full min-h-screen bg-gray-100">
       {/* 左侧导航栏 */}
-      <div className="w-64 min-h-screen bg-white shadow-lg flex-shrink-0">
+      <div className="w-96 min-h-screen bg-white shadow-lg flex-shrink-0">
         {/* Logo */}
-        <div className="p-6">
+        <div className="p-8">
           <img 
             src={logo}
             alt="California Business Sales" 
@@ -63,34 +63,34 @@ export function BrokerDashboard() {
         </div>
 
         {/* 导航链接 */}
-        <nav className="mt-6">
+        <nav className="mt-8">
           <Link 
             to="/broker"
-            className="block px-6 py-4 bg-blue-100 text-blue-800 font-medium"
+            className="block px-8 py-4 text-lg bg-blue-100 text-blue-800 font-medium"
           >
             Home
           </Link>
           <Link 
             to="/broker/email"
-            className="block px-6 py-4 text-gray-600 hover:bg-gray-50"
+            className="block px-8 py-4 text-lg text-gray-600 hover:bg-gray-50"
           >
             Email
           </Link>
           <Link 
             to="/broker/agents"
-            className="block px-6 py-4 text-gray-600 hover:bg-gray-50"
+            className="block px-8 py-4 text-lg text-gray-600 hover:bg-gray-50"
           >
             Agents
           </Link>
           <Link 
             to="/broker/sellers"
-            className="block px-6 py-4 text-gray-600 hover:bg-gray-50"
+            className="block px-8 py-4 text-lg text-gray-600 hover:bg-gray-50"
           >
             Sellers
           </Link>
           <Link 
             to="/broker/buyers"
-            className="block px-6 py-4 text-gray-600 hover:bg-gray-50"
+            className="block px-8 py-4 text-lg text-gray-600 hover:bg-gray-50"
           >
             Buyers
           </Link>
