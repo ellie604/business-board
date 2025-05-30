@@ -11,20 +11,7 @@ interface DashboardStats {
   totalClosedDeals: number;
 }
 
-interface Agent {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-}
-
-interface ApiResponse {
-  agents: Agent[];
-  message: string;
-}
-
 export function BrokerDashboard() {
-  const [agents, setAgents] = useState<Agent[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalActiveListings: 0,
     totalUnderContract: 0,
@@ -41,14 +28,8 @@ export function BrokerDashboard() {
         setLoading(true);
         setError(null);
         
-        // 并行加载数据
-        const [dashboardResponse, agentsResponse] = await Promise.all([
-          brokerService.getDashboardStats(),
-          brokerService.getAgents()
-        ]);
-
+        const dashboardResponse = await brokerService.getDashboardStats();
         setStats(dashboardResponse.stats);
-        setAgents(agentsResponse.agents);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
         setError('Failed to load dashboard data. Please try again later.');
@@ -69,9 +50,9 @@ export function BrokerDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex w-full min-h-screen bg-gray-100">
       {/* 左侧导航栏 */}
-      <div className="w-64 bg-white shadow-lg">
+      <div className="w-64 min-h-screen bg-white shadow-lg flex-shrink-0">
         {/* Logo */}
         <div className="p-6">
           <img 
@@ -117,70 +98,37 @@ export function BrokerDashboard() {
       </div>
 
       {/* 主内容区 */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8 w-full">
         <h1 className="text-3xl font-bold mb-8">
-          Welcome {agents[0]?.name || 'Broker'} to Your Customized Dashboard
+          Welcome Broker to Your Customized Dashboard
         </h1>
 
-        {/* 统计数据表格 */}
-        <div className="bg-white rounded-lg shadow-md mb-8">
-          <table className="w-full">
-            <tbody>
-              <tr className="border-b">
-                <td className="p-4 font-medium">Total Active Listings</td>
-                <td className="p-4 text-right">{stats.totalActiveListings}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-4 font-medium">Total under contract</td>
-                <td className="p-4 text-right">{stats.totalUnderContract}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-4 font-medium">New Listings This Month</td>
-                <td className="p-4 text-right">{stats.newListingsThisMonth}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-4 font-medium">Non Disclosure agreement</td>
-                <td className="p-4 text-right">{stats.totalNDA}</td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium">Total Closed Deals (YTD)</td>
-                <td className="p-4 text-right">{stats.totalClosedDeals}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className="text-sm text-gray-500 mb-4">Table below will be scrollable</div>
-
-        {/* Agents 表格 */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="p-4 text-left font-medium text-gray-600">Name</th>
-                <th className="p-4 text-left font-medium text-gray-600">Email</th>
-                <th className="p-4 text-left font-medium text-gray-600">Joined Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agents.map(agent => (
-                <tr key={agent.id} className="border-t">
-                  <td className="p-4">{agent.name || 'N/A'}</td>
-                  <td className="p-4">{agent.email}</td>
-                  <td className="p-4">
-                    {new Date(agent.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-              {agents.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="p-4 text-center text-gray-500">
-                    No agents found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* 统计数据卡片网格 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-xl font-medium mb-4">Total Active Listings</h3>
+            <p className="text-4xl font-bold text-blue-600">{stats.totalActiveListings}</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-xl font-medium mb-4">Total under contract</h3>
+            <p className="text-4xl font-bold text-green-600">{stats.totalUnderContract}</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-xl font-medium mb-4">New Listings This Month</h3>
+            <p className="text-4xl font-bold text-purple-600">{stats.newListingsThisMonth}</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-xl font-medium mb-4">Non Disclosure agreement</h3>
+            <p className="text-4xl font-bold text-orange-600">{stats.totalNDA}</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-xl font-medium mb-4">Total Closed Deals (YTD)</h3>
+            <p className="text-4xl font-bold text-teal-600">{stats.totalClosedDeals}</p>
+          </div>
         </div>
       </div>
     </div>
