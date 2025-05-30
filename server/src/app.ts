@@ -4,6 +4,8 @@ import session from 'express-session';
 import MemoryStore from 'memorystore';
 import authRouter from './routes/auth';
 import brokerRouter from './routes/broker';
+import agentRouter from './routes/agent';
+import { restoreUser } from './middleware/auth';
 
 // 扩展 Express 的 Request 类型
 declare module 'express' {
@@ -11,6 +13,10 @@ declare module 'express' {
     session: session.Session & {
       userId?: string;
       isAuthenticated?: boolean;
+      user?: {
+        id: string;
+        role: string;
+      };
     };
     sessionID: string;
   }
@@ -79,7 +85,7 @@ const sessionConfig: session.SessionOptions = {
   }),
   name: 'business.board.sid',
   secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: true, // 修改为 true 以确保 session 被保存
+  resave: true,
   saveUninitialized: false,
   rolling: true,
   proxy: true,
@@ -92,6 +98,13 @@ const sessionConfig: session.SessionOptions = {
   }
 };
 
+console.log('Session configuration:', {
+  env: process.env.NODE_ENV,
+  secret: process.env.SESSION_SECRET ? '[SET]' : '[DEFAULT]',
+  secure: sessionConfig.cookie?.secure,
+  sameSite: sessionConfig.cookie?.sameSite
+});
+
 // 在开发环境下禁用 secure cookie
 if (process.env.NODE_ENV === 'development') {
   sessionConfig.cookie!.secure = false;
@@ -100,11 +113,15 @@ if (process.env.NODE_ENV === 'development') {
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
 
+// 从 session 恢复用户信息
+app.use(restoreUser);
+
 // 添加调试中间件
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log('=== Session Debug Info ===');
   console.log('Session ID:', req.sessionID);
   console.log('Session:', req.session);
+  console.log('User:', (req as any).user);
   console.log('Cookie:', req.headers.cookie);
   console.log('Environment:', process.env.NODE_ENV);
   console.log('=== End Session Debug Info ===');
@@ -114,6 +131,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // 注册路由
 app.use('/api/auth', authRouter);
 app.use('/api/broker', brokerRouter);
+app.use('/api/agent', agentRouter);
 
 // 健康检查
 app.get('/health', (req, res) => {

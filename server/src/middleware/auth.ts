@@ -4,35 +4,78 @@ import { AuthenticatedRequest } from '../types/custom';
 
 const prisma = getPrisma();
 
-export const authenticateBroker = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const typedReq = req as AuthenticatedRequest;
-    // 从 session 中获取用户信息
-    const user = typedReq.session?.user;
-    if (!user?.id) {
-      res.status(401).json({ message: 'Unauthorized' });
-      return;
-    }
-
-    // 验证用户是否为经纪人
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { id: true, role: true }
-    });
-
-    if (!dbUser || dbUser.role !== 'BROKER') {
-      res.status(403).json({ message: 'Access denied' });
-      return;
-    }
-
-    typedReq.user = dbUser;
-    next();
-  } catch (error) {
-    console.error('Authentication error:', error);
-    next(error);
+// 从 session 恢复用户信息的中间件
+export const restoreUser = (req: Request, _res: Response, next: NextFunction) => {
+  const typedReq = req as AuthenticatedRequest;
+  console.log('Restoring user from session:', typedReq.session);
+  
+  if (typedReq.session?.user) {
+    typedReq.user = typedReq.session.user;
+    console.log('User restored from session:', typedReq.user);
+  } else {
+    console.log('No user found in session');
   }
+  
+  next();
+};
+
+export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+  const typedReq = req as AuthenticatedRequest;
+  console.log('Checking auth - Session:', typedReq.session);
+  console.log('Checking auth - User:', typedReq.user);
+  
+  if (!typedReq.user) {
+    console.log('No user found in request');
+    res.status(401).json({ message: 'Authentication required' });
+    return;
+  }
+  
+  next();
+};
+
+export const authenticateAgent = (req: Request, res: Response, next: NextFunction) => {
+  const typedReq = req as AuthenticatedRequest;
+  console.log('Authenticating agent - Session:', {
+    sessionID: typedReq.sessionID,
+    user: typedReq.session.user,
+    cookies: typedReq.headers.cookie
+  });
+  console.log('Authenticating agent - User:', {
+    user: typedReq.user,
+    type_of_id: typedReq.user?.id ? typeof typedReq.user.id : 'undefined'
+  });
+  
+  if (!typedReq.user) {
+    console.log('No user found in request');
+    res.status(401).json({ message: 'Authentication required' });
+    return;
+  }
+
+  if (typedReq.user.role !== 'AGENT') {
+    console.log('User is not an agent. Role:', typedReq.user.role);
+    res.status(403).json({ message: 'Access denied. Agent role required.' });
+    return;
+  }
+
+  next();
+};
+
+export const authenticateBroker = (req: Request, res: Response, next: NextFunction) => {
+  const typedReq = req as AuthenticatedRequest;
+  console.log('Authenticating broker - Session:', typedReq.session);
+  console.log('Authenticating broker - User:', typedReq.user);
+  
+  if (!typedReq.user) {
+    console.log('No user found in request');
+    res.status(401).json({ message: 'Authentication required' });
+    return;
+  }
+
+  if (typedReq.user.role !== 'BROKER') {
+    console.log('User is not a broker. Role:', typedReq.user.role);
+    res.status(403).json({ message: 'Access denied. Broker role required.' });
+    return;
+  }
+
+  next();
 }; 

@@ -28,10 +28,21 @@ import { AuthenticatedRequest } from '../types/custom';
 const router = Router();
 const prisma = getPrisma();
 
-const loginHandler: RequestHandler = async (req, res) => {
+interface UserFromDB {
+  id: number;
+  email: string;
+  name: string | null;
+  role: string;
+  managing?: {
+    id: number;
+    email: string;
+    role: string;
+  }[];
+}
+
+const loginHandler = async (req: Request, res: Response): Promise<void> => {
   const typedReq = req as AuthenticatedRequest;
   console.log('Login request received - Body:', typedReq.body);
-  console.log('Session before login:', typedReq.session);
   
   const { email, password } = typedReq.body;
   
@@ -64,17 +75,22 @@ const loginHandler: RequestHandler = async (req, res) => {
       }
     });
 
-    console.log('User search result:', user ? {
+    console.log('Found user:', {
       ...user,
-      password: '******',
-      managing: user.managing.length
-    } : 'Not found');
+      password: user ? '******' : null
+    });
 
     if (!user) {
       console.log('No user found with email:', email);
       res.status(401).json({ message: 'Invalid email or password' });
       return;
     }
+
+    console.log('Found user details:', {
+      id: user.id,
+      role: user.role,
+      type_of_id: typeof user.id
+    });
 
     if (user.password !== password) {
       console.log('Password mismatch');
@@ -84,11 +100,14 @@ const loginHandler: RequestHandler = async (req, res) => {
 
     console.log('Login successful for:', email, 'with role:', user.role);
     
-    // 设置 session
-    typedReq.session.user = {
-      id: user.id,
+    // 设置用户信息到 request 和 session
+    const userInfo = {
+      id: user.id.toString(), // 确保 ID 是字符串类型
       role: user.role
     };
+    
+    typedReq.user = userInfo;
+    typedReq.session.user = userInfo;
 
     // 确保 session 被保存
     typedReq.session.save((error: Error | null) => {
@@ -98,14 +117,18 @@ const loginHandler: RequestHandler = async (req, res) => {
         return;
       }
 
-      console.log('Session after login:', typedReq.session);
+      console.log('Session after login:', {
+        id: typedReq.sessionID,
+        user: typedReq.session.user
+      });
+      console.log('User after login:', typedReq.user);
     
       res.json({ 
         message: 'Login successful',
         role: user.role,
         redirect: `/dashboard/${user.role.toLowerCase()}`,
         user: {
-          id: user.id,
+          id: user.id.toString(), // 确保返回的 ID 也是字符串
           email: user.email,
           name: user.name,
           role: user.role,
@@ -123,7 +146,7 @@ const loginHandler: RequestHandler = async (req, res) => {
 };
 
 // 测试路由 - 用于验证数据库连接
-const testUsersHandler: RequestHandler = async (req, res) => {
+const testUsersHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -141,8 +164,14 @@ const testUsersHandler: RequestHandler = async (req, res) => {
       }
     });
     
-    console.log('All users:', users);
-    res.json({ users });
+    // 确保返回的用户 ID 都是字符串
+    const usersWithStringIds = users.map((user: UserFromDB) => ({
+      ...user,
+      id: user.id.toString()
+    }));
+    
+    console.log('All users:', usersWithStringIds);
+    res.json({ users: usersWithStringIds });
   } catch (error: unknown) {
     console.error('Error fetching users:', error);
     res.status(500).json({ 
