@@ -19,10 +19,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const database_1 = require("../../database");
 const router = (0, express_1.Router)();
+const prisma = (0, database_1.getPrisma)();
 const loginHandler = async (req, res) => {
-    console.log('Login request received - Body:', req.body);
-    console.log('Session before login:', req.session);
-    const { email, password } = req.body;
+    const typedReq = req;
+    console.log('Login request received - Body:', typedReq.body);
+    console.log('Session before login:', typedReq.session);
+    const { email, password } = typedReq.body;
     if (!email || !password) {
         console.error('Missing email or password in request');
         res.status(400).json({ message: 'Email and password are required' });
@@ -30,7 +32,7 @@ const loginHandler = async (req, res) => {
     }
     try {
         console.log('Attempting to find user with email:', email);
-        const user = await database_1.prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 email: email.toLowerCase()
             },
@@ -66,18 +68,18 @@ const loginHandler = async (req, res) => {
         }
         console.log('Login successful for:', email, 'with role:', user.role);
         // 设置 session
-        req.session.user = {
+        typedReq.session.user = {
             id: user.id,
             role: user.role
         };
         // 确保 session 被保存
-        req.session.save((err) => {
-            if (err) {
-                console.error('Session save error:', err);
+        typedReq.session.save((error) => {
+            if (error) {
+                console.error('Session save error:', error);
                 res.status(500).json({ message: 'Failed to save session' });
                 return;
             }
-            console.log('Session after login:', req.session);
+            console.log('Session after login:', typedReq.session);
             res.json({
                 message: 'Login successful',
                 role: user.role,
@@ -103,7 +105,7 @@ const loginHandler = async (req, res) => {
 // 测试路由 - 用于验证数据库连接
 const testUsersHandler = async (req, res) => {
     try {
-        const users = await database_1.prisma.user.findMany({
+        const users = await prisma.user.findMany({
             select: {
                 id: true,
                 email: true,

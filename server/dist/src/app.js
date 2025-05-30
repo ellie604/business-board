@@ -16,10 +16,13 @@ const memoryStore = (0, memorystore_1.default)(express_session_1.default);
 const getAllowedOrigins = () => {
     switch (process.env.NODE_ENV) {
         case 'production':
-            return 'https://business-board.vercel.app';
+            return ['https://business-board.vercel.app'];
         case 'preview':
-            // Vercel Preview 部署的域名模式
-            return /https:\/\/business-board-git-.*-xinyis-projects-6c0795d6\.vercel\.app/;
+            // 更新 Vercel Preview 部署的域名模式，使用数组而不是正则
+            return [
+                /https:\/\/business-board-.*\.vercel\.app$/,
+                /https:\/\/business-board-git-.*\.vercel\.app$/
+            ];
         default:
             return ['http://localhost:5174', 'http://localhost:5173'];
     }
@@ -27,36 +30,25 @@ const getAllowedOrigins = () => {
 // 配置 CORS
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {
-        const allowedOrigin = getAllowedOrigins();
+        const allowedOrigins = getAllowedOrigins();
         console.log('Request origin:', origin);
-        console.log('Allowed origin:', allowedOrigin);
+        console.log('Allowed origins:', allowedOrigins);
         // 允许没有 origin 的请求（比如同源请求）
         if (!origin) {
             console.log('No origin provided, allowing request');
             return callback(null, true);
         }
-        // 如果 allowedOrigin 是正则表达式（preview 环境）
-        if (allowedOrigin instanceof RegExp) {
-            if (allowedOrigin.test(origin)) {
-                console.log('Origin matched preview pattern');
-                return callback(null, origin);
-            }
+        // 检查是否匹配允许的域名
+        const isAllowed = Array.isArray(allowedOrigins)
+            ? allowedOrigins.some(allowed => allowed instanceof RegExp
+                ? allowed.test(origin)
+                : allowed === origin)
+            : allowedOrigins === origin;
+        if (isAllowed) {
+            console.log('Origin allowed:', origin);
+            return callback(null, origin);
         }
-        else if (Array.isArray(allowedOrigin)) {
-            // 如果是数组（开发环境），检查是否包含在允许的域名列表中
-            if (allowedOrigin.includes(origin)) {
-                console.log('Origin found in allowed origins array');
-                return callback(null, origin);
-            }
-        }
-        else {
-            // 生产环境的精确匹配
-            if (origin === allowedOrigin) {
-                console.log('Origin exactly matched allowed origin');
-                return callback(null, origin);
-            }
-        }
-        console.log('Origin not allowed');
+        console.log('Origin not allowed:', origin);
         callback(new Error('Not allowed by CORS'));
     },
     credentials: true

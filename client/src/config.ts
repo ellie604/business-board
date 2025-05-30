@@ -11,9 +11,9 @@ const getBackendUrl = () => {
         const backendDomain = domain.replace('vercel.app', 'onrender.com');
         return `https://${backendDomain}/api`;
       }
-      return 'http://localhost:3000/api';
+      return '/api';
     default:
-      return 'http://localhost:3000/api';
+      return '/api';
   }
 };
 
