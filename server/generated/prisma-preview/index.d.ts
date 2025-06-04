@@ -53,13 +53,30 @@ export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
 
 
 export const DocumentType: {
+  EMAIL_AGENT: 'EMAIL_AGENT',
+  UPLOADED_DOC: 'UPLOADED_DOC',
+  PURCHASE_AGREEMENT: 'PURCHASE_AGREEMENT',
+  DUE_DILIGENCE: 'DUE_DILIGENCE',
+  PRE_CLOSE_CHECKLIST: 'PRE_CLOSE_CHECKLIST',
+  CLOSING_DOCS: 'CLOSING_DOCS',
   NDA: 'NDA',
-  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   FINANCIAL_STATEMENT: 'FINANCIAL_STATEMENT',
-  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT'
+  CBR_CIM: 'CBR_CIM',
+  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
+  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
+  QUESTIONNAIRE: 'QUESTIONNAIRE',
+  AFTER_SALE: 'AFTER_SALE'
 };
 
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
+
+
+export const DocumentStatus: {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED'
+};
+
+export type DocumentStatus = (typeof DocumentStatus)[keyof typeof DocumentStatus]
 
 }
 
@@ -74,6 +91,10 @@ export const ListingStatus: typeof $Enums.ListingStatus
 export type DocumentType = $Enums.DocumentType
 
 export const DocumentType: typeof $Enums.DocumentType
+
+export type DocumentStatus = $Enums.DocumentStatus
+
+export const DocumentStatus: typeof $Enums.DocumentStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1099,11 +1120,15 @@ export namespace Prisma {
   export type UserCountOutputType = {
     managing: number
     listings: number
+    buyerDocs: number
+    sellerDocs: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     managing?: boolean | UserCountOutputTypeCountManagingArgs
     listings?: boolean | UserCountOutputTypeCountListingsArgs
+    buyerDocs?: boolean | UserCountOutputTypeCountBuyerDocsArgs
+    sellerDocs?: boolean | UserCountOutputTypeCountSellerDocsArgs
   }
 
   // Custom InputTypes
@@ -1131,6 +1156,20 @@ export namespace Prisma {
     where?: ListingWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBuyerDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSellerDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
 
   /**
    * Models
@@ -1149,22 +1188,34 @@ export namespace Prisma {
   export type DocumentMinAggregateOutputType = {
     id: string | null
     type: $Enums.DocumentType | null
+    status: $Enums.DocumentStatus | null
     url: string | null
+    buyerId: string | null
+    sellerId: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type DocumentMaxAggregateOutputType = {
     id: string | null
     type: $Enums.DocumentType | null
+    status: $Enums.DocumentStatus | null
     url: string | null
+    buyerId: string | null
+    sellerId: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type DocumentCountAggregateOutputType = {
     id: number
     type: number
+    status: number
     url: number
+    buyerId: number
+    sellerId: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -1172,22 +1223,34 @@ export namespace Prisma {
   export type DocumentMinAggregateInputType = {
     id?: true
     type?: true
+    status?: true
     url?: true
+    buyerId?: true
+    sellerId?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type DocumentMaxAggregateInputType = {
     id?: true
     type?: true
+    status?: true
     url?: true
+    buyerId?: true
+    sellerId?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type DocumentCountAggregateInputType = {
     id?: true
     type?: true
+    status?: true
     url?: true
+    buyerId?: true
+    sellerId?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -1266,8 +1329,12 @@ export namespace Prisma {
   export type DocumentGroupByOutputType = {
     id: string
     type: $Enums.DocumentType
-    url: string
+    status: $Enums.DocumentStatus
+    url: string | null
+    buyerId: string | null
+    sellerId: string | null
     createdAt: Date
+    updatedAt: Date
     _count: DocumentCountAggregateOutputType | null
     _min: DocumentMinAggregateOutputType | null
     _max: DocumentMaxAggregateOutputType | null
@@ -1290,41 +1357,82 @@ export namespace Prisma {
   export type DocumentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
+    status?: boolean
     url?: boolean
+    buyerId?: boolean
+    sellerId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | Document$buyerArgs<ExtArgs>
+    seller?: boolean | Document$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
+    status?: boolean
     url?: boolean
+    buyerId?: boolean
+    sellerId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | Document$buyerArgs<ExtArgs>
+    seller?: boolean | Document$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
+    status?: boolean
     url?: boolean
+    buyerId?: boolean
+    sellerId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | Document$buyerArgs<ExtArgs>
+    seller?: boolean | Document$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectScalar = {
     id?: boolean
     type?: boolean
+    status?: boolean
     url?: boolean
+    buyerId?: boolean
+    sellerId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "url" | "createdAt", ExtArgs["result"]["document"]>
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "buyerId" | "sellerId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+  export type DocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | Document$buyerArgs<ExtArgs>
+    seller?: boolean | Document$sellerArgs<ExtArgs>
+  }
+  export type DocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | Document$buyerArgs<ExtArgs>
+    seller?: boolean | Document$sellerArgs<ExtArgs>
+  }
+  export type DocumentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | Document$buyerArgs<ExtArgs>
+    seller?: boolean | Document$sellerArgs<ExtArgs>
+  }
 
   export type $DocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Document"
-    objects: {}
+    objects: {
+      buyer: Prisma.$UserPayload<ExtArgs> | null
+      seller: Prisma.$UserPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       type: $Enums.DocumentType
-      url: string
+      status: $Enums.DocumentStatus
+      url: string | null
+      buyerId: string | null
+      sellerId: string | null
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["document"]>
     composites: {}
   }
@@ -1719,6 +1827,8 @@ export namespace Prisma {
    */
   export interface Prisma__DocumentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    buyer<T extends Document$buyerArgs<ExtArgs> = {}>(args?: Subset<T, Document$buyerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    seller<T extends Document$sellerArgs<ExtArgs> = {}>(args?: Subset<T, Document$sellerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1750,8 +1860,12 @@ export namespace Prisma {
   interface DocumentFieldRefs {
     readonly id: FieldRef<"Document", 'String'>
     readonly type: FieldRef<"Document", 'DocumentType'>
+    readonly status: FieldRef<"Document", 'DocumentStatus'>
     readonly url: FieldRef<"Document", 'String'>
+    readonly buyerId: FieldRef<"Document", 'String'>
+    readonly sellerId: FieldRef<"Document", 'String'>
     readonly createdAt: FieldRef<"Document", 'DateTime'>
+    readonly updatedAt: FieldRef<"Document", 'DateTime'>
   }
     
 
@@ -1768,6 +1882,10 @@ export namespace Prisma {
      * Omit specific fields from the Document
      */
     omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
     /**
      * Filter, which Document to fetch.
      */
@@ -1787,6 +1905,10 @@ export namespace Prisma {
      */
     omit?: DocumentOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
      * Filter, which Document to fetch.
      */
     where: DocumentWhereUniqueInput
@@ -1804,6 +1926,10 @@ export namespace Prisma {
      * Omit specific fields from the Document
      */
     omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
     /**
      * Filter, which Document to fetch.
      */
@@ -1853,6 +1979,10 @@ export namespace Prisma {
      */
     omit?: DocumentOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
      * Filter, which Document to fetch.
      */
     where?: DocumentWhereInput
@@ -1901,6 +2031,10 @@ export namespace Prisma {
      */
     omit?: DocumentOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
      * Filter, which Documents to fetch.
      */
     where?: DocumentWhereInput
@@ -1944,6 +2078,10 @@ export namespace Prisma {
      */
     omit?: DocumentOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
      * The data needed to create a Document.
      */
     data: XOR<DocumentCreateInput, DocumentUncheckedCreateInput>
@@ -1977,6 +2115,10 @@ export namespace Prisma {
      */
     data: DocumentCreateManyInput | DocumentCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -1991,6 +2133,10 @@ export namespace Prisma {
      * Omit specific fields from the Document
      */
     omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
     /**
      * The data needed to update a Document.
      */
@@ -2043,6 +2189,10 @@ export namespace Prisma {
      * Limit how many Documents to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2057,6 +2207,10 @@ export namespace Prisma {
      * Omit specific fields from the Document
      */
     omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
     /**
      * The filter to search for the Document to update in case it exists.
      */
@@ -2084,6 +2238,10 @@ export namespace Prisma {
      */
     omit?: DocumentOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
      * Filter which Document to delete.
      */
     where: DocumentWhereUniqueInput
@@ -2104,6 +2262,44 @@ export namespace Prisma {
   }
 
   /**
+   * Document.buyer
+   */
+  export type Document$buyerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * Document.seller
+   */
+  export type Document$sellerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * Document without action
    */
   export type DocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2115,6 +2311,10 @@ export namespace Prisma {
      * Omit specific fields from the Document
      */
     omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
   }
 
 
@@ -2309,6 +2509,8 @@ export namespace Prisma {
     managedBy?: boolean | User$managedByArgs<ExtArgs>
     managing?: boolean | User$managingArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
+    buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
+    sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2352,6 +2554,8 @@ export namespace Prisma {
     managedBy?: boolean | User$managedByArgs<ExtArgs>
     managing?: boolean | User$managingArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
+    buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
+    sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2367,6 +2571,8 @@ export namespace Prisma {
       managedBy: Prisma.$UserPayload<ExtArgs> | null
       managing: Prisma.$UserPayload<ExtArgs>[]
       listings: Prisma.$ListingPayload<ExtArgs>[]
+      buyerDocs: Prisma.$DocumentPayload<ExtArgs>[]
+      sellerDocs: Prisma.$DocumentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2774,6 +2980,8 @@ export namespace Prisma {
     managedBy<T extends User$managedByArgs<ExtArgs> = {}>(args?: Subset<T, User$managedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     managing<T extends User$managingArgs<ExtArgs> = {}>(args?: Subset<T, User$managingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     listings<T extends User$listingsArgs<ExtArgs> = {}>(args?: Subset<T, User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    buyerDocs<T extends User$buyerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerDocs<T extends User$sellerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3271,6 +3479,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ListingScalarFieldEnum | ListingScalarFieldEnum[]
+  }
+
+  /**
+   * User.buyerDocs
+   */
+  export type User$buyerDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * User.sellerDocs
+   */
+  export type User$sellerDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
   }
 
   /**
@@ -4427,8 +4683,12 @@ export namespace Prisma {
   export const DocumentScalarFieldEnum: {
     id: 'id',
     type: 'type',
+    status: 'status',
     url: 'url',
-    createdAt: 'createdAt'
+    buyerId: 'buyerId',
+    sellerId: 'sellerId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
@@ -4519,6 +4779,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DocumentStatus'
+   */
+  export type EnumDocumentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentStatus[]'
+   */
+  export type ListEnumDocumentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -4597,15 +4871,27 @@ export namespace Prisma {
     NOT?: DocumentWhereInput | DocumentWhereInput[]
     id?: StringFilter<"Document"> | string
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
-    url?: StringFilter<"Document"> | string
+    status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    url?: StringNullableFilter<"Document"> | string | null
+    buyerId?: StringNullableFilter<"Document"> | string | null
+    sellerId?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
+    updatedAt?: DateTimeFilter<"Document"> | Date | string
+    buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    seller?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type DocumentOrderByWithRelationInput = {
     id?: SortOrder
     type?: SortOrder
-    url?: SortOrder
+    status?: SortOrder
+    url?: SortOrderInput | SortOrder
+    buyerId?: SortOrderInput | SortOrder
+    sellerId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
+    buyer?: UserOrderByWithRelationInput
+    seller?: UserOrderByWithRelationInput
   }
 
   export type DocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -4614,15 +4900,25 @@ export namespace Prisma {
     OR?: DocumentWhereInput[]
     NOT?: DocumentWhereInput | DocumentWhereInput[]
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
-    url?: StringFilter<"Document"> | string
+    status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    url?: StringNullableFilter<"Document"> | string | null
+    buyerId?: StringNullableFilter<"Document"> | string | null
+    sellerId?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
+    updatedAt?: DateTimeFilter<"Document"> | Date | string
+    buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    seller?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type DocumentOrderByWithAggregationInput = {
     id?: SortOrder
     type?: SortOrder
-    url?: SortOrder
+    status?: SortOrder
+    url?: SortOrderInput | SortOrder
+    buyerId?: SortOrderInput | SortOrder
+    sellerId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: DocumentCountOrderByAggregateInput
     _max?: DocumentMaxOrderByAggregateInput
     _min?: DocumentMinOrderByAggregateInput
@@ -4634,8 +4930,12 @@ export namespace Prisma {
     NOT?: DocumentScalarWhereWithAggregatesInput | DocumentScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Document"> | string
     type?: EnumDocumentTypeWithAggregatesFilter<"Document"> | $Enums.DocumentType
-    url?: StringWithAggregatesFilter<"Document"> | string
+    status?: EnumDocumentStatusWithAggregatesFilter<"Document"> | $Enums.DocumentStatus
+    url?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    buyerId?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    sellerId?: StringNullableWithAggregatesFilter<"Document"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
   }
 
   export type UserWhereInput = {
@@ -4653,6 +4953,8 @@ export namespace Prisma {
     managedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     managing?: UserListRelationFilter
     listings?: ListingListRelationFilter
+    buyerDocs?: DocumentListRelationFilter
+    sellerDocs?: DocumentListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4667,6 +4969,8 @@ export namespace Prisma {
     managedBy?: UserOrderByWithRelationInput
     managing?: UserOrderByRelationAggregateInput
     listings?: ListingOrderByRelationAggregateInput
+    buyerDocs?: DocumentOrderByRelationAggregateInput
+    sellerDocs?: DocumentOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4684,6 +4988,8 @@ export namespace Prisma {
     managedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     managing?: UserListRelationFilter
     listings?: ListingListRelationFilter
+    buyerDocs?: DocumentListRelationFilter
+    sellerDocs?: DocumentListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -4784,50 +5090,76 @@ export namespace Prisma {
   export type DocumentCreateInput = {
     id?: string
     type: $Enums.DocumentType
-    url: string
+    status?: $Enums.DocumentStatus
+    url?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    seller?: UserCreateNestedOneWithoutSellerDocsInput
   }
 
   export type DocumentUncheckedCreateInput = {
     id?: string
     type: $Enums.DocumentType
-    url: string
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    buyerId?: string | null
+    sellerId?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type DocumentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-    url?: StringFieldUpdateOperationsInput | string
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    seller?: UserUpdateOneWithoutSellerDocsNestedInput
   }
 
   export type DocumentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-    url?: StringFieldUpdateOperationsInput | string
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DocumentCreateManyInput = {
     id?: string
     type: $Enums.DocumentType
-    url: string
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    buyerId?: string | null
+    sellerId?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type DocumentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-    url?: StringFieldUpdateOperationsInput | string
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DocumentUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-    url?: StringFieldUpdateOperationsInput | string
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserCreateInput = {
@@ -4841,6 +5173,8 @@ export namespace Prisma {
     managedBy?: UserCreateNestedOneWithoutManagingInput
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -4854,6 +5188,8 @@ export namespace Prisma {
     managerId?: string | null
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserUpdateInput = {
@@ -4867,6 +5203,8 @@ export namespace Prisma {
     managedBy?: UserUpdateOneWithoutManagingNestedInput
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -4880,6 +5218,8 @@ export namespace Prisma {
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -5005,6 +5345,28 @@ export namespace Prisma {
     not?: NestedEnumDocumentTypeFilter<$PrismaModel> | $Enums.DocumentType
   }
 
+  export type EnumDocumentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5016,25 +5378,47 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type DocumentCountOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
+    status?: SortOrder
     url?: SortOrder
+    buyerId?: SortOrder
+    sellerId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DocumentMaxOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
+    status?: SortOrder
     url?: SortOrder
+    buyerId?: SortOrder
+    sellerId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DocumentMinOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
+    status?: SortOrder
     url?: SortOrder
+    buyerId?: SortOrder
+    sellerId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5065,6 +5449,34 @@ export namespace Prisma {
     _max?: NestedEnumDocumentTypeFilter<$PrismaModel>
   }
 
+  export type EnumDocumentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusWithAggregatesFilter<$PrismaModel> | $Enums.DocumentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentStatusFilter<$PrismaModel>
+    _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5086,26 +5498,6 @@ export namespace Prisma {
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
-  }
-
   export type UserListRelationFilter = {
     every?: UserWhereInput
     some?: UserWhereInput
@@ -5118,9 +5510,10 @@ export namespace Prisma {
     none?: ListingWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
+  export type DocumentListRelationFilter = {
+    every?: DocumentWhereInput
+    some?: DocumentWhereInput
+    none?: DocumentWhereInput
   }
 
   export type UserOrderByRelationAggregateInput = {
@@ -5128,6 +5521,10 @@ export namespace Prisma {
   }
 
   export type ListingOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DocumentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -5172,24 +5569,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -5279,6 +5658,18 @@ export namespace Prisma {
     _max?: NestedEnumListingStatusFilter<$PrismaModel>
   }
 
+  export type UserCreateNestedOneWithoutBuyerDocsInput = {
+    create?: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerDocsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSellerDocsInput = {
+    create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -5287,8 +5678,36 @@ export namespace Prisma {
     set?: $Enums.DocumentType
   }
 
+  export type EnumDocumentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentStatus
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type UserUpdateOneWithoutBuyerDocsNestedInput = {
+    create?: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerDocsInput
+    upsert?: UserUpsertWithoutBuyerDocsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerDocsInput, UserUpdateWithoutBuyerDocsInput>, UserUncheckedUpdateWithoutBuyerDocsInput>
+  }
+
+  export type UserUpdateOneWithoutSellerDocsNestedInput = {
+    create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
+    upsert?: UserUpsertWithoutSellerDocsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerDocsInput, UserUpdateWithoutSellerDocsInput>, UserUncheckedUpdateWithoutSellerDocsInput>
   }
 
   export type UserCreateNestedOneWithoutManagingInput = {
@@ -5311,6 +5730,20 @@ export namespace Prisma {
     connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
   }
 
+  export type DocumentCreateNestedManyWithoutBuyerInput = {
+    create?: XOR<DocumentCreateWithoutBuyerInput, DocumentUncheckedCreateWithoutBuyerInput> | DocumentCreateWithoutBuyerInput[] | DocumentUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutBuyerInput | DocumentCreateOrConnectWithoutBuyerInput[]
+    createMany?: DocumentCreateManyBuyerInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type DocumentCreateNestedManyWithoutSellerInput = {
+    create?: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput> | DocumentCreateWithoutSellerInput[] | DocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
+    createMany?: DocumentCreateManySellerInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -5323,6 +5756,20 @@ export namespace Prisma {
     connectOrCreate?: ListingCreateOrConnectWithoutSellerInput | ListingCreateOrConnectWithoutSellerInput[]
     createMany?: ListingCreateManySellerInputEnvelope
     connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutBuyerInput = {
+    create?: XOR<DocumentCreateWithoutBuyerInput, DocumentUncheckedCreateWithoutBuyerInput> | DocumentCreateWithoutBuyerInput[] | DocumentUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutBuyerInput | DocumentCreateOrConnectWithoutBuyerInput[]
+    createMany?: DocumentCreateManyBuyerInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput> | DocumentCreateWithoutSellerInput[] | DocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
+    createMany?: DocumentCreateManySellerInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -5367,8 +5814,32 @@ export namespace Prisma {
     deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
+  export type DocumentUpdateManyWithoutBuyerNestedInput = {
+    create?: XOR<DocumentCreateWithoutBuyerInput, DocumentUncheckedCreateWithoutBuyerInput> | DocumentCreateWithoutBuyerInput[] | DocumentUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutBuyerInput | DocumentCreateOrConnectWithoutBuyerInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutBuyerInput | DocumentUpsertWithWhereUniqueWithoutBuyerInput[]
+    createMany?: DocumentCreateManyBuyerInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutBuyerInput | DocumentUpdateWithWhereUniqueWithoutBuyerInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutBuyerInput | DocumentUpdateManyWithWhereWithoutBuyerInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type DocumentUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput> | DocumentCreateWithoutSellerInput[] | DocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutSellerInput | DocumentUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: DocumentCreateManySellerInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutSellerInput | DocumentUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutSellerInput | DocumentUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
@@ -5397,6 +5868,34 @@ export namespace Prisma {
     update?: ListingUpdateWithWhereUniqueWithoutSellerInput | ListingUpdateWithWhereUniqueWithoutSellerInput[]
     updateMany?: ListingUpdateManyWithWhereWithoutSellerInput | ListingUpdateManyWithWhereWithoutSellerInput[]
     deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutBuyerNestedInput = {
+    create?: XOR<DocumentCreateWithoutBuyerInput, DocumentUncheckedCreateWithoutBuyerInput> | DocumentCreateWithoutBuyerInput[] | DocumentUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutBuyerInput | DocumentCreateOrConnectWithoutBuyerInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutBuyerInput | DocumentUpsertWithWhereUniqueWithoutBuyerInput[]
+    createMany?: DocumentCreateManyBuyerInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutBuyerInput | DocumentUpdateWithWhereUniqueWithoutBuyerInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutBuyerInput | DocumentUpdateManyWithWhereWithoutBuyerInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput> | DocumentCreateWithoutSellerInput[] | DocumentUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutSellerInput | DocumentUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: DocumentCreateManySellerInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutSellerInput | DocumentUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutSellerInput | DocumentUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutListingsInput = {
@@ -5444,6 +5943,27 @@ export namespace Prisma {
     in?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.DocumentType[] | ListEnumDocumentTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumDocumentTypeFilter<$PrismaModel> | $Enums.DocumentType
+  }
+
+  export type NestedEnumDocumentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -5495,49 +6015,14 @@ export namespace Prisma {
     _max?: NestedEnumDocumentTypeFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+  export type NestedEnumDocumentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentStatus | EnumDocumentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentStatusWithAggregatesFilter<$PrismaModel> | $Enums.DocumentStatus
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
-  }
-
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumUserRoleFilter<$PrismaModel>
-    _max?: NestedEnumUserRoleFilter<$PrismaModel>
+    _min?: NestedEnumDocumentStatusFilter<$PrismaModel>
+    _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5566,6 +6051,37 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
+  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
   export type NestedFloatFilter<$PrismaModel = never> = {
@@ -5612,6 +6128,150 @@ export namespace Prisma {
     _max?: NestedEnumListingStatusFilter<$PrismaModel>
   }
 
+  export type UserCreateWithoutBuyerDocsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyerDocsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyerDocsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+  }
+
+  export type UserCreateWithoutSellerDocsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutSellerDocsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutSellerDocsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
+  }
+
+  export type UserUpsertWithoutBuyerDocsInput = {
+    update: XOR<UserUpdateWithoutBuyerDocsInput, UserUncheckedUpdateWithoutBuyerDocsInput>
+    create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBuyerDocsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBuyerDocsInput, UserUncheckedUpdateWithoutBuyerDocsInput>
+  }
+
+  export type UserUpdateWithoutBuyerDocsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyerDocsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUpsertWithoutSellerDocsInput = {
+    update: XOR<UserUpdateWithoutSellerDocsInput, UserUncheckedUpdateWithoutSellerDocsInput>
+    create: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSellerDocsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSellerDocsInput, UserUncheckedUpdateWithoutSellerDocsInput>
+  }
+
+  export type UserUpdateWithoutSellerDocsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSellerDocsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
   export type UserCreateWithoutManagingInput = {
     id?: string
     email: string
@@ -5622,6 +6282,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     managedBy?: UserCreateNestedOneWithoutManagingInput
     listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -5634,6 +6296,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     managerId?: string | null
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -5651,6 +6315,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -5663,6 +6329,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -5703,6 +6371,66 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DocumentCreateWithoutBuyerInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller?: UserCreateNestedOneWithoutSellerDocsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutBuyerInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    sellerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutBuyerInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutBuyerInput, DocumentUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type DocumentCreateManyBuyerInputEnvelope = {
+    data: DocumentCreateManyBuyerInput | DocumentCreateManyBuyerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DocumentCreateWithoutSellerInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutSellerInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    buyerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutSellerInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput>
+  }
+
+  export type DocumentCreateManySellerInputEnvelope = {
+    data: DocumentCreateManySellerInput | DocumentCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -5724,6 +6452,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managedBy?: UserUpdateOneWithoutManagingNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -5736,6 +6466,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -5797,6 +6529,52 @@ export namespace Prisma {
     sellerId?: StringFilter<"Listing"> | string
   }
 
+  export type DocumentUpsertWithWhereUniqueWithoutBuyerInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutBuyerInput, DocumentUncheckedUpdateWithoutBuyerInput>
+    create: XOR<DocumentCreateWithoutBuyerInput, DocumentUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutBuyerInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutBuyerInput, DocumentUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutBuyerInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutBuyerInput>
+  }
+
+  export type DocumentScalarWhereInput = {
+    AND?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+    OR?: DocumentScalarWhereInput[]
+    NOT?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+    id?: StringFilter<"Document"> | string
+    type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
+    status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    url?: StringNullableFilter<"Document"> | string | null
+    buyerId?: StringNullableFilter<"Document"> | string | null
+    sellerId?: StringNullableFilter<"Document"> | string | null
+    createdAt?: DateTimeFilter<"Document"> | Date | string
+    updatedAt?: DateTimeFilter<"Document"> | Date | string
+  }
+
+  export type DocumentUpsertWithWhereUniqueWithoutSellerInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutSellerInput, DocumentUncheckedUpdateWithoutSellerInput>
+    create: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutSellerInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutSellerInput, DocumentUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutSellerInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutSellerInput>
+  }
+
   export type UserCreateWithoutListingsInput = {
     id?: string
     email: string
@@ -5807,6 +6585,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     managedBy?: UserCreateNestedOneWithoutManagingInput
     managing?: UserCreateNestedManyWithoutManagedByInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -5819,6 +6599,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     managerId?: string | null
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
@@ -5847,6 +6629,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managedBy?: UserUpdateOneWithoutManagingNestedInput
     managing?: UserUpdateManyWithoutManagedByNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -5859,6 +6643,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyManagedByInput = {
@@ -5880,6 +6666,26 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type DocumentCreateManyBuyerInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    sellerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateManySellerInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    url?: string | null
+    buyerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserUpdateWithoutManagedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -5890,6 +6696,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -5902,6 +6710,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -5939,6 +6749,66 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneWithoutSellerDocsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

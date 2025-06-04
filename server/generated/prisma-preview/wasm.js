@@ -123,8 +123,12 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.DocumentScalarFieldEnum = {
   id: 'id',
   type: 'type',
+  status: 'status',
   url: 'url',
-  createdAt: 'createdAt'
+  buyerId: 'buyerId',
+  sellerId: 'sellerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
@@ -163,10 +167,24 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 exports.DocumentType = exports.$Enums.DocumentType = {
+  EMAIL_AGENT: 'EMAIL_AGENT',
+  UPLOADED_DOC: 'UPLOADED_DOC',
+  PURCHASE_AGREEMENT: 'PURCHASE_AGREEMENT',
+  DUE_DILIGENCE: 'DUE_DILIGENCE',
+  PRE_CLOSE_CHECKLIST: 'PRE_CLOSE_CHECKLIST',
+  CLOSING_DOCS: 'CLOSING_DOCS',
   NDA: 'NDA',
-  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   FINANCIAL_STATEMENT: 'FINANCIAL_STATEMENT',
-  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT'
+  CBR_CIM: 'CBR_CIM',
+  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
+  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
+  QUESTIONNAIRE: 'QUESTIONNAIRE',
+  AFTER_SALE: 'AFTER_SALE'
+};
+
+exports.DocumentStatus = exports.$Enums.DocumentStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED'
 };
 
 exports.UserRole = exports.$Enums.UserRole = {

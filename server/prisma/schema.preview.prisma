@@ -25,31 +25,58 @@ enum ListingStatus {
 }
 
 enum DocumentType {
+  // Common documents
+  EMAIL_AGENT
+  UPLOADED_DOC
+  PURCHASE_AGREEMENT
+  DUE_DILIGENCE
+  PRE_CLOSE_CHECKLIST
+  CLOSING_DOCS
+
+  // Buyer documents
   NDA
-  LISTING_AGREEMENT
   FINANCIAL_STATEMENT
+  CBR_CIM
   PURCHASE_CONTRACT
+
+  // Seller documents
+  LISTING_AGREEMENT
+  QUESTIONNAIRE
+  AFTER_SALE
+}
+
+enum DocumentStatus {
+  PENDING
+  COMPLETED
 }
 
 model Document {
-  id        String      @id @default(uuid())
+  id        String         @id @default(uuid())
   type      DocumentType
-  url       String
-  createdAt DateTime    @default(now())
+  status    DocumentStatus @default(PENDING)
+  url       String?
+  buyerId   String?
+  sellerId  String?
+  buyer     User?         @relation("BuyerDocuments", fields: [buyerId], references: [id])
+  seller    User?         @relation("SellerDocuments", fields: [sellerId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 model User {
-  id          String    @id @default(uuid())
-  email       String    @unique
-  password    String
-  name        String    @default("")
-  role        UserRole  @default(BUYER)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
-  managedBy   User?     @relation("UserManagement", fields: [managerId], references: [id])
-  managerId   String?
-  managing    User[]    @relation("UserManagement")
-  listings    Listing[] @relation("SellerListings")
+  id            String     @id @default(uuid())
+  email         String     @unique
+  password      String
+  name          String     @default("")
+  role          UserRole   @default(BUYER)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
+  managedBy     User?      @relation("UserManagement", fields: [managerId], references: [id])
+  managerId     String?
+  managing      User[]     @relation("UserManagement")
+  listings      Listing[]  @relation("SellerListings")
+  buyerDocs     Document[] @relation("BuyerDocuments")
+  sellerDocs    Document[] @relation("SellerDocuments")
 }
 
 model Listing {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
+import { RequestHandler } from 'express';
 
 const prisma = getPrisma();
 
@@ -33,7 +34,7 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   next();
 };
 
-export const authenticateAgent = (req: Request, res: Response, next: NextFunction) => {
+export const authenticateAgent: RequestHandler = (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
   console.log('Authenticating agent - Session:', {
     sessionID: typedReq.sessionID,
@@ -60,7 +61,7 @@ export const authenticateAgent = (req: Request, res: Response, next: NextFunctio
   next();
 };
 
-export const authenticateBroker = (req: Request, res: Response, next: NextFunction) => {
+export const authenticateBroker: RequestHandler = (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
   console.log('Authenticating broker - Session:', typedReq.session);
   console.log('Authenticating broker - User:', typedReq.user);
@@ -77,5 +78,24 @@ export const authenticateBroker = (req: Request, res: Response, next: NextFuncti
     return;
   }
 
+  next();
+};
+
+// 买家认证中间件
+export const authenticateBuyer: RequestHandler = (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  if (typedReq.user?.role !== 'BUYER') {
+    res.status(403).json({ message: 'Access denied. Buyer role required.' });
+    return;
+  }
+  next();
+};
+
+export const authenticateSeller: RequestHandler = (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  if (typedReq.user?.role !== 'SELLER') {
+    res.status(403).json({ message: 'Access denied. Seller role required.' });
+    return;
+  }
   next();
 }; 
