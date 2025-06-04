@@ -5,6 +5,8 @@ import MemoryStore from 'memorystore';
 import authRouter from './routes/auth';
 import brokerRouter from './routes/broker';
 import agentRouter from './routes/agent';
+import buyerRouter from './routes/buyer';
+import sellerRouter from './routes/seller';
 import { restoreUser } from './middleware/auth';
 
 // 扩展 Express 的 Request 类型
@@ -132,6 +134,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use('/api/auth', authRouter);
 app.use('/api/broker', brokerRouter);
 app.use('/api/agent', agentRouter);
+app.use('/api/buyer', buyerRouter);
+app.use('/api/seller', sellerRouter);
 
 // 健康检查
 app.get('/health', (req, res) => {

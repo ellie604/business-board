@@ -1,0 +1,18 @@
+    我的前端部署在vercel，后端部署在render,数据库部署在supabase,并且我有两个环境， 
+    preview和production，分别对应了两个数据库，可以在我的server/generated文件夹
+    下看到生成的两个数据库prisma,我也根据不同的环境配置了.env文件
+
+NODE_ENV=preview npx prisma generate --schema=./prisma/schema.preview.prisma - 生成 Prisma Client
+NODE_ENV=preview npx prisma db push --force-reset --schema=./prisma/schema.preview.prisma - 使用预览环境的 schema 重置并更新数据库
+NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts - 使用正确的编译选项运行 seed 脚本
+首先需要运行 npx prisma generate --schema=./prisma/schema.preview.prisma 来生成 Prisma Client
+然后运行 NODE_ENV=preview npx prisma db push --force-reset --schema=./prisma/schema.preview.prisma 来应用 schema 更改
+最后运行 NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts 来重新填充数据库
+
+本地运行测试
+server目录下：NODE_ENV=development npm run dev 
+client目录下：npm run dev
+
+preview环境测试：push到dev分支后自动部署
+
+production环境：dev分支合并到main分支自动部署
