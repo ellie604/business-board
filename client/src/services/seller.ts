@@ -1,4 +1,4 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
 export interface DashboardStats {
@@ -13,7 +13,7 @@ export interface DashboardStats {
   afterSale: 'completed' | 'pending';
 }
 
-export interface Document {
+interface Document {
   id: string;
   type: string;
   status: string;
@@ -21,66 +21,157 @@ export interface Document {
   updatedAt: string;
 }
 
-export const sellerService = {
-  // Get dashboard statistics
-  getDashboardStats: async (): Promise<DashboardStats> => {
-    const response = await axios.get(`${API_BASE_URL}/seller/dashboard`);
-    return response.data.stats;
-  },
+interface DashboardResponse {
+  stats: DashboardStats;
+  message: string;
+}
 
-  // Get all documents
-  getDocuments: async (): Promise<Document[]> => {
-    const response = await axios.get(`${API_BASE_URL}/seller/documents`);
-    return response.data.documents;
-  },
+interface DocumentsResponse {
+  documents: Document[];
+  message: string;
+}
 
-  // Upload a document
-  uploadDocument: async (file: File, type: string): Promise<Document> => {
+class SellerService {
+  async getDashboardStats(): Promise<DashboardResponse> {
+    const response = await fetch(`${API_BASE_URL}/seller/dashboard`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch dashboard stats');
+    }
+
+    return response.json();
+  }
+
+  async getDocuments(): Promise<DocumentsResponse> {
+    const response = await fetch(`${API_BASE_URL}/seller/documents`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch documents');
+    }
+
+    return response.json();
+  }
+
+  async uploadDocument(file: File, type: string): Promise<Document> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
-    const response = await axios.post(`${API_BASE_URL}/seller/documents/upload`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+
+    const response = await fetch(`${API_BASE_URL}/seller/documents/upload`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
     });
-    return response.data.document;
-  },
 
-  // Submit listing agreement
-  submitListingAgreement: async (data: any): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/seller/listing-agreement`, data);
-  },
+    if (!response.ok) {
+      throw new Error('Failed to upload document');
+    }
 
-  // Submit questionnaire
-  submitQuestionnaire: async (data: any): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/seller/questionnaire`, data);
-  },
-
-  // Submit purchase agreement
-  submitPurchaseAgreement: async (data: any): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/seller/purchase-agreement`, data);
-  },
-
-  // Submit due diligence
-  submitDueDiligence: async (data: any): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/seller/due-diligence`, data);
-  },
-
-  // Get pre-close checklist
-  getPreCloseChecklist: async (): Promise<any> => {
-    const response = await axios.get(`${API_BASE_URL}/seller/pre-close-checklist`);
-    return response.data.checklist;
-  },
-
-  // Submit pre-close checklist
-  submitPreCloseChecklist: async (data: any): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/seller/pre-close-checklist`, data);
-  },
-
-  // Get closing documents
-  getClosingDocuments: async (): Promise<Document[]> => {
-    const response = await axios.get(`${API_BASE_URL}/seller/closing-documents`);
-    return response.data.documents;
+    return response.json().then(data => data.document);
   }
-}; 
+
+  async submitListingAgreement(data: any): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/seller/listing-agreement`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit listing agreement');
+    }
+  }
+
+  async submitQuestionnaire(data: any): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/seller/questionnaire`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit questionnaire');
+    }
+  }
+
+  async submitPurchaseAgreement(data: any): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/seller/purchase-agreement`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit purchase agreement');
+    }
+  }
+
+  async submitDueDiligence(data: any): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/seller/due-diligence`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit due diligence');
+    }
+  }
+
+  async getPreCloseChecklist(): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/seller/pre-close-checklist`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get pre-close checklist');
+    }
+
+    return response.json().then(data => data.checklist);
+  }
+
+  async submitPreCloseChecklist(data: any): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/seller/pre-close-checklist`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit pre-close checklist');
+    }
+  }
+
+  async getClosingDocuments(): Promise<DocumentsResponse> {
+    const response = await fetch(`${API_BASE_URL}/seller/closing-documents`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch closing documents');
+    }
+
+    return response.json();
+  }
+}
+
+export const sellerService = new SellerService(); 

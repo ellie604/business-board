@@ -28,6 +28,11 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  * 
  */
 export type Listing = $Result.DefaultSelection<Prisma.$ListingPayload>
+/**
+ * Model Activity
+ * 
+ */
+export type Activity = $Result.DefaultSelection<Prisma.$ActivityPayload>
 
 /**
  * Enums
@@ -250,6 +255,16 @@ export class PrismaClient<
     * ```
     */
   get listing(): Prisma.ListingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.activity`: Exposes CRUD operations for the **Activity** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Activities
+    * const activities = await prisma.activity.findMany()
+    * ```
+    */
+  get activity(): Prisma.ActivityDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -692,7 +707,8 @@ export namespace Prisma {
   export const ModelName: {
     Document: 'Document',
     User: 'User',
-    Listing: 'Listing'
+    Listing: 'Listing',
+    Activity: 'Activity'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -711,7 +727,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "document" | "user" | "listing"
+      modelProps: "document" | "user" | "listing" | "activity"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -937,6 +953,80 @@ export namespace Prisma {
           }
         }
       }
+      Activity: {
+        payload: Prisma.$ActivityPayload<ExtArgs>
+        fields: Prisma.ActivityFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ActivityFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ActivityFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>
+          }
+          findFirst: {
+            args: Prisma.ActivityFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ActivityFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>
+          }
+          findMany: {
+            args: Prisma.ActivityFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>[]
+          }
+          create: {
+            args: Prisma.ActivityCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>
+          }
+          createMany: {
+            args: Prisma.ActivityCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ActivityCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>[]
+          }
+          delete: {
+            args: Prisma.ActivityDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>
+          }
+          update: {
+            args: Prisma.ActivityUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>
+          }
+          deleteMany: {
+            args: Prisma.ActivityDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ActivityUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ActivityUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>[]
+          }
+          upsert: {
+            args: Prisma.ActivityUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityPayload>
+          }
+          aggregate: {
+            args: Prisma.ActivityAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateActivity>
+          }
+          groupBy: {
+            args: Prisma.ActivityGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ActivityGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ActivityCountArgs<ExtArgs>
+            result: $Utils.Optional<ActivityCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1024,6 +1114,7 @@ export namespace Prisma {
     document?: DocumentOmit
     user?: UserOmit
     listing?: ListingOmit
+    activity?: ActivityOmit
   }
 
   /* Types for Logging */
@@ -1122,6 +1213,7 @@ export namespace Prisma {
     listings: number
     buyerDocs: number
     sellerDocs: number
+    activities: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1129,6 +1221,7 @@ export namespace Prisma {
     listings?: boolean | UserCountOutputTypeCountListingsArgs
     buyerDocs?: boolean | UserCountOutputTypeCountBuyerDocsArgs
     sellerDocs?: boolean | UserCountOutputTypeCountSellerDocsArgs
+    activities?: boolean | UserCountOutputTypeCountActivitiesArgs
   }
 
   // Custom InputTypes
@@ -1170,6 +1263,13 @@ export namespace Prisma {
     where?: DocumentWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountActivitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityWhereInput
+  }
+
 
   /**
    * Models
@@ -1190,8 +1290,8 @@ export namespace Prisma {
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
     url: string | null
-    buyerId: string | null
     sellerId: string | null
+    buyerId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1201,8 +1301,8 @@ export namespace Prisma {
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
     url: string | null
-    buyerId: string | null
     sellerId: string | null
+    buyerId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1212,8 +1312,8 @@ export namespace Prisma {
     type: number
     status: number
     url: number
-    buyerId: number
     sellerId: number
+    buyerId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1225,8 +1325,8 @@ export namespace Prisma {
     type?: true
     status?: true
     url?: true
-    buyerId?: true
     sellerId?: true
+    buyerId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1236,8 +1336,8 @@ export namespace Prisma {
     type?: true
     status?: true
     url?: true
-    buyerId?: true
     sellerId?: true
+    buyerId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1247,8 +1347,8 @@ export namespace Prisma {
     type?: true
     status?: true
     url?: true
-    buyerId?: true
     sellerId?: true
+    buyerId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1331,8 +1431,8 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status: $Enums.DocumentStatus
     url: string | null
+    sellerId: string
     buyerId: string | null
-    sellerId: string | null
     createdAt: Date
     updatedAt: Date
     _count: DocumentCountAggregateOutputType | null
@@ -1359,12 +1459,12 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
-    buyerId?: boolean
     sellerId?: boolean
+    buyerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
-    seller?: boolean | Document$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1372,12 +1472,12 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
-    buyerId?: boolean
     sellerId?: boolean
+    buyerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
-    seller?: boolean | Document$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1385,12 +1485,12 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
-    buyerId?: boolean
     sellerId?: boolean
+    buyerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
-    seller?: boolean | Document$sellerArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectScalar = {
@@ -1398,39 +1498,39 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
-    buyerId?: boolean
     sellerId?: boolean
+    buyerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "buyerId" | "sellerId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "sellerId" | "buyerId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
   export type DocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
-    seller?: boolean | Document$sellerArgs<ExtArgs>
   }
   export type DocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
-    seller?: boolean | Document$sellerArgs<ExtArgs>
   }
   export type DocumentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
-    seller?: boolean | Document$sellerArgs<ExtArgs>
   }
 
   export type $DocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Document"
     objects: {
+      seller: Prisma.$UserPayload<ExtArgs>
       buyer: Prisma.$UserPayload<ExtArgs> | null
-      seller: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       type: $Enums.DocumentType
       status: $Enums.DocumentStatus
       url: string | null
+      sellerId: string
       buyerId: string | null
-      sellerId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["document"]>
@@ -1827,8 +1927,8 @@ export namespace Prisma {
    */
   export interface Prisma__DocumentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     buyer<T extends Document$buyerArgs<ExtArgs> = {}>(args?: Subset<T, Document$buyerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    seller<T extends Document$sellerArgs<ExtArgs> = {}>(args?: Subset<T, Document$sellerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1862,8 +1962,8 @@ export namespace Prisma {
     readonly type: FieldRef<"Document", 'DocumentType'>
     readonly status: FieldRef<"Document", 'DocumentStatus'>
     readonly url: FieldRef<"Document", 'String'>
-    readonly buyerId: FieldRef<"Document", 'String'>
     readonly sellerId: FieldRef<"Document", 'String'>
+    readonly buyerId: FieldRef<"Document", 'String'>
     readonly createdAt: FieldRef<"Document", 'DateTime'>
     readonly updatedAt: FieldRef<"Document", 'DateTime'>
   }
@@ -2281,25 +2381,6 @@ export namespace Prisma {
   }
 
   /**
-   * Document.seller
-   */
-  export type Document$sellerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the User
-     */
-    omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-  }
-
-  /**
    * Document without action
    */
   export type DocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2511,6 +2592,7 @@ export namespace Prisma {
     listings?: boolean | User$listingsArgs<ExtArgs>
     buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
     sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
+    activities?: boolean | User$activitiesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2556,6 +2638,7 @@ export namespace Prisma {
     listings?: boolean | User$listingsArgs<ExtArgs>
     buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
     sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
+    activities?: boolean | User$activitiesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2573,6 +2656,7 @@ export namespace Prisma {
       listings: Prisma.$ListingPayload<ExtArgs>[]
       buyerDocs: Prisma.$DocumentPayload<ExtArgs>[]
       sellerDocs: Prisma.$DocumentPayload<ExtArgs>[]
+      activities: Prisma.$ActivityPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2982,6 +3066,7 @@ export namespace Prisma {
     listings<T extends User$listingsArgs<ExtArgs> = {}>(args?: Subset<T, User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyerDocs<T extends User$buyerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sellerDocs<T extends User$sellerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    activities<T extends User$activitiesArgs<ExtArgs> = {}>(args?: Subset<T, User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3530,6 +3615,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.activities
+   */
+  export type User$activitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    where?: ActivityWhereInput
+    orderBy?: ActivityOrderByWithRelationInput | ActivityOrderByWithRelationInput[]
+    cursor?: ActivityWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ActivityScalarFieldEnum | ActivityScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3562,10 +3671,12 @@ export namespace Prisma {
 
   export type ListingAvgAggregateOutputType = {
     price: number | null
+    views: number | null
   }
 
   export type ListingSumAggregateOutputType = {
     price: number | null
+    views: number | null
   }
 
   export type ListingMinAggregateOutputType = {
@@ -3574,6 +3685,7 @@ export namespace Prisma {
     description: string | null
     price: number | null
     status: $Enums.ListingStatus | null
+    views: number | null
     createdAt: Date | null
     sellerId: string | null
   }
@@ -3584,6 +3696,7 @@ export namespace Prisma {
     description: string | null
     price: number | null
     status: $Enums.ListingStatus | null
+    views: number | null
     createdAt: Date | null
     sellerId: string | null
   }
@@ -3594,6 +3707,7 @@ export namespace Prisma {
     description: number
     price: number
     status: number
+    views: number
     createdAt: number
     sellerId: number
     _all: number
@@ -3602,10 +3716,12 @@ export namespace Prisma {
 
   export type ListingAvgAggregateInputType = {
     price?: true
+    views?: true
   }
 
   export type ListingSumAggregateInputType = {
     price?: true
+    views?: true
   }
 
   export type ListingMinAggregateInputType = {
@@ -3614,6 +3730,7 @@ export namespace Prisma {
     description?: true
     price?: true
     status?: true
+    views?: true
     createdAt?: true
     sellerId?: true
   }
@@ -3624,6 +3741,7 @@ export namespace Prisma {
     description?: true
     price?: true
     status?: true
+    views?: true
     createdAt?: true
     sellerId?: true
   }
@@ -3634,6 +3752,7 @@ export namespace Prisma {
     description?: true
     price?: true
     status?: true
+    views?: true
     createdAt?: true
     sellerId?: true
     _all?: true
@@ -3731,6 +3850,7 @@ export namespace Prisma {
     description: string
     price: number
     status: $Enums.ListingStatus
+    views: number
     createdAt: Date
     sellerId: string
     _count: ListingCountAggregateOutputType | null
@@ -3760,6 +3880,7 @@ export namespace Prisma {
     description?: boolean
     price?: boolean
     status?: boolean
+    views?: boolean
     createdAt?: boolean
     sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -3771,6 +3892,7 @@ export namespace Prisma {
     description?: boolean
     price?: boolean
     status?: boolean
+    views?: boolean
     createdAt?: boolean
     sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -3782,6 +3904,7 @@ export namespace Prisma {
     description?: boolean
     price?: boolean
     status?: boolean
+    views?: boolean
     createdAt?: boolean
     sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -3793,11 +3916,12 @@ export namespace Prisma {
     description?: boolean
     price?: boolean
     status?: boolean
+    views?: boolean
     createdAt?: boolean
     sellerId?: boolean
   }
 
-  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "price" | "status" | "createdAt" | "sellerId", ExtArgs["result"]["listing"]>
+  export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "price" | "status" | "views" | "createdAt" | "sellerId", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -3819,6 +3943,7 @@ export namespace Prisma {
       description: string
       price: number
       status: $Enums.ListingStatus
+      views: number
       createdAt: Date
       sellerId: string
     }, ExtArgs["result"]["listing"]>
@@ -4250,6 +4375,7 @@ export namespace Prisma {
     readonly description: FieldRef<"Listing", 'String'>
     readonly price: FieldRef<"Listing", 'Float'>
     readonly status: FieldRef<"Listing", 'ListingStatus'>
+    readonly views: FieldRef<"Listing", 'Int'>
     readonly createdAt: FieldRef<"Listing", 'DateTime'>
     readonly sellerId: FieldRef<"Listing", 'String'>
   }
@@ -4667,6 +4793,1051 @@ export namespace Prisma {
 
 
   /**
+   * Model Activity
+   */
+
+  export type AggregateActivity = {
+    _count: ActivityCountAggregateOutputType | null
+    _min: ActivityMinAggregateOutputType | null
+    _max: ActivityMaxAggregateOutputType | null
+  }
+
+  export type ActivityMinAggregateOutputType = {
+    id: string | null
+    description: string | null
+    createdAt: Date | null
+    sellerId: string | null
+  }
+
+  export type ActivityMaxAggregateOutputType = {
+    id: string | null
+    description: string | null
+    createdAt: Date | null
+    sellerId: string | null
+  }
+
+  export type ActivityCountAggregateOutputType = {
+    id: number
+    description: number
+    createdAt: number
+    sellerId: number
+    _all: number
+  }
+
+
+  export type ActivityMinAggregateInputType = {
+    id?: true
+    description?: true
+    createdAt?: true
+    sellerId?: true
+  }
+
+  export type ActivityMaxAggregateInputType = {
+    id?: true
+    description?: true
+    createdAt?: true
+    sellerId?: true
+  }
+
+  export type ActivityCountAggregateInputType = {
+    id?: true
+    description?: true
+    createdAt?: true
+    sellerId?: true
+    _all?: true
+  }
+
+  export type ActivityAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Activity to aggregate.
+     */
+    where?: ActivityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Activities to fetch.
+     */
+    orderBy?: ActivityOrderByWithRelationInput | ActivityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ActivityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Activities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Activities.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Activities
+    **/
+    _count?: true | ActivityCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ActivityMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ActivityMaxAggregateInputType
+  }
+
+  export type GetActivityAggregateType<T extends ActivityAggregateArgs> = {
+        [P in keyof T & keyof AggregateActivity]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateActivity[P]>
+      : GetScalarType<T[P], AggregateActivity[P]>
+  }
+
+
+
+
+  export type ActivityGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityWhereInput
+    orderBy?: ActivityOrderByWithAggregationInput | ActivityOrderByWithAggregationInput[]
+    by: ActivityScalarFieldEnum[] | ActivityScalarFieldEnum
+    having?: ActivityScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ActivityCountAggregateInputType | true
+    _min?: ActivityMinAggregateInputType
+    _max?: ActivityMaxAggregateInputType
+  }
+
+  export type ActivityGroupByOutputType = {
+    id: string
+    description: string
+    createdAt: Date
+    sellerId: string
+    _count: ActivityCountAggregateOutputType | null
+    _min: ActivityMinAggregateOutputType | null
+    _max: ActivityMaxAggregateOutputType | null
+  }
+
+  type GetActivityGroupByPayload<T extends ActivityGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ActivityGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ActivityGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ActivityGroupByOutputType[P]>
+            : GetScalarType<T[P], ActivityGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ActivitySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    description?: boolean
+    createdAt?: boolean
+    sellerId?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activity"]>
+
+  export type ActivitySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    description?: boolean
+    createdAt?: boolean
+    sellerId?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activity"]>
+
+  export type ActivitySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    description?: boolean
+    createdAt?: boolean
+    sellerId?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activity"]>
+
+  export type ActivitySelectScalar = {
+    id?: boolean
+    description?: boolean
+    createdAt?: boolean
+    sellerId?: boolean
+  }
+
+  export type ActivityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "description" | "createdAt" | "sellerId", ExtArgs["result"]["activity"]>
+  export type ActivityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ActivityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ActivityIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ActivityPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Activity"
+    objects: {
+      seller: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      description: string
+      createdAt: Date
+      sellerId: string
+    }, ExtArgs["result"]["activity"]>
+    composites: {}
+  }
+
+  type ActivityGetPayload<S extends boolean | null | undefined | ActivityDefaultArgs> = $Result.GetResult<Prisma.$ActivityPayload, S>
+
+  type ActivityCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ActivityFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ActivityCountAggregateInputType | true
+    }
+
+  export interface ActivityDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Activity'], meta: { name: 'Activity' } }
+    /**
+     * Find zero or one Activity that matches the filter.
+     * @param {ActivityFindUniqueArgs} args - Arguments to find a Activity
+     * @example
+     * // Get one Activity
+     * const activity = await prisma.activity.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ActivityFindUniqueArgs>(args: SelectSubset<T, ActivityFindUniqueArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Activity that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ActivityFindUniqueOrThrowArgs} args - Arguments to find a Activity
+     * @example
+     * // Get one Activity
+     * const activity = await prisma.activity.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ActivityFindUniqueOrThrowArgs>(args: SelectSubset<T, ActivityFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Activity that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityFindFirstArgs} args - Arguments to find a Activity
+     * @example
+     * // Get one Activity
+     * const activity = await prisma.activity.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ActivityFindFirstArgs>(args?: SelectSubset<T, ActivityFindFirstArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Activity that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityFindFirstOrThrowArgs} args - Arguments to find a Activity
+     * @example
+     * // Get one Activity
+     * const activity = await prisma.activity.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ActivityFindFirstOrThrowArgs>(args?: SelectSubset<T, ActivityFindFirstOrThrowArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Activities that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Activities
+     * const activities = await prisma.activity.findMany()
+     * 
+     * // Get first 10 Activities
+     * const activities = await prisma.activity.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const activityWithIdOnly = await prisma.activity.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ActivityFindManyArgs>(args?: SelectSubset<T, ActivityFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Activity.
+     * @param {ActivityCreateArgs} args - Arguments to create a Activity.
+     * @example
+     * // Create one Activity
+     * const Activity = await prisma.activity.create({
+     *   data: {
+     *     // ... data to create a Activity
+     *   }
+     * })
+     * 
+     */
+    create<T extends ActivityCreateArgs>(args: SelectSubset<T, ActivityCreateArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Activities.
+     * @param {ActivityCreateManyArgs} args - Arguments to create many Activities.
+     * @example
+     * // Create many Activities
+     * const activity = await prisma.activity.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ActivityCreateManyArgs>(args?: SelectSubset<T, ActivityCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Activities and returns the data saved in the database.
+     * @param {ActivityCreateManyAndReturnArgs} args - Arguments to create many Activities.
+     * @example
+     * // Create many Activities
+     * const activity = await prisma.activity.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Activities and only return the `id`
+     * const activityWithIdOnly = await prisma.activity.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ActivityCreateManyAndReturnArgs>(args?: SelectSubset<T, ActivityCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Activity.
+     * @param {ActivityDeleteArgs} args - Arguments to delete one Activity.
+     * @example
+     * // Delete one Activity
+     * const Activity = await prisma.activity.delete({
+     *   where: {
+     *     // ... filter to delete one Activity
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ActivityDeleteArgs>(args: SelectSubset<T, ActivityDeleteArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Activity.
+     * @param {ActivityUpdateArgs} args - Arguments to update one Activity.
+     * @example
+     * // Update one Activity
+     * const activity = await prisma.activity.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ActivityUpdateArgs>(args: SelectSubset<T, ActivityUpdateArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Activities.
+     * @param {ActivityDeleteManyArgs} args - Arguments to filter Activities to delete.
+     * @example
+     * // Delete a few Activities
+     * const { count } = await prisma.activity.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ActivityDeleteManyArgs>(args?: SelectSubset<T, ActivityDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Activities.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Activities
+     * const activity = await prisma.activity.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ActivityUpdateManyArgs>(args: SelectSubset<T, ActivityUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Activities and returns the data updated in the database.
+     * @param {ActivityUpdateManyAndReturnArgs} args - Arguments to update many Activities.
+     * @example
+     * // Update many Activities
+     * const activity = await prisma.activity.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Activities and only return the `id`
+     * const activityWithIdOnly = await prisma.activity.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ActivityUpdateManyAndReturnArgs>(args: SelectSubset<T, ActivityUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Activity.
+     * @param {ActivityUpsertArgs} args - Arguments to update or create a Activity.
+     * @example
+     * // Update or create a Activity
+     * const activity = await prisma.activity.upsert({
+     *   create: {
+     *     // ... data to create a Activity
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Activity we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ActivityUpsertArgs>(args: SelectSubset<T, ActivityUpsertArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Activities.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityCountArgs} args - Arguments to filter Activities to count.
+     * @example
+     * // Count the number of Activities
+     * const count = await prisma.activity.count({
+     *   where: {
+     *     // ... the filter for the Activities we want to count
+     *   }
+     * })
+    **/
+    count<T extends ActivityCountArgs>(
+      args?: Subset<T, ActivityCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ActivityCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Activity.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ActivityAggregateArgs>(args: Subset<T, ActivityAggregateArgs>): Prisma.PrismaPromise<GetActivityAggregateType<T>>
+
+    /**
+     * Group by Activity.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ActivityGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ActivityGroupByArgs['orderBy'] }
+        : { orderBy?: ActivityGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ActivityGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetActivityGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Activity model
+   */
+  readonly fields: ActivityFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Activity.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ActivityClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Activity model
+   */
+  interface ActivityFieldRefs {
+    readonly id: FieldRef<"Activity", 'String'>
+    readonly description: FieldRef<"Activity", 'String'>
+    readonly createdAt: FieldRef<"Activity", 'DateTime'>
+    readonly sellerId: FieldRef<"Activity", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Activity findUnique
+   */
+  export type ActivityFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * Filter, which Activity to fetch.
+     */
+    where: ActivityWhereUniqueInput
+  }
+
+  /**
+   * Activity findUniqueOrThrow
+   */
+  export type ActivityFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * Filter, which Activity to fetch.
+     */
+    where: ActivityWhereUniqueInput
+  }
+
+  /**
+   * Activity findFirst
+   */
+  export type ActivityFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * Filter, which Activity to fetch.
+     */
+    where?: ActivityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Activities to fetch.
+     */
+    orderBy?: ActivityOrderByWithRelationInput | ActivityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Activities.
+     */
+    cursor?: ActivityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Activities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Activities.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Activities.
+     */
+    distinct?: ActivityScalarFieldEnum | ActivityScalarFieldEnum[]
+  }
+
+  /**
+   * Activity findFirstOrThrow
+   */
+  export type ActivityFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * Filter, which Activity to fetch.
+     */
+    where?: ActivityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Activities to fetch.
+     */
+    orderBy?: ActivityOrderByWithRelationInput | ActivityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Activities.
+     */
+    cursor?: ActivityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Activities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Activities.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Activities.
+     */
+    distinct?: ActivityScalarFieldEnum | ActivityScalarFieldEnum[]
+  }
+
+  /**
+   * Activity findMany
+   */
+  export type ActivityFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * Filter, which Activities to fetch.
+     */
+    where?: ActivityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Activities to fetch.
+     */
+    orderBy?: ActivityOrderByWithRelationInput | ActivityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Activities.
+     */
+    cursor?: ActivityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Activities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Activities.
+     */
+    skip?: number
+    distinct?: ActivityScalarFieldEnum | ActivityScalarFieldEnum[]
+  }
+
+  /**
+   * Activity create
+   */
+  export type ActivityCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Activity.
+     */
+    data: XOR<ActivityCreateInput, ActivityUncheckedCreateInput>
+  }
+
+  /**
+   * Activity createMany
+   */
+  export type ActivityCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Activities.
+     */
+    data: ActivityCreateManyInput | ActivityCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Activity createManyAndReturn
+   */
+  export type ActivityCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * The data used to create many Activities.
+     */
+    data: ActivityCreateManyInput | ActivityCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Activity update
+   */
+  export type ActivityUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Activity.
+     */
+    data: XOR<ActivityUpdateInput, ActivityUncheckedUpdateInput>
+    /**
+     * Choose, which Activity to update.
+     */
+    where: ActivityWhereUniqueInput
+  }
+
+  /**
+   * Activity updateMany
+   */
+  export type ActivityUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Activities.
+     */
+    data: XOR<ActivityUpdateManyMutationInput, ActivityUncheckedUpdateManyInput>
+    /**
+     * Filter which Activities to update
+     */
+    where?: ActivityWhereInput
+    /**
+     * Limit how many Activities to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Activity updateManyAndReturn
+   */
+  export type ActivityUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * The data used to update Activities.
+     */
+    data: XOR<ActivityUpdateManyMutationInput, ActivityUncheckedUpdateManyInput>
+    /**
+     * Filter which Activities to update
+     */
+    where?: ActivityWhereInput
+    /**
+     * Limit how many Activities to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Activity upsert
+   */
+  export type ActivityUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Activity to update in case it exists.
+     */
+    where: ActivityWhereUniqueInput
+    /**
+     * In case the Activity found by the `where` argument doesn't exist, create a new Activity with this data.
+     */
+    create: XOR<ActivityCreateInput, ActivityUncheckedCreateInput>
+    /**
+     * In case the Activity was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ActivityUpdateInput, ActivityUncheckedUpdateInput>
+  }
+
+  /**
+   * Activity delete
+   */
+  export type ActivityDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
+     * Filter which Activity to delete.
+     */
+    where: ActivityWhereUniqueInput
+  }
+
+  /**
+   * Activity deleteMany
+   */
+  export type ActivityDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Activities to delete
+     */
+    where?: ActivityWhereInput
+    /**
+     * Limit how many Activities to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Activity without action
+   */
+  export type ActivityDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Activity
+     */
+    select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Activity
+     */
+    omit?: ActivityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4685,8 +5856,8 @@ export namespace Prisma {
     type: 'type',
     status: 'status',
     url: 'url',
-    buyerId: 'buyerId',
     sellerId: 'sellerId',
+    buyerId: 'buyerId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -4714,11 +5885,22 @@ export namespace Prisma {
     description: 'description',
     price: 'price',
     status: 'status',
+    views: 'views',
     createdAt: 'createdAt',
     sellerId: 'sellerId'
   };
 
   export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
+
+
+  export const ActivityScalarFieldEnum: {
+    id: 'id',
+    description: 'description',
+    createdAt: 'createdAt',
+    sellerId: 'sellerId'
+  };
+
+  export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -4873,12 +6055,12 @@ export namespace Prisma {
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableFilter<"Document"> | string | null
+    sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
-    sellerId?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    seller?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type DocumentOrderByWithRelationInput = {
@@ -4886,12 +6068,12 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrderInput | SortOrder
+    sellerId?: SortOrder
     buyerId?: SortOrderInput | SortOrder
-    sellerId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    buyer?: UserOrderByWithRelationInput
     seller?: UserOrderByWithRelationInput
+    buyer?: UserOrderByWithRelationInput
   }
 
   export type DocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -4902,12 +6084,12 @@ export namespace Prisma {
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableFilter<"Document"> | string | null
+    sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
-    sellerId?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    seller?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type DocumentOrderByWithAggregationInput = {
@@ -4915,8 +6097,8 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrderInput | SortOrder
+    sellerId?: SortOrder
     buyerId?: SortOrderInput | SortOrder
-    sellerId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DocumentCountOrderByAggregateInput
@@ -4932,8 +6114,8 @@ export namespace Prisma {
     type?: EnumDocumentTypeWithAggregatesFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusWithAggregatesFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    sellerId?: StringWithAggregatesFilter<"Document"> | string
     buyerId?: StringNullableWithAggregatesFilter<"Document"> | string | null
-    sellerId?: StringNullableWithAggregatesFilter<"Document"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
   }
@@ -4955,6 +6137,7 @@ export namespace Prisma {
     listings?: ListingListRelationFilter
     buyerDocs?: DocumentListRelationFilter
     sellerDocs?: DocumentListRelationFilter
+    activities?: ActivityListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4971,6 +6154,7 @@ export namespace Prisma {
     listings?: ListingOrderByRelationAggregateInput
     buyerDocs?: DocumentOrderByRelationAggregateInput
     sellerDocs?: DocumentOrderByRelationAggregateInput
+    activities?: ActivityOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4990,6 +6174,7 @@ export namespace Prisma {
     listings?: ListingListRelationFilter
     buyerDocs?: DocumentListRelationFilter
     sellerDocs?: DocumentListRelationFilter
+    activities?: ActivityListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -5029,6 +6214,7 @@ export namespace Prisma {
     description?: StringFilter<"Listing"> | string
     price?: FloatFilter<"Listing"> | number
     status?: EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
+    views?: IntFilter<"Listing"> | number
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5040,6 +6226,7 @@ export namespace Prisma {
     description?: SortOrder
     price?: SortOrder
     status?: SortOrder
+    views?: SortOrder
     createdAt?: SortOrder
     sellerId?: SortOrder
     seller?: UserOrderByWithRelationInput
@@ -5054,6 +6241,7 @@ export namespace Prisma {
     description?: StringFilter<"Listing"> | string
     price?: FloatFilter<"Listing"> | number
     status?: EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
+    views?: IntFilter<"Listing"> | number
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -5065,6 +6253,7 @@ export namespace Prisma {
     description?: SortOrder
     price?: SortOrder
     status?: SortOrder
+    views?: SortOrder
     createdAt?: SortOrder
     sellerId?: SortOrder
     _count?: ListingCountOrderByAggregateInput
@@ -5083,8 +6272,59 @@ export namespace Prisma {
     description?: StringWithAggregatesFilter<"Listing"> | string
     price?: FloatWithAggregatesFilter<"Listing"> | number
     status?: EnumListingStatusWithAggregatesFilter<"Listing"> | $Enums.ListingStatus
+    views?: IntWithAggregatesFilter<"Listing"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Listing"> | Date | string
     sellerId?: StringWithAggregatesFilter<"Listing"> | string
+  }
+
+  export type ActivityWhereInput = {
+    AND?: ActivityWhereInput | ActivityWhereInput[]
+    OR?: ActivityWhereInput[]
+    NOT?: ActivityWhereInput | ActivityWhereInput[]
+    id?: StringFilter<"Activity"> | string
+    description?: StringFilter<"Activity"> | string
+    createdAt?: DateTimeFilter<"Activity"> | Date | string
+    sellerId?: StringFilter<"Activity"> | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ActivityOrderByWithRelationInput = {
+    id?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    sellerId?: SortOrder
+    seller?: UserOrderByWithRelationInput
+  }
+
+  export type ActivityWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ActivityWhereInput | ActivityWhereInput[]
+    OR?: ActivityWhereInput[]
+    NOT?: ActivityWhereInput | ActivityWhereInput[]
+    description?: StringFilter<"Activity"> | string
+    createdAt?: DateTimeFilter<"Activity"> | Date | string
+    sellerId?: StringFilter<"Activity"> | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type ActivityOrderByWithAggregationInput = {
+    id?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    sellerId?: SortOrder
+    _count?: ActivityCountOrderByAggregateInput
+    _max?: ActivityMaxOrderByAggregateInput
+    _min?: ActivityMinOrderByAggregateInput
+  }
+
+  export type ActivityScalarWhereWithAggregatesInput = {
+    AND?: ActivityScalarWhereWithAggregatesInput | ActivityScalarWhereWithAggregatesInput[]
+    OR?: ActivityScalarWhereWithAggregatesInput[]
+    NOT?: ActivityScalarWhereWithAggregatesInput | ActivityScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Activity"> | string
+    description?: StringWithAggregatesFilter<"Activity"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Activity"> | Date | string
+    sellerId?: StringWithAggregatesFilter<"Activity"> | string
   }
 
   export type DocumentCreateInput = {
@@ -5094,8 +6334,8 @@ export namespace Prisma {
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerDocsInput
     buyer?: UserCreateNestedOneWithoutBuyerDocsInput
-    seller?: UserCreateNestedOneWithoutSellerDocsInput
   }
 
   export type DocumentUncheckedCreateInput = {
@@ -5103,8 +6343,8 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    sellerId: string
     buyerId?: string | null
-    sellerId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5116,8 +6356,8 @@ export namespace Prisma {
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
     buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
-    seller?: UserUpdateOneWithoutSellerDocsNestedInput
   }
 
   export type DocumentUncheckedUpdateInput = {
@@ -5125,8 +6365,8 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5136,8 +6376,8 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    sellerId: string
     buyerId?: string | null
-    sellerId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5156,8 +6396,8 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5175,6 +6415,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -5190,6 +6431,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserUpdateInput = {
@@ -5205,6 +6447,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -5220,6 +6463,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -5260,6 +6504,7 @@ export namespace Prisma {
     description: string
     price: number
     status?: $Enums.ListingStatus
+    views?: number
     createdAt?: Date | string
     seller: UserCreateNestedOneWithoutListingsInput
   }
@@ -5270,6 +6515,7 @@ export namespace Prisma {
     description: string
     price: number
     status?: $Enums.ListingStatus
+    views?: number
     createdAt?: Date | string
     sellerId: string
   }
@@ -5280,6 +6526,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutListingsNestedInput
   }
@@ -5290,6 +6537,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: StringFieldUpdateOperationsInput | string
   }
@@ -5300,6 +6548,7 @@ export namespace Prisma {
     description: string
     price: number
     status?: $Enums.ListingStatus
+    views?: number
     createdAt?: Date | string
     sellerId: string
   }
@@ -5310,6 +6559,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5319,6 +6569,55 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ActivityCreateInput = {
+    id?: string
+    description: string
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutActivitiesInput
+  }
+
+  export type ActivityUncheckedCreateInput = {
+    id?: string
+    description: string
+    createdAt?: Date | string
+    sellerId: string
+  }
+
+  export type ActivityUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutActivitiesNestedInput
+  }
+
+  export type ActivityUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ActivityCreateManyInput = {
+    id?: string
+    description: string
+    createdAt?: Date | string
+    sellerId: string
+  }
+
+  export type ActivityUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: StringFieldUpdateOperationsInput | string
   }
@@ -5378,6 +6677,11 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -5393,8 +6697,8 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrder
-    buyerId?: SortOrder
     sellerId?: SortOrder
+    buyerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5404,8 +6708,8 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrder
-    buyerId?: SortOrder
     sellerId?: SortOrder
+    buyerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5415,8 +6719,8 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrder
-    buyerId?: SortOrder
     sellerId?: SortOrder
+    buyerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5516,6 +6820,12 @@ export namespace Prisma {
     none?: DocumentWhereInput
   }
 
+  export type ActivityListRelationFilter = {
+    every?: ActivityWhereInput
+    some?: ActivityWhereInput
+    none?: ActivityWhereInput
+  }
+
   export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -5525,6 +6835,10 @@ export namespace Prisma {
   }
 
   export type DocumentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ActivityOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -5589,9 +6903,15 @@ export namespace Prisma {
     not?: NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type ListingCountOrderByAggregateInput = {
@@ -5600,12 +6920,14 @@ export namespace Prisma {
     description?: SortOrder
     price?: SortOrder
     status?: SortOrder
+    views?: SortOrder
     createdAt?: SortOrder
     sellerId?: SortOrder
   }
 
   export type ListingAvgOrderByAggregateInput = {
     price?: SortOrder
+    views?: SortOrder
   }
 
   export type ListingMaxOrderByAggregateInput = {
@@ -5614,6 +6936,7 @@ export namespace Prisma {
     description?: SortOrder
     price?: SortOrder
     status?: SortOrder
+    views?: SortOrder
     createdAt?: SortOrder
     sellerId?: SortOrder
   }
@@ -5624,12 +6947,14 @@ export namespace Prisma {
     description?: SortOrder
     price?: SortOrder
     status?: SortOrder
+    views?: SortOrder
     createdAt?: SortOrder
     sellerId?: SortOrder
   }
 
   export type ListingSumOrderByAggregateInput = {
     price?: SortOrder
+    views?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -5658,15 +6983,52 @@ export namespace Prisma {
     _max?: NestedEnumListingStatusFilter<$PrismaModel>
   }
 
-  export type UserCreateNestedOneWithoutBuyerDocsInput = {
-    create?: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutBuyerDocsInput
-    connect?: UserWhereUniqueInput
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type ActivityCountOrderByAggregateInput = {
+    id?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    sellerId?: SortOrder
+  }
+
+  export type ActivityMaxOrderByAggregateInput = {
+    id?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    sellerId?: SortOrder
+  }
+
+  export type ActivityMinOrderByAggregateInput = {
+    id?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    sellerId?: SortOrder
   }
 
   export type UserCreateNestedOneWithoutSellerDocsInput = {
     create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutBuyerDocsInput = {
+    create?: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerDocsInput
     connect?: UserWhereUniqueInput
   }
 
@@ -5690,6 +7052,14 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type UserUpdateOneRequiredWithoutSellerDocsNestedInput = {
+    create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
+    upsert?: UserUpsertWithoutSellerDocsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerDocsInput, UserUpdateWithoutSellerDocsInput>, UserUncheckedUpdateWithoutSellerDocsInput>
+  }
+
   export type UserUpdateOneWithoutBuyerDocsNestedInput = {
     create?: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
     connectOrCreate?: UserCreateOrConnectWithoutBuyerDocsInput
@@ -5698,16 +7068,6 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerDocsInput, UserUpdateWithoutBuyerDocsInput>, UserUncheckedUpdateWithoutBuyerDocsInput>
-  }
-
-  export type UserUpdateOneWithoutSellerDocsNestedInput = {
-    create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
-    upsert?: UserUpsertWithoutSellerDocsInput
-    disconnect?: UserWhereInput | boolean
-    delete?: UserWhereInput | boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerDocsInput, UserUpdateWithoutSellerDocsInput>, UserUncheckedUpdateWithoutSellerDocsInput>
   }
 
   export type UserCreateNestedOneWithoutManagingInput = {
@@ -5744,6 +7104,13 @@ export namespace Prisma {
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
+  export type ActivityCreateNestedManyWithoutSellerInput = {
+    create?: XOR<ActivityCreateWithoutSellerInput, ActivityUncheckedCreateWithoutSellerInput> | ActivityCreateWithoutSellerInput[] | ActivityUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: ActivityCreateOrConnectWithoutSellerInput | ActivityCreateOrConnectWithoutSellerInput[]
+    createMany?: ActivityCreateManySellerInputEnvelope
+    connect?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -5770,6 +7137,13 @@ export namespace Prisma {
     connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
     createMany?: DocumentCreateManySellerInputEnvelope
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type ActivityUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<ActivityCreateWithoutSellerInput, ActivityUncheckedCreateWithoutSellerInput> | ActivityCreateWithoutSellerInput[] | ActivityUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: ActivityCreateOrConnectWithoutSellerInput | ActivityCreateOrConnectWithoutSellerInput[]
+    createMany?: ActivityCreateManySellerInputEnvelope
+    connect?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -5842,6 +7216,20 @@ export namespace Prisma {
     deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
+  export type ActivityUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<ActivityCreateWithoutSellerInput, ActivityUncheckedCreateWithoutSellerInput> | ActivityCreateWithoutSellerInput[] | ActivityUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: ActivityCreateOrConnectWithoutSellerInput | ActivityCreateOrConnectWithoutSellerInput[]
+    upsert?: ActivityUpsertWithWhereUniqueWithoutSellerInput | ActivityUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: ActivityCreateManySellerInputEnvelope
+    set?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    disconnect?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    delete?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    connect?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    update?: ActivityUpdateWithWhereUniqueWithoutSellerInput | ActivityUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: ActivityUpdateManyWithWhereWithoutSellerInput | ActivityUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: ActivityScalarWhereInput | ActivityScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -5898,6 +7286,20 @@ export namespace Prisma {
     deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
+  export type ActivityUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<ActivityCreateWithoutSellerInput, ActivityUncheckedCreateWithoutSellerInput> | ActivityCreateWithoutSellerInput[] | ActivityUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: ActivityCreateOrConnectWithoutSellerInput | ActivityCreateOrConnectWithoutSellerInput[]
+    upsert?: ActivityUpsertWithWhereUniqueWithoutSellerInput | ActivityUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: ActivityCreateManySellerInputEnvelope
+    set?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    disconnect?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    delete?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    connect?: ActivityWhereUniqueInput | ActivityWhereUniqueInput[]
+    update?: ActivityUpdateWithWhereUniqueWithoutSellerInput | ActivityUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: ActivityUpdateManyWithWhereWithoutSellerInput | ActivityUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: ActivityScalarWhereInput | ActivityScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutListingsInput = {
     create?: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
     connectOrCreate?: UserCreateOrConnectWithoutListingsInput
@@ -5916,12 +7318,34 @@ export namespace Prisma {
     set?: $Enums.ListingStatus
   }
 
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type UserUpdateOneRequiredWithoutListingsNestedInput = {
     create?: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
     connectOrCreate?: UserCreateOrConnectWithoutListingsInput
     upsert?: UserUpsertWithoutListingsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutListingsInput, UserUpdateWithoutListingsInput>, UserUncheckedUpdateWithoutListingsInput>
+  }
+
+  export type UserCreateNestedOneWithoutActivitiesInput = {
+    create?: XOR<UserCreateWithoutActivitiesInput, UserUncheckedCreateWithoutActivitiesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActivitiesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutActivitiesNestedInput = {
+    create?: XOR<UserCreateWithoutActivitiesInput, UserUncheckedCreateWithoutActivitiesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActivitiesInput
+    upsert?: UserUpsertWithoutActivitiesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActivitiesInput, UserUpdateWithoutActivitiesInput>, UserUncheckedUpdateWithoutActivitiesInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -6128,37 +7552,20 @@ export namespace Prisma {
     _max?: NestedEnumListingStatusFilter<$PrismaModel>
   }
 
-  export type UserCreateWithoutBuyerDocsInput = {
-    id?: string
-    email: string
-    password: string
-    name?: string
-    role?: $Enums.UserRole
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    managedBy?: UserCreateNestedOneWithoutManagingInput
-    managing?: UserCreateNestedManyWithoutManagedByInput
-    listings?: ListingCreateNestedManyWithoutSellerInput
-    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
-  }
-
-  export type UserUncheckedCreateWithoutBuyerDocsInput = {
-    id?: string
-    email: string
-    password: string
-    name?: string
-    role?: $Enums.UserRole
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    managerId?: string | null
-    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
-    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
-    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
-  }
-
-  export type UserCreateOrConnectWithoutBuyerDocsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type UserCreateWithoutSellerDocsInput = {
@@ -6173,6 +7580,7 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    activities?: ActivityCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSellerDocsInput = {
@@ -6187,6 +7595,7 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSellerDocsInput = {
@@ -6194,43 +7603,39 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
   }
 
-  export type UserUpsertWithoutBuyerDocsInput = {
-    update: XOR<UserUpdateWithoutBuyerDocsInput, UserUncheckedUpdateWithoutBuyerDocsInput>
+  export type UserCreateWithoutBuyerDocsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyerDocsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyerDocsInput = {
+    where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutBuyerDocsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutBuyerDocsInput, UserUncheckedUpdateWithoutBuyerDocsInput>
-  }
-
-  export type UserUpdateWithoutBuyerDocsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    managedBy?: UserUpdateOneWithoutManagingNestedInput
-    managing?: UserUpdateManyWithoutManagedByNestedInput
-    listings?: ListingUpdateManyWithoutSellerNestedInput
-    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutBuyerDocsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    managerId?: NullableStringFieldUpdateOperationsInput | string | null
-    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
-    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
-    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithoutSellerDocsInput = {
@@ -6256,6 +7661,7 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    activities?: ActivityUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerDocsInput = {
@@ -6270,6 +7676,48 @@ export namespace Prisma {
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUpsertWithoutBuyerDocsInput = {
+    update: XOR<UserUpdateWithoutBuyerDocsInput, UserUncheckedUpdateWithoutBuyerDocsInput>
+    create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBuyerDocsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBuyerDocsInput, UserUncheckedUpdateWithoutBuyerDocsInput>
+  }
+
+  export type UserUpdateWithoutBuyerDocsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyerDocsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutManagingInput = {
@@ -6284,6 +7732,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -6298,6 +7747,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -6317,6 +7767,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -6331,6 +7782,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -6349,6 +7801,7 @@ export namespace Prisma {
     description: string
     price: number
     status?: $Enums.ListingStatus
+    views?: number
     createdAt?: Date | string
   }
 
@@ -6358,6 +7811,7 @@ export namespace Prisma {
     description: string
     price: number
     status?: $Enums.ListingStatus
+    views?: number
     createdAt?: Date | string
   }
 
@@ -6378,7 +7832,7 @@ export namespace Prisma {
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    seller?: UserCreateNestedOneWithoutSellerDocsInput
+    seller: UserCreateNestedOneWithoutSellerDocsInput
   }
 
   export type DocumentUncheckedCreateWithoutBuyerInput = {
@@ -6386,7 +7840,7 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
-    sellerId?: string | null
+    sellerId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6431,6 +7885,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ActivityCreateWithoutSellerInput = {
+    id?: string
+    description: string
+    createdAt?: Date | string
+  }
+
+  export type ActivityUncheckedCreateWithoutSellerInput = {
+    id?: string
+    description: string
+    createdAt?: Date | string
+  }
+
+  export type ActivityCreateOrConnectWithoutSellerInput = {
+    where: ActivityWhereUniqueInput
+    create: XOR<ActivityCreateWithoutSellerInput, ActivityUncheckedCreateWithoutSellerInput>
+  }
+
+  export type ActivityCreateManySellerInputEnvelope = {
+    data: ActivityCreateManySellerInput | ActivityCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -6454,6 +7930,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -6468,6 +7945,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -6525,6 +8003,7 @@ export namespace Prisma {
     description?: StringFilter<"Listing"> | string
     price?: FloatFilter<"Listing"> | number
     status?: EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
+    views?: IntFilter<"Listing"> | number
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
   }
@@ -6553,8 +8032,8 @@ export namespace Prisma {
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableFilter<"Document"> | string | null
+    sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
-    sellerId?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
   }
@@ -6575,6 +8054,32 @@ export namespace Prisma {
     data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutSellerInput>
   }
 
+  export type ActivityUpsertWithWhereUniqueWithoutSellerInput = {
+    where: ActivityWhereUniqueInput
+    update: XOR<ActivityUpdateWithoutSellerInput, ActivityUncheckedUpdateWithoutSellerInput>
+    create: XOR<ActivityCreateWithoutSellerInput, ActivityUncheckedCreateWithoutSellerInput>
+  }
+
+  export type ActivityUpdateWithWhereUniqueWithoutSellerInput = {
+    where: ActivityWhereUniqueInput
+    data: XOR<ActivityUpdateWithoutSellerInput, ActivityUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type ActivityUpdateManyWithWhereWithoutSellerInput = {
+    where: ActivityScalarWhereInput
+    data: XOR<ActivityUpdateManyMutationInput, ActivityUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type ActivityScalarWhereInput = {
+    AND?: ActivityScalarWhereInput | ActivityScalarWhereInput[]
+    OR?: ActivityScalarWhereInput[]
+    NOT?: ActivityScalarWhereInput | ActivityScalarWhereInput[]
+    id?: StringFilter<"Activity"> | string
+    description?: StringFilter<"Activity"> | string
+    createdAt?: DateTimeFilter<"Activity"> | Date | string
+    sellerId?: StringFilter<"Activity"> | string
+  }
+
   export type UserCreateWithoutListingsInput = {
     id?: string
     email: string
@@ -6587,6 +8092,7 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -6601,6 +8107,7 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
@@ -6631,6 +8138,7 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -6643,6 +8151,83 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserCreateWithoutActivitiesInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutActivitiesInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutActivitiesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutActivitiesInput, UserUncheckedCreateWithoutActivitiesInput>
+  }
+
+  export type UserUpsertWithoutActivitiesInput = {
+    update: XOR<UserUpdateWithoutActivitiesInput, UserUncheckedUpdateWithoutActivitiesInput>
+    create: XOR<UserCreateWithoutActivitiesInput, UserUncheckedCreateWithoutActivitiesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutActivitiesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutActivitiesInput, UserUncheckedUpdateWithoutActivitiesInput>
+  }
+
+  export type UserUpdateWithoutActivitiesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutActivitiesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
   }
@@ -6663,6 +8248,7 @@ export namespace Prisma {
     description: string
     price: number
     status?: $Enums.ListingStatus
+    views?: number
     createdAt?: Date | string
   }
 
@@ -6671,7 +8257,7 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
-    sellerId?: string | null
+    sellerId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6686,6 +8272,12 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ActivityCreateManySellerInput = {
+    id?: string
+    description: string
+    createdAt?: Date | string
+  }
+
   export type UserUpdateWithoutManagedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -6698,6 +8290,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -6712,6 +8305,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -6730,6 +8324,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -6739,6 +8334,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -6748,6 +8344,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -6758,7 +8355,7 @@ export namespace Prisma {
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    seller?: UserUpdateOneWithoutSellerDocsNestedInput
+    seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
   }
 
   export type DocumentUncheckedUpdateWithoutBuyerInput = {
@@ -6766,7 +8363,7 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6776,7 +8373,7 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
-    sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6809,6 +8406,24 @@ export namespace Prisma {
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityUncheckedUpdateManyWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

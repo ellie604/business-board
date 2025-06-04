@@ -130,10 +130,10 @@ async function main() {
   await Promise.all([
     prisma.document.createMany({
       data: [
-        { type: DocumentType.EMAIL_AGENT, status: DocumentStatus.COMPLETED, buyerId: buyer1.id },
-        { type: DocumentType.NDA, status: DocumentStatus.COMPLETED, buyerId: buyer1.id },
-        { type: DocumentType.FINANCIAL_STATEMENT, status: DocumentStatus.PENDING, buyerId: buyer1.id },
-        { type: DocumentType.CBR_CIM, status: DocumentStatus.PENDING, buyerId: buyer1.id }
+        { type: DocumentType.EMAIL_AGENT, status: DocumentStatus.COMPLETED, buyerId: buyer1.id, sellerId: seller1.id },
+        { type: DocumentType.NDA, status: DocumentStatus.COMPLETED, buyerId: buyer1.id, sellerId: seller1.id },
+        { type: DocumentType.FINANCIAL_STATEMENT, status: DocumentStatus.PENDING, buyerId: buyer1.id, sellerId: seller1.id },
+        { type: DocumentType.CBR_CIM, status: DocumentStatus.PENDING, buyerId: buyer1.id, sellerId: seller1.id }
       ]
     })
   ]);
@@ -142,11 +142,23 @@ async function main() {
   await Promise.all([
     prisma.document.createMany({
       data: [
-        { type: DocumentType.EMAIL_AGENT, status: DocumentStatus.COMPLETED, buyerId: buyer2.id },
-        { type: DocumentType.NDA, status: DocumentStatus.COMPLETED, buyerId: buyer2.id },
-        { type: DocumentType.FINANCIAL_STATEMENT, status: DocumentStatus.COMPLETED, buyerId: buyer2.id },
-        { type: DocumentType.CBR_CIM, status: DocumentStatus.COMPLETED, buyerId: buyer2.id },
-        { type: DocumentType.PURCHASE_CONTRACT, status: DocumentStatus.PENDING, buyerId: buyer2.id }
+        { type: DocumentType.EMAIL_AGENT, status: DocumentStatus.COMPLETED, buyerId: buyer2.id, sellerId: seller2.id },
+        { type: DocumentType.NDA, status: DocumentStatus.COMPLETED, buyerId: buyer2.id, sellerId: seller2.id },
+        { type: DocumentType.FINANCIAL_STATEMENT, status: DocumentStatus.COMPLETED, buyerId: buyer2.id, sellerId: seller2.id },
+        { type: DocumentType.CBR_CIM, status: DocumentStatus.COMPLETED, buyerId: buyer2.id, sellerId: seller2.id },
+        { type: DocumentType.PURCHASE_CONTRACT, status: DocumentStatus.PENDING, buyerId: buyer2.id, sellerId: seller2.id }
+      ]
+    })
+  ]);
+
+  // Create documents for buyer3
+  await Promise.all([
+    prisma.document.createMany({
+      data: [
+        { type: DocumentType.EMAIL_AGENT, status: DocumentStatus.COMPLETED, buyerId: buyer3.id, sellerId: seller3.id },
+        { type: DocumentType.NDA, status: DocumentStatus.COMPLETED, buyerId: buyer3.id, sellerId: seller3.id },
+        { type: DocumentType.FINANCIAL_STATEMENT, status: DocumentStatus.PENDING, buyerId: buyer3.id, sellerId: seller3.id },
+        { type: DocumentType.CBR_CIM, status: DocumentStatus.PENDING, buyerId: buyer3.id, sellerId: seller3.id }
       ]
     })
   ]);

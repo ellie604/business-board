@@ -125,8 +125,8 @@ exports.Prisma.DocumentScalarFieldEnum = {
   type: 'type',
   status: 'status',
   url: 'url',
-  buyerId: 'buyerId',
   sellerId: 'sellerId',
+  buyerId: 'buyerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -148,6 +148,14 @@ exports.Prisma.ListingScalarFieldEnum = {
   description: 'description',
   price: 'price',
   status: 'status',
+  views: 'views',
+  createdAt: 'createdAt',
+  sellerId: 'sellerId'
+};
+
+exports.Prisma.ActivityScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
   createdAt: 'createdAt',
   sellerId: 'sellerId'
 };
@@ -203,7 +211,8 @@ exports.ListingStatus = exports.$Enums.ListingStatus = {
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
-  Listing: 'Listing'
+  Listing: 'Listing',
+  Activity: 'Activity'
 };
 
 /**
