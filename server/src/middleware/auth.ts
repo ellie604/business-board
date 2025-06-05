@@ -98,4 +98,18 @@ export const authenticateSeller: RequestHandler = (req, res, next) => {
     return;
   }
   next();
+};
+
+export const authenticateUser: RequestHandler = (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  console.log('Authenticating user - Session:', typedReq.session);
+  console.log('Authenticating user - User:', typedReq.user);
+  
+  if (!typedReq.user) {
+    console.log('No user found in request');
+    res.status(401).json({ message: 'Authentication required' });
+    return;
+  }
+
+  next();
 }; 

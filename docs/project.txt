@@ -9,6 +9,8 @@ NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.prev
 然后运行 NODE_ENV=preview npx prisma db push --force-reset --schema=./prisma/schema.preview.prisma 来应用 schema 更改
 最后运行 NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts 来重新填充数据库
 
+
+
 本地运行测试
 server目录下：NODE_ENV=development npm run dev 
 client目录下：npm run dev

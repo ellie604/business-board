@@ -1,15 +1,28 @@
 import { Request } from 'express';
 import { Session } from 'express-session';
 
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-  session: Session & {
-    user?: {
-      id: string;
-      role: string;
-    }
+// User interface
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+// Extend express-session
+declare module 'express-session' {
+  interface Session {
+    user?: User;
   }
+}
+
+// Custom session interface
+interface CustomSession extends Session {
+  user?: User;
+}
+
+// Authenticated request interface
+export interface AuthenticatedRequest extends Request {
+  user?: User;
+  session: CustomSession;
 } 

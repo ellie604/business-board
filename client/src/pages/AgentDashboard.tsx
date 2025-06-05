@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { agentService } from '../services/agent';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import logo from '../assets/california-business-sales-logo.png';
 
 interface DashboardStats {
@@ -21,6 +21,7 @@ export function AgentDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -64,18 +65,19 @@ export function AgentDashboard() {
 
         {/* 导航链接 */}
         <nav className="mt-6">
-          <Link 
+          <NavLink 
             to="/agent"
-            className="block px-6 py-4 text-base bg-blue-100 text-blue-800 font-medium"
+            className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
+            end
           >
             Home
-          </Link>
-          <Link 
-            to="/agent/email"
+          </NavLink>
+          <NavLink 
+            to="/agent/messages"
             className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
           >
             Email
-          </Link>
+          </NavLink>
           <Link 
             to="/agent/sellers"
             className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
@@ -93,37 +95,42 @@ export function AgentDashboard() {
 
       {/* 主内容区 */}
       <div className="flex-1 p-8 w-full">
-        <h1 className="text-3xl font-bold mb-8">
-          Welcome Agent to Your Customized Dashboard
-        </h1>
+        <Outlet />
+        {location.pathname === '/agent' && (
+          <>
+            <h1 className="text-3xl font-bold mb-8">
+              Welcome Agent to Your Customized Dashboard
+            </h1>
 
-        {/* 统计数据卡片网格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-xl font-medium mb-4">Total Active Listings</h3>
-            <p className="text-4xl font-bold text-blue-600">{stats.totalActiveListings}</p>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-xl font-medium mb-4">Total under contract</h3>
-            <p className="text-4xl font-bold text-green-600">{stats.totalUnderContract}</p>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-xl font-medium mb-4">New Listings This Month</h3>
-            <p className="text-4xl font-bold text-purple-600">{stats.newListingsThisMonth}</p>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-xl font-medium mb-4">Non Disclosure agreement</h3>
-            <p className="text-4xl font-bold text-orange-600">{stats.totalNDA}</p>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-xl font-medium mb-4">Total Closed Deals (YTD)</h3>
-            <p className="text-4xl font-bold text-teal-600">{stats.totalClosedDeals}</p>
-          </div>
-        </div>
+            {/* 统计数据卡片网格 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <h3 className="text-xl font-medium mb-4">Total Active Listings</h3>
+                <p className="text-4xl font-bold text-blue-600">{stats.totalActiveListings}</p>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <h3 className="text-xl font-medium mb-4">Total under contract</h3>
+                <p className="text-4xl font-bold text-green-600">{stats.totalUnderContract}</p>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <h3 className="text-xl font-medium mb-4">New Listings This Month</h3>
+                <p className="text-4xl font-bold text-purple-600">{stats.newListingsThisMonth}</p>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <h3 className="text-xl font-medium mb-4">Non Disclosure agreement</h3>
+                <p className="text-4xl font-bold text-orange-600">{stats.totalNDA}</p>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <h3 className="text-xl font-medium mb-4">Total Closed Deals (YTD)</h3>
+                <p className="text-4xl font-bold text-teal-600">{stats.totalClosedDeals}</p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -139,7 +139,10 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  managerId: 'managerId'
+  managerId: 'managerId',
+  userType: 'userType',
+  unreadCount: 'unreadCount',
+  lastReadAt: 'lastReadAt'
 };
 
 exports.Prisma.ListingScalarFieldEnum = {
@@ -158,6 +161,36 @@ exports.Prisma.ActivityScalarFieldEnum = {
   description: 'description',
   createdAt: 'createdAt',
   sellerId: 'sellerId'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  subject: 'subject',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  readAt: 'readAt',
+  senderId: 'senderId',
+  senderType: 'senderType',
+  senderName: 'senderName',
+  receiverId: 'receiverId',
+  receiverType: 'receiverType',
+  receiverName: 'receiverName',
+  status: 'status',
+  isRead: 'isRead',
+  isArchived: 'isArchived',
+  parentMessageId: 'parentMessageId',
+  threadId: 'threadId'
+};
+
+exports.Prisma.MessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  fileType: 'fileType',
+  fileUrl: 'fileUrl',
+  uploadedAt: 'uploadedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -202,17 +235,34 @@ exports.UserRole = exports.$Enums.UserRole = {
   BUYER: 'BUYER'
 };
 
+exports.UserType = exports.$Enums.UserType = {
+  BROKER: 'BROKER',
+  AGENT: 'AGENT',
+  SELLER: 'SELLER',
+  BUYER: 'BUYER'
+};
+
 exports.ListingStatus = exports.$Enums.ListingStatus = {
   ACTIVE: 'ACTIVE',
   UNDER_CONTRACT: 'UNDER_CONTRACT',
   CLOSED: 'CLOSED'
 };
 
+exports.MessageStatus = exports.$Enums.MessageStatus = {
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  ARCHIVED: 'ARCHIVED',
+  DELETED: 'DELETED'
+};
+
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
   Listing: 'Listing',
-  Activity: 'Activity'
+  Activity: 'Activity',
+  Message: 'Message',
+  MessageAttachment: 'MessageAttachment'
 };
 
 /**

@@ -50,6 +50,21 @@ enum DocumentStatus {
   COMPLETED
 }
 
+enum UserType {
+  BROKER
+  AGENT
+  SELLER
+  BUYER
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  ARCHIVED
+  DELETED
+}
+
 model Document {
   id        String         @id @default(uuid())
   type      DocumentType
@@ -78,6 +93,11 @@ model User {
   buyerDocs     Document[] @relation("BuyerDocuments")
   sellerDocs    Document[] @relation("SellerDocuments")
   activities    Activity[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  userType         UserType
+  unreadCount      Int       @default(0)
+  lastReadAt       DateTime?
 }
 
 model Listing {
@@ -98,4 +118,51 @@ model Activity {
   createdAt   DateTime @default(now())
   sellerId    String
   seller      User     @relation(fields: [sellerId], references: [id])
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  subject       String
+  content       String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  readAt        DateTime?
+
+  senderId      String
+  senderType    UserType
+  senderName    String
+
+  receiverId    String
+  receiverType  UserType
+  receiverName  String
+
+  status        MessageStatus @default(SENT)
+  isRead        Boolean       @default(false)
+  isArchived    Boolean       @default(false)
+
+  parentMessageId String?
+  threadId       String?
+
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  parentMessage Message? @relation("MessageReplies", fields: [parentMessageId], references: [id])
+  replies       Message[] @relation("MessageReplies")
+
+  attachments   MessageAttachment[]
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([threadId])
+}
+
+model MessageAttachment {
+  id          String   @id @default(cuid())
+  messageId   String
+  fileName    String
+  fileSize    Int
+  fileType    String
+  fileUrl     String
+  uploadedAt  DateTime @default(now())
+
+  message     Message  @relation(fields: [messageId], references: [id])
 }

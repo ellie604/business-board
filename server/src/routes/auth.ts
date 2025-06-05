@@ -102,8 +102,10 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     
     // 设置用户信息到 request 和 session
     const userInfo = {
-      id: user.id.toString(), // 确保 ID 是字符串类型
-      role: user.role
+      id: user.id,
+      role: user.role,
+      name: user.name,
+      email: user.email
     };
     
     typedReq.user = userInfo;

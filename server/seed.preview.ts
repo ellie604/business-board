@@ -1,8 +1,11 @@
 // seed.preview.ts
 import { PrismaClient, DocumentType, DocumentStatus } from './generated/prisma-preview';
-const prisma = new PrismaClient();
+import { getPrisma } from './database';
+import { UserRole } from './generated/prisma-preview';
 
 async function main() {
+  const prisma = getPrisma();
+
   // Create broker
   const broker = await prisma.user.create({
     data: {
@@ -10,6 +13,7 @@ async function main() {
       email: 'broker@example.com',
       password: '123456',
       role: 'BROKER',
+      userType: 'BROKER'
     },
   });
 
@@ -20,6 +24,7 @@ async function main() {
         email: 'agent1@example.com',
         password: '123456',
         role: 'AGENT',
+        userType: 'AGENT',
         managerId: broker.id,
       },
     }),
@@ -28,6 +33,7 @@ async function main() {
         email: 'agent2@example.com',
         password: '123456',
         role: 'AGENT',
+        userType: 'AGENT',
         managerId: broker.id,
       },
     }),
@@ -39,7 +45,8 @@ async function main() {
       email: 'seller1@example.com',
       password: '123456',
       role: 'SELLER',
-      managerId: broker.id,
+      userType: 'SELLER',
+      managerId: agents[0].id,
     },
   });
 
@@ -48,7 +55,8 @@ async function main() {
       email: 'seller2@example.com',
       password: '123456',
       role: 'SELLER',
-      managerId: broker.id,
+      userType: 'SELLER',
+      managerId: agents[0].id,
     },
   });
 
@@ -57,7 +65,8 @@ async function main() {
       email: 'seller3@example.com',
       password: '123456',
       role: 'SELLER',
-      managerId: broker.id,
+      userType: 'SELLER',
+      managerId: agents[1].id,
     },
   });
 
@@ -104,7 +113,8 @@ async function main() {
       email: 'buyer1@example.com',
       password: '123456',
       role: 'BUYER',
-      managerId: broker.id,
+      userType: 'BUYER',
+      managerId: agents[0].id,
     },
   });
 
@@ -113,7 +123,8 @@ async function main() {
       email: 'buyer2@example.com',
       password: '123456',
       role: 'BUYER',
-      managerId: broker.id,
+      userType: 'BUYER',
+      managerId: agents[0].id,
     },
   });
 
@@ -122,7 +133,8 @@ async function main() {
       email: 'buyer3@example.com',
       password: '123456',
       role: 'BUYER',
-      managerId: broker.id,
+      userType: 'BUYER',
+      managerId: agents[1].id,
     },
   });
 
@@ -172,5 +184,6 @@ main()
     process.exit(1);
   })
   .finally(async () => {
+    const prisma = getPrisma();
     await prisma.$disconnect();
   });
