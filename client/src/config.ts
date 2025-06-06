@@ -10,7 +10,8 @@ const getBackendUrl = () => {
       return 'https://business-board-backend.onrender.com/api';
     case 'preview':
       // 开发预览环境：前端在 Vercel dev 分支，后端在 Render.com 预览环境
-      return 'https://business-board.onrender.com/api';
+      // return 'https://business-board.onrender.com/api';
+      return 'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app/api';
     default:
       // 本地开发环境
       return 'http://localhost:3000/api';
