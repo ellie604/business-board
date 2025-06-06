@@ -1,10 +1,25 @@
 // 统一的后端 URL 配置
 const getBackendUrl = () => {
   const env = import.meta.env.MODE;
-  console.log('Current environment:', env);
+  const isDev = import.meta.env.DEV;
+  const isProd = import.meta.env.PROD;
+  const baseUrl = import.meta.env.BASE_URL;
+  
+  console.log('=== Environment Debug Info ===');
+  console.log('Current environment (MODE):', env);
+  console.log('isDev:', isDev);
+  console.log('isProd:', isProd);
+  console.log('BASE_URL:', baseUrl);
   console.log('Current hostname:', window.location.hostname);
+  console.log('=== End Environment Debug Info ===');
 
-  switch(env) {
+  // 根据域名判断环境
+  const isPreviewDomain = window.location.hostname.includes('-dev-');
+  const envByDomain = isPreviewDomain ? 'preview' : 'production';
+  console.log('Environment detected by domain:', envByDomain);
+
+  // 使用域名判断来确定环境
+  switch(envByDomain) {
     case 'production':
       // 生产环境：前端在 Vercel，后端在 Render.com
       return 'https://business-board-backend.onrender.com/api';
