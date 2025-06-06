@@ -7,14 +7,16 @@ const getBackendUrl = () => {
     case 'preview':
       // 从当前域名构建后端 URL
       const domain = window.location.hostname;
-      if (domain.includes('-xinyis-projects-6c0795d6.vercel.app')) {
-        const backendDomain = domain.replace('vercel.app', 'onrender.com');
-        return `https://${backendDomain}/api`;
-      }
+      // 使用相对路径，让浏览器自动处理同源请求
       return '/api';
     default:
       return '/api';
   }
 };
 
-export const API_BASE_URL = getBackendUrl(); 
+export const API_BASE_URL = getBackendUrl();
+
+// 添加调试信息
+console.log('Current environment:', import.meta.env.MODE);
+console.log('API Base URL:', API_BASE_URL);
+console.log('Current hostname:', window.location.hostname); 
