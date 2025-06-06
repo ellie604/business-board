@@ -36,16 +36,23 @@ const getAllowedOrigins = () => {
   type OriginType = string | RegExp;
   
   const origins: Record<string, OriginType[]> = {
-    production: ['https://business-board.vercel.app'],
-    preview: [
-      /https:\/\/business-board-git-.*-xinyis-projects-.*\.vercel\.app/,
-      /https:\/\/business-board-.*\.vercel\.app/
+    production: [
+      'https://business-board.vercel.app',  // 生产环境主域名
+      /https:\/\/business-board-git-main-.*\.vercel\.app/  // 生产环境的其他 Vercel 域名
     ],
-    development: ['http://localhost:5174', 'http://localhost:5173']
+    preview: [
+      /https:\/\/business-board-git-dev-.*\.vercel\.app/,  // 预览环境的 Vercel 域名
+      /https:\/\/business-board-.*\.vercel\.app/  // 其他 Vercel 预览域名
+    ],
+    development: [
+      'http://localhost:5174', 
+      'http://localhost:5173'
+    ]
   };
 
   const env = process.env.NODE_ENV || 'development';
   console.log('Current environment:', env);
+  console.log('Current hostname:', process.env.HOST);
   
   if (!(env in origins)) {
     console.warn('Unknown environment:', env, 'falling back to development');

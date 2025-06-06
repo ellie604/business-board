@@ -6,11 +6,11 @@ const getBackendUrl = () => {
 
   switch(env) {
     case 'production':
-      // 使用主域名作为后端 API
-      return 'https://business-board-git-main-xinyis-projects-6c0795d6.vercel.app/api';
+      // 生产环境：前端在 Vercel，后端在 Render.com
+      return 'https://business-board-backend.onrender.com/api';
     case 'preview':
-      // 在预览环境中，后端和前端部署在同一域名下
-      return 'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app/api';
+      // 开发预览环境：前端在 Vercel dev 分支，后端在 Render.com 预览环境
+      return 'https://business-board-preview.onrender.com/api';
     default:
       // 本地开发环境
       return 'http://localhost:3000/api';

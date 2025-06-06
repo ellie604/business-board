@@ -18,3 +18,5 @@ client目录下：npm run dev
 preview环境测试：push到dev分支后自动部署
 
 production环境：dev分支合并到main分支自动部署
+
+都要用原生的import { API_BASE_URL } from '../../config';，不要用axios
