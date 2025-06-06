@@ -1,34 +1,24 @@
 // 统一的后端 URL 配置
 const getBackendUrl = () => {
   const env = import.meta.env.MODE;
-  const isDev = import.meta.env.DEV;
-  const isProd = import.meta.env.PROD;
-  const baseUrl = import.meta.env.BASE_URL;
+  const hostname = window.location.hostname;
   
   console.log('=== Environment Debug Info ===');
-  console.log('Current environment (MODE):', env);
-  console.log('isDev:', isDev);
-  console.log('isProd:', isProd);
-  console.log('BASE_URL:', baseUrl);
-  console.log('Current hostname:', window.location.hostname);
+  console.log('Current hostname:', hostname);
   console.log('=== End Environment Debug Info ===');
 
-  // 根据域名判断环境
-  const isPreviewDomain = window.location.hostname.includes('-dev-');
-  const envByDomain = isPreviewDomain ? 'preview' : 'production';
-  console.log('Environment detected by domain:', envByDomain);
-
-  // 使用域名判断来确定环境
-  switch(envByDomain) {
-    case 'production':
-      // 生产环境：前端在 Vercel，后端在 Render.com
-      return 'https://business-board-backend.onrender.com/api';
-    case 'preview':
-      // 开发预览环境：前端在 Vercel dev 分支，后端在 Render.com 预览环境
-      return 'https://business-board-preview.onrender.com/api';
-    default:
-      // 本地开发环境
-      return 'http://localhost:3000/api';
+  // 如果域名包含 -dev- 就是 preview 环境
+  // 如果是 localhost 就是本地开发环境
+  // 其他情况都是 production 环境
+  if (hostname.includes('-dev-')) {
+    console.log('Environment: preview');
+    return 'https://business-board-preview.onrender.com/api';
+  } else if (hostname === 'localhost') {
+    console.log('Environment: development');
+    return 'http://localhost:3000/api';
+  } else {
+    console.log('Environment: production');
+    return 'https://business-board-backend.onrender.com/api';
   }
 };
 
