@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MessageList from '../../components/messages/MessageList';
 import MessageCompose from '../../components/messages/MessageCompose';
-import axios from 'axios';
+
+import { API_BASE_URL } from '../../config';
 
 interface User {
   id: string;
@@ -26,13 +27,17 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     queryFn: async () => {
       try {
         console.log('Fetching inbox messages...');
-        const response = await axios.get('/api/messages/inbox', {
-          withCredentials: true
+        const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
+          credentials: 'include'
         });
-        console.log('Inbox response:', response.data);
-        return response.data;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Inbox response:', data);
+        return data;
       } catch (error) {
-        console.error('Error fetching inbox:', error.response || error);
+        console.error('Error fetching inbox:', error);
         throw error;
       }
     },
@@ -44,13 +49,17 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     queryFn: async () => {
       try {
         console.log('Fetching sent messages...');
-        const response = await axios.get('/api/messages/sent', {
-          withCredentials: true
+        const response = await fetch(`${API_BASE_URL}/messages/sent`, {
+          credentials: 'include'
         });
-        console.log('Sent response:', response.data);
-        return response.data;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Sent response:', data);
+        return data;
       } catch (error) {
-        console.error('Error fetching sent:', error.response || error);
+        console.error('Error fetching sent:', error);
         throw error;
       }
     },
@@ -62,13 +71,17 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     queryFn: async () => {
       try {
         console.log('Fetching users...');
-        const response = await axios.get('/api/users', {
-          withCredentials: true
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          credentials: 'include'
         });
-        console.log('Users response:', response.data);
-        return response.data;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Users response:', data);
+        return data;
       } catch (error) {
-        console.error('Error fetching users:', error.response || error);
+        console.error('Error fetching users:', error);
         throw error;
       }
     },
@@ -99,12 +112,17 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
         attachmentsCount: data.attachments?.length || 0
       });
       
-      const response = await axios.post('/api/messages/send', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await fetch(`${API_BASE_URL}/messages/send`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
       });
-      return response.data;
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
     },
     onSuccess: () => {
       // Invalidate both inbox and sent messages queries
@@ -121,7 +139,14 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
   // Mark message as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
-      await axios.put(`/api/messages/${messageId}/read`);
+      const response = await fetch(`${API_BASE_URL}/messages/${messageId}/read`, {
+        method: 'PUT',
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
