@@ -143,6 +143,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// 添加路由调试中间件
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log('=== Request Debug Info ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  console.log('=== End Request Debug Info ===');
+  next();
+});
+
 // 注册路由
 app.use('/api/auth', authRouter);
 app.use('/api/broker', brokerRouter);

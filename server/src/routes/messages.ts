@@ -26,12 +26,19 @@ const getInbox: RequestHandler = async (req: Request, res: Response, next: NextF
   const typedReq = req as AuthenticatedRequest;
   const db = getPrisma();
   
+  console.log('=== Get Inbox Debug Info ===');
+  console.log('Session:', typedReq.session);
+  console.log('User:', typedReq.user);
+  console.log('Headers:', req.headers);
+  
   try {
     if (!typedReq.user) {
+      console.log('No user found in request');
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
+    console.log('Fetching inbox messages for user:', typedReq.user.id);
     const messages = await db.message.findMany({
       where: {
         receiverId: typedReq.user.id,
@@ -51,9 +58,12 @@ const getInbox: RequestHandler = async (req: Request, res: Response, next: NextF
         createdAt: 'desc',
       },
     });
+    
+    console.log('Found messages:', messages.length);
     res.json(messages);
     return;
   } catch (error) {
+    console.error('Error in getInbox:', error);
     next(error);
     return;
   }

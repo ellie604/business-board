@@ -21,30 +21,56 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
   const queryClient = useQueryClient();
 
   // Fetch inbox messages
-  const { data: inboxMessages, isLoading: isLoadingInbox } = useQuery({
+  const { data: inboxMessages, isLoading: isLoadingInbox, error: inboxError } = useQuery({
     queryKey: ['messages', 'inbox'],
     queryFn: async () => {
-      const response = await axios.get('/api/messages/inbox');
-      return response.data;
+      try {
+        console.log('Fetching inbox messages...');
+        const response = await axios.get('/api/messages/inbox', {
+          withCredentials: true
+        });
+        console.log('Inbox response:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching inbox:', error.response || error);
+        throw error;
+      }
     },
   });
 
   // Fetch sent messages
-  const { data: sentMessages, isLoading: isLoadingSent } = useQuery({
+  const { data: sentMessages, isLoading: isLoadingSent, error: sentError } = useQuery({
     queryKey: ['messages', 'sent'],
     queryFn: async () => {
-      const response = await axios.get('/api/messages/sent');
-      return response.data;
+      try {
+        console.log('Fetching sent messages...');
+        const response = await axios.get('/api/messages/sent', {
+          withCredentials: true
+        });
+        console.log('Sent response:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching sent:', error.response || error);
+        throw error;
+      }
     },
   });
 
   // Fetch all users except current user
-  const { data: contacts, isLoading: isLoadingContacts } = useQuery({
+  const { data: contacts, isLoading: isLoadingContacts, error: contactsError } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await axios.get('/api/users');
-      console.log('Fetched users:', response.data);
-      return response.data;
+      try {
+        console.log('Fetching users...');
+        const response = await axios.get('/api/users', {
+          withCredentials: true
+        });
+        console.log('Users response:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching users:', error.response || error);
+        throw error;
+      }
     },
   });
 
