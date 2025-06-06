@@ -41,6 +41,7 @@ const getAllowedOrigins = () => {
       /https:\/\/business-board-git-main-.*\.vercel\.app/  // 生产环境的其他 Vercel 域名
     ],
     preview: [
+      'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app',  // 你的具体预览环境域名
       /https:\/\/business-board-git-dev-.*\.vercel\.app/,  // 预览环境的 Vercel 域名
       /https:\/\/business-board-.*\.vercel\.app/  // 其他 Vercel 预览域名
     ],
@@ -67,7 +68,9 @@ const getAllowedOrigins = () => {
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = getAllowedOrigins();
+    console.log('=== CORS Debug Info ===');
     console.log('Incoming request origin:', origin);
+    console.log('Current NODE_ENV:', process.env.NODE_ENV);
     console.log('Allowed origins:', allowedOrigins);
     
     // 允许没有 origin 的请求（比如同源请求）
@@ -93,6 +96,7 @@ app.use(cors({
     }
 
     console.log('Origin not allowed:', origin);
+    console.log('=== End CORS Debug Info ===');
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
