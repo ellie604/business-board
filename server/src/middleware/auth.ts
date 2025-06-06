@@ -8,10 +8,17 @@ const prisma = getPrisma();
 // 从 session 恢复用户信息的中间件
 export const restoreUser = (req: Request, _res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
-  console.log('Restoring user from session:', typedReq.session);
+  console.log('Restoring user from session:', {
+    sessionID: typedReq.sessionID,
+    sessionUser: typedReq.session?.user,
+    cookies: typedReq.headers.cookie
+  });
   
   if (typedReq.session?.user) {
-    typedReq.user = typedReq.session.user;
+    typedReq.user = {
+      ...typedReq.session.user,
+      id: typedReq.session.user.id.toString() // 确保 ID 是字符串
+    };
     console.log('User restored from session:', typedReq.user);
   } else {
     console.log('No user found in session');
@@ -102,13 +109,23 @@ export const authenticateSeller: RequestHandler = (req, res, next) => {
 
 export const authenticateUser: RequestHandler = (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
-  console.log('Authenticating user - Session:', typedReq.session);
-  console.log('Authenticating user - User:', typedReq.user);
+  console.log('Authenticating user - Session:', {
+    sessionID: typedReq.sessionID,
+    sessionUser: typedReq.session?.user,
+    cookies: typedReq.headers.cookie
+  });
   
-  if (!typedReq.user) {
-    console.log('No user found in request');
+  if (!typedReq.session?.user) {
+    console.log('No user found in session');
     res.status(401).json({ message: 'Authentication required' });
     return;
+  }
+
+  if (!typedReq.user) {
+    typedReq.user = {
+      ...typedReq.session.user,
+      id: typedReq.session.user.id.toString() // 确保 ID 是字符串
+    };
   }
 
   next();

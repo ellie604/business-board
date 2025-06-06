@@ -7,6 +7,8 @@ import brokerRouter from './routes/broker';
 import agentRouter from './routes/agent';
 import buyerRouter from './routes/buyer';
 import sellerRouter from './routes/seller';
+import usersRouter from './routes/users';
+import messagesRouter from './routes/messages';
 import { restoreUser } from './middleware/auth';
 
 // 扩展 Express 的 Request 类型
@@ -136,6 +138,8 @@ app.use('/api/broker', brokerRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/buyer', buyerRouter);
 app.use('/api/seller', sellerRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/messages', messagesRouter);
 
 // 健康检查
 app.get('/health', (req, res) => {
