@@ -6,7 +6,8 @@ const getBackendUrl = () => {
 
   switch(env) {
     case 'production':
-      return 'https://business-board.onrender.com/api';
+      // 使用主域名作为后端 API
+      return 'https://business-board-git-main-xinyis-projects-6c0795d6.vercel.app/api';
     case 'preview':
       // 在预览环境中，后端和前端部署在同一域名下
       return 'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app/api';
