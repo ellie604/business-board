@@ -33,25 +33,34 @@ const memoryStore = MemoryStore(session);
 
 // 根据环境配置允许的域名
 const getAllowedOrigins = () => {
-  switch(process.env.NODE_ENV) {
-    case 'production':
-      return ['https://business-board.vercel.app'];
-    case 'preview':
-      // 更新 Vercel Preview 部署的域名模式，移除 $ 结尾以匹配所有路径
-      return [
-        /https:\/\/business-board-.*\.vercel\.app/,
-        /https:\/\/business-board-git-.*\.vercel\.app/
-      ];
-    default:
-      return ['http://localhost:5174', 'http://localhost:5173'];
+  type OriginType = string | RegExp;
+  
+  const origins: Record<string, OriginType[]> = {
+    production: ['https://business-board.vercel.app'],
+    preview: [
+      /https:\/\/business-board-git-.*-xinyis-projects-.*\.vercel\.app/,
+      /https:\/\/business-board-.*\.vercel\.app/
+    ],
+    development: ['http://localhost:5174', 'http://localhost:5173']
+  };
+
+  const env = process.env.NODE_ENV || 'development';
+  console.log('Current environment:', env);
+  
+  if (!(env in origins)) {
+    console.warn('Unknown environment:', env, 'falling back to development');
+    return origins.development;
   }
+
+  console.log('Available origins for this environment:', origins[env]);
+  return origins[env];
 };
 
 // 配置 CORS
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = getAllowedOrigins();
-    console.log('Request origin:', origin);
+    console.log('Incoming request origin:', origin);
     console.log('Allowed origins:', allowedOrigins);
     
     // 允许没有 origin 的请求（比如同源请求）
@@ -62,11 +71,13 @@ app.use(cors({
 
     // 检查是否匹配允许的域名
     const isAllowed = Array.isArray(allowedOrigins)
-      ? allowedOrigins.some(allowed => 
-          allowed instanceof RegExp 
+      ? allowedOrigins.some(allowed => {
+          const matches = allowed instanceof RegExp 
             ? allowed.test(origin)
-            : allowed === origin
-        )
+            : allowed === origin;
+          console.log(`Checking origin ${origin} against ${allowed}:`, matches);
+          return matches;
+        })
       : allowedOrigins === origin;
 
     if (isAllowed) {
