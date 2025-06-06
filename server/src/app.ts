@@ -37,10 +37,10 @@ const getAllowedOrigins = () => {
     case 'production':
       return ['https://business-board.vercel.app'];
     case 'preview':
-      // 更新 Vercel Preview 部署的域名模式，使用数组而不是正则
+      // 更新 Vercel Preview 部署的域名模式，移除 $ 结尾以匹配所有路径
       return [
-        /https:\/\/business-board-.*\.vercel\.app$/,
-        /https:\/\/business-board-git-.*\.vercel\.app$/
+        /https:\/\/business-board-.*\.vercel\.app/,
+        /https:\/\/business-board-git-.*\.vercel\.app/
       ];
     default:
       return ['http://localhost:5174', 'http://localhost:5173'];
