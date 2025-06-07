@@ -15,6 +15,25 @@ NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.prev
 server目录下：NODE_ENV=development npm run dev 
 client目录下：npm run dev
 
+后端api测试：# 测试确认了正确的后端URL是可用的
+curl https://business-board.onrender.com/health
+# 返回: {"status":"ok","environment":"preview"}
+
+环境检测逻辑：
+// 之前依赖环境变量的方式
+const env = import.meta.env.MODE;
+switch(env) { ... }
+
+// 改进后使用域名判断的方式
+const hostname = window.location.hostname;
+if (hostname.includes('-dev-')) {
+  // preview环境
+} else if (hostname === 'localhost') {
+  // 开发环境
+} else {
+  // production环境
+}
+
 preview环境测试：push到dev分支后自动部署
 
 production环境：dev分支合并到main分支自动部署
