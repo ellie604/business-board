@@ -43,7 +43,8 @@ const getAllowedOrigins = () => {
     preview: [
       'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app',  // 你的具体预览环境域名
       /https:\/\/business-board-git-dev-.*\.vercel\.app/,  // 预览环境的 Vercel 域名
-      /https:\/\/business-board-.*\.vercel\.app/  // 其他 Vercel 预览域名
+      /https:\/\/business-board-.*\.vercel\.app/,  // 其他 Vercel 预览域名
+      'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app'  // 确保完全匹配
     ],
     development: [
       'http://localhost:5174', 

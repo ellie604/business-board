@@ -50,19 +50,10 @@ enum DocumentStatus {
   COMPLETED
 }
 
-enum UserType {
-  BROKER
-  AGENT
-  SELLER
-  BUYER
-}
-
 enum MessageStatus {
   SENT
   DELIVERED
   READ
-  ARCHIVED
-  DELETED
 }
 
 model Document {
@@ -79,45 +70,24 @@ model Document {
 }
 
 model User {
-  id            String     @id @default(uuid())
-  email         String     @unique
-  password      String
-  name          String     @default("")
-  role          UserRole   @default(BUYER)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @default(now()) @updatedAt
-  managedBy     User?      @relation("UserManagement", fields: [managerId], references: [id])
-  managerId     String?
-  managing      User[]     @relation("UserManagement")
-  listings      Listing[]  @relation("SellerListings")
-  buyerDocs     Document[] @relation("BuyerDocuments")
-  sellerDocs    Document[] @relation("SellerDocuments")
-  activities    Activity[]
-  sentMessages     Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
-  userType         UserType
-  unreadCount      Int       @default(0)
+  id               String     @id @default(uuid())
+  email            String     @unique
+  password         String
+  name             String     @default("")
+  role             UserRole   @default(BUYER)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @default(now()) @updatedAt
+  managedBy        User?      @relation("UserManagement", fields: [managerId], references: [id])
+  managerId        String?
+  managing         User[]     @relation("UserManagement")
+  listings         Listing[]  @relation("SellerListings")
+  buyerDocs        Document[] @relation("BuyerDocuments")
+  sellerDocs       Document[] @relation("SellerDocuments")
+  activities       Activity[]
+  sentMessages     Message[]  @relation("SentMessages")
+  receivedMessages Message[]  @relation("ReceivedMessages")
+  unreadCount      Int        @default(0)
   lastReadAt       DateTime?
-}
-
-model Listing {
-  id          String        @id @default(uuid())
-  title       String
-  description String
-  price       Float
-  status      ListingStatus @default(ACTIVE)
-  views       Int           @default(0)
-  createdAt   DateTime      @default(now())
-  sellerId    String
-  seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
-}
-
-model Activity {
-  id          String   @id @default(uuid())
-  description String
-  createdAt   DateTime @default(now())
-  sellerId    String
-  seller      User     @relation(fields: [sellerId], references: [id])
 }
 
 model Message {
@@ -129,11 +99,11 @@ model Message {
   readAt        DateTime?
 
   senderId      String
-  senderType    UserType
+  senderType    UserRole
   senderName    String
 
   receiverId    String
-  receiverType  UserType
+  receiverType  UserRole
   receiverName  String
 
   status        MessageStatus @default(SENT)
@@ -165,4 +135,24 @@ model MessageAttachment {
   uploadedAt  DateTime @default(now())
 
   message     Message  @relation(fields: [messageId], references: [id])
+}
+
+model Listing {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  status      ListingStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  sellerId    String
+  seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }

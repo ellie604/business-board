@@ -48,6 +48,12 @@ enum DocumentStatus {
   COMPLETED
 }
 
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
 model Document {
   id        String         @id @default(uuid())
   type      DocumentType
@@ -62,20 +68,71 @@ model Document {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  password   String
-  name       String     @default("")
-  role       UserRole   @default(BUYER)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @default(now()) @updatedAt
-  managedBy  User?      @relation("UserManagement", fields: [managerId], references: [id])
-  managerId  String?
-  managing   User[]     @relation("UserManagement")
-  listings   Listing[]  @relation("SellerListings")
-  buyerDocs  Document[] @relation("BuyerDocuments")
-  sellerDocs Document[] @relation("SellerDocuments")
-  activities Activity[]
+  id               String     @id @default(uuid())
+  email            String     @unique
+  password         String
+  name             String     @default("")
+  role             UserRole   @default(BUYER)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @default(now()) @updatedAt
+  managedBy        User?      @relation("UserManagement", fields: [managerId], references: [id])
+  managerId        String?
+  managing         User[]     @relation("UserManagement")
+  listings         Listing[]  @relation("SellerListings")
+  buyerDocs        Document[] @relation("BuyerDocuments")
+  sellerDocs       Document[] @relation("SellerDocuments")
+  activities       Activity[]
+  sentMessages     Message[]  @relation("SentMessages")
+  receivedMessages Message[]  @relation("ReceivedMessages")
+  unreadCount      Int        @default(0)
+  lastReadAt       DateTime?
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  subject   String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  readAt    DateTime?
+
+  senderId   String
+  senderType UserRole
+  senderName String
+
+  receiverId   String
+  receiverType UserRole
+  receiverName String
+
+  status     MessageStatus @default(SENT)
+  isRead     Boolean       @default(false)
+  isArchived Boolean       @default(false)
+
+  parentMessageId String?
+  threadId        String?
+
+  sender        User      @relation("SentMessages", fields: [senderId], references: [id])
+  receiver      User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  parentMessage Message?  @relation("MessageReplies", fields: [parentMessageId], references: [id])
+  replies       Message[] @relation("MessageReplies")
+
+  attachments MessageAttachment[]
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([threadId])
+}
+
+model MessageAttachment {
+  id         String   @id @default(cuid())
+  messageId  String
+  fileName   String
+  fileSize   Int
+  fileType   String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id])
 }
 
 model Listing {
@@ -84,16 +141,16 @@ model Listing {
   description String
   price       Float
   status      ListingStatus @default(ACTIVE)
-  views       Int           @default(0)
   createdAt   DateTime      @default(now())
   sellerId    String
   seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
 }
 
 model Activity {
-  id          String   @id @default(uuid())
-  description String
-  createdAt   DateTime @default(now())
-  sellerId    String
-  seller      User     @relation(fields: [sellerId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }

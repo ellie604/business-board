@@ -1,6 +1,5 @@
 // 统一的后端 URL 配置
 const getBackendUrl = () => {
-  const env = import.meta.env.MODE;
   const hostname = window.location.hostname;
   
   console.log('=== Environment Debug Info ===');

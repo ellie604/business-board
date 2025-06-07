@@ -50,19 +50,10 @@ enum DocumentStatus {
   COMPLETED
 }
 
-enum UserType {
-  BROKER
-  AGENT
-  SELLER
-  BUYER
-}
-
 enum MessageStatus {
   SENT
   DELIVERED
   READ
-  ARCHIVED
-  DELETED
 }
 
 model Document {
@@ -95,29 +86,8 @@ model User {
   activities       Activity[]
   sentMessages     Message[]  @relation("SentMessages")
   receivedMessages Message[]  @relation("ReceivedMessages")
-  userType         UserType
   unreadCount      Int        @default(0)
   lastReadAt       DateTime?
-}
-
-model Listing {
-  id          String        @id @default(uuid())
-  title       String
-  description String
-  price       Float
-  status      ListingStatus @default(ACTIVE)
-  views       Int           @default(0)
-  createdAt   DateTime      @default(now())
-  sellerId    String
-  seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
-}
-
-model Activity {
-  id          String   @id @default(uuid())
-  description String
-  createdAt   DateTime @default(now())
-  sellerId    String
-  seller      User     @relation(fields: [sellerId], references: [id])
 }
 
 model Message {
@@ -129,11 +99,11 @@ model Message {
   readAt    DateTime?
 
   senderId   String
-  senderType UserType
+  senderType UserRole
   senderName String
 
   receiverId   String
-  receiverType UserType
+  receiverType UserRole
   receiverName String
 
   status     MessageStatus @default(SENT)
@@ -165,4 +135,24 @@ model MessageAttachment {
   uploadedAt DateTime @default(now())
 
   message Message @relation(fields: [messageId], references: [id])
+}
+
+model Listing {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  status      ListingStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  sellerId    String
+  seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }

@@ -140,27 +140,8 @@ exports.Prisma.UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   managerId: 'managerId',
-  userType: 'userType',
   unreadCount: 'unreadCount',
   lastReadAt: 'lastReadAt'
-};
-
-exports.Prisma.ListingScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  description: 'description',
-  price: 'price',
-  status: 'status',
-  views: 'views',
-  createdAt: 'createdAt',
-  sellerId: 'sellerId'
-};
-
-exports.Prisma.ActivityScalarFieldEnum = {
-  id: 'id',
-  description: 'description',
-  createdAt: 'createdAt',
-  sellerId: 'sellerId'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -193,9 +174,32 @@ exports.Prisma.MessageAttachmentScalarFieldEnum = {
   uploadedAt: 'uploadedAt'
 };
 
+exports.Prisma.ListingScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  price: 'price',
+  status: 'status',
+  createdAt: 'createdAt',
+  sellerId: 'sellerId'
+};
+
+exports.Prisma.ActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  data: 'data',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -206,6 +210,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.DocumentType = exports.$Enums.DocumentType = {
   EMAIL_AGENT: 'EMAIL_AGENT',
@@ -235,11 +245,10 @@ exports.UserRole = exports.$Enums.UserRole = {
   BUYER: 'BUYER'
 };
 
-exports.UserType = exports.$Enums.UserType = {
-  BROKER: 'BROKER',
-  AGENT: 'AGENT',
-  SELLER: 'SELLER',
-  BUYER: 'BUYER'
+exports.MessageStatus = exports.$Enums.MessageStatus = {
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ'
 };
 
 exports.ListingStatus = exports.$Enums.ListingStatus = {
@@ -248,21 +257,13 @@ exports.ListingStatus = exports.$Enums.ListingStatus = {
   CLOSED: 'CLOSED'
 };
 
-exports.MessageStatus = exports.$Enums.MessageStatus = {
-  SENT: 'SENT',
-  DELIVERED: 'DELIVERED',
-  READ: 'READ',
-  ARCHIVED: 'ARCHIVED',
-  DELETED: 'DELETED'
-};
-
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
-  Listing: 'Listing',
-  Activity: 'Activity',
   Message: 'Message',
-  MessageAttachment: 'MessageAttachment'
+  MessageAttachment: 'MessageAttachment',
+  Listing: 'Listing',
+  Activity: 'Activity'
 };
 
 /**
