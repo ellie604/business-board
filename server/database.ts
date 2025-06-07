@@ -11,9 +11,14 @@ let prisma: any = null;
 // 获取 prisma 实例的函数
 export function getPrisma() {
   if (!prisma) {
+    console.log('Initializing Prisma client...');
+    console.log('Current NODE_ENV:', process.env.NODE_ENV);
+    
     if (process.env.NODE_ENV === 'production') {
+      console.log('Using production database URL:', process.env.DATABASE_URL);
       prisma = new ProductionPrismaClient();
     } else {
+      console.log('Using preview database URL:', process.env.PREVIEW_DATABASE_URL);
       prisma = new PreviewPrismaClient();
     }
   }

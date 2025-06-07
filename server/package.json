@@ -6,7 +6,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "NODE_ENV=development SESSION_SECRET=dev-secret nodemon --exec ts-node --project tsconfig.server.json src/index.ts",
+    "dev": "nodemon --exec ts-node -r dotenv/config --project tsconfig.server.json src/index.ts",
     "build": "npx prisma generate --schema=./prisma/schema.${NODE_ENV:-production}.prisma && tsc -p tsconfig.server.json && cp -r generated dist/",
     "start": "node dist/src/index.js",
     "seed:preview": "npx ts-node -T --project tsconfig.server.json seed.preview.ts",

@@ -4,21 +4,13 @@ import { authenticateUser } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types/custom';
 import multer from 'multer';
 import path from 'path';
+import { supabase, getStorageBucket } from '../config/supabase';
 
 const router = Router();
 const prisma = getPrisma();
 
-// Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../../uploads'));
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Get inbox messages
@@ -153,18 +145,61 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
     // Handle attachments if any
     const files = (req as any).files;
     if (files && Array.isArray(files)) {
+      const bucketName = getStorageBucket();
+      console.log('Using storage bucket:', bucketName);
+      console.log('Files to upload:', files.length);
+      
       const attachmentPromises = files.map(async (file: Express.Multer.File) => {
-        return db.messageAttachment.create({
-          data: {
-            messageId: message.id,
-            fileName: file.originalname,
-            fileSize: file.size,
-            fileType: file.mimetype,
-            fileUrl: file.path,
-          },
-        });
+        try {
+          // Upload file to Supabase Storage
+          const fileName = `${Date.now()}-${file.originalname}`;
+          console.log('Uploading file:', fileName);
+          
+          const { data, error } = await supabase.storage
+            .from(bucketName)
+            .upload(fileName, file.buffer, {
+              contentType: file.mimetype,
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (error) {
+            console.error('Error uploading file to Supabase:', error);
+            throw error;
+          }
+
+          console.log('Upload successful:', data);
+
+          // Get the public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from(bucketName)
+            .getPublicUrl(fileName);
+
+          console.log('Public URL:', publicUrl);
+
+          // Create attachment record in database
+          return db.messageAttachment.create({
+            data: {
+              messageId: message.id,
+              fileName: file.originalname,
+              fileSize: file.size,
+              fileType: file.mimetype,
+              fileUrl: publicUrl,
+            },
+          });
+        } catch (error) {
+          console.error('Error processing attachment:', error);
+          throw error;
+        }
       });
-      await Promise.all(attachmentPromises);
+
+      try {
+        await Promise.all(attachmentPromises);
+        console.log('All attachments processed successfully');
+      } catch (error) {
+        console.error('Error processing attachments:', error);
+        throw error;
+      }
     }
 
     // Update receiver's unread count
