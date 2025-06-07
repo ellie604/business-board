@@ -12,7 +12,7 @@ const getBackendUrl = () => {
   // 其他情况都是 production 环境
   if (hostname.includes('-dev-')) {
     console.log('Environment: preview');
-    return 'https://business-board-preview.onrender.com/api';
+    return 'https://business-board.onrender.com/api';
   } else if (hostname === 'localhost') {
     console.log('Environment: development');
     return 'http://localhost:3000/api';
