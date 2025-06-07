@@ -23,7 +23,6 @@ const prisma = (0, database_1.getPrisma)();
 const loginHandler = async (req, res) => {
     const typedReq = req;
     console.log('Login request received - Body:', typedReq.body);
-    console.log('Session before login:', typedReq.session);
     const { email, password } = typedReq.body;
     if (!email || !password) {
         console.error('Missing email or password in request');
@@ -51,27 +50,35 @@ const loginHandler = async (req, res) => {
                 }
             }
         });
-        console.log('User search result:', user ? {
+        console.log('Found user:', {
             ...user,
-            password: '******',
-            managing: user.managing.length
-        } : 'Not found');
+            password: user ? '******' : null
+        });
         if (!user) {
             console.log('No user found with email:', email);
             res.status(401).json({ message: 'Invalid email or password' });
             return;
         }
+        console.log('Found user details:', {
+            id: user.id,
+            role: user.role,
+            type_of_id: typeof user.id
+        });
         if (user.password !== password) {
             console.log('Password mismatch');
             res.status(401).json({ message: 'Invalid email or password' });
             return;
         }
         console.log('Login successful for:', email, 'with role:', user.role);
-        // 设置 session
-        typedReq.session.user = {
+        // 设置用户信息到 request 和 session
+        const userInfo = {
             id: user.id,
-            role: user.role
+            role: user.role,
+            name: user.name,
+            email: user.email
         };
+        typedReq.user = userInfo;
+        typedReq.session.user = userInfo;
         // 确保 session 被保存
         typedReq.session.save((error) => {
             if (error) {
@@ -79,13 +86,17 @@ const loginHandler = async (req, res) => {
                 res.status(500).json({ message: 'Failed to save session' });
                 return;
             }
-            console.log('Session after login:', typedReq.session);
+            console.log('Session after login:', {
+                id: typedReq.sessionID,
+                user: typedReq.session.user
+            });
+            console.log('User after login:', typedReq.user);
             res.json({
                 message: 'Login successful',
                 role: user.role,
                 redirect: `/dashboard/${user.role.toLowerCase()}`,
                 user: {
-                    id: user.id,
+                    id: user.id.toString(), // 确保返回的 ID 也是字符串
                     email: user.email,
                     name: user.name,
                     role: user.role,
@@ -120,8 +131,13 @@ const testUsersHandler = async (req, res) => {
                 }
             }
         });
-        console.log('All users:', users);
-        res.json({ users });
+        // 确保返回的用户 ID 都是字符串
+        const usersWithStringIds = users.map((user) => ({
+            ...user,
+            id: user.id.toString()
+        }));
+        console.log('All users:', usersWithStringIds);
+        res.json({ users: usersWithStringIds });
     }
     catch (error) {
         console.error('Error fetching users:', error);

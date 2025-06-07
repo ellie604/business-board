@@ -123,17 +123,55 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.DocumentScalarFieldEnum = {
   id: 'id',
   type: 'type',
+  status: 'status',
   url: 'url',
-  createdAt: 'createdAt'
+  sellerId: 'sellerId',
+  buyerId: 'buyerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   password: 'password',
+  name: 'name',
   role: 'role',
   createdAt: 'createdAt',
-  brokerId: 'brokerId'
+  updatedAt: 'updatedAt',
+  managerId: 'managerId',
+  unreadCount: 'unreadCount',
+  lastReadAt: 'lastReadAt'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  subject: 'subject',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  readAt: 'readAt',
+  senderId: 'senderId',
+  senderType: 'senderType',
+  senderName: 'senderName',
+  receiverId: 'receiverId',
+  receiverType: 'receiverType',
+  receiverName: 'receiverName',
+  status: 'status',
+  isRead: 'isRead',
+  isArchived: 'isArchived',
+  parentMessageId: 'parentMessageId',
+  threadId: 'threadId'
+};
+
+exports.Prisma.MessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  fileType: 'fileType',
+  fileUrl: 'fileUrl',
+  uploadedAt: 'uploadedAt'
 };
 
 exports.Prisma.ListingScalarFieldEnum = {
@@ -141,20 +179,27 @@ exports.Prisma.ListingScalarFieldEnum = {
   title: 'title',
   description: 'description',
   price: 'price',
-  sellerId: 'sellerId',
-  createdAt: 'createdAt'
+  status: 'status',
+  createdAt: 'createdAt',
+  sellerId: 'sellerId'
 };
 
-exports.Prisma.BrokerScalarFieldEnum = {
+exports.Prisma.ActivityScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  email: 'email',
-  password: 'password'
+  userId: 'userId',
+  type: 'type',
+  data: 'data',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -166,25 +211,59 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.DocumentType = exports.$Enums.DocumentType = {
+  EMAIL_AGENT: 'EMAIL_AGENT',
+  UPLOADED_DOC: 'UPLOADED_DOC',
+  PURCHASE_AGREEMENT: 'PURCHASE_AGREEMENT',
+  DUE_DILIGENCE: 'DUE_DILIGENCE',
+  PRE_CLOSE_CHECKLIST: 'PRE_CLOSE_CHECKLIST',
+  CLOSING_DOCS: 'CLOSING_DOCS',
   NDA: 'NDA',
-  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   FINANCIAL_STATEMENT: 'FINANCIAL_STATEMENT',
-  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT'
+  CBR_CIM: 'CBR_CIM',
+  PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
+  LISTING_AGREEMENT: 'LISTING_AGREEMENT',
+  QUESTIONNAIRE: 'QUESTIONNAIRE',
+  AFTER_SALE: 'AFTER_SALE'
 };
 
-exports.Role = exports.$Enums.Role = {
-  BUYER: 'BUYER',
-  SELLER: 'SELLER',
+exports.DocumentStatus = exports.$Enums.DocumentStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED'
+};
+
+exports.UserRole = exports.$Enums.UserRole = {
+  BROKER: 'BROKER',
   AGENT: 'AGENT',
-  BROKER: 'BROKER'
+  SELLER: 'SELLER',
+  BUYER: 'BUYER'
+};
+
+exports.MessageStatus = exports.$Enums.MessageStatus = {
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ'
+};
+
+exports.ListingStatus = exports.$Enums.ListingStatus = {
+  ACTIVE: 'ACTIVE',
+  UNDER_CONTRACT: 'UNDER_CONTRACT',
+  CLOSED: 'CLOSED'
 };
 
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
+  Message: 'Message',
+  MessageAttachment: 'MessageAttachment',
   Listing: 'Listing',
-  Broker: 'Broker'
+  Activity: 'Activity'
 };
 
 /**

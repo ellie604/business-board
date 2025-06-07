@@ -51,3 +51,15 @@ production环境：dev分支合并到main分支自动部署
 本地开发：
 前端：http://localhost:5173
 后端：http://localhost:3000
+
+
+render上preview 环境检测
+Build Command：npm install && npx prisma generate --schema=./prisma/schema.preview.prisma && npm run build
+注意npx prisma migrate reset --force --skip-seed --schema=./prisma/schema.preview.prisma以及
+NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts等指令需要在本地
+切换到数据库直接连接URL5432端口执行，其他连接指令在6543端口执行
+# Connect to Supabase via connection pooling
+DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:[YOUR-PASSWORD]@aws-0-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+# Direct connection to the database. Used for migrations
+DIRECT_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:[YOUR-PASSWORD]@aws-0-us-east-2.pooler.supabase.com:5432/postgres"
