@@ -3,9 +3,9 @@ import { PrismaClient, DocumentType, DocumentStatus } from './generated/prisma-p
 import { getPrisma } from './database';
 import { UserRole } from './generated/prisma-preview';
 
-async function main() {
-  const prisma = getPrisma();
+const prisma = getPrisma();
 
+async function main() {
   // Create broker
   const broker = await prisma.user.create({
     data: {
@@ -237,11 +237,14 @@ async function main() {
 }
 
 main()
+  .then(() => {
+    console.log('✅ Preview seed data inserted!');
+    process.exit(0);
+  })
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {
-    const prisma = getPrisma();
     await prisma.$disconnect();
   });
