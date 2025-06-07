@@ -266,7 +266,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/luoxinyi/Desktop/project-root/server/prisma/schema.preview.prisma",
+    "sourceFilePath": "/Users/luoxinyi/Desktop/project-root/server/prisma/schema.production.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

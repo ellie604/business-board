@@ -63,3 +63,13 @@ DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:[YOUR-PASSWORD]@aws-0-u
 
 # Direct connection to the database. Used for migrations
 DIRECT_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:[YOUR-PASSWORD]@aws-0-us-east-2.pooler.supabase.com:5432/postgres"
+
+常用数据库命令：
+npm install \
+&& npx prisma generate --schema=./prisma/schema.preview.prisma \
+&& npx prisma migrate reset --force --skip-seed --schema=./prisma/schema.preview.prisma \
+&& NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts \
+&& npm run build
+
+DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:OaL05zmJP1eqMaYq@aws-0-us-east-2.pooler.supabase.com:5432/postgres" npx prisma db push --schema=prisma/schema.production.prisma
+   DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:OaL05zmJP1eqMaYq@aws-0-us-east-2.pooler.supabase.com:5432/postgres" NODE_ENV=production npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.production.ts
