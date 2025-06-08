@@ -1,14 +1,14 @@
-// server/prisma/schema.preview.prisma
+// server/prisma/schema.production.prisma
 
 generator client {
   provider      = "prisma-client-js"
-  output        = "../generated/prisma-preview"
+  output        = "../generated/prisma-production"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("PREVIEW_DATABASE_URL")
+  url      = env("PRO_DIRECT_URL")
 }
 
 enum UserRole {

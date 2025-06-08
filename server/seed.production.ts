@@ -1,7 +1,7 @@
-// seed.preview.ts
-import { PrismaClient, DocumentType, DocumentStatus } from './generated/prisma-preview';
+// seed.production.ts
+import { PrismaClient, DocumentType, DocumentStatus } from './generated/prisma-production';
 import { getPrisma } from './database';
-import { UserRole } from './generated/prisma-preview';
+import { UserRole } from './generated/prisma-production';
 
 const prisma = getPrisma();
 
@@ -238,7 +238,7 @@ async function main() {
 
 main()
   .then(() => {
-    console.log('✅ Preview seed data inserted!');
+    console.log('✅ production seed data inserted!');
     process.exit(0);
   })
   .catch((e) => {
