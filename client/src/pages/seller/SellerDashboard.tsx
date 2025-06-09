@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import { sellerService } from '../services/seller';
-import type { DashboardStats } from '../services/seller';
-import logo from '../assets/california-business-sales-logo.png';
+import { sellerService } from '../../services/seller';
+import type { DashboardStats } from '../../services/seller';
+import logo from '../../assets/california-business-sales-logo.png';
 
 const SellerDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);

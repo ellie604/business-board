@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import { buyerService } from '../services/buyer';
-import type { DashboardStats } from '../services/buyer';
-import logo from '../assets/california-business-sales-logo.png';
+import { buyerService } from '../../services/buyer';
+import type { DashboardStats } from '../../services/buyer';
+import logo from '../../assets/california-business-sales-logo.png';
 
 const BuyerDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);

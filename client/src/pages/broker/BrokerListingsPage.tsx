@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import ListingEditModal from '../components/ListingEditModal';
-import { listingService, userService } from '../services/listing';
+import ListingEditModal from '../../components/ListingEditModal';
+import { listingService, userService } from '../../services/listing';
 
 interface Listing {
   id: string;

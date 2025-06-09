@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { brokerService } from '../services/broker';
+import { brokerService } from '../../services/broker';
 
 interface Agent {
   id: string;

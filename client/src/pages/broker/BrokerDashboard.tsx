@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { brokerService } from '../services/broker';
+import { brokerService } from '../../services/broker';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import logo from '../assets/california-business-sales-logo.png';
+import logo from '../../assets/california-business-sales-logo.png';
 
 interface DashboardStats {
   totalActiveListings: number;

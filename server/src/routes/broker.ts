@@ -355,6 +355,84 @@ const getAgentStats: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Get all sellers with their listings
+const getSellers: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const sellers = await prisma.user.findMany({
+      where: { 
+        role: 'SELLER',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        listings: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            status: true,
+            createdAt: true,
+          }
+        }
+      }
+    });
+
+    res.json({ sellers });
+  } catch (err) {
+    console.error('Error in getSellers:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get all buyers with their interested listings
+const getBuyers: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const buyers = await prisma.user.findMany({
+      where: { 
+        role: 'BUYER',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        buyingListings: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            status: true,
+            createdAt: true,
+          }
+        }
+      }
+    });
+
+    res.json({ buyers });
+  } catch (err) {
+    console.error('Error in getBuyers:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+router.get('/sellers', authenticateBroker, getSellers);
+router.get('/buyers', authenticateBroker, getBuyers);
 router.get('/dashboard', authenticateBroker, getDashboardStats);
 router.get('/agents', authenticateBroker, getAgents);
 router.get('/agents-with-stats', authenticateBroker, getAgentsWithStats);

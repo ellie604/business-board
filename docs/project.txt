@@ -78,3 +78,11 @@ DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:OaL05zmJP1eqMaYq@aws-0-
 npx prisma generate --schema=./prisma/schema.preview.prisma
 npx prisma db push --force-reset --schema=./prisma/schema.preview.prisma
 NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts
+
+Routing:
+/broker/sellers: Shows the seller panel
+/broker/buyers: Shows the buyer panel
+/broker/sellers/:sellerId/:listingId: Shows detailed seller listing view
+/broker/buyers/:buyerId/:listingId: Shows detailed buyer listing view
+/broker/sellers/:sellerId/:listingId/documents: Shows all documents for a seller's listing
+/broker/buyers/:buyerId/:listingId/documents: Shows all documents for a buyer's listing
