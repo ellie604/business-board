@@ -12,6 +12,7 @@ interface DashboardStats {
 }
 
 export function AgentDashboard() {
+  const location = useLocation();
   const [stats, setStats] = useState<DashboardStats>({
     totalActiveListings: 0,
     totalUnderContract: 0,
@@ -21,7 +22,6 @@ export function AgentDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const location = useLocation();
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -72,12 +72,18 @@ export function AgentDashboard() {
           >
             Home
           </NavLink>
-          <NavLink 
+          <Link 
             to="/agent/messages"
             className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
           >
             Email
-          </NavLink>
+          </Link>
+          <Link 
+            to="/agent/listings"
+            className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
+          >
+            Listings
+          </Link>
           <Link 
             to="/agent/sellers"
             className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
@@ -96,10 +102,10 @@ export function AgentDashboard() {
       {/* 主内容区 */}
       <div className="flex-1 p-8 w-full">
         <Outlet />
-        {location.pathname === '/agent' && (
+        {location.pathname === '/agent' && !location.pathname.includes('messages') && (
           <>
             <h1 className="text-3xl font-bold mb-8">
-              Welcome Agent to Your Customized Dashboard
+              Welcome Agent to Your Dashboard
             </h1>
 
             {/* 统计数据卡片网格 */}

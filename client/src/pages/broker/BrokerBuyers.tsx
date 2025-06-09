@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 
 interface Listing {
   id: string;
@@ -28,8 +28,21 @@ const BrokerBuyers: React.FC = () => {
   useEffect(() => {
     const fetchBuyers = async () => {
       try {
-        const response = await axios.get('/api/broker/buyers');
-        setBuyers(response.data.buyers);
+        const response = await fetch(`${API_BASE_URL}/broker/buyers`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch buyers');
+        }
+
+        const data = await response.json();
+        setBuyers(data.buyers);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch buyers');

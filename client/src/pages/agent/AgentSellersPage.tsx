@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../config';
-
-interface Listing {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  status: string;
-  createdAt: string;
-}
+import { agentService } from '../../services/agent';
 
 interface Seller {
   id: string;
   name: string;
   email: string;
   createdAt: string;
-  listings: Listing[];
+  listings: {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    status: string;
+  }[];
 }
 
-const BrokerSellers: React.FC = () => {
+export default function AgentSellersPage() {
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,21 +25,8 @@ const BrokerSellers: React.FC = () => {
   useEffect(() => {
     const fetchSellers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/broker/sellers`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch sellers');
-        }
-
-        const data = await response.json();
-        setSellers(data.sellers);
+        const response = await agentService.getSellers();
+        setSellers(response.sellers);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch sellers');
@@ -54,31 +38,19 @@ const BrokerSellers: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
+    return <div className="text-red-500 p-4">{error}</div>;
   }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Sellers</h1>
+      <h1 className="text-3xl font-bold mb-8">My Assigned Sellers</h1>
       <div className="space-y-6">
         {sellers.map((seller) => (
-          <div
-            key={seller.id}
-            className="bg-white rounded-lg shadow-lg p-6"
-          >
-            {/* Seller Info - 不可点击部分 */}
+          <div key={seller.id} className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h2 className="text-xl font-semibold">{seller.name}</h2>
@@ -94,7 +66,6 @@ const BrokerSellers: React.FC = () => {
               </div>
             </div>
 
-            {/* Listings - 可点击部分 */}
             {seller.listings.length > 0 && (
               <div className="mt-4">
                 <h3 className="text-lg font-medium mb-2">Listings</h3>
@@ -103,7 +74,7 @@ const BrokerSellers: React.FC = () => {
                     <div
                       key={listing.id}
                       className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => navigate(`/broker/sellers/${seller.id}/${listing.id}`)}
+                      onClick={() => navigate(`/agent/sellers/${seller.id}/${listing.id}`)}
                     >
                       <h4 className="font-medium">{listing.title}</h4>
                       <p className="text-sm text-gray-600 line-clamp-2">{listing.description}</p>
@@ -131,6 +102,4 @@ const BrokerSellers: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default BrokerSellers;
+} 

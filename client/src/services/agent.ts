@@ -1,54 +1,35 @@
 import { API_BASE_URL } from '../config';
 
-interface DashboardStats {
-  totalActiveListings: number;
-  totalUnderContract: number;
-  newListingsThisMonth: number;
-  totalNDA: number;
-  totalClosedDeals: number;
+export interface DashboardStats {
+  totalAssignedListings: number;
+  totalAssignedSellers: number;
+  totalAssignedBuyers: number;
+  activeDeals: number;
+  completedDeals: number;
 }
 
-interface DashboardResponse {
-  stats: DashboardStats;
-  message: string;
-}
-
-class AgentService {
-  async getDashboardStats(): Promise<DashboardResponse> {
-    const response = await fetch(`${API_BASE_URL}/agent/dashboard`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch dashboard stats');
-    }
-
-    return response.json();
-  }
+export const agentService = {
+  async getDashboardStats() {
+    const res = await fetch(`${API_BASE_URL}/agent/dashboard`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+    return res.json();
+  },
 
   async getListings() {
-    const response = await fetch(`${API_BASE_URL}/agent/listings`, {
-      credentials: 'include',
-    });
+    const res = await fetch(`${API_BASE_URL}/agent/listings`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch listings');
+    return res.json();
+  },
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch listings');
-    }
+  async getSellers() {
+    const res = await fetch(`${API_BASE_URL}/agent/sellers`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch sellers');
+    return res.json();
+  },
 
-    return response.json();
+  async getBuyers() {
+    const res = await fetch(`${API_BASE_URL}/agent/buyers`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch buyers');
+    return res.json();
   }
-
-  async getClients() {
-    const response = await fetch(`${API_BASE_URL}/agent/clients`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch clients');
-    }
-
-    return response.json();
-  }
-}
-
-export const agentService = new AgentService(); 
+}; 

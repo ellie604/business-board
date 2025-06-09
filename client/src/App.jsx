@@ -13,6 +13,9 @@ import BrokerSellers from './pages/broker/BrokerSellers';
 import BrokerBuyers from './pages/broker/BrokerBuyers';
 import SellerListing from './pages/seller/SellerListing';
 import BuyerListing from './pages/buyer/BuyerListing';
+import AgentListingsPage from './pages/agent/AgentListingsPage';
+import AgentSellersPage from './pages/agent/AgentSellersPage';
+import AgentBuyersPage from './pages/agent/AgentBuyersPage';
 
 const queryClient = new QueryClient();
 
@@ -23,7 +26,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/broker" element={<BrokerDashboard />}>
-            <Route index element={<Navigate to="listings" replace />} />
             <Route path="messages" element={<MessagesPage userType="BROKER" />} />
             <Route path="agents" element={<BrokerAgentsPage />} />
             <Route path="listings" element={<BrokerListingsPage />} />
@@ -34,6 +36,11 @@ function App() {
           </Route>
           <Route path="/agent" element={<AgentDashboard />}>
             <Route path="messages" element={<MessagesPage userType="AGENT" />} />
+            <Route path="listings" element={<AgentListingsPage />} />
+            <Route path="sellers" element={<AgentSellersPage />} />
+            <Route path="buyers" element={<AgentBuyersPage />} />
+            <Route path="sellers/:sellerId/:listingId/*" element={<SellerListing />} />
+            <Route path="buyers/:buyerId/:listingId/*" element={<BuyerListing />} />
           </Route>
           <Route path="/seller" element={<SellerDashboard />}>
             <Route path="messages" element={<MessagesPage userType="SELLER" />} />
@@ -42,7 +49,7 @@ function App() {
             <Route path="messages" element={<MessagesPage userType="BUYER" />} />
           </Route>
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/broker/listings" replace />} />
+          <Route path="*" element={<Navigate to="/broker" replace />} />
         </Routes>
       </Router>
     </QueryClientProvider>
