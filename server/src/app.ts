@@ -113,17 +113,17 @@ const sessionConfig: session.SessionOptions = {
   }),
   name: 'business.board.sid',
   secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   rolling: true,
   proxy: true,
   cookie: {
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
-    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+    domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
   }
 };
 

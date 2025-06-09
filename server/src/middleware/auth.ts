@@ -70,21 +70,32 @@ export const authenticateAgent: RequestHandler = (req, res, next) => {
 
 export const authenticateBroker: RequestHandler = (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
-  console.log('Authenticating broker - Session:', typedReq.session);
-  console.log('Authenticating broker - User:', typedReq.user);
+  console.log('=== Broker Authentication Debug ===');
+  console.log('Session ID:', typedReq.sessionID);
+  console.log('Session:', {
+    ...typedReq.session,
+    user: typedReq.session.user ? {
+      id: typedReq.session.user.id,
+      role: typedReq.session.user.role
+    } : null
+  });
+  console.log('User:', typedReq.user);
+  console.log('Cookies:', req.headers.cookie);
+  console.log('=== End Broker Authentication Debug ===');
   
   if (!typedReq.user) {
-    console.log('No user found in request');
+    console.log('Authentication failed: No user found in request');
     res.status(401).json({ message: 'Authentication required' });
     return;
   }
 
   if (typedReq.user.role !== 'BROKER') {
-    console.log('User is not a broker. Role:', typedReq.user.role);
+    console.log('Authorization failed: User is not a broker. Role:', typedReq.user.role);
     res.status(403).json({ message: 'Access denied. Broker role required.' });
     return;
   }
 
+  console.log('Authentication successful for broker:', typedReq.user.id);
   next();
 };
 

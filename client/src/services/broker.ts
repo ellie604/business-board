@@ -34,15 +34,28 @@ interface AgentStats {
 
 class BrokerService {
   async getDashboardStats(): Promise<DashboardResponse> {
-    const response = await fetch(`${API_BASE_URL}/broker/dashboard`, {
-      credentials: 'include',
-    });
+    try {
+      console.log('Fetching dashboard stats...');
+      const response = await fetch(`${API_BASE_URL}/broker/dashboard`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch dashboard stats');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to fetch dashboard stats' }));
+        console.error('Dashboard stats error:', errorData);
+        throw new Error(errorData.message || 'Failed to fetch dashboard stats');
+      }
+
+      const data = await response.json();
+      console.log('Dashboard stats response:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in getDashboardStats:', error);
+      throw error;
     }
-
-    return response.json();
   }
 
   async getAgents(): Promise<AgentsResponse> {
