@@ -113,16 +113,17 @@ const sessionConfig: session.SessionOptions = {
   }),
   name: 'business.board.sid',
   secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: true,
+  resave: false,
   saveUninitialized: false,
   rolling: true,
   proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV !== 'development',
+    secure: true,
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'development' ? 'lax' as const : 'none' as const,
+    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    path: '/'
+    path: '/',
+    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
   }
 };
 
@@ -130,12 +131,15 @@ console.log('Session configuration:', {
   env: process.env.NODE_ENV,
   secret: process.env.SESSION_SECRET ? '[SET]' : '[DEFAULT]',
   secure: sessionConfig.cookie?.secure,
-  sameSite: sessionConfig.cookie?.sameSite
+  sameSite: sessionConfig.cookie?.sameSite,
+  domain: sessionConfig.cookie?.domain
 });
 
-// 在开发环境下禁用 secure cookie
+// 在开发环境下修改 cookie 设置
 if (process.env.NODE_ENV === 'development') {
   sessionConfig.cookie!.secure = false;
+  sessionConfig.cookie!.sameSite = 'lax';
+  delete sessionConfig.cookie!.domain;
 }
 
 // 确保在所有路由之前初始化 session

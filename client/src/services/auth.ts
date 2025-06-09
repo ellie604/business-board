@@ -15,6 +15,8 @@ interface LoginResponse {
 
 export const authService = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
+    console.log('Attempting login with:', { email, API_BASE_URL });
+    
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: {
@@ -25,9 +27,13 @@ export const authService = {
     });
 
     if (!response.ok) {
-      throw new Error('Login failed');
+      const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
+      console.error('Login failed:', errorData);
+      throw new Error(errorData.message || 'Login failed');
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log('Login response:', data);
+    return data;
   },
 }; 
