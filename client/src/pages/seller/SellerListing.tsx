@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ProgressSteps from '../../components/ProgressSteps';
 
 // Mock data - will be replaced with API calls later
@@ -104,9 +104,16 @@ const mockDocuments = [
 const SellerListing: React.FC = () => {
   const { sellerId, listingId } = useParams<{ sellerId: string; listingId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBackToList = () => {
-    navigate('/broker/sellers');
+    if (location.pathname.startsWith('/broker/')) {
+      navigate('/broker/sellers');
+    } else if (location.pathname.startsWith('/agent/')) {
+      navigate('/agent/sellers');
+    } else {
+      navigate('/broker/sellers');
+    }
   };
 
   return (
