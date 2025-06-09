@@ -82,15 +82,12 @@ app.use(cors({
     }
 
     // 检查是否匹配允许的域名
-    const isAllowed = Array.isArray(allowedOrigins)
-      ? allowedOrigins.some(allowed => {
-          const matches = allowed instanceof RegExp 
-            ? allowed.test(origin)
-            : allowed === origin;
-          console.log(`Checking origin ${origin} against ${allowed}:`, matches);
-          return matches;
-        })
-      : allowedOrigins === origin;
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return allowed === origin;
+    });
 
     if (isAllowed) {
       console.log('Origin allowed:', origin);
@@ -101,7 +98,9 @@ app.use(cors({
     console.log('=== End CORS Debug Info ===');
     callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 app.use(express.json());
@@ -120,10 +119,10 @@ const sessionConfig: session.SessionOptions = {
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
-    domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
+    domain: undefined
   }
 };
 
@@ -139,11 +138,22 @@ console.log('Session configuration:', {
 if (process.env.NODE_ENV === 'development') {
   sessionConfig.cookie!.secure = false;
   sessionConfig.cookie!.sameSite = 'lax';
-  delete sessionConfig.cookie!.domain;
+} else {
+  // 在生产环境确保安全设置
+  sessionConfig.cookie!.secure = true;
+  sessionConfig.cookie!.sameSite = 'none';
 }
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
+
+// 添加安全相关的响应头
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // 从 session 恢复用户信息
 app.use(restoreUser);

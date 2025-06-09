@@ -8,21 +8,34 @@ const prisma = getPrisma();
 // 从 session 恢复用户信息的中间件
 export const restoreUser = (req: Request, _res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
-  console.log('Restoring user from session:', {
-    sessionID: typedReq.sessionID,
-    sessionUser: typedReq.session?.user,
-    cookies: typedReq.headers.cookie
+  console.log('=== Session Restore Debug ===');
+  console.log('Request headers:', {
+    cookie: req.headers.cookie,
+    origin: req.headers.origin,
+    referer: req.headers.referer
+  });
+  console.log('Session details:', {
+    id: typedReq.sessionID,
+    cookie: typedReq.session?.cookie,
+    user: typedReq.session?.user ? {
+      id: typedReq.session.user.id,
+      role: typedReq.session.user.role
+    } : null
   });
   
   if (typedReq.session?.user) {
     typedReq.user = {
       ...typedReq.session.user,
-      id: typedReq.session.user.id.toString() // 确保 ID 是字符串
+      id: typedReq.session.user.id.toString()
     };
-    console.log('User restored from session:', typedReq.user);
+    console.log('User restored successfully:', {
+      id: typedReq.user.id,
+      role: typedReq.user.role
+    });
   } else {
     console.log('No user found in session');
   }
+  console.log('=== End Session Restore Debug ===');
   
   next();
 };
@@ -71,31 +84,55 @@ export const authenticateAgent: RequestHandler = (req, res, next) => {
 export const authenticateBroker: RequestHandler = (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
   console.log('=== Broker Authentication Debug ===');
-  console.log('Session ID:', typedReq.sessionID);
-  console.log('Session:', {
-    ...typedReq.session,
-    user: typedReq.session.user ? {
+  console.log('Request details:', {
+    method: req.method,
+    path: req.path,
+    headers: {
+      cookie: req.headers.cookie,
+      origin: req.headers.origin,
+      referer: req.headers.referer
+    }
+  });
+  console.log('Session details:', {
+    id: typedReq.sessionID,
+    cookie: typedReq.session?.cookie,
+    user: typedReq.session?.user ? {
       id: typedReq.session.user.id,
       role: typedReq.session.user.role
     } : null
   });
-  console.log('User:', typedReq.user);
-  console.log('Cookies:', req.headers.cookie);
-  console.log('=== End Broker Authentication Debug ===');
   
   if (!typedReq.user) {
-    console.log('Authentication failed: No user found in request');
-    res.status(401).json({ message: 'Authentication required' });
+    console.log('Authentication failed: No user in request');
+    res.status(401).json({ 
+      message: 'Authentication required',
+      debug: {
+        sessionExists: !!typedReq.session,
+        hasCookie: !!req.headers.cookie,
+        sessionID: typedReq.sessionID
+      }
+    });
     return;
   }
 
   if (typedReq.user.role !== 'BROKER') {
-    console.log('Authorization failed: User is not a broker. Role:', typedReq.user.role);
-    res.status(403).json({ message: 'Access denied. Broker role required.' });
+    console.log('Authorization failed: Invalid role:', typedReq.user.role);
+    res.status(403).json({ 
+      message: 'Access denied. Broker role required.',
+      debug: {
+        userRole: typedReq.user.role,
+        requiredRole: 'BROKER'
+      }
+    });
     return;
   }
 
-  console.log('Authentication successful for broker:', typedReq.user.id);
+  console.log('Authentication successful:', {
+    userId: typedReq.user.id,
+    role: typedReq.user.role
+  });
+  console.log('=== End Broker Authentication Debug ===');
+  
   next();
 };
 

@@ -37,10 +37,13 @@ class BrokerService {
     try {
       console.log('Fetching dashboard stats...');
       const response = await fetch(`${API_BASE_URL}/broker/dashboard`, {
+        method: 'GET',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        mode: 'cors'
       });
 
       if (!response.ok) {
