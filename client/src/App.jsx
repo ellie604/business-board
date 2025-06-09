@@ -7,6 +7,8 @@ import AgentDashboard from './pages/AgentDashboard';
 import SellerDashboard from './pages/SellerDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
 import MessagesPage from './pages/messages';
+import BrokerAgentsPage from './pages/BrokerAgentsPage';
+import BrokerListingsPage from './pages/BrokerListingsPage';
 
 const queryClient = new QueryClient();
 
@@ -18,6 +20,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/broker" element={<BrokerDashboard />}>
             <Route path="messages" element={<MessagesPage userType="BROKER" />} />
+            <Route path="agents" element={<BrokerAgentsPage />} />
+            <Route path="listings" element={<BrokerListingsPage />} />
           </Route>
           <Route path="/agent" element={<AgentDashboard />}>
             <Route path="messages" element={<MessagesPage userType="AGENT" />} />

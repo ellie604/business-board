@@ -26,6 +26,12 @@ interface AgentsResponse {
   message: string;
 }
 
+interface AgentStats {
+  numberOfListings: number;
+  numberUnderContract: number;
+  closingsToDate: number;
+}
+
 class BrokerService {
   async getDashboardStats(): Promise<DashboardResponse> {
     const response = await fetch(`${API_BASE_URL}/broker/dashboard`, {
@@ -48,6 +54,40 @@ class BrokerService {
       throw new Error('Failed to fetch agents');
     }
 
+    return response.json();
+  }
+
+  async getAgentStats(agentId: string): Promise<AgentStats> {
+    const response = await fetch(`${API_BASE_URL}/broker/agent/${agentId}/stats`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch agent stats');
+    }
+
+    const data = await response.json();
+    return data.stats;
+  }
+
+  async getAgentsWithStats() {
+    const response = await fetch(`${API_BASE_URL}/broker/agents-with-stats`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch agents with stats');
+    }
+    return response.json();
+  }
+
+  async deleteAgent(agentId: string) {
+    const response = await fetch(`${API_BASE_URL}/broker/agent/${agentId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete agent');
+    }
     return response.json();
   }
 }

@@ -233,6 +233,40 @@ async function main() {
     }
   });
 
+  // Create listings with one seller and multiple buyers
+  const listing1 = await prisma.listing.create({
+    data: {
+      title: "Yacht Sales",
+      description: "Luxury yacht for sale.",
+      price: 5000000,
+      status: "ACTIVE",
+      seller: { connect: { id: sellers[0].id } },
+      buyers: { connect: [{ id: buyers[0].id }, { id: buyers[1].id }] },
+    },
+  });
+
+  const listing2 = await prisma.listing.create({
+    data: {
+      title: "Airplane Sales",
+      description: "Private jet for sale.",
+      price: 12000000,
+      status: "UNDER_CONTRACT",
+      seller: { connect: { id: sellers[1].id } },
+      buyers: { connect: [{ id: buyers[2].id }] },
+    },
+  });
+
+  const listing3 = await prisma.listing.create({
+    data: {
+      title: "Coffee Shop",
+      description: "Downtown coffee shop business.",
+      price: 300000,
+      status: "CLOSED",
+      seller: { connect: { id: sellers[2].id } },
+      buyers: { connect: [] }, // No buyers yet
+    },
+  });
+
   console.log('Database has been seeded. 🌱');
 }
 

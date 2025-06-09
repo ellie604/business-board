@@ -72,4 +72,9 @@ npm install \
 && npm run build
 
 DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:OaL05zmJP1eqMaYq@aws-0-us-east-2.pooler.supabase.com:5432/postgres" npx prisma db push --schema=prisma/schema.production.prisma
-   DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:OaL05zmJP1eqMaYq@aws-0-us-east-2.pooler.supabase.com:5432/postgres" NODE_ENV=production npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.production.ts
+DATABASE_URL="postgresql://postgres.jklgdzqqwtbwrfgdyhxj:OaL05zmJP1eqMaYq@aws-0-us-east-2.pooler.supabase.com:5432/postgres" NODE_ENV=production npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.production.ts
+
+本地数据库更新：
+npx prisma generate --schema=./prisma/schema.preview.prisma
+npx prisma db push --force-reset --schema=./prisma/schema.preview.prisma
+NODE_ENV=preview npx ts-node --compilerOptions '{"module":"CommonJS"}' seed.preview.ts

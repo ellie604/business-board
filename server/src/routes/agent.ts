@@ -141,7 +141,71 @@ const getClients: RequestHandler = async (req, res, next) => {
   }
 };
 
+// 获取代理相关的所有房源列表
+const getListings: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const agentId = typedReq.user?.id;
+    if (!agentId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 获取代理管理的所有客户ID
+    const managedClients = await prisma.user.findMany({
+      where: {
+        managerId: agentId,
+        role: {
+          in: ['SELLER', 'BUYER']
+        }
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const clientIds = managedClients.map((client: { id: string }) => client.id);
+
+    // 获取与这些客户相关的所有房源
+    const listings = await prisma.listing.findMany({
+      where: {
+        OR: [
+          { sellerId: { in: clientIds } },  // 卖家的房源
+          { buyers: { some: { id: { in: clientIds } } } }  // 买家感兴趣的房源
+        ]
+      },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        buyers: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({
+      listings,
+      message: 'Listings retrieved successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 router.get('/dashboard', authenticateAgent, getDashboardStats);
 router.get('/clients', authenticateAgent, getClients);
+router.get('/listings', authenticateAgent, getListings);
 
 export default router; 

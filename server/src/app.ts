@@ -9,6 +9,7 @@ import buyerRouter from './routes/buyer';
 import sellerRouter from './routes/seller';
 import usersRouter from './routes/users';
 import messagesRouter from './routes/messages';
+import listingRouter from './routes/listing';
 import { restoreUser } from './middleware/auth';
 
 // 扩展 Express 的 Request 类型
@@ -168,6 +169,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // 注册路由
 app.use('/api/auth', authRouter);
+app.use('/api/broker/listings', listingRouter);
 app.use('/api/broker', brokerRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/buyer', buyerRouter);

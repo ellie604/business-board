@@ -85,6 +85,12 @@ export function BrokerDashboard() {
             Agents
           </Link>
           <Link 
+            to="/broker/listings"
+            className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
+          >
+            Listings
+          </Link>
+          <Link 
             to="/broker/sellers"
             className="block px-6 py-4 text-base text-gray-600 hover:bg-gray-50"
           >
