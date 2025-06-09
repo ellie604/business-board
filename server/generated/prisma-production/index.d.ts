@@ -1411,6 +1411,7 @@ export namespace Prisma {
     activities: number
     sentMessages: number
     receivedMessages: number
+    buyingListings: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1421,6 +1422,7 @@ export namespace Prisma {
     activities?: boolean | UserCountOutputTypeCountActivitiesArgs
     sentMessages?: boolean | UserCountOutputTypeCountSentMessagesArgs
     receivedMessages?: boolean | UserCountOutputTypeCountReceivedMessagesArgs
+    buyingListings?: boolean | UserCountOutputTypeCountBuyingListingsArgs
   }
 
   // Custom InputTypes
@@ -1483,6 +1485,13 @@ export namespace Prisma {
     where?: MessageWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBuyingListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ListingWhereInput
+  }
+
 
   /**
    * Count Type MessageCountOutputType
@@ -1521,6 +1530,37 @@ export namespace Prisma {
    */
   export type MessageCountOutputTypeCountAttachmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MessageAttachmentWhereInput
+  }
+
+
+  /**
+   * Count Type ListingCountOutputType
+   */
+
+  export type ListingCountOutputType = {
+    buyers: number
+  }
+
+  export type ListingCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyers?: boolean | ListingCountOutputTypeCountBuyersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingCountOutputType
+     */
+    select?: ListingCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountBuyersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
   }
 
 
@@ -2898,6 +2938,7 @@ export namespace Prisma {
     activities?: boolean | User$activitiesArgs<ExtArgs>
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
+    buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2952,6 +2993,7 @@ export namespace Prisma {
     activities?: boolean | User$activitiesArgs<ExtArgs>
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
+    buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2972,6 +3014,7 @@ export namespace Prisma {
       activities: Prisma.$ActivityPayload<ExtArgs>[]
       sentMessages: Prisma.$MessagePayload<ExtArgs>[]
       receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
+      buyingListings: Prisma.$ListingPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3386,6 +3429,7 @@ export namespace Prisma {
     activities<T extends User$activitiesArgs<ExtArgs> = {}>(args?: Subset<T, User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentMessages<T extends User$sentMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receivedMessages<T extends User$receivedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    buyingListings<T extends User$buyingListingsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyingListingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4005,6 +4049,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * User.buyingListings
+   */
+  export type User$buyingListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+    orderBy?: ListingOrderByWithRelationInput | ListingOrderByWithRelationInput[]
+    cursor?: ListingWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ListingScalarFieldEnum | ListingScalarFieldEnum[]
   }
 
   /**
@@ -6666,6 +6734,8 @@ export namespace Prisma {
     createdAt?: boolean
     sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    buyers?: boolean | Listing$buyersArgs<ExtArgs>
+    _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
   export type ListingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6703,6 +6773,8 @@ export namespace Prisma {
   export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "price" | "status" | "createdAt" | "sellerId", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    buyers?: boolean | Listing$buyersArgs<ExtArgs>
+    _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ListingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -6715,6 +6787,7 @@ export namespace Prisma {
     name: "Listing"
     objects: {
       seller: Prisma.$UserPayload<ExtArgs>
+      buyers: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7119,6 +7192,7 @@ export namespace Prisma {
   export interface Prisma__ListingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    buyers<T extends Listing$buyersArgs<ExtArgs> = {}>(args?: Subset<T, Listing$buyersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7548,6 +7622,30 @@ export namespace Prisma {
      * Limit how many Listings to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Listing.buyers
+   */
+  export type Listing$buyersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -9018,6 +9116,7 @@ export namespace Prisma {
     activities?: ActivityListRelationFilter
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
+    buyingListings?: ListingListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -9039,6 +9138,7 @@ export namespace Prisma {
     activities?: ActivityOrderByRelationAggregateInput
     sentMessages?: MessageOrderByRelationAggregateInput
     receivedMessages?: MessageOrderByRelationAggregateInput
+    buyingListings?: ListingOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -9063,6 +9163,7 @@ export namespace Prisma {
     activities?: ActivityListRelationFilter
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
+    buyingListings?: ListingListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -9305,6 +9406,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    buyers?: UserListRelationFilter
   }
 
   export type ListingOrderByWithRelationInput = {
@@ -9316,6 +9418,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     sellerId?: SortOrder
     seller?: UserOrderByWithRelationInput
+    buyers?: UserOrderByRelationAggregateInput
   }
 
   export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -9330,6 +9433,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    buyers?: UserListRelationFilter
   }, "id">
 
   export type ListingOrderByWithAggregationInput = {
@@ -9508,6 +9612,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -9528,6 +9633,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUpdateInput = {
@@ -9548,6 +9654,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -9568,6 +9675,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -9830,6 +9938,7 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
   }
 
   export type ListingUncheckedCreateInput = {
@@ -9840,6 +9949,7 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
   }
 
   export type ListingUpdateInput = {
@@ -9850,6 +9960,7 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
   }
 
   export type ListingUncheckedUpdateInput = {
@@ -9860,6 +9971,7 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
   }
 
   export type ListingCreateManyInput = {
@@ -10691,6 +10803,12 @@ export namespace Prisma {
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
   }
 
+  export type ListingCreateNestedManyWithoutBuyersInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -10738,6 +10856,12 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutReceiverInput | MessageCreateOrConnectWithoutReceiverInput[]
     createMany?: MessageCreateManyReceiverInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type ListingUncheckedCreateNestedManyWithoutBuyersInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -10864,6 +10988,19 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
+  export type ListingUpdateManyWithoutBuyersNestedInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    upsert?: ListingUpsertWithWhereUniqueWithoutBuyersInput | ListingUpsertWithWhereUniqueWithoutBuyersInput[]
+    set?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    disconnect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    delete?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    update?: ListingUpdateWithWhereUniqueWithoutBuyersInput | ListingUpdateWithWhereUniqueWithoutBuyersInput[]
+    updateMany?: ListingUpdateManyWithWhereWithoutBuyersInput | ListingUpdateManyWithWhereWithoutBuyersInput[]
+    deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -10960,6 +11097,19 @@ export namespace Prisma {
     update?: MessageUpdateWithWhereUniqueWithoutReceiverInput | MessageUpdateWithWhereUniqueWithoutReceiverInput[]
     updateMany?: MessageUpdateManyWithWhereWithoutReceiverInput | MessageUpdateManyWithWhereWithoutReceiverInput[]
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type ListingUncheckedUpdateManyWithoutBuyersNestedInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    upsert?: ListingUpsertWithWhereUniqueWithoutBuyersInput | ListingUpsertWithWhereUniqueWithoutBuyersInput[]
+    set?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    disconnect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    delete?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    update?: ListingUpdateWithWhereUniqueWithoutBuyersInput | ListingUpdateWithWhereUniqueWithoutBuyersInput[]
+    updateMany?: ListingUpdateManyWithWhereWithoutBuyersInput | ListingUpdateManyWithWhereWithoutBuyersInput[]
+    deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSentMessagesInput = {
@@ -11118,6 +11268,18 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type UserCreateNestedManyWithoutBuyingListingsInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutBuyingListingsInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -11136,6 +11298,32 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutListingsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutListingsInput, UserUpdateWithoutListingsInput>, UserUncheckedUpdateWithoutListingsInput>
+  }
+
+  export type UserUpdateManyWithoutBuyingListingsNestedInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutBuyingListingsInput | UserUpsertWithWhereUniqueWithoutBuyingListingsInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutBuyingListingsInput | UserUpdateWithWhereUniqueWithoutBuyingListingsInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutBuyingListingsInput | UserUpdateManyWithWhereWithoutBuyingListingsInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutBuyingListingsNestedInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutBuyingListingsInput | UserUpsertWithWhereUniqueWithoutBuyingListingsInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutBuyingListingsInput | UserUpdateWithWhereUniqueWithoutBuyingListingsInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutBuyingListingsInput | UserUpdateManyWithWhereWithoutBuyingListingsInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutActivitiesInput = {
@@ -11467,6 +11655,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutSellerDocsInput = {
@@ -11486,6 +11675,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutSellerDocsInput = {
@@ -11510,6 +11700,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutBuyerDocsInput = {
@@ -11529,6 +11720,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutBuyerDocsInput = {
@@ -11564,6 +11756,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerDocsInput = {
@@ -11583,6 +11776,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUpsertWithoutBuyerDocsInput = {
@@ -11613,6 +11807,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerDocsInput = {
@@ -11632,6 +11827,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserCreateWithoutManagingInput = {
@@ -11651,6 +11847,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -11670,6 +11867,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -11694,6 +11892,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -11713,6 +11912,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -11732,6 +11932,7 @@ export namespace Prisma {
     price: number
     status?: $Enums.ListingStatus
     createdAt?: Date | string
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
   }
 
   export type ListingUncheckedCreateWithoutSellerInput = {
@@ -11741,6 +11942,7 @@ export namespace Prisma {
     price: number
     status?: $Enums.ListingStatus
     createdAt?: Date | string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
   }
 
   export type ListingCreateOrConnectWithoutSellerInput = {
@@ -11941,6 +12143,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ListingCreateWithoutBuyersInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+  }
+
+  export type ListingUncheckedCreateWithoutBuyersInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+  }
+
+  export type ListingCreateOrConnectWithoutBuyersInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput>
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -11969,6 +12196,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -11988,6 +12216,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -12179,6 +12408,22 @@ export namespace Prisma {
     data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutReceiverInput>
   }
 
+  export type ListingUpsertWithWhereUniqueWithoutBuyersInput = {
+    where: ListingWhereUniqueInput
+    update: XOR<ListingUpdateWithoutBuyersInput, ListingUncheckedUpdateWithoutBuyersInput>
+    create: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput>
+  }
+
+  export type ListingUpdateWithWhereUniqueWithoutBuyersInput = {
+    where: ListingWhereUniqueInput
+    data: XOR<ListingUpdateWithoutBuyersInput, ListingUncheckedUpdateWithoutBuyersInput>
+  }
+
+  export type ListingUpdateManyWithWhereWithoutBuyersInput = {
+    where: ListingScalarWhereInput
+    data: XOR<ListingUpdateManyMutationInput, ListingUncheckedUpdateManyWithoutBuyersInput>
+  }
+
   export type UserCreateWithoutSentMessagesInput = {
     id?: string
     email: string
@@ -12196,6 +12441,7 @@ export namespace Prisma {
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -12215,6 +12461,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -12239,6 +12486,7 @@ export namespace Prisma {
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -12258,6 +12506,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -12420,6 +12669,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -12439,6 +12689,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -12469,6 +12720,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -12488,6 +12740,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type MessageUpsertWithoutRepliesInput = {
@@ -12705,6 +12958,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -12724,11 +12978,57 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
+  }
+
+  export type UserCreateWithoutBuyingListingsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyingListingsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyingListingsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput>
   }
 
   export type UserUpsertWithoutListingsInput = {
@@ -12759,6 +13059,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -12778,6 +13079,23 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutBuyingListingsInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutBuyingListingsInput, UserUncheckedUpdateWithoutBuyingListingsInput>
+    create: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutBuyingListingsInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutBuyingListingsInput, UserUncheckedUpdateWithoutBuyingListingsInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutBuyingListingsInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutBuyingListingsInput>
   }
 
   export type UserCreateWithoutActivitiesInput = {
@@ -12797,6 +13115,7 @@ export namespace Prisma {
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -12816,6 +13135,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -12851,6 +13171,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -12870,6 +13191,7 @@ export namespace Prisma {
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserCreateManyManagedByInput = {
@@ -12975,6 +13297,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -12994,6 +13317,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -13015,6 +13339,7 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutSellerInput = {
@@ -13024,6 +13349,7 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
   }
 
   export type ListingUncheckedUpdateManyWithoutSellerInput = {
@@ -13238,6 +13564,36 @@ export namespace Prisma {
     threadId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type ListingUpdateWithoutBuyersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutBuyersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ListingUncheckedUpdateManyWithoutBuyersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type MessageCreateManyParentMessageInput = {
     id?: string
     subject: string
@@ -13352,6 +13708,59 @@ export namespace Prisma {
     fileType?: StringFieldUpdateOperationsInput | string
     fileUrl?: StringFieldUpdateOperationsInput | string
     uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserUpdateWithoutBuyingListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyingListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutBuyingListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

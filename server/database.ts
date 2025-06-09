@@ -21,14 +21,14 @@ export function getPrisma() {
       datasources: {
         db: {
           url: process.env.NODE_ENV === 'production' 
-            ? process.env.DATABASE_URL 
+            ? process.env.PRO_DATABASE_URL 
             : process.env.PREVIEW_DATABASE_URL
         }
       }
     };
 
     if (process.env.NODE_ENV === 'production') {
-      console.log('Using production database URL:', process.env.DATABASE_URL);
+      console.log('Using production database URL:', process.env.PRO_DATABASE_URL);
       prisma = new ProductionPrismaClient(prismaOptions);
     } else {
       console.log('Using preview database URL:', process.env.PREVIEW_DATABASE_URL);

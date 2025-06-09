@@ -8,7 +8,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("PRO_DIRECT_URL")
+  url      = env("PRO_DATABASE_URL")
+  directUrl = env("PRO_DIRECT_URL")
 }
 
 enum UserRole {
@@ -88,6 +89,7 @@ model User {
   receivedMessages Message[]  @relation("ReceivedMessages")
   unreadCount      Int        @default(0)
   lastReadAt       DateTime?
+  buyingListings   Listing[]  @relation("BuyerListings")
 }
 
 model Message {
@@ -144,8 +146,9 @@ model Listing {
   price       Float
   status      ListingStatus @default(ACTIVE)
   createdAt   DateTime      @default(now())
-  sellerId    String
   seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
+  sellerId    String
+  buyers      User[]        @relation("BuyerListings")
 }
 
 model Activity {
