@@ -43,11 +43,19 @@ enum DocumentType {
   LISTING_AGREEMENT
   QUESTIONNAIRE
   AFTER_SALE
+  FINANCIAL_DOCUMENTS
 }
 
 enum DocumentStatus {
   PENDING
   COMPLETED
+}
+
+enum DocumentOperationType {
+  UPLOAD
+  DOWNLOAD
+  BOTH
+  NONE
 }
 
 enum MessageStatus {
@@ -57,16 +65,23 @@ enum MessageStatus {
 }
 
 model Document {
-  id        String         @id @default(uuid())
-  type      DocumentType
-  status    DocumentStatus @default(PENDING)
-  url       String?
-  sellerId  String
-  seller    User          @relation("SellerDocuments", fields: [sellerId], references: [id])
-  buyerId   String?
-  buyer     User?         @relation("BuyerDocuments", fields: [buyerId], references: [id])
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id              String                 @id @default(uuid())
+  type            DocumentType
+  status          DocumentStatus         @default(PENDING)
+  url             String?
+  fileName        String?
+  fileSize        Int?
+  operationType   DocumentOperationType  @default(NONE)
+  stepId          Int?                   // 关联到具体的步骤
+  sellerId        String
+  seller          User                   @relation("SellerDocuments", fields: [sellerId], references: [id])
+  buyerId         String?
+  buyer           User?                  @relation("BuyerDocuments", fields: [buyerId], references: [id])
+  listingId       String?                // 关联到具体的listing
+  uploadedAt      DateTime?              // 上传时间
+  downloadedAt    DateTime?              // 下载时间
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
 }
 
 model User {
@@ -89,6 +104,18 @@ model User {
   unreadCount      Int        @default(0)
   lastReadAt       DateTime?
   buyingListings   Listing[]  @relation("BuyerListings")
+  sellerProgress   SellerProgress[]
+}
+
+model SellerProgress {
+  id                String   @id @default(uuid())
+  sellerId          String   @unique
+  seller            User     @relation(fields: [sellerId], references: [id])
+  currentStep       Int      @default(0)
+  completedSteps    Json     @default("[]")
+  selectedListingId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Message {

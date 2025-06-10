@@ -1,138 +1,136 @@
 import React from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import ProgressSteps from '../../components/ProgressSteps';
+import ProgressSteps from '../ProgressSteps';
 
 // Mock data - will be replaced with API calls later
-const mockBuyerSteps = [
-  { title: 'Email the broker or agent', completed: true },
-  { title: 'Fill out a Non Disclosure agreement online', completed: true },
-  { title: 'Fill out a simple financial statement online', completed: true },
-  { title: 'Download a CBR or CIM for the business your interested in', completed: true },
-  { title: 'Upload documents', completed: false },
+const mockSellerSteps = [
+  { title: 'Download your listing agreement', completed: true },
+  { title: 'Fill out your business questionnaire Online', completed: true },
+  { title: 'Upload your Financial documents', completed: true },
+  { title: 'Buyer Activity: Up to the minute updates on buyers', completed: false },
   { title: 'Download your purchase contract', completed: false },
-  { title: 'Request & Download Due Diligence documents', completed: false },
-  { title: 'Checklist: Check off your to do list', completed: false },
+  { title: 'Upload due diligence documents', completed: false },
   { title: 'Download Closing document once we are closed', completed: false },
-  { title: 'After the Sale: Tips to make your transition smoother', completed: false }
+  { title: 'After the Sale: Learn about ways mitigate taxes on the proceeds', completed: false }
 ];
 
 const mockDocuments = [
   {
     id: '1',
-    name: 'Non-Disclosure Agreement.pdf',
+    name: 'Listing Agreement.pdf',
     uploadDate: '2024-03-01',
-    size: '1.2 MB',
-    downloadUrl: '/documents/nda.pdf'
+    size: '2.5 MB',
+    downloadUrl: '/documents/listing-agreement.pdf'
   },
   {
     id: '2',
-    name: 'Financial Statement.pdf',
+    name: 'Business Questionnaire.pdf',
     uploadDate: '2024-03-02',
-    size: '2.1 MB',
-    downloadUrl: '/documents/financial-statement.pdf'
+    size: '1.8 MB',
+    downloadUrl: '/documents/questionnaire.pdf'
   },
   {
     id: '3',
-    name: 'Business Profile.pdf',
+    name: 'Financial Statements.pdf',
     uploadDate: '2024-03-03',
-    size: '4.5 MB',
-    downloadUrl: '/documents/business-profile.pdf'
+    size: '3.2 MB',
+    downloadUrl: '/documents/financials.pdf'
   },
   {
     id: '4',
-    name: 'Proof of Funds.pdf',
+    name: 'Tax Returns 2023.pdf',
     uploadDate: '2024-03-04',
-    size: '1.8 MB',
-    downloadUrl: '/documents/proof-of-funds.pdf'
+    size: '4.1 MB',
+    downloadUrl: '/documents/tax-returns-2023.pdf'
   },
   {
     id: '5',
-    name: 'Bank Statements.pdf',
+    name: 'Equipment Inventory.xlsx',
     uploadDate: '2024-03-05',
-    size: '3.2 MB',
-    downloadUrl: '/documents/bank-statements.pdf'
+    size: '1.5 MB',
+    downloadUrl: '/documents/equipment-inventory.xlsx'
   },
   {
     id: '6',
-    name: 'Business Plan.pdf',
+    name: 'Employee Contracts.zip',
     uploadDate: '2024-03-06',
-    size: '5.7 MB',
-    downloadUrl: '/documents/business-plan.pdf'
+    size: '5.2 MB',
+    downloadUrl: '/documents/employee-contracts.zip'
   },
   {
     id: '7',
-    name: 'Investment Portfolio.pdf',
+    name: 'Lease Agreement.pdf',
     uploadDate: '2024-03-07',
-    size: '2.9 MB',
-    downloadUrl: '/documents/investment-portfolio.pdf'
+    size: '2.8 MB',
+    downloadUrl: '/documents/lease-agreement.pdf'
   },
   {
     id: '8',
-    name: 'Credit Report.pdf',
+    name: 'Insurance Policies.pdf',
     uploadDate: '2024-03-08',
-    size: '1.5 MB',
-    downloadUrl: '/documents/credit-report.pdf'
+    size: '3.5 MB',
+    downloadUrl: '/documents/insurance-policies.pdf'
   },
   {
     id: '9',
-    name: 'Resume.pdf',
+    name: 'Business Licenses.pdf',
     uploadDate: '2024-03-09',
-    size: '0.8 MB',
-    downloadUrl: '/documents/resume.pdf'
+    size: '1.9 MB',
+    downloadUrl: '/documents/business-licenses.pdf'
   },
   {
     id: '10',
-    name: 'Reference Letters.pdf',
+    name: 'Vendor Contracts.pdf',
     uploadDate: '2024-03-10',
-    size: '1.6 MB',
-    downloadUrl: '/documents/reference-letters.pdf'
+    size: '2.7 MB',
+    downloadUrl: '/documents/vendor-contracts.pdf'
   },
   {
     id: '11',
-    name: 'Due Diligence Questions.docx',
+    name: 'Property Photos.zip',
     uploadDate: '2024-03-11',
-    size: '1.1 MB',
-    downloadUrl: '/documents/due-diligence-questions.docx'
+    size: '8.4 MB',
+    downloadUrl: '/documents/property-photos.zip'
   },
   {
     id: '12',
-    name: 'Purchase Offer Draft.pdf',
+    name: 'Marketing Materials.pdf',
     uploadDate: '2024-03-12',
-    size: '2.3 MB',
-    downloadUrl: '/documents/purchase-offer-draft.pdf'
+    size: '4.3 MB',
+    downloadUrl: '/documents/marketing-materials.pdf'
   }
 ];
 
-const BuyerListing: React.FC = () => {
-  const { buyerId, listingId } = useParams<{ buyerId: string; listingId: string }>();
+const SellerProgressView: React.FC = () => {
+  const { sellerId, listingId } = useParams<{ sellerId: string; listingId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleBackToList = () => {
     if (location.pathname.startsWith('/broker/')) {
-      navigate('/broker/buyers');
+      navigate('/broker/sellers');
     } else if (location.pathname.startsWith('/agent/')) {
-      navigate('/agent/buyers');
+      navigate('/agent/sellers');
     } else {
-      navigate('/broker/buyers');
+      navigate('/broker/sellers');
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Buyer Progress</h1>
+        <h1 className="text-3xl font-bold">Seller Progress</h1>
         <button
           onClick={handleBackToList}
           className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
         >
-          Back to Buyer List
+          Back to Seller List
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <ProgressSteps steps={mockBuyerSteps} type="buyer" />
+          <ProgressSteps steps={mockSellerSteps} type="seller" />
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-lg h-[calc(100vh-12rem)] overflow-y-auto">
@@ -173,4 +171,4 @@ const BuyerListing: React.FC = () => {
   );
 };
 
-export default BuyerListing; 
+export default SellerProgressView; 

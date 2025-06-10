@@ -24,6 +24,11 @@ export type Document = $Result.DefaultSelection<Prisma.$DocumentPayload>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model SellerProgress
+ * 
+ */
+export type SellerProgress = $Result.DefaultSelection<Prisma.$SellerProgressPayload>
+/**
  * Model Message
  * 
  */
@@ -80,7 +85,8 @@ export const DocumentType: {
   PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
   LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   QUESTIONNAIRE: 'QUESTIONNAIRE',
-  AFTER_SALE: 'AFTER_SALE'
+  AFTER_SALE: 'AFTER_SALE',
+  FINANCIAL_DOCUMENTS: 'FINANCIAL_DOCUMENTS'
 };
 
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
@@ -92,6 +98,16 @@ export const DocumentStatus: {
 };
 
 export type DocumentStatus = (typeof DocumentStatus)[keyof typeof DocumentStatus]
+
+
+export const DocumentOperationType: {
+  UPLOAD: 'UPLOAD',
+  DOWNLOAD: 'DOWNLOAD',
+  BOTH: 'BOTH',
+  NONE: 'NONE'
+};
+
+export type DocumentOperationType = (typeof DocumentOperationType)[keyof typeof DocumentOperationType]
 
 
 export const MessageStatus: {
@@ -119,6 +135,10 @@ export const DocumentType: typeof $Enums.DocumentType
 export type DocumentStatus = $Enums.DocumentStatus
 
 export const DocumentStatus: typeof $Enums.DocumentStatus
+
+export type DocumentOperationType = $Enums.DocumentOperationType
+
+export const DocumentOperationType: typeof $Enums.DocumentOperationType
 
 export type MessageStatus = $Enums.MessageStatus
 
@@ -268,6 +288,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.sellerProgress`: Exposes CRUD operations for the **SellerProgress** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SellerProgresses
+    * const sellerProgresses = await prisma.sellerProgress.findMany()
+    * ```
+    */
+  get sellerProgress(): Prisma.SellerProgressDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.message`: Exposes CRUD operations for the **Message** model.
@@ -750,6 +780,7 @@ export namespace Prisma {
   export const ModelName: {
     Document: 'Document',
     User: 'User',
+    SellerProgress: 'SellerProgress',
     Message: 'Message',
     MessageAttachment: 'MessageAttachment',
     Listing: 'Listing',
@@ -772,7 +803,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "document" | "user" | "message" | "messageAttachment" | "listing" | "activity"
+      modelProps: "document" | "user" | "sellerProgress" | "message" | "messageAttachment" | "listing" | "activity"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -921,6 +952,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      SellerProgress: {
+        payload: Prisma.$SellerProgressPayload<ExtArgs>
+        fields: Prisma.SellerProgressFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SellerProgressFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SellerProgressFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          findFirst: {
+            args: Prisma.SellerProgressFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SellerProgressFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          findMany: {
+            args: Prisma.SellerProgressFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>[]
+          }
+          create: {
+            args: Prisma.SellerProgressCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          createMany: {
+            args: Prisma.SellerProgressCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SellerProgressCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>[]
+          }
+          delete: {
+            args: Prisma.SellerProgressDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          update: {
+            args: Prisma.SellerProgressUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          deleteMany: {
+            args: Prisma.SellerProgressDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SellerProgressUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SellerProgressUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>[]
+          }
+          upsert: {
+            args: Prisma.SellerProgressUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          aggregate: {
+            args: Prisma.SellerProgressAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSellerProgress>
+          }
+          groupBy: {
+            args: Prisma.SellerProgressGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SellerProgressGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SellerProgressCountArgs<ExtArgs>
+            result: $Utils.Optional<SellerProgressCountAggregateOutputType> | number
           }
         }
       }
@@ -1306,6 +1411,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     document?: DocumentOmit
     user?: UserOmit
+    sellerProgress?: SellerProgressOmit
     message?: MessageOmit
     messageAttachment?: MessageAttachmentOmit
     listing?: ListingOmit
@@ -1412,6 +1518,7 @@ export namespace Prisma {
     sentMessages: number
     receivedMessages: number
     buyingListings: number
+    sellerProgress: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1423,6 +1530,7 @@ export namespace Prisma {
     sentMessages?: boolean | UserCountOutputTypeCountSentMessagesArgs
     receivedMessages?: boolean | UserCountOutputTypeCountReceivedMessagesArgs
     buyingListings?: boolean | UserCountOutputTypeCountBuyingListingsArgs
+    sellerProgress?: boolean | UserCountOutputTypeCountSellerProgressArgs
   }
 
   // Custom InputTypes
@@ -1490,6 +1598,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountBuyingListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ListingWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProgressWhereInput
   }
 
 
@@ -1574,8 +1689,20 @@ export namespace Prisma {
 
   export type AggregateDocument = {
     _count: DocumentCountAggregateOutputType | null
+    _avg: DocumentAvgAggregateOutputType | null
+    _sum: DocumentSumAggregateOutputType | null
     _min: DocumentMinAggregateOutputType | null
     _max: DocumentMaxAggregateOutputType | null
+  }
+
+  export type DocumentAvgAggregateOutputType = {
+    fileSize: number | null
+    stepId: number | null
+  }
+
+  export type DocumentSumAggregateOutputType = {
+    fileSize: number | null
+    stepId: number | null
   }
 
   export type DocumentMinAggregateOutputType = {
@@ -1583,8 +1710,15 @@ export namespace Prisma {
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
     url: string | null
+    fileName: string | null
+    fileSize: number | null
+    operationType: $Enums.DocumentOperationType | null
+    stepId: number | null
     sellerId: string | null
     buyerId: string | null
+    listingId: string | null
+    uploadedAt: Date | null
+    downloadedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1594,8 +1728,15 @@ export namespace Prisma {
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
     url: string | null
+    fileName: string | null
+    fileSize: number | null
+    operationType: $Enums.DocumentOperationType | null
+    stepId: number | null
     sellerId: string | null
     buyerId: string | null
+    listingId: string | null
+    uploadedAt: Date | null
+    downloadedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1605,21 +1746,45 @@ export namespace Prisma {
     type: number
     status: number
     url: number
+    fileName: number
+    fileSize: number
+    operationType: number
+    stepId: number
     sellerId: number
     buyerId: number
+    listingId: number
+    uploadedAt: number
+    downloadedAt: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
 
+  export type DocumentAvgAggregateInputType = {
+    fileSize?: true
+    stepId?: true
+  }
+
+  export type DocumentSumAggregateInputType = {
+    fileSize?: true
+    stepId?: true
+  }
+
   export type DocumentMinAggregateInputType = {
     id?: true
     type?: true
     status?: true
     url?: true
+    fileName?: true
+    fileSize?: true
+    operationType?: true
+    stepId?: true
     sellerId?: true
     buyerId?: true
+    listingId?: true
+    uploadedAt?: true
+    downloadedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1629,8 +1794,15 @@ export namespace Prisma {
     type?: true
     status?: true
     url?: true
+    fileName?: true
+    fileSize?: true
+    operationType?: true
+    stepId?: true
     sellerId?: true
     buyerId?: true
+    listingId?: true
+    uploadedAt?: true
+    downloadedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1640,8 +1812,15 @@ export namespace Prisma {
     type?: true
     status?: true
     url?: true
+    fileName?: true
+    fileSize?: true
+    operationType?: true
+    stepId?: true
     sellerId?: true
     buyerId?: true
+    listingId?: true
+    uploadedAt?: true
+    downloadedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1685,6 +1864,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: DocumentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DocumentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: DocumentMinAggregateInputType
@@ -1715,6 +1906,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: DocumentCountAggregateInputType | true
+    _avg?: DocumentAvgAggregateInputType
+    _sum?: DocumentSumAggregateInputType
     _min?: DocumentMinAggregateInputType
     _max?: DocumentMaxAggregateInputType
   }
@@ -1724,11 +1917,20 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status: $Enums.DocumentStatus
     url: string | null
+    fileName: string | null
+    fileSize: number | null
+    operationType: $Enums.DocumentOperationType
+    stepId: number | null
     sellerId: string
     buyerId: string | null
+    listingId: string | null
+    uploadedAt: Date | null
+    downloadedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: DocumentCountAggregateOutputType | null
+    _avg: DocumentAvgAggregateOutputType | null
+    _sum: DocumentSumAggregateOutputType | null
     _min: DocumentMinAggregateOutputType | null
     _max: DocumentMaxAggregateOutputType | null
   }
@@ -1752,8 +1954,15 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -1765,8 +1974,15 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -1778,8 +1994,15 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -1791,13 +2014,20 @@ export namespace Prisma {
     type?: boolean
     status?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "sellerId" | "buyerId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "fileName" | "fileSize" | "operationType" | "stepId" | "sellerId" | "buyerId" | "listingId" | "uploadedAt" | "downloadedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
   export type DocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
@@ -1822,8 +2052,15 @@ export namespace Prisma {
       type: $Enums.DocumentType
       status: $Enums.DocumentStatus
       url: string | null
+      fileName: string | null
+      fileSize: number | null
+      operationType: $Enums.DocumentOperationType
+      stepId: number | null
       sellerId: string
       buyerId: string | null
+      listingId: string | null
+      uploadedAt: Date | null
+      downloadedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["document"]>
@@ -2255,8 +2492,15 @@ export namespace Prisma {
     readonly type: FieldRef<"Document", 'DocumentType'>
     readonly status: FieldRef<"Document", 'DocumentStatus'>
     readonly url: FieldRef<"Document", 'String'>
+    readonly fileName: FieldRef<"Document", 'String'>
+    readonly fileSize: FieldRef<"Document", 'Int'>
+    readonly operationType: FieldRef<"Document", 'DocumentOperationType'>
+    readonly stepId: FieldRef<"Document", 'Int'>
     readonly sellerId: FieldRef<"Document", 'String'>
     readonly buyerId: FieldRef<"Document", 'String'>
+    readonly listingId: FieldRef<"Document", 'String'>
+    readonly uploadedAt: FieldRef<"Document", 'DateTime'>
+    readonly downloadedAt: FieldRef<"Document", 'DateTime'>
     readonly createdAt: FieldRef<"Document", 'DateTime'>
     readonly updatedAt: FieldRef<"Document", 'DateTime'>
   }
@@ -2939,6 +3183,7 @@ export namespace Prisma {
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
     buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
+    sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2994,6 +3239,7 @@ export namespace Prisma {
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
     buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
+    sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3015,6 +3261,7 @@ export namespace Prisma {
       sentMessages: Prisma.$MessagePayload<ExtArgs>[]
       receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
       buyingListings: Prisma.$ListingPayload<ExtArgs>[]
+      sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3430,6 +3677,7 @@ export namespace Prisma {
     sentMessages<T extends User$sentMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receivedMessages<T extends User$receivedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyingListings<T extends User$buyingListingsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyingListingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerProgress<T extends User$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4076,6 +4324,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.sellerProgress
+   */
+  export type User$sellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    where?: SellerProgressWhereInput
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    cursor?: SellerProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4091,6 +4363,1120 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SellerProgress
+   */
+
+  export type AggregateSellerProgress = {
+    _count: SellerProgressCountAggregateOutputType | null
+    _avg: SellerProgressAvgAggregateOutputType | null
+    _sum: SellerProgressSumAggregateOutputType | null
+    _min: SellerProgressMinAggregateOutputType | null
+    _max: SellerProgressMaxAggregateOutputType | null
+  }
+
+  export type SellerProgressAvgAggregateOutputType = {
+    currentStep: number | null
+  }
+
+  export type SellerProgressSumAggregateOutputType = {
+    currentStep: number | null
+  }
+
+  export type SellerProgressMinAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    currentStep: number | null
+    selectedListingId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerProgressMaxAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    currentStep: number | null
+    selectedListingId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerProgressCountAggregateOutputType = {
+    id: number
+    sellerId: number
+    currentStep: number
+    completedSteps: number
+    selectedListingId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SellerProgressAvgAggregateInputType = {
+    currentStep?: true
+  }
+
+  export type SellerProgressSumAggregateInputType = {
+    currentStep?: true
+  }
+
+  export type SellerProgressMinAggregateInputType = {
+    id?: true
+    sellerId?: true
+    currentStep?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerProgressMaxAggregateInputType = {
+    id?: true
+    sellerId?: true
+    currentStep?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerProgressCountAggregateInputType = {
+    id?: true
+    sellerId?: true
+    currentStep?: true
+    completedSteps?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SellerProgressAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerProgress to aggregate.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SellerProgresses
+    **/
+    _count?: true | SellerProgressCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SellerProgressAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SellerProgressSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SellerProgressMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SellerProgressMaxAggregateInputType
+  }
+
+  export type GetSellerProgressAggregateType<T extends SellerProgressAggregateArgs> = {
+        [P in keyof T & keyof AggregateSellerProgress]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSellerProgress[P]>
+      : GetScalarType<T[P], AggregateSellerProgress[P]>
+  }
+
+
+
+
+  export type SellerProgressGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProgressWhereInput
+    orderBy?: SellerProgressOrderByWithAggregationInput | SellerProgressOrderByWithAggregationInput[]
+    by: SellerProgressScalarFieldEnum[] | SellerProgressScalarFieldEnum
+    having?: SellerProgressScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SellerProgressCountAggregateInputType | true
+    _avg?: SellerProgressAvgAggregateInputType
+    _sum?: SellerProgressSumAggregateInputType
+    _min?: SellerProgressMinAggregateInputType
+    _max?: SellerProgressMaxAggregateInputType
+  }
+
+  export type SellerProgressGroupByOutputType = {
+    id: string
+    sellerId: string
+    currentStep: number
+    completedSteps: JsonValue
+    selectedListingId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SellerProgressCountAggregateOutputType | null
+    _avg: SellerProgressAvgAggregateOutputType | null
+    _sum: SellerProgressSumAggregateOutputType | null
+    _min: SellerProgressMinAggregateOutputType | null
+    _max: SellerProgressMaxAggregateOutputType | null
+  }
+
+  type GetSellerProgressGroupByPayload<T extends SellerProgressGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SellerProgressGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SellerProgressGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SellerProgressGroupByOutputType[P]>
+            : GetScalarType<T[P], SellerProgressGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SellerProgressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerProgress"]>
+
+  export type SellerProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerProgress"]>
+
+  export type SellerProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerProgress"]>
+
+  export type SellerProgressSelectScalar = {
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SellerProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sellerId" | "currentStep" | "completedSteps" | "selectedListingId" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerProgress"]>
+  export type SellerProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SellerProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SellerProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SellerProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SellerProgress"
+    objects: {
+      seller: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sellerId: string
+      currentStep: number
+      completedSteps: Prisma.JsonValue
+      selectedListingId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["sellerProgress"]>
+    composites: {}
+  }
+
+  type SellerProgressGetPayload<S extends boolean | null | undefined | SellerProgressDefaultArgs> = $Result.GetResult<Prisma.$SellerProgressPayload, S>
+
+  type SellerProgressCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SellerProgressFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SellerProgressCountAggregateInputType | true
+    }
+
+  export interface SellerProgressDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SellerProgress'], meta: { name: 'SellerProgress' } }
+    /**
+     * Find zero or one SellerProgress that matches the filter.
+     * @param {SellerProgressFindUniqueArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SellerProgressFindUniqueArgs>(args: SelectSubset<T, SellerProgressFindUniqueArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SellerProgress that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SellerProgressFindUniqueOrThrowArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SellerProgressFindUniqueOrThrowArgs>(args: SelectSubset<T, SellerProgressFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerProgress that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressFindFirstArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SellerProgressFindFirstArgs>(args?: SelectSubset<T, SellerProgressFindFirstArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerProgress that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressFindFirstOrThrowArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SellerProgressFindFirstOrThrowArgs>(args?: SelectSubset<T, SellerProgressFindFirstOrThrowArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SellerProgresses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SellerProgresses
+     * const sellerProgresses = await prisma.sellerProgress.findMany()
+     * 
+     * // Get first 10 SellerProgresses
+     * const sellerProgresses = await prisma.sellerProgress.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sellerProgressWithIdOnly = await prisma.sellerProgress.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SellerProgressFindManyArgs>(args?: SelectSubset<T, SellerProgressFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SellerProgress.
+     * @param {SellerProgressCreateArgs} args - Arguments to create a SellerProgress.
+     * @example
+     * // Create one SellerProgress
+     * const SellerProgress = await prisma.sellerProgress.create({
+     *   data: {
+     *     // ... data to create a SellerProgress
+     *   }
+     * })
+     * 
+     */
+    create<T extends SellerProgressCreateArgs>(args: SelectSubset<T, SellerProgressCreateArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SellerProgresses.
+     * @param {SellerProgressCreateManyArgs} args - Arguments to create many SellerProgresses.
+     * @example
+     * // Create many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SellerProgressCreateManyArgs>(args?: SelectSubset<T, SellerProgressCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SellerProgresses and returns the data saved in the database.
+     * @param {SellerProgressCreateManyAndReturnArgs} args - Arguments to create many SellerProgresses.
+     * @example
+     * // Create many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SellerProgresses and only return the `id`
+     * const sellerProgressWithIdOnly = await prisma.sellerProgress.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SellerProgressCreateManyAndReturnArgs>(args?: SelectSubset<T, SellerProgressCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SellerProgress.
+     * @param {SellerProgressDeleteArgs} args - Arguments to delete one SellerProgress.
+     * @example
+     * // Delete one SellerProgress
+     * const SellerProgress = await prisma.sellerProgress.delete({
+     *   where: {
+     *     // ... filter to delete one SellerProgress
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SellerProgressDeleteArgs>(args: SelectSubset<T, SellerProgressDeleteArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SellerProgress.
+     * @param {SellerProgressUpdateArgs} args - Arguments to update one SellerProgress.
+     * @example
+     * // Update one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SellerProgressUpdateArgs>(args: SelectSubset<T, SellerProgressUpdateArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SellerProgresses.
+     * @param {SellerProgressDeleteManyArgs} args - Arguments to filter SellerProgresses to delete.
+     * @example
+     * // Delete a few SellerProgresses
+     * const { count } = await prisma.sellerProgress.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SellerProgressDeleteManyArgs>(args?: SelectSubset<T, SellerProgressDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SellerProgressUpdateManyArgs>(args: SelectSubset<T, SellerProgressUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerProgresses and returns the data updated in the database.
+     * @param {SellerProgressUpdateManyAndReturnArgs} args - Arguments to update many SellerProgresses.
+     * @example
+     * // Update many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SellerProgresses and only return the `id`
+     * const sellerProgressWithIdOnly = await prisma.sellerProgress.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SellerProgressUpdateManyAndReturnArgs>(args: SelectSubset<T, SellerProgressUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SellerProgress.
+     * @param {SellerProgressUpsertArgs} args - Arguments to update or create a SellerProgress.
+     * @example
+     * // Update or create a SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.upsert({
+     *   create: {
+     *     // ... data to create a SellerProgress
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SellerProgress we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SellerProgressUpsertArgs>(args: SelectSubset<T, SellerProgressUpsertArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SellerProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressCountArgs} args - Arguments to filter SellerProgresses to count.
+     * @example
+     * // Count the number of SellerProgresses
+     * const count = await prisma.sellerProgress.count({
+     *   where: {
+     *     // ... the filter for the SellerProgresses we want to count
+     *   }
+     * })
+    **/
+    count<T extends SellerProgressCountArgs>(
+      args?: Subset<T, SellerProgressCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SellerProgressCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SellerProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SellerProgressAggregateArgs>(args: Subset<T, SellerProgressAggregateArgs>): Prisma.PrismaPromise<GetSellerProgressAggregateType<T>>
+
+    /**
+     * Group by SellerProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SellerProgressGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SellerProgressGroupByArgs['orderBy'] }
+        : { orderBy?: SellerProgressGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SellerProgressGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSellerProgressGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SellerProgress model
+   */
+  readonly fields: SellerProgressFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SellerProgress.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SellerProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SellerProgress model
+   */
+  interface SellerProgressFieldRefs {
+    readonly id: FieldRef<"SellerProgress", 'String'>
+    readonly sellerId: FieldRef<"SellerProgress", 'String'>
+    readonly currentStep: FieldRef<"SellerProgress", 'Int'>
+    readonly completedSteps: FieldRef<"SellerProgress", 'Json'>
+    readonly selectedListingId: FieldRef<"SellerProgress", 'String'>
+    readonly createdAt: FieldRef<"SellerProgress", 'DateTime'>
+    readonly updatedAt: FieldRef<"SellerProgress", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SellerProgress findUnique
+   */
+  export type SellerProgressFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress findUniqueOrThrow
+   */
+  export type SellerProgressFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress findFirst
+   */
+  export type SellerProgressFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerProgresses.
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerProgresses.
+     */
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * SellerProgress findFirstOrThrow
+   */
+  export type SellerProgressFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerProgresses.
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerProgresses.
+     */
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * SellerProgress findMany
+   */
+  export type SellerProgressFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgresses to fetch.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SellerProgresses.
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * SellerProgress create
+   */
+  export type SellerProgressCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SellerProgress.
+     */
+    data: XOR<SellerProgressCreateInput, SellerProgressUncheckedCreateInput>
+  }
+
+  /**
+   * SellerProgress createMany
+   */
+  export type SellerProgressCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SellerProgresses.
+     */
+    data: SellerProgressCreateManyInput | SellerProgressCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SellerProgress createManyAndReturn
+   */
+  export type SellerProgressCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * The data used to create many SellerProgresses.
+     */
+    data: SellerProgressCreateManyInput | SellerProgressCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerProgress update
+   */
+  export type SellerProgressUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SellerProgress.
+     */
+    data: XOR<SellerProgressUpdateInput, SellerProgressUncheckedUpdateInput>
+    /**
+     * Choose, which SellerProgress to update.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress updateMany
+   */
+  export type SellerProgressUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SellerProgresses.
+     */
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerProgresses to update
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * Limit how many SellerProgresses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerProgress updateManyAndReturn
+   */
+  export type SellerProgressUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * The data used to update SellerProgresses.
+     */
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerProgresses to update
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * Limit how many SellerProgresses to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerProgress upsert
+   */
+  export type SellerProgressUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SellerProgress to update in case it exists.
+     */
+    where: SellerProgressWhereUniqueInput
+    /**
+     * In case the SellerProgress found by the `where` argument doesn't exist, create a new SellerProgress with this data.
+     */
+    create: XOR<SellerProgressCreateInput, SellerProgressUncheckedCreateInput>
+    /**
+     * In case the SellerProgress was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SellerProgressUpdateInput, SellerProgressUncheckedUpdateInput>
+  }
+
+  /**
+   * SellerProgress delete
+   */
+  export type SellerProgressDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter which SellerProgress to delete.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress deleteMany
+   */
+  export type SellerProgressDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerProgresses to delete
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * Limit how many SellerProgresses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerProgress without action
+   */
+  export type SellerProgressDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
   }
 
 
@@ -8740,8 +10126,15 @@ export namespace Prisma {
     type: 'type',
     status: 'status',
     url: 'url',
+    fileName: 'fileName',
+    fileSize: 'fileSize',
+    operationType: 'operationType',
+    stepId: 'stepId',
     sellerId: 'sellerId',
     buyerId: 'buyerId',
+    listingId: 'listingId',
+    uploadedAt: 'uploadedAt',
+    downloadedAt: 'downloadedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8763,6 +10156,19 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const SellerProgressScalarFieldEnum: {
+    id: 'id',
+    sellerId: 'sellerId',
+    currentStep: 'currentStep',
+    completedSteps: 'completedSteps',
+    selectedListingId: 'selectedListingId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SellerProgressScalarFieldEnum = (typeof SellerProgressScalarFieldEnum)[keyof typeof SellerProgressScalarFieldEnum]
 
 
   export const MessageScalarFieldEnum: {
@@ -8831,6 +10237,13 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const NullableJsonNullValueInput: {
@@ -8914,6 +10327,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentOperationType'
+   */
+  export type EnumDocumentOperationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentOperationType'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentOperationType[]'
+   */
+  export type ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentOperationType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -8942,16 +10383,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'Json'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
     
 
 
   /**
-   * Reference to a field of type 'Int[]'
+   * Reference to a field of type 'QueryMode'
    */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -9002,20 +10443,6 @@ export namespace Prisma {
    */
   export type ListEnumListingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ListingStatus[]'>
     
-
-
-  /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
   /**
    * Deep Input Types
    */
@@ -9029,8 +10456,15 @@ export namespace Prisma {
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableFilter<"Document"> | string | null
+    fileName?: StringNullableFilter<"Document"> | string | null
+    fileSize?: IntNullableFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableFilter<"Document"> | number | null
     sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
+    listingId?: StringNullableFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -9042,8 +10476,15 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    fileSize?: SortOrderInput | SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrderInput | SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrderInput | SortOrder
+    listingId?: SortOrderInput | SortOrder
+    uploadedAt?: SortOrderInput | SortOrder
+    downloadedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seller?: UserOrderByWithRelationInput
@@ -9058,8 +10499,15 @@ export namespace Prisma {
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableFilter<"Document"> | string | null
+    fileName?: StringNullableFilter<"Document"> | string | null
+    fileSize?: IntNullableFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableFilter<"Document"> | number | null
     sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
+    listingId?: StringNullableFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -9071,13 +10519,22 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    fileSize?: SortOrderInput | SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrderInput | SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrderInput | SortOrder
+    listingId?: SortOrderInput | SortOrder
+    uploadedAt?: SortOrderInput | SortOrder
+    downloadedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DocumentCountOrderByAggregateInput
+    _avg?: DocumentAvgOrderByAggregateInput
     _max?: DocumentMaxOrderByAggregateInput
     _min?: DocumentMinOrderByAggregateInput
+    _sum?: DocumentSumOrderByAggregateInput
   }
 
   export type DocumentScalarWhereWithAggregatesInput = {
@@ -9088,8 +10545,15 @@ export namespace Prisma {
     type?: EnumDocumentTypeWithAggregatesFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusWithAggregatesFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    fileName?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    fileSize?: IntNullableWithAggregatesFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeWithAggregatesFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableWithAggregatesFilter<"Document"> | number | null
     sellerId?: StringWithAggregatesFilter<"Document"> | string
     buyerId?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    listingId?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
   }
@@ -9117,6 +10581,7 @@ export namespace Prisma {
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
     buyingListings?: ListingListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -9139,6 +10604,7 @@ export namespace Prisma {
     sentMessages?: MessageOrderByRelationAggregateInput
     receivedMessages?: MessageOrderByRelationAggregateInput
     buyingListings?: ListingOrderByRelationAggregateInput
+    sellerProgress?: SellerProgressOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -9164,6 +10630,7 @@ export namespace Prisma {
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
     buyingListings?: ListingListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -9198,6 +10665,73 @@ export namespace Prisma {
     managerId?: StringNullableWithAggregatesFilter<"User"> | string | null
     unreadCount?: IntWithAggregatesFilter<"User"> | number
     lastReadAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  }
+
+  export type SellerProgressWhereInput = {
+    AND?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    OR?: SellerProgressWhereInput[]
+    NOT?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    id?: StringFilter<"SellerProgress"> | string
+    sellerId?: StringFilter<"SellerProgress"> | string
+    currentStep?: IntFilter<"SellerProgress"> | number
+    completedSteps?: JsonFilter<"SellerProgress">
+    selectedListingId?: StringNullableFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SellerProgressOrderByWithRelationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    seller?: UserOrderByWithRelationInput
+  }
+
+  export type SellerProgressWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sellerId?: string
+    AND?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    OR?: SellerProgressWhereInput[]
+    NOT?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    currentStep?: IntFilter<"SellerProgress"> | number
+    completedSteps?: JsonFilter<"SellerProgress">
+    selectedListingId?: StringNullableFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "sellerId">
+
+  export type SellerProgressOrderByWithAggregationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SellerProgressCountOrderByAggregateInput
+    _avg?: SellerProgressAvgOrderByAggregateInput
+    _max?: SellerProgressMaxOrderByAggregateInput
+    _min?: SellerProgressMinOrderByAggregateInput
+    _sum?: SellerProgressSumOrderByAggregateInput
+  }
+
+  export type SellerProgressScalarWhereWithAggregatesInput = {
+    AND?: SellerProgressScalarWhereWithAggregatesInput | SellerProgressScalarWhereWithAggregatesInput[]
+    OR?: SellerProgressScalarWhereWithAggregatesInput[]
+    NOT?: SellerProgressScalarWhereWithAggregatesInput | SellerProgressScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SellerProgress"> | string
+    sellerId?: StringWithAggregatesFilter<"SellerProgress"> | string
+    currentStep?: IntWithAggregatesFilter<"SellerProgress"> | number
+    completedSteps?: JsonWithAggregatesFilter<"SellerProgress">
+    selectedListingId?: StringNullableWithAggregatesFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SellerProgress"> | Date | string
   }
 
   export type MessageWhereInput = {
@@ -9524,6 +11058,13 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerDocsInput
@@ -9535,8 +11076,15 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9546,6 +11094,13 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
@@ -9557,8 +11112,15 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9568,8 +11130,15 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9579,6 +11148,13 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9588,8 +11164,15 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9613,6 +11196,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -9634,6 +11218,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserUpdateInput = {
@@ -9655,6 +11240,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -9676,6 +11262,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -9714,6 +11301,75 @@ export namespace Prisma {
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     unreadCount?: IntFieldUpdateOperationsInput | number
     lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type SellerProgressCreateInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerProgressInput
+  }
+
+  export type SellerProgressUncheckedCreateInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerProgressNestedInput
+  }
+
+  export type SellerProgressUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressCreateManyInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageCreateInput = {
@@ -10102,6 +11758,35 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type EnumDocumentOperationTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeFilter<$PrismaModel> | $Enums.DocumentOperationType
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -10133,10 +11818,22 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrder
+    fileName?: SortOrder
+    fileSize?: SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrder
+    listingId?: SortOrder
+    uploadedAt?: SortOrder
+    downloadedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type DocumentAvgOrderByAggregateInput = {
+    fileSize?: SortOrder
+    stepId?: SortOrder
   }
 
   export type DocumentMaxOrderByAggregateInput = {
@@ -10144,8 +11841,15 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrder
+    fileName?: SortOrder
+    fileSize?: SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrder
+    listingId?: SortOrder
+    uploadedAt?: SortOrder
+    downloadedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10155,10 +11859,22 @@ export namespace Prisma {
     type?: SortOrder
     status?: SortOrder
     url?: SortOrder
+    fileName?: SortOrder
+    fileSize?: SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrder
+    listingId?: SortOrder
+    uploadedAt?: SortOrder
+    downloadedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type DocumentSumOrderByAggregateInput = {
+    fileSize?: SortOrder
+    stepId?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -10217,6 +11933,46 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type EnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel> | $Enums.DocumentOperationType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+    _max?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -10249,17 +12005,6 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type UserListRelationFilter = {
     every?: UserWhereInput
     some?: UserWhereInput
@@ -10290,6 +12035,12 @@ export namespace Prisma {
     none?: MessageWhereInput
   }
 
+  export type SellerProgressListRelationFilter = {
+    every?: SellerProgressWhereInput
+    some?: SellerProgressWhereInput
+    none?: SellerProgressWhereInput
+  }
+
   export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -10307,6 +12058,10 @@ export namespace Prisma {
   }
 
   export type MessageOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SellerProgressOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10382,19 +12137,90 @@ export namespace Prisma {
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type SellerProgressCountOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerProgressAvgOrderByAggregateInput = {
+    currentStep?: SortOrder
+  }
+
+  export type SellerProgressMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerProgressMinOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerProgressSumOrderByAggregateInput = {
+    currentStep?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumMessageStatusFilter<$PrismaModel = never> = {
@@ -10726,6 +12552,22 @@ export namespace Prisma {
     set?: string | null
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type EnumDocumentOperationTypeFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentOperationType
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -10809,6 +12651,13 @@ export namespace Prisma {
     connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
   }
 
+  export type SellerProgressCreateNestedManyWithoutSellerInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -10864,6 +12713,13 @@ export namespace Prisma {
     connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
   }
 
+  export type SellerProgressUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
   export type EnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole
   }
@@ -10874,10 +12730,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type UserUpdateOneWithoutManagingNestedInput = {
@@ -11001,6 +12853,20 @@ export namespace Prisma {
     deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
   }
 
+  export type SellerProgressUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSellerInput | SellerProgressUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSellerInput | SellerProgressUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSellerInput | SellerProgressUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -11110,6 +12976,34 @@ export namespace Prisma {
     update?: ListingUpdateWithWhereUniqueWithoutBuyersInput | ListingUpdateWithWhereUniqueWithoutBuyersInput[]
     updateMany?: ListingUpdateManyWithWhereWithoutBuyersInput | ListingUpdateManyWithWhereWithoutBuyersInput[]
     deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSellerInput | SellerProgressUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSellerInput | SellerProgressUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSellerInput | SellerProgressUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutSellerProgressInput = {
+    create?: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerProgressInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSellerProgressNestedInput = {
+    create?: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerProgressInput
+    upsert?: UserUpsertWithoutSellerProgressInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerProgressInput, UserUpdateWithoutSellerProgressInput>, UserUncheckedUpdateWithoutSellerProgressInput>
   }
 
   export type UserCreateNestedOneWithoutSentMessagesInput = {
@@ -11382,6 +13276,35 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumDocumentOperationTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeFilter<$PrismaModel> | $Enums.DocumentOperationType
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -11458,7 +13381,7 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -11466,7 +13389,47 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel> | $Enums.DocumentOperationType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+    _max?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11488,17 +13451,6 @@ export namespace Prisma {
     in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
@@ -11537,19 +13489,28 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumMessageStatusFilter<$PrismaModel = never> = {
@@ -11656,6 +13617,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSellerDocsInput = {
@@ -11676,6 +13638,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSellerDocsInput = {
@@ -11701,6 +13664,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBuyerDocsInput = {
@@ -11721,6 +13685,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBuyerDocsInput = {
@@ -11757,6 +13722,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerDocsInput = {
@@ -11777,6 +13743,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithoutBuyerDocsInput = {
@@ -11808,6 +13775,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerDocsInput = {
@@ -11828,6 +13796,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutManagingInput = {
@@ -11848,6 +13817,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -11868,6 +13838,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -11893,6 +13864,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -11913,6 +13885,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -11960,6 +13933,13 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerDocsInput
@@ -11970,7 +13950,14 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11990,6 +13977,13 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     buyer?: UserCreateNestedOneWithoutBuyerDocsInput
@@ -12000,7 +13994,14 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12168,6 +14169,34 @@ export namespace Prisma {
     create: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput>
   }
 
+  export type SellerProgressCreateWithoutSellerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressUncheckedCreateWithoutSellerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressCreateOrConnectWithoutSellerInput = {
+    where: SellerProgressWhereUniqueInput
+    create: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProgressCreateManySellerInputEnvelope = {
+    data: SellerProgressCreateManySellerInput | SellerProgressCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -12197,6 +14226,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -12217,6 +14247,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -12304,8 +14335,15 @@ export namespace Prisma {
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
     url?: StringNullableFilter<"Document"> | string | null
+    fileName?: StringNullableFilter<"Document"> | string | null
+    fileSize?: IntNullableFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableFilter<"Document"> | number | null
     sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
+    listingId?: StringNullableFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
   }
@@ -12424,6 +14462,135 @@ export namespace Prisma {
     data: XOR<ListingUpdateManyMutationInput, ListingUncheckedUpdateManyWithoutBuyersInput>
   }
 
+  export type SellerProgressUpsertWithWhereUniqueWithoutSellerInput = {
+    where: SellerProgressWhereUniqueInput
+    update: XOR<SellerProgressUpdateWithoutSellerInput, SellerProgressUncheckedUpdateWithoutSellerInput>
+    create: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProgressUpdateWithWhereUniqueWithoutSellerInput = {
+    where: SellerProgressWhereUniqueInput
+    data: XOR<SellerProgressUpdateWithoutSellerInput, SellerProgressUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type SellerProgressUpdateManyWithWhereWithoutSellerInput = {
+    where: SellerProgressScalarWhereInput
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type SellerProgressScalarWhereInput = {
+    AND?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+    OR?: SellerProgressScalarWhereInput[]
+    NOT?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+    id?: StringFilter<"SellerProgress"> | string
+    sellerId?: StringFilter<"SellerProgress"> | string
+    currentStep?: IntFilter<"SellerProgress"> | number
+    completedSteps?: JsonFilter<"SellerProgress">
+    selectedListingId?: StringNullableFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
+  }
+
+  export type UserCreateWithoutSellerProgressInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+  }
+
+  export type UserUncheckedCreateWithoutSellerProgressInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+  }
+
+  export type UserCreateOrConnectWithoutSellerProgressInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+  }
+
+  export type UserUpsertWithoutSellerProgressInput = {
+    update: XOR<UserUpdateWithoutSellerProgressInput, UserUncheckedUpdateWithoutSellerProgressInput>
+    create: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSellerProgressInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSellerProgressInput, UserUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type UserUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+  }
+
   export type UserCreateWithoutSentMessagesInput = {
     id?: string
     email: string
@@ -12442,6 +14609,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -12462,6 +14630,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -12487,6 +14656,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -12507,6 +14677,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -12670,6 +14841,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -12690,6 +14862,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -12721,6 +14894,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -12741,6 +14915,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type MessageUpsertWithoutRepliesInput = {
@@ -12959,6 +15134,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -12979,6 +15155,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
@@ -13004,6 +15181,7 @@ export namespace Prisma {
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBuyingListingsInput = {
@@ -13024,6 +15202,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBuyingListingsInput = {
@@ -13060,6 +15239,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -13080,6 +15260,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutBuyingListingsInput = {
@@ -13116,6 +15297,7 @@ export namespace Prisma {
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -13136,6 +15318,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -13172,6 +15355,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -13192,6 +15376,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserCreateManyManagedByInput = {
@@ -13220,7 +15405,14 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13230,7 +15422,14 @@ export namespace Prisma {
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13280,6 +15479,15 @@ export namespace Prisma {
     threadId?: string | null
   }
 
+  export type SellerProgressCreateManySellerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserUpdateWithoutManagedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -13298,6 +15506,7 @@ export namespace Prisma {
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -13318,6 +15527,7 @@ export namespace Prisma {
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -13366,6 +15576,13 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
@@ -13376,7 +15593,14 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13386,7 +15610,14 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13396,6 +15627,13 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
@@ -13406,7 +15644,14 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13416,7 +15661,14 @@ export namespace Prisma {
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13594,6 +15846,33 @@ export namespace Prisma {
     sellerId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type SellerProgressUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MessageCreateManyParentMessageInput = {
     id?: string
     subject: string
@@ -13728,6 +16007,7 @@ export namespace Prisma {
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyingListingsInput = {
@@ -13748,6 +16028,7 @@ export namespace Prisma {
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutBuyingListingsInput = {

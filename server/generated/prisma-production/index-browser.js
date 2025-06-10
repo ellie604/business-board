@@ -125,8 +125,15 @@ exports.Prisma.DocumentScalarFieldEnum = {
   type: 'type',
   status: 'status',
   url: 'url',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  operationType: 'operationType',
+  stepId: 'stepId',
   sellerId: 'sellerId',
   buyerId: 'buyerId',
+  listingId: 'listingId',
+  uploadedAt: 'uploadedAt',
+  downloadedAt: 'downloadedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -142,6 +149,16 @@ exports.Prisma.UserScalarFieldEnum = {
   managerId: 'managerId',
   unreadCount: 'unreadCount',
   lastReadAt: 'lastReadAt'
+};
+
+exports.Prisma.SellerProgressScalarFieldEnum = {
+  id: 'id',
+  sellerId: 'sellerId',
+  currentStep: 'currentStep',
+  completedSteps: 'completedSteps',
+  selectedListingId: 'selectedListingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -197,6 +214,10 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.NullableJsonNullValueInput = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
@@ -230,12 +251,20 @@ exports.DocumentType = exports.$Enums.DocumentType = {
   PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
   LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   QUESTIONNAIRE: 'QUESTIONNAIRE',
-  AFTER_SALE: 'AFTER_SALE'
+  AFTER_SALE: 'AFTER_SALE',
+  FINANCIAL_DOCUMENTS: 'FINANCIAL_DOCUMENTS'
 };
 
 exports.DocumentStatus = exports.$Enums.DocumentStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED'
+};
+
+exports.DocumentOperationType = exports.$Enums.DocumentOperationType = {
+  UPLOAD: 'UPLOAD',
+  DOWNLOAD: 'DOWNLOAD',
+  BOTH: 'BOTH',
+  NONE: 'NONE'
 };
 
 exports.UserRole = exports.$Enums.UserRole = {
@@ -260,6 +289,7 @@ exports.ListingStatus = exports.$Enums.ListingStatus = {
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
+  SellerProgress: 'SellerProgress',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
   Listing: 'Listing',

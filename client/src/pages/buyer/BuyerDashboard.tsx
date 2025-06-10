@@ -2,14 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { buyerService } from '../../services/buyer';
 import type { DashboardStats } from '../../services/buyer';
+import ProgressBar from '../../components/ProgressBar';
 import logo from '../../assets/california-business-sales-logo.png';
 
 const BuyerDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const steps = [
+    'Home',
+    'Contact your agent via messages',
+    'Fill out a Non Disclosure agreement online',
+    'Fill out a simple financial statement online',
+    'Download a CBR or CIM for the business your interested in',
+    'Upload documents for loan pre-approval',
+    'Download your purchase contract (once we have an accepted offer)',
+    'Request & Download Due Diligence documents',
+    'Pre Close Checklist: Check off your to do list',
+    'Download Closing document once we are closed',
+    'After the Sale: Tips to make your transition smoother'
+  ];
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -28,18 +45,43 @@ const BuyerDashboard: React.FC = () => {
   }, []);
 
   const menuItems = [
-    { label: 'Home', path: '/buyer' },
-    { label: 'Email Agent', path: '/buyer/messages' },
-    { label: 'Non Disclosure', path: '/buyer/nda' },
-    { label: 'Financial Statement', path: '/buyer/financial' },
-    { label: 'CBR/CIM', path: '/buyer/cbr' },
-    { label: 'Upload Docs', path: '/buyer/upload' },
-    { label: 'Purchase Contract', path: '/buyer/contract' },
-    { label: 'Due Diligence', path: '/buyer/due-diligence' },
-    { label: 'Pre Close Checklist', path: '/buyer/pre-close' },
-    { label: 'Closing Docs', path: '/buyer/closing' },
-    { label: 'After The Sale', path: '/buyer/after-sale' }
+    { label: 'Home', path: '/buyer', stepId: null },
+    { label: 'Messages', path: '/buyer/messages', stepId: 1 },
+    { label: 'Non Disclosure', path: '/buyer/non-disclosure', stepId: 2 },
+    { label: 'Financial Statement', path: '/buyer/financial-statement', stepId: 3 },
+    { label: 'CBR/CIM', path: '/buyer/cbr-cim', stepId: 4 },
+    { label: 'Upload Docs', path: '/buyer/upload-docs', stepId: 5 },
+    { label: 'Purchase Contract', path: '/buyer/purchase-contract', stepId: 6 },
+    { label: 'Due Diligence', path: '/buyer/due-diligence', stepId: 7 },
+    { label: 'Pre Close Checklist', path: '/buyer/pre-close-checklist', stepId: 8 },
+    { label: 'Closing Docs', path: '/buyer/closing-docs', stepId: 9 },
+    { label: 'After The Sale', path: '/buyer/after-sale', stepId: 10 }
   ];
+
+  const handleMenuClick = (item: any) => {
+    if (item.stepId === null) {
+      // Home page is always accessible
+      navigate(item.path);
+      return;
+    }
+
+    const currentStepIndex = currentStep || 0;
+    
+    // Check if step is truly accessible (for StepGuard)
+    const isAccessible = item.stepId <= currentStepIndex;
+    
+    // Always navigate, but pass accessibility state
+    navigate(item.path, { 
+      state: { 
+        stepAccessible: isAccessible,
+        currentStep: currentStepIndex
+      } 
+    });
+  };
+
+  const getCurrentStepIndex = () => {
+    return currentStep || 0;
+  };
 
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
   if (error) return <div className="text-red-500 p-4">{error}</div>;
@@ -62,7 +104,7 @@ const BuyerDashboard: React.FC = () => {
           {menuItems.map((item, index) => (
             <button
               key={index}
-              onClick={() => navigate(item.path)}
+              onClick={() => handleMenuClick(item)}
               className={`block w-full px-6 py-4 text-base text-left ${
                 location.pathname === item.path
                   ? 'bg-blue-100 text-blue-800 font-medium'
@@ -83,15 +125,7 @@ const BuyerDashboard: React.FC = () => {
             <h1 className="text-3xl font-bold mb-8">Welcome to Your Customized Dashboard</h1>
             
             {/* Progress Bar */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-2">Transaction Progress</h3>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-blue-600 h-4 rounded-full transition-all duration-500"
-                  style={{ width: `${stats ? Object.values(stats).filter(s => s === 'completed').length / Object.keys(stats).length * 100 : 0}%` }}
-                />
-              </div>
-            </div>
+            <ProgressBar currentStep={currentStep} steps={steps} />
 
             {/* Steps Description */}
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -99,16 +133,9 @@ const BuyerDashboard: React.FC = () => {
               <p className="mb-4">Your dynamic progress bar on top will show you the progress on the purchase of your business in real time as it progresses.</p>
               <p className="mb-4">Please select from the menu items on the left to do the following:</p>
               <ol className="list-decimal pl-6 space-y-2">
-                <li>Email the broker or agent</li>
-                <li>Fill out a Non Disclosure agreement online</li>
-                <li>Fill out a simple financial statement online</li>
-                <li>Download a CBR or CIM for the business your interested in</li>
-                <li>Upload documents</li>
-                <li>Download your purchase contract (once we have an accepted offer)</li>
-                <li>Request & Download Due Diligence documents</li>
-                <li>Checklist: Check off your to do list. See if others have done theirs</li>
-                <li>Download Closing document once we are closed</li>
-                <li>After the Sale: Tips to make your transition smoother, or Tips to ramp up your business. Contacts info for services they might need</li>
+                {steps.slice(1).map((step, index) => (
+                  <li key={index}>{step}</li>
+                ))}
               </ol>
             </div>
 
