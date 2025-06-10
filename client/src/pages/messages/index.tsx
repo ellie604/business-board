@@ -79,7 +79,8 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
         }
         const data = await response.json();
         console.log('Users response:', data);
-        return data;
+        // Return the users array from the response object
+        return data.users || [];
       } catch (error) {
         console.error('Error fetching users:', error);
         throw error;

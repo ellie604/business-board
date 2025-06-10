@@ -24,6 +24,9 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Ensure contacts is always an array
+  const safeContacts = Array.isArray(contacts) ? contacts : [];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!receiverId || !subject || !content) {
@@ -70,7 +73,7 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
           required
         >
           <option value="">Select recipient</option>
-          {contacts.map((contact) => (
+          {safeContacts.map((contact) => (
             <option key={contact.id} value={contact.id}>
               {contact.name || contact.email} ({contact.role})
             </option>
