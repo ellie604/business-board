@@ -42,18 +42,23 @@ interface UserFromDB {
 
 const loginHandler = async (req: Request, res: Response): Promise<void> => {
   const typedReq = req as AuthenticatedRequest;
-  console.log('Login request received - Body:', typedReq.body);
+  
+  // 仅在开发环境记录详细日志
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Login request received - Body:', typedReq.body);
+  }
   
   const { email, password } = typedReq.body;
   
   if (!email || !password) {
-    console.error('Missing email or password in request');
     res.status(400).json({ message: 'Email and password are required' });
     return;
   }
   
   try {
-    console.log('Attempting to find user with email:', email);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Attempting to find user with email:', email);
+    }
     
     const user = await prisma.user.findUnique({
       where: { 
@@ -75,30 +80,26 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
       }
     });
 
-    console.log('Found user:', {
-      ...user,
-      password: user ? '******' : null
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Found user:', {
+        ...user,
+        password: user ? '******' : null
+      });
+    }
 
     if (!user) {
-      console.log('No user found with email:', email);
       res.status(401).json({ message: 'Invalid email or password' });
       return;
     }
-
-    console.log('Found user details:', {
-      id: user.id,
-      role: user.role,
-      type_of_id: typeof user.id
-    });
 
     if (user.password !== password) {
-      console.log('Password mismatch');
       res.status(401).json({ message: 'Invalid email or password' });
       return;
     }
 
-    console.log('Login successful for:', email, 'with role:', user.role);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Login successful for:', email, 'with role:', user.role);
+    }
     
     // 设置用户信息到 request 和 session
     const userInfo = {
@@ -119,18 +120,20 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
         return;
       }
 
-      console.log('Session after login:', {
-        id: typedReq.sessionID,
-        user: typedReq.session.user
-      });
-      console.log('User after login:', typedReq.user);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Session after login:', {
+          id: typedReq.sessionID,
+          user: typedReq.session.user
+        });
+        console.log('User after login:', typedReq.user);
+      }
     
       res.json({ 
         message: 'Login successful',
         role: user.role,
         redirect: `/dashboard/${user.role.toLowerCase()}`,
         user: {
-          id: user.id.toString(), // 确保返回的 ID 也是字符串
+          id: user.id.toString(),
           email: user.email,
           name: user.name,
           role: user.role,

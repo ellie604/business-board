@@ -6,6 +6,7 @@ const getBackendUrl = () => {
   console.log('Current hostname:', hostname);
   console.log('=== End Environment Debug Info ===');
 
+  // 前端在Vercel，后端在Render
   // 如果域名包含 -dev- 就是 preview 环境
   // 如果是 localhost 就是本地开发环境
   // 其他情况都是 production 环境

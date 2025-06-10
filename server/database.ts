@@ -28,27 +28,46 @@ export function getPrisma() {
     };
 
     if (process.env.NODE_ENV === 'production') {
-      console.log('Using production database URL:', process.env.PRO_DATABASE_URL);
+      console.log('Using production database');
       prisma = new ProductionPrismaClient(prismaOptions);
     } else {
-      console.log('Using preview database URL:', process.env.PREVIEW_DATABASE_URL);
+      console.log('Using preview database');
       prisma = new PreviewPrismaClient(prismaOptions);
     }
 
-    // 添加错误处理中间件
+    // 简化错误处理中间件 - 减少重连尝试
     prisma.$use(async (params: any, next: any) => {
+      const startTime = Date.now();
       try {
-        return await next(params);
+        const result = await next(params);
+        const duration = Date.now() - startTime;
+        
+        // 只在查询时间过长时记录日志
+        if (duration > 1000) {
+          console.log(`Slow query detected: ${params.model}.${params.action} took ${duration}ms`);
+        }
+        
+        return result;
       } catch (error: any) {
-        if (error?.code === 'P1017') {
-          console.log('Connection lost, attempting to reconnect...');
+        const duration = Date.now() - startTime;
+        console.error(`Database error after ${duration}ms:`, error.message);
+        
+        // 简化错误处理，避免无限重连
+        if (error?.code === 'P1017' || error?.code === 'P2028') {
+          console.log('Connection issue detected, will reconnect on next request');
           await prisma.$disconnect();
           prisma = null;
-          return getPrisma()[params.model][params.action](params.args);
         }
         throw error;
       }
     });
+
+    // 设置连接预热
+    if (process.env.NODE_ENV === 'production') {
+      prisma.$connect().catch((error: any) => {
+        console.error('Failed to connect to database:', error);
+      });
+    }
   }
   return prisma;
 }
@@ -58,5 +77,17 @@ export async function disconnectPrisma() {
   if (prisma) {
     await prisma.$disconnect();
     prisma = null;
+  }
+}
+
+// 添加连接健康检查
+export async function checkDatabaseHealth() {
+  try {
+    const prismaInstance = getPrisma();
+    await prismaInstance.$queryRaw`SELECT 1`;
+    return true;
+  } catch (error) {
+    console.error('Database health check failed:', error);
+    return false;
   }
 }

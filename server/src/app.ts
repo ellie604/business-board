@@ -11,6 +11,7 @@ import usersRouter from './routes/users';
 import messagesRouter from './routes/messages';
 import listingRouter from './routes/listing';
 import { restoreUser } from './middleware/auth';
+import { checkDatabaseHealth } from '../database';
 
 // 扩展 Express 的 Request 类型
 declare module 'express' {
@@ -158,28 +159,30 @@ app.use((req, res, next) => {
 // 从 session 恢复用户信息
 app.use(restoreUser);
 
-// 添加调试中间件
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log('=== Session Debug Info ===');
-  console.log('Session ID:', req.sessionID);
-  console.log('Session:', req.session);
-  console.log('User:', (req as any).user);
-  console.log('Cookie:', req.headers.cookie);
-  console.log('Environment:', process.env.NODE_ENV);
-  console.log('=== End Session Debug Info ===');
-  next();
-});
+// 添加调试中间件 - 仅在开发环境
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    console.log('=== Session Debug Info ===');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session:', req.session);
+    console.log('User:', (req as any).user);
+    console.log('Cookie:', req.headers.cookie);
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('=== End Session Debug Info ===');
+    next();
+  });
 
-// 添加路由调试中间件
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log('=== Request Debug Info ===');
-  console.log('Method:', req.method);
-  console.log('URL:', req.url);
-  console.log('Headers:', req.headers);
-  console.log('Body:', req.body);
-  console.log('=== End Request Debug Info ===');
-  next();
-});
+  // 添加路由调试中间件 - 仅在开发环境
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    console.log('=== Request Debug Info ===');
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+    console.log('=== End Request Debug Info ===');
+    next();
+  });
+}
 
 // 注册路由
 app.use('/api/auth', authRouter);
@@ -192,8 +195,13 @@ app.use('/api/users', usersRouter);
 app.use('/api/messages', messagesRouter);
 
 // 健康检查
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', environment: process.env.NODE_ENV });
+app.get('/health', async (req, res) => {
+  try {
+    const health = await checkDatabaseHealth();
+    res.json({ status: 'ok', environment: process.env.NODE_ENV, database: health });
+  } catch (error) {
+    res.status(500).json({ status: 'error', environment: process.env.NODE_ENV, message: error.message });
+  }
 });
 
 export default app; 
