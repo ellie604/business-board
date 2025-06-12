@@ -1,5 +1,5 @@
 // seed.production.ts
-import { PrismaClient, DocumentType, DocumentStatus, DocumentOperationType } from './generated/prisma-production';
+import { PrismaClient } from './generated/prisma-production';
 import { getPrisma } from './database';
 import { UserRole } from './generated/prisma-production';
 
@@ -43,10 +43,23 @@ async function main() {
           }
         }
       }
+    }),
+    prisma.user.create({
+      data: {
+        name: "Sarah Agent",
+        email: "agent3@example.com",
+        password: "123456",
+        role: UserRole.AGENT,
+        managedBy: {
+          connect: {
+            id: broker.id
+          }
+        }
+      }
     })
   ]);
 
-  // Create sellers
+  // Create more sellers
   const sellers = await Promise.all([
     prisma.user.create({
       data: {
@@ -86,213 +99,40 @@ async function main() {
           }
         }
       }
-    })
-  ]);
-
-  // Create listings first (before creating documents that reference them)
-  const listing1 = await prisma.listing.create({
-    data: {
-      title: "Yacht Sales",
-      description: "Luxury yacht for sale.",
-      price: 5000000,
-      status: "ACTIVE",
-      seller: { connect: { id: sellers[0].id } },
-    },
-  });
-
-  const listing2 = await prisma.listing.create({
-    data: {
-      title: "Airplane Sales",
-      description: "Private jet for sale.",
-      price: 12000000,
-      status: "UNDER_CONTRACT",
-      seller: { connect: { id: sellers[1].id } },
-    },
-  });
-
-  const listing3 = await prisma.listing.create({
-    data: {
-      title: "Coffee Shop",
-      description: "Downtown coffee shop business.",
-      price: 300000,
-      status: "CLOSED",
-      seller: { connect: { id: sellers[2].id } },
-    },
-  });
-
-  // Create seller progress records
-  await Promise.all([
-    prisma.sellerProgress.create({
+    }),
+    prisma.user.create({
       data: {
-        sellerId: sellers[0].id,
-        currentStep: 2,
-        completedSteps: [0, 1],
-        selectedListingId: listing1.id
+        name: "Isabella Seller",
+        email: "seller4@example.com",
+        password: "123456",
+        role: UserRole.SELLER,
+        managedBy: {
+          connect: {
+            id: agents[1].id
+          }
+        }
       }
     }),
-    prisma.sellerProgress.create({
+    prisma.user.create({
       data: {
-        sellerId: sellers[1].id,
-        currentStep: 4,
-        completedSteps: [0, 1, 2, 3],
-        selectedListingId: listing2.id
-      }
-    }),
-    prisma.sellerProgress.create({
-      data: {
-        sellerId: sellers[2].id,
-        currentStep: 1,
-        completedSteps: [0],
-        selectedListingId: listing3.id
+        name: "James Seller",
+        email: "seller5@example.com",
+        password: "123456",
+        role: UserRole.SELLER,
+        managedBy: {
+          connect: {
+            id: agents[2].id
+          }
+        }
       }
     })
   ]);
 
-  // Create step-related documents for seller1 (steps 0,1 completed, step 2 in progress)
-  await Promise.all([
-    prisma.document.create({
-      data: {
-        type: DocumentType.EMAIL_AGENT,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[0].id,
-        stepId: 0,
-        listingId: listing1.id,
-        operationType: DocumentOperationType.BOTH,
-        fileName: "email_communication.txt",
-        fileSize: 1024,
-        uploadedAt: new Date('2024-01-01'),
-        downloadedAt: new Date('2024-01-01')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.LISTING_AGREEMENT,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[0].id,
-        stepId: 1,
-        listingId: listing1.id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "listing_agreement.pdf",
-        fileSize: 524288,
-        downloadedAt: new Date('2024-01-02')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.QUESTIONNAIRE,
-        status: DocumentStatus.PENDING,
-        sellerId: sellers[0].id,
-        stepId: 2,
-        listingId: listing1.id,
-        operationType: DocumentOperationType.UPLOAD,
-        fileName: "business_questionnaire.pdf",
-        fileSize: 0
-      }
-    })
-  ]);
-
-  // Create step-related documents for seller2 (steps 0,1,2,3 completed, step 4 in progress)
-  await Promise.all([
-    prisma.document.create({
-      data: {
-        type: DocumentType.EMAIL_AGENT,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[1].id,
-        stepId: 0,
-        listingId: listing2.id,
-        operationType: DocumentOperationType.BOTH,
-        fileName: "email_communication.txt",
-        fileSize: 2048,
-        uploadedAt: new Date('2024-01-03'),
-        downloadedAt: new Date('2024-01-03')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.LISTING_AGREEMENT,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[1].id,
-        stepId: 1,
-        listingId: listing2.id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "listing_agreement.pdf",
-        fileSize: 524288,
-        downloadedAt: new Date('2024-01-04')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.QUESTIONNAIRE,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[1].id,
-        stepId: 2,
-        listingId: listing2.id,
-        operationType: DocumentOperationType.UPLOAD,
-        fileName: "business_questionnaire.pdf",
-        fileSize: 102400,
-        uploadedAt: new Date('2024-01-05')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.FINANCIAL_DOCUMENTS,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[1].id,
-        stepId: 3,
-        listingId: listing2.id,
-        operationType: DocumentOperationType.UPLOAD,
-        fileName: "financial_statements.pdf",
-        fileSize: 1048576,
-        uploadedAt: new Date('2024-01-06')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.UPLOADED_DOC,
-        status: DocumentStatus.PENDING,
-        sellerId: sellers[1].id,
-        stepId: 4,
-        listingId: listing2.id,
-        operationType: DocumentOperationType.NONE
-      }
-    })
-  ]);
-
-  // Create step-related documents for seller3 (step 0 completed, step 1 in progress)
-  await Promise.all([
-    prisma.document.create({
-      data: {
-        type: DocumentType.EMAIL_AGENT,
-        status: DocumentStatus.COMPLETED,
-        sellerId: sellers[2].id,
-        stepId: 0,
-        listingId: listing3.id,
-        operationType: DocumentOperationType.BOTH,
-        fileName: "email_communication.txt",
-        fileSize: 512,
-        uploadedAt: new Date('2024-01-07'),
-        downloadedAt: new Date('2024-01-07')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.LISTING_AGREEMENT,
-        status: DocumentStatus.PENDING,
-        sellerId: sellers[2].id,
-        stepId: 1,
-        listingId: listing3.id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "listing_agreement.pdf",
-        fileSize: 0
-      }
-    })
-  ]);
-
-  // Create buyers
+  // Create more buyers
   const buyers = await Promise.all([
     prisma.user.create({
       data: {
-        name: "Ivy Buyer",
+        name: "John Buyer",
         email: "buyer1@example.com",
         password: "123456",
         role: UserRole.BUYER,
@@ -305,7 +145,7 @@ async function main() {
     }),
     prisma.user.create({
       data: {
-        name: "Jack Buyer",
+        name: "Kate Buyer",
         email: "buyer2@example.com",
         password: "123456",
         role: UserRole.BUYER,
@@ -318,7 +158,7 @@ async function main() {
     }),
     prisma.user.create({
       data: {
-        name: "Kelly Buyer",
+        name: "Leo Buyer",
         email: "buyer3@example.com",
         password: "123456",
         role: UserRole.BUYER,
@@ -328,179 +168,187 @@ async function main() {
           }
         }
       }
+    }),
+    prisma.user.create({
+      data: {
+        name: "Maria Buyer",
+        email: "buyer4@example.com",
+        password: "123456",
+        role: UserRole.BUYER,
+        managedBy: {
+          connect: {
+            id: agents[1].id
+          }
+        }
+      }
+    }),
+    prisma.user.create({
+      data: {
+        name: "Nick Buyer",
+        email: "buyer5@example.com",
+        password: "123456",
+        role: UserRole.BUYER,
+        managedBy: {
+          connect: {
+            id: agents[2].id
+          }
+        }
+      }
+    }),
+    prisma.user.create({
+      data: {
+        name: "Olivia Buyer",
+        email: "buyer6@example.com",
+        password: "123456",
+        role: UserRole.BUYER,
+        managedBy: {
+          connect: {
+            id: agents[2].id
+          }
+        }
+      }
     })
   ]);
 
-  // Update listings to connect buyers
-  await prisma.listing.update({
-    where: { id: listing1.id },
-    data: {
-      buyers: { connect: [{ id: buyers[0].id }, { id: buyers[1].id }] }
-    }
-  });
+  // Create diverse listings with different buyer scenarios
+  const listings = await Promise.all([
+    // Listing 1: Frank's Yacht Sales (1 seller, 1 buyer)
+    prisma.listing.create({
+      data: {
+        title: "Luxury Yacht Sales Business",
+        description: "Established yacht sales company with marina access.",
+        price: 5000000,
+        status: "ACTIVE",
+        seller: { connect: { id: sellers[0].id } },
+      },
+    }),
+    // Listing 2: Grace's Airplane Sales (1 seller, multiple buyers)
+    prisma.listing.create({
+      data: {
+        title: "Private Jet Sales Business",
+        description: "High-end aircraft sales and maintenance company.",
+        price: 12000000,
+        status: "UNDER_CONTRACT",
+        seller: { connect: { id: sellers[1].id } },
+      },
+    }),
+    // Listing 3: Henry's Coffee Shop (1 seller, no buyers yet)
+    prisma.listing.create({
+      data: {
+        title: "Downtown Coffee Shop",
+        description: "Busy coffee shop in prime downtown location.",
+        price: 300000,
+        status: "ACTIVE",
+        seller: { connect: { id: sellers[2].id } },
+      },
+    }),
+    // Listing 4: Isabella's Restaurant (1 seller, 1 buyer)
+    prisma.listing.create({
+      data: {
+        title: "Italian Restaurant",
+        description: "Family-owned Italian restaurant with loyal customer base.",
+        price: 750000,
+        status: "ACTIVE",
+        seller: { connect: { id: sellers[3].id } },
+      },
+    }),
+    // Listing 5: James's Tech Startup (1 seller, multiple buyers)
+    prisma.listing.create({
+      data: {
+        title: "Software Development Company",
+        description: "Growing tech startup with proprietary software products.",
+        price: 2500000,
+        status: "ACTIVE",
+        seller: { connect: { id: sellers[4].id } },
+      },
+    }),
+    // Additional listings for same sellers
+    // Frank's second business
+    prisma.listing.create({
+      data: {
+        title: "Marine Equipment Store",
+        description: "Retail store selling marine equipment and accessories.",
+        price: 800000,
+        status: "ACTIVE",
+        seller: { connect: { id: sellers[0].id } },
+      },
+    }),
+    // Grace's second business
+    prisma.listing.create({
+      data: {
+        title: "Aviation Training School",
+        description: "Flight training academy with certified instructors.",
+        price: 1500000,
+        status: "ACTIVE",
+        seller: { connect: { id: sellers[1].id } },
+      },
+    })
+  ]);
 
-  await prisma.listing.update({
-    where: { id: listing2.id },
-    data: {
-      buyers: { connect: [{ id: buyers[2].id }] }
-    }
-  });
-
-  // Create documents for buyer1
+  // Connect buyers to listings with different scenarios
   await Promise.all([
-    prisma.document.create({
-      data: {
-        type: DocumentType.EMAIL_AGENT,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[0].id,
-        sellerId: sellers[0].id,
-        operationType: DocumentOperationType.BOTH,
-        fileName: "buyer_email_communication.txt",
-        fileSize: 1024
-      }
+    // Listing 1: 1 buyer
+    prisma.listing.update({
+      where: { id: listings[0].id },
+      data: { buyers: { connect: [{ id: buyers[0].id }] } }
     }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.NDA,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[0].id,
-        sellerId: sellers[0].id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "nda_agreement.pdf",
-        fileSize: 204800,
-        downloadedAt: new Date('2024-01-08')
-      }
+    // Listing 2: Multiple buyers
+    prisma.listing.update({
+      where: { id: listings[1].id },
+      data: { buyers: { connect: [{ id: buyers[1].id }, { id: buyers[2].id }, { id: buyers[3].id }] } }
     }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.FINANCIAL_STATEMENT,
-        status: DocumentStatus.PENDING,
-        buyerId: buyers[0].id,
-        sellerId: sellers[0].id,
-        operationType: DocumentOperationType.UPLOAD
-      }
+    // Listing 3: No buyers (Henry's coffee shop)
+    // Listing 4: 1 buyer
+    prisma.listing.update({
+      where: { id: listings[3].id },
+      data: { buyers: { connect: [{ id: buyers[4].id }] } }
     }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.CBR_CIM,
-        status: DocumentStatus.PENDING,
-        buyerId: buyers[0].id,
-        sellerId: sellers[0].id,
-        operationType: DocumentOperationType.DOWNLOAD
-      }
-    })
+    // Listing 5: Multiple buyers
+    prisma.listing.update({
+      where: { id: listings[4].id },
+      data: { buyers: { connect: [{ id: buyers[0].id }, { id: buyers[5].id }] } }
+    }),
+    // Listing 6: 1 buyer
+    prisma.listing.update({
+      where: { id: listings[5].id },
+      data: { buyers: { connect: [{ id: buyers[1].id }] } }
+    }),
+    // Listing 7: No buyers yet
   ]);
 
-  // Create documents for buyer2
-  await Promise.all([
-    prisma.document.create({
-      data: {
-        type: DocumentType.EMAIL_AGENT,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[1].id,
-        sellerId: sellers[1].id,
-        operationType: DocumentOperationType.BOTH,
-        fileName: "buyer_email_communication.txt",
-        fileSize: 2048
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.NDA,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[1].id,
-        sellerId: sellers[1].id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "nda_agreement.pdf",
-        fileSize: 204800,
-        downloadedAt: new Date('2024-01-09')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.FINANCIAL_STATEMENT,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[1].id,
-        sellerId: sellers[1].id,
-        operationType: DocumentOperationType.UPLOAD,
-        fileName: "buyer_financial_statement.pdf",
-        fileSize: 512000,
-        uploadedAt: new Date('2024-01-10')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.CBR_CIM,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[1].id,
-        sellerId: sellers[1].id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "cbr_cim.pdf",
-        fileSize: 1024000,
-        downloadedAt: new Date('2024-01-11')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.PURCHASE_CONTRACT,
-        status: DocumentStatus.PENDING,
-        buyerId: buyers[1].id,
-        sellerId: sellers[1].id,
-        operationType: DocumentOperationType.UPLOAD
-      }
-    })
-  ]);
+  // Create seller progress records - ALL START AT STEP 0 with no progress and no selected listing
+  await Promise.all(
+    sellers.map(seller => 
+      prisma.sellerProgress.create({
+        data: {
+          sellerId: seller.id,
+          currentStep: 0,          // Everyone starts at step 0
+          completedSteps: [],      // No steps completed initially
+          selectedListingId: null  // No listing selected initially - user must select
+        }
+      })
+    )
+  );
 
-  // Create documents for buyer3
-  await Promise.all([
-    prisma.document.create({
-      data: {
-        type: DocumentType.EMAIL_AGENT,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[2].id,
-        sellerId: sellers[2].id,
-        operationType: DocumentOperationType.BOTH,
-        fileName: "buyer_email_communication.txt",
-        fileSize: 1536
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.NDA,
-        status: DocumentStatus.COMPLETED,
-        buyerId: buyers[2].id,
-        sellerId: sellers[2].id,
-        operationType: DocumentOperationType.DOWNLOAD,
-        fileName: "nda_agreement.pdf",
-        fileSize: 204800,
-        downloadedAt: new Date('2024-01-12')
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.FINANCIAL_STATEMENT,
-        status: DocumentStatus.PENDING,
-        buyerId: buyers[2].id,
-        sellerId: sellers[2].id,
-        operationType: DocumentOperationType.UPLOAD
-      }
-    }),
-    prisma.document.create({
-      data: {
-        type: DocumentType.CBR_CIM,
-        status: DocumentStatus.PENDING,
-        buyerId: buyers[2].id,
-        sellerId: sellers[2].id,
-        operationType: DocumentOperationType.DOWNLOAD
-      }
-    })
-  ]);
+  // Create buyer progress records - ALL START AT STEP 0 with no progress and no selected listing
+  await Promise.all(
+    buyers.map(buyer => 
+      prisma.buyerProgress.create({
+        data: {
+          buyerId: buyer.id,
+          currentStep: 0,          // Everyone starts at step 0
+          completedSteps: [],      // No steps completed initially
+          selectedListingId: null  // No listing selected initially - user must select
+        }
+      })
+    )
+  );
 
-  // Create some test messages
+  // Create some test messages (but no documents)
   await prisma.message.create({
     data: {
       subject: "Welcome to the platform",
-      content: "Hi, welcome to our business board platform!",
+      content: "Hi, welcome to our business sales platform!",
       senderId: broker.id,
       senderType: UserRole.BROKER,
       senderName: broker.name,
@@ -513,22 +361,31 @@ async function main() {
   await prisma.message.create({
     data: {
       subject: "Question about listing",
-      content: "I'm interested in creating a new listing.",
-      senderId: sellers[0].id,
+      content: "I'm interested in learning more about the process.",
+      senderId: sellers[1].id,
       senderType: UserRole.SELLER,
-      senderName: sellers[0].name,
-      receiverId: broker.id,
-      receiverType: UserRole.BROKER,
-      receiverName: broker.name
+      senderName: sellers[1].name,
+      receiverId: agents[0].id,
+      receiverType: UserRole.AGENT,
+      receiverName: agents[0].name
     }
   });
 
   console.log('Database has been seeded. 🌱');
+  console.log('Created:');
+  console.log(`- 1 Broker: ${broker.name}`);
+  console.log(`- 3 Agents: ${agents.map(a => a.name).join(', ')}`);
+  console.log(`- 5 Sellers: ${sellers.map(s => s.name).join(', ')}`);
+  console.log(`- 6 Buyers: ${buyers.map(b => b.name).join(', ')}`);
+  console.log(`- 7 Listings with different buyer scenarios`);
+  console.log(`- All sellers start at step 0 with no progress and no selected listing`);
+  console.log(`- All buyers start at step 0 with no progress and no selected listing`);
+  console.log(`- NO documents created - clean slate for testing uploads/downloads`);
 }
 
 main()
   .then(() => {
-    console.log('✅ production seed data inserted!');
+    console.log('✅ Production seed data inserted!');
     process.exit(0);
   })
   .catch((e) => {

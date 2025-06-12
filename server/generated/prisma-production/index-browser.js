@@ -124,6 +124,7 @@ exports.Prisma.DocumentScalarFieldEnum = {
   id: 'id',
   type: 'type',
   status: 'status',
+  category: 'category',
   url: 'url',
   fileName: 'fileName',
   fileSize: 'fileSize',
@@ -134,6 +135,7 @@ exports.Prisma.DocumentScalarFieldEnum = {
   listingId: 'listingId',
   uploadedAt: 'uploadedAt',
   downloadedAt: 'downloadedAt',
+  uploadedBy: 'uploadedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -154,6 +156,16 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.SellerProgressScalarFieldEnum = {
   id: 'id',
   sellerId: 'sellerId',
+  currentStep: 'currentStep',
+  completedSteps: 'completedSteps',
+  selectedListingId: 'selectedListingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BuyerProgressScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
   currentStep: 'currentStep',
   completedSteps: 'completedSteps',
   selectedListingId: 'selectedListingId',
@@ -260,6 +272,13 @@ exports.DocumentStatus = exports.$Enums.DocumentStatus = {
   COMPLETED: 'COMPLETED'
 };
 
+exports.DocumentCategory = exports.$Enums.DocumentCategory = {
+  SELLER_UPLOAD: 'SELLER_UPLOAD',
+  AGENT_PROVIDED: 'AGENT_PROVIDED',
+  BUYER_UPLOAD: 'BUYER_UPLOAD',
+  SYSTEM_GENERATED: 'SYSTEM_GENERATED'
+};
+
 exports.DocumentOperationType = exports.$Enums.DocumentOperationType = {
   UPLOAD: 'UPLOAD',
   DOWNLOAD: 'DOWNLOAD',
@@ -290,6 +309,7 @@ exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
   SellerProgress: 'SellerProgress',
+  BuyerProgress: 'BuyerProgress',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
   Listing: 'Listing',
