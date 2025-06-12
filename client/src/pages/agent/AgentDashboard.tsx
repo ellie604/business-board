@@ -11,7 +11,15 @@ interface DashboardStats {
   totalClosedDeals: number;
 }
 
+// Simple auth hook
+const useAuth = () => {
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  return { user };
+};
+
 export function AgentDashboard() {
+  const { user } = useAuth();
   const location = useLocation();
   const [stats, setStats] = useState<DashboardStats>({
     totalActiveListings: 0,
@@ -105,7 +113,7 @@ export function AgentDashboard() {
         {location.pathname === '/agent' && !location.pathname.includes('messages') && (
           <>
             <h1 className="text-3xl font-bold mb-8">
-              Welcome Agent to Your Dashboard
+              Welcome {user?.name || 'Agent'} to Your Dashboard
             </h1>
 
             {/* 统计数据卡片网格 */}

@@ -11,7 +11,15 @@ interface DashboardStats {
   totalClosedDeals: number;
 }
 
+// Simple auth hook
+const useAuth = () => {
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  return { user };
+};
+
 export function BrokerDashboard() {
+  const { user } = useAuth();
   const location = useLocation();
   const [stats, setStats] = useState<DashboardStats>({
     totalActiveListings: 0,
@@ -111,7 +119,7 @@ export function BrokerDashboard() {
         {location.pathname === '/broker' && !location.pathname.includes('messages') && (
           <>
             <h1 className="text-3xl font-bold mb-8">
-              Welcome Broker to Your Customized Dashboard
+              Welcome {user?.name || 'Broker'} to Your Customized Dashboard
             </h1>
 
             {/* 统计数据卡片网格 */}

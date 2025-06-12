@@ -5,7 +5,15 @@ import type { DashboardStats } from '../../services/buyer';
 import ProgressBar from '../../components/ProgressBar';
 import logo from '../../assets/california-business-sales-logo.png';
 
+// Simple auth hook
+const useAuth = () => {
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  return { user };
+};
+
 const BuyerDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState<any>(null);
@@ -122,7 +130,7 @@ const BuyerDashboard: React.FC = () => {
         <Outlet />
         {location.pathname === '/buyer' && (
           <>
-            <h1 className="text-3xl font-bold mb-8">Welcome to Your Customized Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-8">Welcome {user?.name || 'Buyer'} to Your Customized Dashboard</h1>
             
             {/* Progress Bar */}
             <ProgressBar currentStep={currentStep} steps={steps} />

@@ -62,6 +62,13 @@ export const authService = {
 
     const data = await response.json();
     console.log('Login response:', data);
+    
+    // 保存用户数据到 localStorage
+    if (data.user) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+      console.log('User data saved to localStorage:', data.user);
+    }
+    
     return data;
       } catch (error) {
         clearTimeout(timeoutId);
