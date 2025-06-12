@@ -10,6 +10,8 @@ const SellerListingAgreement: React.FC = () => {
   const [progress, setProgress] = useState<SellerProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [downloadMessage, setDownloadMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const navigate = useNavigate();
   
   const steps = [
@@ -44,118 +46,72 @@ const SellerListingAgreement: React.FC = () => {
   const handleDownload = async () => {
     try {
       setDownloading(true);
-      // Record the download
-      await sellerService.recordStepDownload(2);
-      // Update step completion
-      await sellerService.updateStep(2);
+      setDownloadMessage('');
+      setMessageType('');
       
-      // 尝试获取broker为当前用户的listing上传的文件
-      try {
-        // 先获取用户的listing信息
-        const progressRes = await sellerService.getProgress();
-        const selectedListingId = progressRes.progress?.selectedListingId;
-        
-        if (selectedListingId) {
-          // 获取该listing的broker文件
-          const documentsResponse = await fetch(`${API_BASE_URL}/broker/listings/${selectedListingId}/documents`, {
-            method: 'GET',
-            credentials: 'include'
-          });
-          
-          if (documentsResponse.ok) {
-            const documentsData = await documentsResponse.json();
-            const listingAgreements = documentsData.documents?.filter(
-              (doc: any) => doc.type === 'LISTING_AGREEMENT'
-            );
-            
-            if (listingAgreements && listingAgreements.length > 0) {
-              // 下载broker上传的文件
-              const agreementDoc = listingAgreements[0];
-              const link = document.createElement('a');
-              link.href = agreementDoc.url;
-              link.download = agreementDoc.fileName;
-              link.target = '_blank';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            } else {
-              // 如果没有broker上传的文件，提供示例PDF
-              await downloadExamplePDF();
-            }
-          } else {
-            await downloadExamplePDF();
-          }
-        } else {
-          await downloadExamplePDF();
-        }
-      } catch (downloadError) {
-        console.error('Download error:', downloadError);
-        await downloadExamplePDF();
-      }
-      
-      // Refresh progress
+      // 先获取用户的listing信息
       const progressRes = await sellerService.getProgress();
-      setProgress(progressRes.progress);
+      const selectedListingId = progressRes.progress?.selectedListingId;
+      
+      if (!selectedListingId) {
+        setDownloadMessage('No listing selected. Please contact your broker or agent.');
+        setMessageType('error');
+        return;
+      }
+
+      // 获取该listing的broker文件 - 使用seller专用的端点
+      const documentsResponse = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/broker-documents`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (!documentsResponse.ok) {
+        setDownloadMessage('Please contact broker or agent for available listing agreement.');
+        setMessageType('error');
+        return;
+      }
+
+      const documentsData = await documentsResponse.json();
+      const listingAgreements = documentsData.documents?.filter(
+        (doc: any) => doc.type === 'LISTING_AGREEMENT'
+      );
+      
+      if (listingAgreements && listingAgreements.length > 0) {
+        // 有broker上传的文件，进行下载
+        const agreementDoc = listingAgreements[0];
+        
+        // Record the download and update step completion
+        await sellerService.recordStepDownload(2);
+        await sellerService.updateStep(2);
+        
+        // 下载文件 - 修改下载逻辑避免弹窗阻止
+        const link = document.createElement('a');
+        link.href = agreementDoc.url;
+        link.download = agreementDoc.fileName || 'listing_agreement.pdf';
+        // 不使用 target="_blank" 来避免弹窗阻止
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        setDownloadMessage('Listing agreement downloaded successfully!');
+        setMessageType('success');
+        
+        // Refresh progress
+        const newProgressRes = await sellerService.getProgress();
+        setProgress(newProgressRes.progress);
+      } else {
+        // 没有broker上传的文件，显示提示信息
+        setDownloadMessage('Please contact broker or agent for available listing agreement.');
+        setMessageType('error');
+      }
     } catch (err) {
       console.error('Failed to download:', err);
-      alert('Failed to download document. Please try again.');
+      setDownloadMessage('Please contact broker or agent for available listing agreement.');
+      setMessageType('error');
     } finally {
       setDownloading(false);
     }
-  };
-
-  const downloadExamplePDF = async () => {
-    // 创建示例PDF作为备用
-    const pdfContent = `%PDF-1.4
-1 0 obj
-<< /Type /Catalog /Pages 2 0 R >>
-endobj
-2 0 obj
-<< /Type /Pages /Kids [3 0 R] /Count 1 >>
-endobj
-3 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
-endobj
-4 0 obj
-<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
-endobj
-5 0 obj
-<< /Length 100 >>
-stream
-BT
-/F1 12 Tf
-72 720 Td
-(Business Listing Agreement) Tj
-0 -20 Td
-(This is your listing agreement document.) Tj
-0 -20 Td
-(Please contact your broker for the official document.) Tj
-ET
-endstream
-endobj
-xref
-0 6
-0000000000 65535 f
-0000000010 00000 n
-0000000079 00000 n
-0000000173 00000 n
-0000000301 00000 n
-0000000380 00000 n
-trailer
-<< /Size 6 /Root 1 0 R >>
-startxref
-529
-%%EOF`;
-    
-    const blob = new Blob([pdfContent], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'listing_agreement.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
   };
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
@@ -286,7 +242,7 @@ startxref
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Downloading...
+                    Checking for agreement...
                   </>
                 ) : (
                   <>
@@ -298,6 +254,23 @@ startxref
                 )}
               </button>
             </div>
+            
+            {/* Download Message */}
+            {downloadMessage && (
+              <div className={`mt-4 p-3 rounded-lg ${
+                messageType === 'success' 
+                  ? 'bg-green-50 border border-green-200' 
+                  : 'bg-red-50 border border-red-200'
+              }`}>
+                <p className={`text-sm ${
+                  messageType === 'success' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {messageType === 'success' && '✓ '}
+                  {messageType === 'error' && '⚠ '}
+                  {downloadMessage}
+                </p>
+              </div>
+            )}
             
             {stepCompleted && (
               <div className="mt-4 p-3 bg-green-50 rounded-lg">

@@ -542,6 +542,78 @@ router.get('/listings/:listingId/documents', authenticateSeller, async (req, res
   }
 });
 
+// 获取broker/agent为seller的listing提供的文件
+router.get('/listings/:listingId/broker-documents', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证listing是否属于该seller
+    const listing = await prisma.listing.findFirst({
+      where: { 
+        id: listingId,
+        sellerId: typedReq.user.id
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found or not owned by seller' });
+      return;
+    }
+
+    // 获取broker/agent为该listing提供的文档
+    const documents = await prisma.document.findMany({
+      where: {
+        listingId,
+        category: 'AGENT_PROVIDED' // 获取broker/agent提供的文件
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        },
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: [
+        {
+          uploader: {
+            role: 'desc' // BROKER first, then AGENT
+          }
+        },
+        {
+          type: 'asc' // Then by document type
+        },
+        {
+          createdAt: 'desc' // Finally by creation time (newest first)
+        }
+      ]
+    });
+
+    res.json({ documents });
+  } catch (error: unknown) {
+    console.error('Error fetching broker/agent documents:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch broker/agent documents',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // seller为listing上传文件
 router.post('/listings/:listingId/documents', upload.single('file'), authenticateSeller, async (req, res): Promise<void> => {
   try {

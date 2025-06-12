@@ -3,6 +3,7 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { sellerService } from '../../services/seller';
 import type { DashboardStats, Listing, SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
+import logo from '../../assets/california-business-sales-logo.png';
 
 interface Buyer {
   id: string;
@@ -214,9 +215,11 @@ const SellerDashboard: React.FC = () => {
       <div className="w-64 min-h-screen bg-white shadow-lg flex-shrink-0">
         {/* Logo */}
         <div className="p-6">
-          <div className="text-xl font-bold text-blue-600">
-            California Business Sales
-          </div>
+          <img 
+            src={logo}
+            alt="California Business Sales" 
+            className="w-full"
+          />
         </div>
 
         {/* Navigation Menu */}
