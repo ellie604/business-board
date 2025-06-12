@@ -41,6 +41,12 @@ interface Listing {
   };
 }
 
+interface Buyer {
+  id: string;
+  name: string;
+  email: string;
+}
+
 // Document type options for broker uploads
 const documentTypeOptions = [
   { value: 'NDA', label: 'Non-Disclosure Agreement' },
@@ -59,6 +65,7 @@ const BuyerProgressView: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [listing, setListing] = useState<Listing | null>(null);
+  const [buyer, setBuyer] = useState<Buyer | null>(null);
   const [brokerDocuments, setBrokerDocuments] = useState<Document[]>([]);
   const [buyerDocuments, setBuyerDocuments] = useState<Document[]>([]);
   const [buyerProgress, setBuyerProgress] = useState<any>(null);
@@ -74,6 +81,7 @@ const BuyerProgressView: React.FC = () => {
   useEffect(() => {
     if (listingId && buyerId) {
       fetchListingData();
+      fetchBuyerData();
       fetchBrokerDocuments();
       fetchBuyerDocuments();
       fetchBuyerProgress();
@@ -97,6 +105,30 @@ const BuyerProgressView: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching listing data:', error);
+    }
+  };
+
+  const fetchBuyerData = async () => {
+    try {
+      // Get buyers list and find the specific buyer
+      const apiEndpoint = location.pathname.startsWith('/broker/') 
+        ? `${API_BASE_URL}/broker/buyers`
+        : `${API_BASE_URL}/agent/buyers`;
+        
+      const response = await fetch(apiEndpoint, {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const currentBuyer = data.buyers.find((b: Buyer) => b.id === buyerId);
+        setBuyer(currentBuyer || null);
+      } else {
+        console.log('Failed to fetch buyer data');
+        setBuyer(null);
+      }
+    } catch (error) {
+      console.error('Error fetching buyer data:', error);
+      setBuyer(null);
     }
   };
 
@@ -298,6 +330,9 @@ const BuyerProgressView: React.FC = () => {
           {listing && (
             <div className="mt-2 text-gray-600">
               <p className="text-lg font-medium">{listing.title}</p>
+              {buyer && (
+                <p>Buyer: {buyer.name} ({buyer.email})</p>
+              )}
               <p>Seller: {listing.seller.name} ({listing.seller.email})</p>
               <p>Price: ${listing.price.toLocaleString()}</p>
             </div>
