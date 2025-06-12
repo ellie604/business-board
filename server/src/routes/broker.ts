@@ -6,7 +6,6 @@ import multer from 'multer';
 import { supabase, getStorageBucket } from '../config/supabase';
 
 const router = Router();
-const prisma = getPrisma();
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
@@ -54,7 +53,7 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
     }
 
     // 1. 获取所有代理
-    const managedAgents = await prisma.user.findMany({
+    const managedAgents = await getPrisma().user.findMany({
       where: {
         managerId: brokerId,
         role: 'AGENT',
@@ -65,7 +64,7 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
     });
 
     // 2. 获取这些代理管理的所有卖家
-    const sellers = await prisma.user.findMany({
+    const sellers = await getPrisma().user.findMany({
       where: {
         managerId: {
           in: managedAgents.map((agent: { id: string }) => agent.id)
@@ -82,19 +81,19 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
     // 3. 统计这些卖家的房源
     const [activeListings, underContract, newListings, ndaCount, closedDeals] =
       await Promise.all([
-        prisma.listing.count({
+        getPrisma().listing.count({
           where: {
             sellerId: { in: sellerIds },
             status: 'ACTIVE',
           },
         }),
-        prisma.listing.count({
+        getPrisma().listing.count({
           where: {
             sellerId: { in: sellerIds },
             status: 'UNDER_CONTRACT',
           },
         }),
-        prisma.listing.count({
+        getPrisma().listing.count({
           where: {
             sellerId: { in: sellerIds },
             createdAt: {
@@ -102,12 +101,12 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
             },
           },
         }),
-        prisma.document.count({
+        getPrisma().document.count({
           where: {
             type: 'NDA',
           },
         }),
-        prisma.listing.count({
+        getPrisma().listing.count({
           where: {
             sellerId: { in: sellerIds },
             status: 'CLOSED',
@@ -143,7 +142,7 @@ const getAgents: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const agents = await prisma.user.findMany({
+    const agents = await getPrisma().user.findMany({
       where: {
         managerId: brokerId,
         role: 'AGENT',
@@ -176,7 +175,7 @@ const getAgentsWithStats: RequestHandler = async (req, res, next) => {
     }
 
     // 获取所有代理
-    const agents = await prisma.user.findMany({
+    const agents = await getPrisma().user.findMany({
       where: {
         managerId: brokerId,
         role: 'AGENT',
@@ -193,7 +192,7 @@ const getAgentsWithStats: RequestHandler = async (req, res, next) => {
     const agentsWithStats = await Promise.all(
       agents.map(async (agent: Agent) => {
         // 获取代理管理的所有客户
-        const managedClients = await prisma.user.findMany({
+        const managedClients = await getPrisma().user.findMany({
           where: {
             managerId: agent.id,
             role: {
@@ -210,14 +209,14 @@ const getAgentsWithStats: RequestHandler = async (req, res, next) => {
         // 获取统计数据
         const [numberOfListings, numberUnderContract, closingsToDate] = await Promise.all([
           // 总房源数 - 只统计代理管理的卖家的房源
-          prisma.listing.findMany({
+          getPrisma().listing.findMany({
             where: {
               sellerId: { in: clientIds }
             },
             distinct: ['id'],
           }).then((listings: Listing[]) => listings.length),
           // 正在交易中的房源数
-          prisma.listing.findMany({
+          getPrisma().listing.findMany({
             where: {
               sellerId: { in: clientIds },
               status: 'UNDER_CONTRACT'
@@ -225,7 +224,7 @@ const getAgentsWithStats: RequestHandler = async (req, res, next) => {
             distinct: ['id'],
           }).then((listings: Listing[]) => listings.length),
           // 已完成交易的房源数
-          prisma.listing.findMany({
+          getPrisma().listing.findMany({
             where: {
               sellerId: { in: clientIds },
               status: 'CLOSED'
@@ -267,7 +266,7 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
     }
 
     // 验证代理是否属于该经纪人
-    const agent = await prisma.user.findFirst({
+    const agent = await getPrisma().user.findFirst({
       where: {
         id: agentId,
         managerId: brokerId,
@@ -281,7 +280,7 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
     }
 
     // 删除代理
-    await prisma.user.delete({
+    await getPrisma().user.delete({
       where: {
         id: agentId
       }
@@ -308,7 +307,7 @@ const getAgentStats: RequestHandler = async (req, res, next) => {
     }
 
     // 验证代理是否属于该经纪人
-    const agent = await prisma.user.findFirst({
+    const agent = await getPrisma().user.findFirst({
       where: {
         id: agentId,
         managerId: brokerId,
@@ -322,7 +321,7 @@ const getAgentStats: RequestHandler = async (req, res, next) => {
     }
 
     // 获取代理管理的所有客户ID
-    const managedClients = await prisma.user.findMany({
+    const managedClients = await getPrisma().user.findMany({
       where: {
         managerId: agentId,
         role: {
@@ -339,14 +338,14 @@ const getAgentStats: RequestHandler = async (req, res, next) => {
     // 获取统计数据
     const [numberOfListings, numberUnderContract, closingsToDate] = await Promise.all([
       // 总房源数 - 只统计代理管理的卖家的房源
-      prisma.listing.findMany({
+      getPrisma().listing.findMany({
         where: {
           sellerId: { in: clientIds }
         },
         distinct: ['id'],
       }).then((listings: Listing[]) => listings.length),
       // 正在交易中的房源数
-      prisma.listing.findMany({
+      getPrisma().listing.findMany({
         where: {
           sellerId: { in: clientIds },
           status: 'UNDER_CONTRACT'
@@ -354,7 +353,7 @@ const getAgentStats: RequestHandler = async (req, res, next) => {
         distinct: ['id'],
       }).then((listings: Listing[]) => listings.length),
       // 已完成交易的房源数
-      prisma.listing.findMany({
+      getPrisma().listing.findMany({
         where: {
           sellerId: { in: clientIds },
           status: 'CLOSED'
@@ -385,7 +384,7 @@ const getSellers: RequestHandler = async (req: Request, res: Response, next: Nex
       return;
     }
 
-    const sellers = await prisma.user.findMany({
+    const sellers = await getPrisma().user.findMany({
       where: { 
         role: 'SELLER',
       },
@@ -423,7 +422,7 @@ const getBuyers: RequestHandler = async (req: Request, res: Response, next: Next
       return;
     }
 
-    const buyers = await prisma.user.findMany({
+    const buyers = await getPrisma().user.findMany({
       where: { 
         role: 'BUYER',
       },
@@ -457,7 +456,7 @@ router.get('/listings/:listingId/documents', authenticateBroker, async (req, res
   try {
     const { listingId } = req.params;
     
-    const documents = await prisma.document.findMany({
+    const documents = await getPrisma().document.findMany({
       where: {
         listingId,
         category: 'AGENT_PROVIDED'
@@ -523,7 +522,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
     }
 
     // 检查listing是否存在
-    const listing = await prisma.listing.findUnique({
+    const listing = await getPrisma().listing.findUnique({
       where: { id: listingId }
     });
 
@@ -534,7 +533,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
 
     // 如果指定了buyerId，验证buyer是否存在
     if (buyerId) {
-      const buyer = await prisma.user.findFirst({
+      const buyer = await getPrisma().user.findFirst({
         where: { 
           id: buyerId, 
           role: 'BUYER' 
@@ -570,7 +569,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
       .getPublicUrl(fileName);
 
     // 创建文档记录
-    const document = await prisma.document.create({
+    const document = await getPrisma().document.create({
       data: {
         type: documentType || 'UPLOADED_DOC',
         category: 'AGENT_PROVIDED',    // broker提供的文件
@@ -619,7 +618,7 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
       return;
     }
 
-    const document = await prisma.document.findFirst({
+    const document = await getPrisma().document.findFirst({
       where: {
         id: documentId,
         listingId,
@@ -648,7 +647,7 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
     }
 
     // 从数据库删除记录
-    await prisma.document.delete({
+    await getPrisma().document.delete({
       where: { id: documentId }
     });
 
@@ -665,7 +664,7 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
 // 获取所有listings（用于broker选择）
 router.get('/listings', authenticateBroker, async (req, res): Promise<void> => {
   try {
-    const listings = await prisma.listing.findMany({
+    const listings = await getPrisma().listing.findMany({
       include: {
         seller: {
           select: {
@@ -703,7 +702,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
     }
 
     // First, get the listing and verify it belongs to a seller managed by this broker's agents
-    const listing = await prisma.listing.findFirst({
+    const listing = await getPrisma().listing.findFirst({
       where: { id: listingId },
       include: {
         seller: {
@@ -727,13 +726,13 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
     }
 
     // Get seller's progress
-    let sellerProgress = await prisma.sellerProgress.findFirst({
+    let sellerProgress = await getPrisma().sellerProgress.findFirst({
       where: { sellerId: listing.sellerId }
     });
 
     if (!sellerProgress) {
       // Create default progress if none exists - but don't force a selectedListingId
-      sellerProgress = await prisma.sellerProgress.create({
+      sellerProgress = await getPrisma().sellerProgress.create({
         data: {
           sellerId: listing.sellerId,
           currentStep: 0,
@@ -802,13 +801,13 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
           return !!listingId;
           
         case 1: // Email agent
-          const sentMessages = await prisma.message.findFirst({
+          const sentMessages = await getPrisma().message.findFirst({
             where: { senderId: sellerId }
           });
           return !!sentMessages;
           
         case 2: // Download listing agreement  
-          const listingDoc = await prisma.document.findFirst({
+          const listingDoc = await getPrisma().document.findFirst({
             where: { 
               sellerId, 
               stepId: 2, 
@@ -820,7 +819,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
           return !!listingDoc;
           
         case 3: // Fill questionnaire
-          const questionnaireDoc = await prisma.document.findFirst({
+          const questionnaireDoc = await getPrisma().document.findFirst({
             where: { 
               sellerId, 
               stepId: 3, 
@@ -832,7 +831,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
           return !!questionnaireDoc;
           
         case 4: // Upload financial documents
-          const financialDocs = await prisma.document.findMany({
+          const financialDocs = await getPrisma().document.findMany({
             where: { 
               sellerId, 
               listingId,
@@ -849,7 +848,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
           return false;
           
         case 7: // Upload due diligence
-          const dueDiligenceDocs = await prisma.document.findMany({
+          const dueDiligenceDocs = await getPrisma().document.findMany({
             where: { 
               sellerId, 
               listingId,
@@ -929,6 +928,277 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Get buyer progress for a specific listing
+const getBuyerProgress: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const brokerId = typedReq.user?.id;
+    const { buyerId, listingId } = req.params;
+    
+    if (!brokerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // First, get the buyer and verify access
+    const buyer = await getPrisma().user.findFirst({
+      where: { 
+        id: buyerId,
+        role: 'BUYER'
+      }
+    });
+
+    if (!buyer) {
+      res.status(404).json({ message: 'Buyer not found' });
+      return;
+    }
+
+    // Get the listing to verify it exists
+    const listing = await getPrisma().listing.findFirst({
+      where: { id: listingId },
+      include: {
+        seller: {
+          include: {
+            managedBy: true // This should be the agent
+          }
+        }
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    // Check if the seller's manager (agent) is managed by this broker
+    const agent = listing.seller.managedBy;
+    if (!agent || agent.managerId !== brokerId) {
+      res.status(403).json({ message: 'Access denied - listing not under your management' });
+      return;
+    }
+
+    // Get buyer's progress
+    let buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { buyerId }
+    });
+
+    if (!buyerProgress) {
+      // Create default progress if none exists - but don't force a selectedListingId
+      buyerProgress = await getPrisma().buyerProgress.create({
+        data: {
+          buyerId,
+          currentStep: 0,
+          completedSteps: [],
+          selectedListingId: null // Don't force the URL listingId - buyer must select it themselves
+        }
+      });
+    }
+
+    // Use buyer's actual selectedListingId, not the URL listingId
+    const actualSelectedListingId = buyerProgress.selectedListingId;
+    
+    // If buyer hasn't selected this specific listing, they may be at step 0 or working on a different listing
+    const isViewingSelectedListing = actualSelectedListingId === listingId;
+
+    // Import the step definitions and completion logic from buyer routes
+    const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
+      0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
+      1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
+      2: { type: 'NDA', operationType: 'UPLOAD', description: 'Fill out Non Disclosure agreement online' },
+      3: { type: 'FINANCIAL_STATEMENT', operationType: 'UPLOAD', description: 'Fill out financial statement online' },
+      4: { type: 'CBR_CIM', operationType: 'DOWNLOAD', description: 'Download CBR or CIM for the business' },
+      5: { type: 'UPLOADED_DOC', operationType: 'UPLOAD', description: 'Upload documents' },
+      6: { type: 'PURCHASE_CONTRACT', operationType: 'DOWNLOAD', description: 'Download your purchase contract' },
+      7: { type: 'DUE_DILIGENCE', operationType: 'DOWNLOAD', description: 'Request & Download Due Diligence documents' },
+      8: { type: 'PRE_CLOSE_CHECKLIST', operationType: 'BOTH', description: 'Checklist: Check off your to do list' },
+      9: { type: 'CLOSING_DOCS', operationType: 'DOWNLOAD', description: 'Download Closing document once we are closed' },
+      10: { type: 'AFTER_SALE', operationType: 'DOWNLOAD', description: 'After the Sale: Tips to make your transition smoother' }
+    };
+
+    const steps = [
+      { id: 0, title: 'Select listing you are interested in', completed: false, accessible: true },
+      { id: 1, title: 'Email the broker or agent', completed: false, accessible: false },
+      { id: 2, title: 'Fill out a Non Disclosure agreement online', completed: false, accessible: false },
+      { id: 3, title: 'Fill out a simple financial statement online', completed: false, accessible: false },
+      { id: 4, title: 'Download a CBR or CIM for the business your interested in', completed: false, accessible: false },
+      { id: 5, title: 'Upload documents', completed: false, accessible: false },
+      { id: 6, title: 'Download your purchase contract', completed: false, accessible: false },
+      { id: 7, title: 'Request & Download Due Diligence documents', completed: false, accessible: false },
+      { id: 8, title: 'Checklist: Check off your to do list', completed: false, accessible: false },
+      { id: 9, title: 'Download Closing document once we are closed', completed: false, accessible: false },
+      { id: 10, title: 'After the Sale: Tips to make your transition smoother', completed: false, accessible: false }
+    ];
+
+    // Check step completion using the same logic as buyer routes
+    const checkBuyerStepCompletion = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
+      // First, check if all previous steps are completed (except for step 0)
+      if (stepId > 0) {
+        // Check all previous steps
+        for (let i = 0; i < stepId; i++) {
+          const previousStepCompleted = await checkBuyerStepCompletionInternal(buyerId, i, listingId);
+          if (!previousStepCompleted) {
+            return false;
+          }
+        }
+      }
+      
+      // If all previous steps are completed (or this is step 0), check this step
+      return await checkBuyerStepCompletionInternal(buyerId, stepId, listingId);
+    };
+
+    // Internal function to check buyer step completion without considering dependencies
+    const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
+      switch (stepId) {
+        case 0: // Select listing
+          return !!listingId;
+          
+        case 1: // Email agent
+          const sentMessages = await getPrisma().message.findFirst({
+            where: { senderId: buyerId }
+          });
+          return !!sentMessages;
+          
+        case 2: // Fill out NDA
+          const ndaDoc = await getPrisma().document.findFirst({
+            where: { 
+              buyerId, 
+              stepId: 2, 
+              type: 'NDA',
+              operationType: 'UPLOAD',
+              status: 'COMPLETED'
+            }
+          });
+          return !!ndaDoc;
+          
+        case 3: // Fill out financial statement
+          const financialDoc = await getPrisma().document.findFirst({
+            where: { 
+              buyerId, 
+              stepId: 3, 
+              type: 'FINANCIAL_STATEMENT',
+              operationType: 'UPLOAD',
+              status: 'COMPLETED'
+            }
+          });
+          return !!financialDoc;
+          
+        case 4: // Download CBR/CIM
+          const cbrDoc = await getPrisma().document.findFirst({
+            where: { 
+              buyerId, 
+              stepId: 4, 
+              type: 'CBR_CIM',
+              operationType: 'DOWNLOAD',
+              downloadedAt: { not: null }
+            }
+          });
+          return !!cbrDoc;
+          
+        case 5: // Upload documents
+          const uploadedDocs = await getPrisma().document.findMany({
+            where: { 
+              buyerId, 
+              listingId,
+              category: 'BUYER_UPLOAD',
+              type: 'UPLOADED_DOC'
+            }
+          });
+          return uploadedDocs.length > 0;
+          
+        case 6: // Download purchase contract
+          const purchaseDoc = await getPrisma().document.findFirst({
+            where: { 
+              buyerId, 
+              stepId: 6, 
+              type: 'PURCHASE_CONTRACT',
+              operationType: 'DOWNLOAD',
+              downloadedAt: { not: null }
+            }
+          });
+          return !!purchaseDoc;
+          
+        case 7: // Download due diligence documents
+          const dueDiligenceDoc = await getPrisma().document.findFirst({
+            where: { 
+              buyerId, 
+              stepId: 7, 
+              type: 'DUE_DILIGENCE',
+              operationType: 'DOWNLOAD',
+              downloadedAt: { not: null }
+            }
+          });
+          return !!dueDiligenceDoc;
+          
+        case 8: // Complete pre-closing checklist
+          return false;
+          
+        case 9: // Download closing docs
+          return false;
+          
+        case 10: // After sale
+          return false;
+          
+        default:
+          return false;
+      }
+    };
+
+    // Check each step individually
+    let currentStep = 0;
+    const completedSteps: number[] = [];
+    
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      // Use buyer's actual selectedListingId for step completion check
+      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, actualSelectedListingId);
+      step.completed = isCompleted;
+      
+      if (isCompleted) {
+        completedSteps.push(step.id);
+      }
+    }
+    
+    // Determine current step
+    for (let i = 0; i < steps.length; i++) {
+      if (!steps[i].completed) {
+        currentStep = i;
+        break;
+      }
+    }
+    
+    if (completedSteps.length === steps.length) {
+      currentStep = steps.length;
+    }
+    
+    // Update accessibility
+    steps.forEach((step, index) => {
+      if (index === 0) {
+        step.accessible = true;
+      } else {
+        step.accessible = steps[index - 1].completed;
+      }
+      
+      const stepDoc = BUYER_STEP_DOCUMENT_REQUIREMENTS[step.id as keyof typeof BUYER_STEP_DOCUMENT_REQUIREMENTS];
+      if (stepDoc) {
+        (step as any).documentRequirement = stepDoc;
+      }
+    });
+
+    res.json({
+      progress: {
+        currentStep,
+        steps,
+        selectedListingId: actualSelectedListingId,
+        isViewingSelectedListing,
+        viewingListingId: listingId
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching buyer progress:', error);
+    next(error);
+  }
+};
+
 router.get('/sellers', authenticateBroker, getSellers);
 router.get('/buyers', authenticateBroker, getBuyers);
 router.get('/dashboard', authenticateBroker, getDashboardStats);
@@ -937,5 +1207,86 @@ router.get('/agents-with-stats', authenticateBroker, getAgentsWithStats);
 router.delete('/agent/:agentId', authenticateBroker, deleteAgent);
 router.get('/agent/:agentId/stats', authenticateBroker, getAgentStats);
 router.get('/listings/:listingId/progress', authenticateBroker, getSellerProgress);
+router.get('/buyers/:buyerId/listings/:listingId/progress', authenticateBroker, getBuyerProgress);
+
+// Get buyer documents for a specific listing from broker perspective
+router.get('/buyers/:buyerId/listings/:listingId/documents', authenticateBroker, async (req, res): Promise<void> => {
+  try {
+    const { buyerId, listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    const brokerId = typedReq.user?.id;
+
+    if (!brokerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // Verify access to the listing through agent management
+    const listing = await getPrisma().listing.findFirst({
+      where: { id: listingId },
+      include: {
+        seller: {
+          include: {
+            managedBy: true // This should be the agent
+          }
+        }
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    // Check if the seller's manager (agent) is managed by this broker
+    const agent = listing.seller.managedBy;
+    if (!agent || agent.managerId !== brokerId) {
+      res.status(403).json({ message: 'Access denied - listing not under your management' });
+      return;
+    }
+
+    // Verify buyer exists
+    const buyer = await getPrisma().user.findFirst({
+      where: { 
+        id: buyerId,
+        role: 'BUYER'
+      }
+    });
+
+    if (!buyer) {
+      res.status(404).json({ message: 'Buyer not found' });
+      return;
+    }
+
+    // Get buyer's documents for this listing
+    const documents = await getPrisma().document.findMany({
+      where: {
+        listingId,
+        buyerId,
+        category: 'BUYER_UPLOAD'
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({ documents });
+  } catch (error: unknown) {
+    console.error('Error fetching buyer documents:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch buyer documents',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
 
 export default router;

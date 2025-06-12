@@ -30,6 +30,26 @@ interface DocumentsResponse {
   message: string;
 }
 
+export interface BuyerProgress {
+  currentStep: number;
+  steps: Array<{
+    id: number;
+    title: string;
+    completed: boolean;
+    accessible: boolean;
+    documentRequirement?: {
+      type: string;
+      operationType: string;
+      description: string;
+    };
+  }>;
+  selectedListingId: string | null;
+}
+
+export interface BuyerProgressResponse {
+  progress: BuyerProgress;
+}
+
 class BuyerService {
   async getDashboardStats(): Promise<DashboardStats> {
     const response = await fetch(`${API_BASE_URL}/buyer/dashboard`, {
@@ -202,6 +222,91 @@ class BuyerService {
 
     const data = await response.json();
     return data.documents;
+  }
+
+  // Get buyer progress
+  async getProgress(): Promise<BuyerProgressResponse> {
+    const response = await fetch(`${API_BASE_URL}/buyer/progress`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  // Update step progress
+  async updateStep(stepId: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/buyer/update-step`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ stepId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  }
+
+  // Select a listing
+  async selectListing(listingId: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/buyer/select-listing`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ listingId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  // Get buyer's current listing
+  async getCurrentListing(): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/buyer/current-listing`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  // Get buyer's listings
+  async getListings(): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/buyer/listings`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
   }
 }
 

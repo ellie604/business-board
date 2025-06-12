@@ -355,7 +355,7 @@ const SellerProgressView: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-yellow-800">Seller hasn't selected this listing yet</p>
                   <p className="text-xs text-yellow-600 mt-1">
-                    The progress shown below reflects their actual selected listing, not this one.
+                    The progress shown below reflects their actual selected listing.
                   </p>
                 </div>
               </div>

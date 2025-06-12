@@ -117,6 +117,7 @@ model User {
   lastReadAt        DateTime?
   buyingListings    Listing[]        @relation("BuyerListings")
   sellerProgress    SellerProgress[]
+  buyerProgress     BuyerProgress[]
 }
 
 model SellerProgress {
@@ -127,6 +128,18 @@ model SellerProgress {
   completedSteps    Json     @default("[]")
   selectedListingId String?
   selectedListing   Listing? @relation(fields: [selectedListingId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model BuyerProgress {
+  id                String   @id @default(uuid())
+  buyerId           String   @unique
+  buyer             User     @relation(fields: [buyerId], references: [id])
+  currentStep       Int      @default(0)
+  completedSteps    Json     @default("[]")
+  selectedListingId String?
+  selectedListing   Listing? @relation("BuyerSelectedListing", fields: [selectedListingId], references: [id])
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -179,17 +192,18 @@ model MessageAttachment {
 }
 
 model Listing {
-  id             String           @id @default(uuid())
-  title          String
-  description    String
-  price          Float
-  status         ListingStatus    @default(ACTIVE)
-  createdAt      DateTime         @default(now())
-  seller         User             @relation("SellerListings", fields: [sellerId], references: [id])
-  sellerId       String
-  buyers         User[]           @relation("BuyerListings")
-  documents      Document[] // 新增：listing相关的文档
-  sellerProgress SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
+  id                    String           @id @default(uuid())
+  title                 String
+  description           String
+  price                 Float
+  status                ListingStatus    @default(ACTIVE)
+  createdAt             DateTime         @default(now())
+  seller                User             @relation("SellerListings", fields: [sellerId], references: [id])
+  sellerId              String
+  buyers                User[]           @relation("BuyerListings")
+  documents             Document[] // 新增：listing相关的文档
+  sellerProgress        SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
+  buyerSelectedProgress BuyerProgress[]  @relation("BuyerSelectedListing") // 关联到buyer进度
 }
 
 model Activity {

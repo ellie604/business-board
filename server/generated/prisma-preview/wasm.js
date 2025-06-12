@@ -163,6 +163,16 @@ exports.Prisma.SellerProgressScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BuyerProgressScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  currentStep: 'currentStep',
+  completedSteps: 'completedSteps',
+  selectedListingId: 'selectedListingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   subject: 'subject',
@@ -299,6 +309,7 @@ exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
   SellerProgress: 'SellerProgress',
+  BuyerProgress: 'BuyerProgress',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
   Listing: 'Listing',

@@ -6,8 +6,8 @@ import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
 
 import { API_BASE_URL } from '../../config';
-import { sellerService } from '../../services/seller';
-import type { SellerProgress } from '../../services/seller';
+import { buyerService } from '../../services/buyer';
+import type { BuyerProgress } from '../../services/buyer';
 
 interface User {
   id: string;
@@ -19,12 +19,12 @@ interface User {
 const BuyerMessages: React.FC = () => {
   const [isComposing, setIsComposing] = useState(false);
   const [activeTab, setActiveTab] = useState<'inbox' | 'sent'>('inbox');
-  const [progress, setProgress] = useState<SellerProgress | null>(null);
+  const [progress, setProgress] = useState<BuyerProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const queryClient = useQueryClient();
 
   const steps = [
-    'Home',
+    'Select Listing',
     'Messages',
     'Non Disclosure',
     'Financial Statement',
@@ -40,7 +40,8 @@ const BuyerMessages: React.FC = () => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const progressRes = await sellerService.getProgress();
+        const progressRes = await buyerService.getProgress();
+        console.log('BuyerMessages - Progress data received:', JSON.stringify(progressRes, null, 2));
         setProgress(progressRes.progress);
       } catch (err) {
         console.error('Failed to fetch progress:', err);
@@ -156,10 +157,24 @@ const BuyerMessages: React.FC = () => {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Invalidate message queries
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       setIsComposing(false);
       setActiveTab('sent');
+      
+      // Update step progress - mark step 1 (Messages) as completed
+      try {
+        await buyerService.updateStep(1);
+        
+        // Refresh progress data
+        const progressRes = await buyerService.getProgress();
+        setProgress(progressRes.progress);
+        
+        console.log('Step 1 (Messages) marked as completed');
+      } catch (error) {
+        console.error('Failed to update step progress:', error);
+      }
     },
     onError: (error) => {
       console.error('Failed to send message:', error);
@@ -206,10 +221,20 @@ const BuyerMessages: React.FC = () => {
     );
   }
 
-  const stepCompleted = progress?.steps[1]?.completed;
+  const stepCompleted = progress?.steps[1]?.completed || false;
   const currentStepIndex = progress?.currentStep || 0;
+  const isStepFinished = stepCompleted || currentStepIndex > 1;
   const isCurrentStep = currentStepIndex === 1;
   const isAccessible = currentStepIndex >= 1;
+
+  console.log('BuyerMessages - Step status debug:', {
+    stepCompleted,
+    currentStepIndex,
+    isStepFinished,
+    isCurrentStep,
+    isAccessible,
+    step1Data: progress?.steps[1]
+  });
 
   return (
     <StepGuard stepName="Messages">
@@ -228,7 +253,7 @@ const BuyerMessages: React.FC = () => {
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 2 of 11
               </span>
-              {stepCompleted ? (
+              {isStepFinished ? (
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

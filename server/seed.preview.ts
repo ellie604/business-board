@@ -330,6 +330,20 @@ async function main() {
     )
   );
 
+  // Create buyer progress records - ALL START AT STEP 0 with no progress and no selected listing
+  await Promise.all(
+    buyers.map(buyer => 
+      prisma.buyerProgress.create({
+        data: {
+          buyerId: buyer.id,
+          currentStep: 0,          // Everyone starts at step 0
+          completedSteps: [],      // No steps completed initially
+          selectedListingId: null  // No listing selected initially - user must select
+        }
+      })
+    )
+  );
+
   // Create some test messages (but no documents)
   await prisma.message.create({
     data: {
@@ -365,6 +379,7 @@ async function main() {
   console.log(`- 6 Buyers: ${buyers.map(b => b.name).join(', ')}`);
   console.log(`- 7 Listings with different buyer scenarios`);
   console.log(`- All sellers start at step 0 with no progress and no selected listing`);
+  console.log(`- All buyers start at step 0 with no progress and no selected listing`);
   console.log(`- NO documents created - clean slate for testing uploads/downloads`);
 }
 
