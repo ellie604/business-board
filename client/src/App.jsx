@@ -25,7 +25,7 @@ import AgentBuyersPage from './pages/agent/AgentBuyersPage';
 import SellerMessages from './pages/seller/SellerMessages';
 import SellerListingAgreement from './pages/seller/SellerListingAgreement';
 import SellerQuestionnaire from './pages/seller/SellerQuestionnaire';
-import SellerFinancials from './pages/seller/SellerFinancials';
+import SellerUploadDocs from './pages/seller/SellerUploadDocs';
 import SellerBuyerActivity from './pages/seller/SellerBuyerActivity';
 import SellerPurchaseAgreement from './pages/seller/SellerPurchaseAgreement';
 import SellerDueDiligence from './pages/seller/SellerDueDiligence';
@@ -80,7 +80,7 @@ function App() {
             <Route path="messages" element={<SellerMessages />} />
             <Route path="listing-agreement" element={<SellerListingAgreement />} />
             <Route path="questionnaire" element={<SellerQuestionnaire />} />
-            <Route path="financials" element={<SellerFinancials />} />
+            <Route path="financials" element={<SellerUploadDocs />} />
             <Route path="buyer-activity" element={<SellerBuyerActivity />} />
             <Route path="purchase-agreement" element={<SellerPurchaseAgreement />} />
             <Route path="due-diligence" element={<SellerDueDiligence />} />

@@ -45,7 +45,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
   
   // 仅在开发环境记录详细日志
   if (process.env.NODE_ENV !== 'production') {
-    console.log('Login request received - Body:', typedReq.body);
+  console.log('Login request received - Body:', typedReq.body);
   }
   
   const { email, password } = typedReq.body;
@@ -57,7 +57,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
   
   try {
     if (process.env.NODE_ENV !== 'production') {
-      console.log('Attempting to find user with email:', email);
+    console.log('Attempting to find user with email:', email);
     }
     
     const user = await prisma.user.findUnique({
@@ -81,10 +81,10 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('Found user:', {
-        ...user,
-        password: user ? '******' : null
-      });
+    console.log('Found user:', {
+      ...user,
+      password: user ? '******' : null
+    });
     }
 
     if (!user) {
@@ -98,7 +98,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log('Login successful for:', email, 'with role:', user.role);
+    console.log('Login successful for:', email, 'with role:', user.role);
     }
     
     // 设置用户信息到 request 和 session
@@ -121,11 +121,11 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
       }
 
       if (process.env.NODE_ENV !== 'production') {
-        console.log('Session after login:', {
-          id: typedReq.sessionID,
-          user: typedReq.session.user
-        });
-        console.log('User after login:', typedReq.user);
+      console.log('Session after login:', {
+        id: typedReq.sessionID,
+        user: typedReq.session.user
+      });
+      console.log('User after login:', typedReq.user);
       }
     
       res.json({ 

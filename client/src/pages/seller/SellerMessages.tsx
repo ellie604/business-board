@@ -41,6 +41,7 @@ const SellerMessages: React.FC = () => {
     const fetchProgress = async () => {
       try {
         const progressRes = await sellerService.getProgress();
+        console.log('SellerMessages - Progress data received:', JSON.stringify(progressRes, null, 2));
         setProgress(progressRes.progress);
       } catch (err) {
         console.error('Failed to fetch progress:', err);
@@ -156,10 +157,24 @@ const SellerMessages: React.FC = () => {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Invalidate message queries
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       setIsComposing(false);
       setActiveTab('sent');
+      
+      // Update step progress - mark step 1 (Messages) as completed
+      try {
+        await sellerService.updateStep(1);
+        
+        // Refresh progress data
+        const progressRes = await sellerService.getProgress();
+        setProgress(progressRes.progress);
+        
+        console.log('Step 1 (Messages) marked as completed');
+      } catch (error) {
+        console.error('Failed to update step progress:', error);
+      }
     },
     onError: (error) => {
       console.error('Failed to send message:', error);
@@ -206,10 +221,20 @@ const SellerMessages: React.FC = () => {
     );
   }
 
-  const stepCompleted = progress?.steps[1]?.completed;
+  const stepCompleted = progress?.steps[1]?.completed || false;
   const currentStepIndex = progress?.currentStep || 0;
+  const isStepFinished = stepCompleted || currentStepIndex > 1;
   const isCurrentStep = currentStepIndex === 1;
   const isAccessible = currentStepIndex >= 1;
+
+  console.log('SellerMessages - Step status debug:', {
+    stepCompleted,
+    currentStepIndex,
+    isStepFinished,
+    isCurrentStep,
+    isAccessible,
+    step1Data: progress?.steps[1]
+  });
 
   return (
     <StepGuard stepName="Messages">
@@ -221,14 +246,14 @@ const SellerMessages: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 2: Messages</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Step 1: Messages</h1>
               <p className="text-gray-600 mt-2">Contact your agent via secure messaging</p>
             </div>
             <div className="flex items-center space-x-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                Step 2 of 11
+                Step 1 of 11
               </span>
-              {stepCompleted ? (
+              {isStepFinished ? (
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

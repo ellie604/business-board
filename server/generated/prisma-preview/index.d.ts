@@ -118,6 +118,16 @@ export const MessageStatus: {
 
 export type MessageStatus = (typeof MessageStatus)[keyof typeof MessageStatus]
 
+
+export const DocumentCategory: {
+  SELLER_UPLOAD: 'SELLER_UPLOAD',
+  AGENT_PROVIDED: 'AGENT_PROVIDED',
+  BUYER_UPLOAD: 'BUYER_UPLOAD',
+  SYSTEM_GENERATED: 'SYSTEM_GENERATED'
+};
+
+export type DocumentCategory = (typeof DocumentCategory)[keyof typeof DocumentCategory]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -143,6 +153,10 @@ export const DocumentOperationType: typeof $Enums.DocumentOperationType
 export type MessageStatus = $Enums.MessageStatus
 
 export const MessageStatus: typeof $Enums.MessageStatus
+
+export type DocumentCategory = $Enums.DocumentCategory
+
+export const DocumentCategory: typeof $Enums.DocumentCategory
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1514,6 +1528,7 @@ export namespace Prisma {
     listings: number
     buyerDocs: number
     sellerDocs: number
+    uploadedDocuments: number
     activities: number
     sentMessages: number
     receivedMessages: number
@@ -1526,6 +1541,7 @@ export namespace Prisma {
     listings?: boolean | UserCountOutputTypeCountListingsArgs
     buyerDocs?: boolean | UserCountOutputTypeCountBuyerDocsArgs
     sellerDocs?: boolean | UserCountOutputTypeCountSellerDocsArgs
+    uploadedDocuments?: boolean | UserCountOutputTypeCountUploadedDocumentsArgs
     activities?: boolean | UserCountOutputTypeCountActivitiesArgs
     sentMessages?: boolean | UserCountOutputTypeCountSentMessagesArgs
     receivedMessages?: boolean | UserCountOutputTypeCountReceivedMessagesArgs
@@ -1569,6 +1585,13 @@ export namespace Prisma {
    * UserCountOutputType without action
    */
   export type UserCountOutputTypeCountSellerDocsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUploadedDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DocumentWhereInput
   }
 
@@ -1654,10 +1677,14 @@ export namespace Prisma {
 
   export type ListingCountOutputType = {
     buyers: number
+    documents: number
+    sellerProgress: number
   }
 
   export type ListingCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     buyers?: boolean | ListingCountOutputTypeCountBuyersArgs
+    documents?: boolean | ListingCountOutputTypeCountDocumentsArgs
+    sellerProgress?: boolean | ListingCountOutputTypeCountSellerProgressArgs
   }
 
   // Custom InputTypes
@@ -1676,6 +1703,20 @@ export namespace Prisma {
    */
   export type ListingCountOutputTypeCountBuyersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountSellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProgressWhereInput
   }
 
 
@@ -1709,6 +1750,7 @@ export namespace Prisma {
     id: string | null
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
+    category: $Enums.DocumentCategory | null
     url: string | null
     fileName: string | null
     fileSize: number | null
@@ -1719,6 +1761,7 @@ export namespace Prisma {
     listingId: string | null
     uploadedAt: Date | null
     downloadedAt: Date | null
+    uploadedBy: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1727,6 +1770,7 @@ export namespace Prisma {
     id: string | null
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
+    category: $Enums.DocumentCategory | null
     url: string | null
     fileName: string | null
     fileSize: number | null
@@ -1737,6 +1781,7 @@ export namespace Prisma {
     listingId: string | null
     uploadedAt: Date | null
     downloadedAt: Date | null
+    uploadedBy: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1745,6 +1790,7 @@ export namespace Prisma {
     id: number
     type: number
     status: number
+    category: number
     url: number
     fileName: number
     fileSize: number
@@ -1755,6 +1801,7 @@ export namespace Prisma {
     listingId: number
     uploadedAt: number
     downloadedAt: number
+    uploadedBy: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1775,6 +1822,7 @@ export namespace Prisma {
     id?: true
     type?: true
     status?: true
+    category?: true
     url?: true
     fileName?: true
     fileSize?: true
@@ -1785,6 +1833,7 @@ export namespace Prisma {
     listingId?: true
     uploadedAt?: true
     downloadedAt?: true
+    uploadedBy?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1793,6 +1842,7 @@ export namespace Prisma {
     id?: true
     type?: true
     status?: true
+    category?: true
     url?: true
     fileName?: true
     fileSize?: true
@@ -1803,6 +1853,7 @@ export namespace Prisma {
     listingId?: true
     uploadedAt?: true
     downloadedAt?: true
+    uploadedBy?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1811,6 +1862,7 @@ export namespace Prisma {
     id?: true
     type?: true
     status?: true
+    category?: true
     url?: true
     fileName?: true
     fileSize?: true
@@ -1821,6 +1873,7 @@ export namespace Prisma {
     listingId?: true
     uploadedAt?: true
     downloadedAt?: true
+    uploadedBy?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1916,6 +1969,7 @@ export namespace Prisma {
     id: string
     type: $Enums.DocumentType
     status: $Enums.DocumentStatus
+    category: $Enums.DocumentCategory
     url: string | null
     fileName: string | null
     fileSize: number | null
@@ -1926,6 +1980,7 @@ export namespace Prisma {
     listingId: string | null
     uploadedAt: Date | null
     downloadedAt: Date | null
+    uploadedBy: string | null
     createdAt: Date
     updatedAt: Date
     _count: DocumentCountAggregateOutputType | null
@@ -1953,6 +2008,7 @@ export namespace Prisma {
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
     fileName?: boolean
     fileSize?: boolean
@@ -1963,16 +2019,20 @@ export namespace Prisma {
     listingId?: boolean
     uploadedAt?: boolean
     downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
     fileName?: boolean
     fileSize?: boolean
@@ -1983,16 +2043,20 @@ export namespace Prisma {
     listingId?: boolean
     uploadedAt?: boolean
     downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
     fileName?: boolean
     fileSize?: boolean
@@ -2003,16 +2067,20 @@ export namespace Prisma {
     listingId?: boolean
     uploadedAt?: boolean
     downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectScalar = {
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
     fileName?: boolean
     fileSize?: boolean
@@ -2023,22 +2091,29 @@ export namespace Prisma {
     listingId?: boolean
     uploadedAt?: boolean
     downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "fileName" | "fileSize" | "operationType" | "stepId" | "sellerId" | "buyerId" | "listingId" | "uploadedAt" | "downloadedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "category" | "url" | "fileName" | "fileSize" | "operationType" | "stepId" | "sellerId" | "buyerId" | "listingId" | "uploadedAt" | "downloadedAt" | "uploadedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
   export type DocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }
   export type DocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }
   export type DocumentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }
 
   export type $DocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2046,11 +2121,14 @@ export namespace Prisma {
     objects: {
       seller: Prisma.$UserPayload<ExtArgs>
       buyer: Prisma.$UserPayload<ExtArgs> | null
+      listing: Prisma.$ListingPayload<ExtArgs> | null
+      uploader: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       type: $Enums.DocumentType
       status: $Enums.DocumentStatus
+      category: $Enums.DocumentCategory
       url: string | null
       fileName: string | null
       fileSize: number | null
@@ -2061,6 +2139,7 @@ export namespace Prisma {
       listingId: string | null
       uploadedAt: Date | null
       downloadedAt: Date | null
+      uploadedBy: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["document"]>
@@ -2459,6 +2538,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     buyer<T extends Document$buyerArgs<ExtArgs> = {}>(args?: Subset<T, Document$buyerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    listing<T extends Document$listingArgs<ExtArgs> = {}>(args?: Subset<T, Document$listingArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    uploader<T extends Document$uploaderArgs<ExtArgs> = {}>(args?: Subset<T, Document$uploaderArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2491,6 +2572,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Document", 'String'>
     readonly type: FieldRef<"Document", 'DocumentType'>
     readonly status: FieldRef<"Document", 'DocumentStatus'>
+    readonly category: FieldRef<"Document", 'DocumentCategory'>
     readonly url: FieldRef<"Document", 'String'>
     readonly fileName: FieldRef<"Document", 'String'>
     readonly fileSize: FieldRef<"Document", 'Int'>
@@ -2501,6 +2583,7 @@ export namespace Prisma {
     readonly listingId: FieldRef<"Document", 'String'>
     readonly uploadedAt: FieldRef<"Document", 'DateTime'>
     readonly downloadedAt: FieldRef<"Document", 'DateTime'>
+    readonly uploadedBy: FieldRef<"Document", 'String'>
     readonly createdAt: FieldRef<"Document", 'DateTime'>
     readonly updatedAt: FieldRef<"Document", 'DateTime'>
   }
@@ -2918,6 +3001,44 @@ export namespace Prisma {
   }
 
   /**
+   * Document.listing
+   */
+  export type Document$listingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+  }
+
+  /**
+   * Document.uploader
+   */
+  export type Document$uploaderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * Document without action
    */
   export type DocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3179,6 +3300,7 @@ export namespace Prisma {
     listings?: boolean | User$listingsArgs<ExtArgs>
     buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
     sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
+    uploadedDocuments?: boolean | User$uploadedDocumentsArgs<ExtArgs>
     activities?: boolean | User$activitiesArgs<ExtArgs>
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
@@ -3235,6 +3357,7 @@ export namespace Prisma {
     listings?: boolean | User$listingsArgs<ExtArgs>
     buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
     sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
+    uploadedDocuments?: boolean | User$uploadedDocumentsArgs<ExtArgs>
     activities?: boolean | User$activitiesArgs<ExtArgs>
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
@@ -3257,6 +3380,7 @@ export namespace Prisma {
       listings: Prisma.$ListingPayload<ExtArgs>[]
       buyerDocs: Prisma.$DocumentPayload<ExtArgs>[]
       sellerDocs: Prisma.$DocumentPayload<ExtArgs>[]
+      uploadedDocuments: Prisma.$DocumentPayload<ExtArgs>[]
       activities: Prisma.$ActivityPayload<ExtArgs>[]
       sentMessages: Prisma.$MessagePayload<ExtArgs>[]
       receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
@@ -3673,6 +3797,7 @@ export namespace Prisma {
     listings<T extends User$listingsArgs<ExtArgs> = {}>(args?: Subset<T, User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyerDocs<T extends User$buyerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sellerDocs<T extends User$sellerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    uploadedDocuments<T extends User$uploadedDocumentsArgs<ExtArgs> = {}>(args?: Subset<T, User$uploadedDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     activities<T extends User$activitiesArgs<ExtArgs> = {}>(args?: Subset<T, User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentMessages<T extends User$sentMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receivedMessages<T extends User$receivedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4228,6 +4353,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.uploadedDocuments
+   */
+  export type User$uploadedDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
    * User.activities
    */
   export type User$activitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4577,6 +4726,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
   }, ExtArgs["result"]["sellerProgress"]>
 
   export type SellerProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4588,6 +4738,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
   }, ExtArgs["result"]["sellerProgress"]>
 
   export type SellerProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4599,6 +4750,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
   }, ExtArgs["result"]["sellerProgress"]>
 
   export type SellerProgressSelectScalar = {
@@ -4614,18 +4766,22 @@ export namespace Prisma {
   export type SellerProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sellerId" | "currentStep" | "completedSteps" | "selectedListingId" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerProgress"]>
   export type SellerProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
   }
   export type SellerProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
   }
   export type SellerProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
   }
 
   export type $SellerProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SellerProgress"
     objects: {
       seller: Prisma.$UserPayload<ExtArgs>
+      selectedListing: Prisma.$ListingPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5030,6 +5186,7 @@ export namespace Prisma {
   export interface Prisma__SellerProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    selectedListing<T extends SellerProgress$selectedListingArgs<ExtArgs> = {}>(args?: Subset<T, SellerProgress$selectedListingArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5459,6 +5616,25 @@ export namespace Prisma {
      * Limit how many SellerProgresses to delete.
      */
     limit?: number
+  }
+
+  /**
+   * SellerProgress.selectedListing
+   */
+  export type SellerProgress$selectedListingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
   }
 
   /**
@@ -8121,6 +8297,8 @@ export namespace Prisma {
     sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyers?: boolean | Listing$buyersArgs<ExtArgs>
+    documents?: boolean | Listing$documentsArgs<ExtArgs>
+    sellerProgress?: boolean | Listing$sellerProgressArgs<ExtArgs>
     _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
@@ -8160,6 +8338,8 @@ export namespace Prisma {
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyers?: boolean | Listing$buyersArgs<ExtArgs>
+    documents?: boolean | Listing$documentsArgs<ExtArgs>
+    sellerProgress?: boolean | Listing$sellerProgressArgs<ExtArgs>
     _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ListingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8174,6 +8354,8 @@ export namespace Prisma {
     objects: {
       seller: Prisma.$UserPayload<ExtArgs>
       buyers: Prisma.$UserPayload<ExtArgs>[]
+      documents: Prisma.$DocumentPayload<ExtArgs>[]
+      sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8579,6 +8761,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     buyers<T extends Listing$buyersArgs<ExtArgs> = {}>(args?: Subset<T, Listing$buyersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    documents<T extends Listing$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Listing$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerProgress<T extends Listing$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, Listing$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9032,6 +9216,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.documents
+   */
+  export type Listing$documentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.sellerProgress
+   */
+  export type Listing$sellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    where?: SellerProgressWhereInput
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    cursor?: SellerProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
   }
 
   /**
@@ -10125,6 +10357,7 @@ export namespace Prisma {
     id: 'id',
     type: 'type',
     status: 'status',
+    category: 'category',
     url: 'url',
     fileName: 'fileName',
     fileSize: 'fileSize',
@@ -10135,6 +10368,7 @@ export namespace Prisma {
     listingId: 'listingId',
     uploadedAt: 'uploadedAt',
     downloadedAt: 'downloadedAt',
+    uploadedBy: 'uploadedBy',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -10327,6 +10561,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DocumentCategory'
+   */
+  export type EnumDocumentCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentCategory[]'
+   */
+  export type ListEnumDocumentCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentCategory[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -10455,6 +10703,7 @@ export namespace Prisma {
     id?: StringFilter<"Document"> | string
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableFilter<"Document"> | string | null
     fileName?: StringNullableFilter<"Document"> | string | null
     fileSize?: IntNullableFilter<"Document"> | number | null
@@ -10465,16 +10714,20 @@ export namespace Prisma {
     listingId?: StringNullableFilter<"Document"> | string | null
     uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
     downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    listing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+    uploader?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type DocumentOrderByWithRelationInput = {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrderInput | SortOrder
     fileName?: SortOrderInput | SortOrder
     fileSize?: SortOrderInput | SortOrder
@@ -10485,10 +10738,13 @@ export namespace Prisma {
     listingId?: SortOrderInput | SortOrder
     uploadedAt?: SortOrderInput | SortOrder
     downloadedAt?: SortOrderInput | SortOrder
+    uploadedBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seller?: UserOrderByWithRelationInput
     buyer?: UserOrderByWithRelationInput
+    listing?: ListingOrderByWithRelationInput
+    uploader?: UserOrderByWithRelationInput
   }
 
   export type DocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -10498,6 +10754,7 @@ export namespace Prisma {
     NOT?: DocumentWhereInput | DocumentWhereInput[]
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableFilter<"Document"> | string | null
     fileName?: StringNullableFilter<"Document"> | string | null
     fileSize?: IntNullableFilter<"Document"> | number | null
@@ -10508,16 +10765,20 @@ export namespace Prisma {
     listingId?: StringNullableFilter<"Document"> | string | null
     uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
     downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    listing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+    uploader?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type DocumentOrderByWithAggregationInput = {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrderInput | SortOrder
     fileName?: SortOrderInput | SortOrder
     fileSize?: SortOrderInput | SortOrder
@@ -10528,6 +10789,7 @@ export namespace Prisma {
     listingId?: SortOrderInput | SortOrder
     uploadedAt?: SortOrderInput | SortOrder
     downloadedAt?: SortOrderInput | SortOrder
+    uploadedBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DocumentCountOrderByAggregateInput
@@ -10544,6 +10806,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Document"> | string
     type?: EnumDocumentTypeWithAggregatesFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusWithAggregatesFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryWithAggregatesFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableWithAggregatesFilter<"Document"> | string | null
     fileName?: StringNullableWithAggregatesFilter<"Document"> | string | null
     fileSize?: IntNullableWithAggregatesFilter<"Document"> | number | null
@@ -10554,6 +10817,7 @@ export namespace Prisma {
     listingId?: StringNullableWithAggregatesFilter<"Document"> | string | null
     uploadedAt?: DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
     downloadedAt?: DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableWithAggregatesFilter<"Document"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
   }
@@ -10577,6 +10841,7 @@ export namespace Prisma {
     listings?: ListingListRelationFilter
     buyerDocs?: DocumentListRelationFilter
     sellerDocs?: DocumentListRelationFilter
+    uploadedDocuments?: DocumentListRelationFilter
     activities?: ActivityListRelationFilter
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
@@ -10600,6 +10865,7 @@ export namespace Prisma {
     listings?: ListingOrderByRelationAggregateInput
     buyerDocs?: DocumentOrderByRelationAggregateInput
     sellerDocs?: DocumentOrderByRelationAggregateInput
+    uploadedDocuments?: DocumentOrderByRelationAggregateInput
     activities?: ActivityOrderByRelationAggregateInput
     sentMessages?: MessageOrderByRelationAggregateInput
     receivedMessages?: MessageOrderByRelationAggregateInput
@@ -10626,6 +10892,7 @@ export namespace Prisma {
     listings?: ListingListRelationFilter
     buyerDocs?: DocumentListRelationFilter
     sellerDocs?: DocumentListRelationFilter
+    uploadedDocuments?: DocumentListRelationFilter
     activities?: ActivityListRelationFilter
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
@@ -10679,6 +10946,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
     updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    selectedListing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
   }
 
   export type SellerProgressOrderByWithRelationInput = {
@@ -10690,6 +10958,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seller?: UserOrderByWithRelationInput
+    selectedListing?: ListingOrderByWithRelationInput
   }
 
   export type SellerProgressWhereUniqueInput = Prisma.AtLeast<{
@@ -10704,6 +10973,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
     updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    selectedListing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
   }, "id" | "sellerId">
 
   export type SellerProgressOrderByWithAggregationInput = {
@@ -10941,6 +11211,8 @@ export namespace Prisma {
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyers?: UserListRelationFilter
+    documents?: DocumentListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
   }
 
   export type ListingOrderByWithRelationInput = {
@@ -10953,6 +11225,8 @@ export namespace Prisma {
     sellerId?: SortOrder
     seller?: UserOrderByWithRelationInput
     buyers?: UserOrderByRelationAggregateInput
+    documents?: DocumentOrderByRelationAggregateInput
+    sellerProgress?: SellerProgressOrderByRelationAggregateInput
   }
 
   export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -10968,6 +11242,8 @@ export namespace Prisma {
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyers?: UserListRelationFilter
+    documents?: DocumentListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
   }, "id">
 
   export type ListingOrderByWithAggregationInput = {
@@ -11057,24 +11333,27 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
     operationType?: $Enums.DocumentOperationType
     stepId?: number | null
-    listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerDocsInput
     buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
   }
 
   export type DocumentUncheckedCreateInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
@@ -11085,6 +11364,7 @@ export namespace Prisma {
     listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11093,24 +11373,27 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
     stepId?: NullableIntFieldUpdateOperationsInput | number | null
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
     buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
   }
 
   export type DocumentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
@@ -11121,6 +11404,7 @@ export namespace Prisma {
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11129,6 +11413,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
@@ -11139,6 +11424,7 @@ export namespace Prisma {
     listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11147,12 +11433,12 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
     stepId?: NullableIntFieldUpdateOperationsInput | number | null
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11163,6 +11449,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
@@ -11173,6 +11460,7 @@ export namespace Prisma {
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11192,6 +11480,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -11214,6 +11503,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -11236,6 +11526,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -11258,6 +11549,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
@@ -11307,10 +11599,10 @@ export namespace Prisma {
     id?: string
     currentStep?: number
     completedSteps?: JsonNullValueInput | InputJsonValue
-    selectedListingId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerProgressInput
+    selectedListing?: ListingCreateNestedOneWithoutSellerProgressInput
   }
 
   export type SellerProgressUncheckedCreateInput = {
@@ -11327,10 +11619,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     currentStep?: IntFieldUpdateOperationsInput | number
     completedSteps?: JsonNullValueInput | InputJsonValue
-    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerProgressNestedInput
+    selectedListing?: ListingUpdateOneWithoutSellerProgressNestedInput
   }
 
   export type SellerProgressUncheckedUpdateInput = {
@@ -11357,7 +11649,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     currentStep?: IntFieldUpdateOperationsInput | number
     completedSteps?: JsonNullValueInput | InputJsonValue
-    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11595,6 +11886,8 @@ export namespace Prisma {
     createdAt?: Date | string
     seller: UserCreateNestedOneWithoutListingsInput
     buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
   }
 
   export type ListingUncheckedCreateInput = {
@@ -11606,6 +11899,8 @@ export namespace Prisma {
     createdAt?: Date | string
     sellerId: string
     buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
   }
 
   export type ListingUpdateInput = {
@@ -11617,6 +11912,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutListingsNestedInput
     buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
   }
 
   export type ListingUncheckedUpdateInput = {
@@ -11628,6 +11925,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: StringFieldUpdateOperationsInput | string
     buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
   }
 
   export type ListingCreateManyInput = {
@@ -11743,6 +12042,13 @@ export namespace Prisma {
     not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
   }
 
+  export type EnumDocumentCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryFilter<$PrismaModel> | $Enums.DocumentCategory
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11808,6 +12114,11 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
+  export type ListingNullableScalarRelationFilter = {
+    is?: ListingWhereInput | null
+    isNot?: ListingWhereInput | null
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -11817,6 +12128,7 @@ export namespace Prisma {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrder
     fileName?: SortOrder
     fileSize?: SortOrder
@@ -11827,6 +12139,7 @@ export namespace Prisma {
     listingId?: SortOrder
     uploadedAt?: SortOrder
     downloadedAt?: SortOrder
+    uploadedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -11840,6 +12153,7 @@ export namespace Prisma {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrder
     fileName?: SortOrder
     fileSize?: SortOrder
@@ -11850,6 +12164,7 @@ export namespace Prisma {
     listingId?: SortOrder
     uploadedAt?: SortOrder
     downloadedAt?: SortOrder
+    uploadedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -11858,6 +12173,7 @@ export namespace Prisma {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrder
     fileName?: SortOrder
     fileSize?: SortOrder
@@ -11868,6 +12184,7 @@ export namespace Prisma {
     listingId?: SortOrder
     uploadedAt?: SortOrder
     downloadedAt?: SortOrder
+    uploadedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -11913,6 +12230,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumDocumentStatusFilter<$PrismaModel>
     _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumDocumentCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryWithAggregatesFilter<$PrismaModel> | $Enums.DocumentCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentCategoryFilter<$PrismaModel>
+    _max?: NestedEnumDocumentCategoryFilter<$PrismaModel>
   }
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -12536,6 +12863,18 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type ListingCreateNestedOneWithoutDocumentsInput = {
+    create?: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutDocumentsInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutUploadedDocumentsInput = {
+    create?: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUploadedDocumentsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -12546,6 +12885,10 @@ export namespace Prisma {
 
   export type EnumDocumentStatusFieldUpdateOperationsInput = {
     set?: $Enums.DocumentStatus
+  }
+
+  export type EnumDocumentCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentCategory
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -12590,6 +12933,26 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerDocsInput, UserUpdateWithoutBuyerDocsInput>, UserUncheckedUpdateWithoutBuyerDocsInput>
   }
 
+  export type ListingUpdateOneWithoutDocumentsNestedInput = {
+    create?: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutDocumentsInput
+    upsert?: ListingUpsertWithoutDocumentsInput
+    disconnect?: ListingWhereInput | boolean
+    delete?: ListingWhereInput | boolean
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutDocumentsInput, ListingUpdateWithoutDocumentsInput>, ListingUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type UserUpdateOneWithoutUploadedDocumentsNestedInput = {
+    create?: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUploadedDocumentsInput
+    upsert?: UserUpsertWithoutUploadedDocumentsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUploadedDocumentsInput, UserUpdateWithoutUploadedDocumentsInput>, UserUncheckedUpdateWithoutUploadedDocumentsInput>
+  }
+
   export type UserCreateNestedOneWithoutManagingInput = {
     create?: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
     connectOrCreate?: UserCreateOrConnectWithoutManagingInput
@@ -12621,6 +12984,13 @@ export namespace Prisma {
     create?: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput> | DocumentCreateWithoutSellerInput[] | DocumentUncheckedCreateWithoutSellerInput[]
     connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
     createMany?: DocumentCreateManySellerInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type DocumentCreateNestedManyWithoutUploaderInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
@@ -12683,6 +13053,13 @@ export namespace Prisma {
     create?: XOR<DocumentCreateWithoutSellerInput, DocumentUncheckedCreateWithoutSellerInput> | DocumentCreateWithoutSellerInput[] | DocumentUncheckedCreateWithoutSellerInput[]
     connectOrCreate?: DocumentCreateOrConnectWithoutSellerInput | DocumentCreateOrConnectWithoutSellerInput[]
     createMany?: DocumentCreateManySellerInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutUploaderInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
@@ -12795,6 +13172,20 @@ export namespace Prisma {
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
     update?: DocumentUpdateWithWhereUniqueWithoutSellerInput | DocumentUpdateWithWhereUniqueWithoutSellerInput[]
     updateMany?: DocumentUpdateManyWithWhereWithoutSellerInput | DocumentUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type DocumentUpdateManyWithoutUploaderNestedInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutUploaderInput | DocumentUpsertWithWhereUniqueWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutUploaderInput | DocumentUpdateWithWhereUniqueWithoutUploaderInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutUploaderInput | DocumentUpdateManyWithWhereWithoutUploaderInput[]
     deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
@@ -12923,6 +13314,20 @@ export namespace Prisma {
     deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
+  export type DocumentUncheckedUpdateManyWithoutUploaderNestedInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutUploaderInput | DocumentUpsertWithWhereUniqueWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutUploaderInput | DocumentUpdateWithWhereUniqueWithoutUploaderInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutUploaderInput | DocumentUpdateManyWithWhereWithoutUploaderInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
   export type ActivityUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<ActivityCreateWithoutUserInput, ActivityUncheckedCreateWithoutUserInput> | ActivityCreateWithoutUserInput[] | ActivityUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActivityCreateOrConnectWithoutUserInput | ActivityCreateOrConnectWithoutUserInput[]
@@ -12998,12 +13403,28 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type ListingCreateNestedOneWithoutSellerProgressInput = {
+    create?: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutSellerProgressInput
+    connect?: ListingWhereUniqueInput
+  }
+
   export type UserUpdateOneRequiredWithoutSellerProgressNestedInput = {
     create?: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
     connectOrCreate?: UserCreateOrConnectWithoutSellerProgressInput
     upsert?: UserUpsertWithoutSellerProgressInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerProgressInput, UserUpdateWithoutSellerProgressInput>, UserUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type ListingUpdateOneWithoutSellerProgressNestedInput = {
+    create?: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutSellerProgressInput
+    upsert?: ListingUpsertWithoutSellerProgressInput
+    disconnect?: ListingWhereInput | boolean
+    delete?: ListingWhereInput | boolean
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutSellerProgressInput, ListingUpdateWithoutSellerProgressInput>, ListingUncheckedUpdateWithoutSellerProgressInput>
   }
 
   export type UserCreateNestedOneWithoutSentMessagesInput = {
@@ -13168,10 +13589,38 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
+  export type DocumentCreateNestedManyWithoutListingInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type SellerProgressCreateNestedManyWithoutSelectedListingInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutBuyingListingsInput = {
     create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutListingInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -13207,6 +13656,34 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
+  export type DocumentUpdateManyWithoutListingNestedInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutListingInput | DocumentUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutListingInput | DocumentUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutListingInput | DocumentUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type SellerProgressUpdateManyWithoutSelectedListingNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSelectedListingInput | SellerProgressUpdateManyWithWhereWithoutSelectedListingInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutBuyingListingsNestedInput = {
     create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
@@ -13218,6 +13695,34 @@ export namespace Prisma {
     update?: UserUpdateWithWhereUniqueWithoutBuyingListingsInput | UserUpdateWithWhereUniqueWithoutBuyingListingsInput[]
     updateMany?: UserUpdateManyWithWhereWithoutBuyingListingsInput | UserUpdateManyWithWhereWithoutBuyingListingsInput[]
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutListingNestedInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutListingInput | DocumentUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutListingInput | DocumentUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutListingInput | DocumentUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSelectedListingInput | SellerProgressUpdateManyWithWhereWithoutSelectedListingInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutActivitiesInput = {
@@ -13260,6 +13765,13 @@ export namespace Prisma {
     in?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.DocumentStatus[] | ListEnumDocumentStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
+  }
+
+  export type NestedEnumDocumentCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryFilter<$PrismaModel> | $Enums.DocumentCategory
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
@@ -13362,6 +13874,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumDocumentStatusFilter<$PrismaModel>
     _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDocumentCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryWithAggregatesFilter<$PrismaModel> | $Enums.DocumentCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentCategoryFilter<$PrismaModel>
+    _max?: NestedEnumDocumentCategoryFilter<$PrismaModel>
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -13613,6 +14135,7 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -13634,6 +14157,7 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -13660,6 +14184,7 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -13681,6 +14206,7 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -13691,6 +14217,84 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutBuyerDocsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+  }
+
+  export type ListingCreateWithoutDocumentsInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutDocumentsInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutDocumentsInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+  }
+
+  export type UserCreateWithoutUploadedDocumentsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutUploadedDocumentsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutUploadedDocumentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
   }
 
   export type UserUpsertWithoutSellerDocsInput = {
@@ -13718,6 +14322,7 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -13739,6 +14344,7 @@ export namespace Prisma {
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
@@ -13771,6 +14377,7 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -13791,6 +14398,97 @@ export namespace Prisma {
     lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type ListingUpsertWithoutDocumentsInput = {
+    update: XOR<ListingUpdateWithoutDocumentsInput, ListingUncheckedUpdateWithoutDocumentsInput>
+    create: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutDocumentsInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutDocumentsInput, ListingUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type ListingUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+  }
+
+  export type UserUpsertWithoutUploadedDocumentsInput = {
+    update: XOR<UserUpdateWithoutUploadedDocumentsInput, UserUncheckedUpdateWithoutUploadedDocumentsInput>
+    create: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUploadedDocumentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUploadedDocumentsInput, UserUncheckedUpdateWithoutUploadedDocumentsInput>
+  }
+
+  export type UserUpdateWithoutUploadedDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUploadedDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -13813,6 +14511,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -13834,6 +14533,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -13860,6 +14560,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -13881,6 +14582,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -13906,6 +14608,8 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
   }
 
   export type ListingUncheckedCreateWithoutSellerInput = {
@@ -13916,6 +14620,8 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
   }
 
   export type ListingCreateOrConnectWithoutSellerInput = {
@@ -13932,23 +14638,26 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
     operationType?: $Enums.DocumentOperationType
     stepId?: number | null
-    listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
   }
 
   export type DocumentUncheckedCreateWithoutBuyerInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
@@ -13958,6 +14667,7 @@ export namespace Prisma {
     listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13976,23 +14686,26 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
     operationType?: $Enums.DocumentOperationType
     stepId?: number | null
-    listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
   }
 
   export type DocumentUncheckedCreateWithoutSellerInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
@@ -14002,6 +14715,7 @@ export namespace Prisma {
     listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14013,6 +14727,54 @@ export namespace Prisma {
 
   export type DocumentCreateManySellerInputEnvelope = {
     data: DocumentCreateManySellerInput | DocumentCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DocumentCreateWithoutUploaderInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerDocsInput
+    buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutUploaderInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutUploaderInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput>
+  }
+
+  export type DocumentCreateManyUploaderInputEnvelope = {
+    data: DocumentCreateManyUploaderInput | DocumentCreateManyUploaderInput[]
     skipDuplicates?: boolean
   }
 
@@ -14152,6 +14914,8 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     seller: UserCreateNestedOneWithoutListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
   }
 
   export type ListingUncheckedCreateWithoutBuyersInput = {
@@ -14162,6 +14926,8 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     sellerId: string
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
   }
 
   export type ListingCreateOrConnectWithoutBuyersInput = {
@@ -14173,9 +14939,9 @@ export namespace Prisma {
     id?: string
     currentStep?: number
     completedSteps?: JsonNullValueInput | InputJsonValue
-    selectedListingId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    selectedListing?: ListingCreateNestedOneWithoutSellerProgressInput
   }
 
   export type SellerProgressUncheckedCreateWithoutSellerInput = {
@@ -14222,6 +14988,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -14243,6 +15010,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
@@ -14334,6 +15102,7 @@ export namespace Prisma {
     id?: StringFilter<"Document"> | string
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableFilter<"Document"> | string | null
     fileName?: StringNullableFilter<"Document"> | string | null
     fileSize?: IntNullableFilter<"Document"> | number | null
@@ -14344,6 +15113,7 @@ export namespace Prisma {
     listingId?: StringNullableFilter<"Document"> | string | null
     uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
     downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
   }
@@ -14362,6 +15132,22 @@ export namespace Prisma {
   export type DocumentUpdateManyWithWhereWithoutSellerInput = {
     where: DocumentScalarWhereInput
     data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type DocumentUpsertWithWhereUniqueWithoutUploaderInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutUploaderInput, DocumentUncheckedUpdateWithoutUploaderInput>
+    create: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutUploaderInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutUploaderInput, DocumentUncheckedUpdateWithoutUploaderInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutUploaderInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutUploaderInput>
   }
 
   export type ActivityUpsertWithWhereUniqueWithoutUserInput = {
@@ -14506,6 +15292,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -14527,6 +15314,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -14536,6 +15324,35 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutSellerProgressInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+  }
+
+  export type ListingCreateWithoutSellerProgressInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutSellerProgressInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutSellerProgressInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
   }
 
   export type UserUpsertWithoutSellerProgressInput = {
@@ -14564,6 +15381,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -14585,10 +15403,46 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+  }
+
+  export type ListingUpsertWithoutSellerProgressInput = {
+    update: XOR<ListingUpdateWithoutSellerProgressInput, ListingUncheckedUpdateWithoutSellerProgressInput>
+    create: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutSellerProgressInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutSellerProgressInput, ListingUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type ListingUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
   }
 
   export type UserCreateWithoutSentMessagesInput = {
@@ -14606,6 +15460,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
@@ -14627,6 +15482,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
@@ -14653,6 +15509,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
@@ -14674,6 +15531,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
@@ -14838,6 +15696,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
@@ -14859,6 +15718,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
@@ -14891,6 +15751,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
@@ -14912,6 +15773,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
@@ -15130,6 +15992,7 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -15151,6 +16014,7 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -15178,6 +16042,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
@@ -15199,6 +16064,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
@@ -15208,6 +16074,82 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutBuyingListingsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput>
+  }
+
+  export type DocumentCreateWithoutListingInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerDocsInput
+    buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutListingInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutListingInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput>
+  }
+
+  export type DocumentCreateManyListingInputEnvelope = {
+    data: DocumentCreateManyListingInput | DocumentCreateManyListingInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SellerProgressCreateWithoutSelectedListingInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerProgressInput
+  }
+
+  export type SellerProgressUncheckedCreateWithoutSelectedListingInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressCreateOrConnectWithoutSelectedListingInput = {
+    where: SellerProgressWhereUniqueInput
+    create: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput>
+  }
+
+  export type SellerProgressCreateManySelectedListingInputEnvelope = {
+    data: SellerProgressCreateManySelectedListingInput | SellerProgressCreateManySelectedListingInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutListingsInput = {
@@ -15235,6 +16177,7 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -15256,6 +16199,7 @@ export namespace Prisma {
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
@@ -15279,6 +16223,38 @@ export namespace Prisma {
     data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutBuyingListingsInput>
   }
 
+  export type DocumentUpsertWithWhereUniqueWithoutListingInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutListingInput, DocumentUncheckedUpdateWithoutListingInput>
+    create: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutListingInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutListingInput, DocumentUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutListingInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutListingInput>
+  }
+
+  export type SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput = {
+    where: SellerProgressWhereUniqueInput
+    update: XOR<SellerProgressUpdateWithoutSelectedListingInput, SellerProgressUncheckedUpdateWithoutSelectedListingInput>
+    create: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput>
+  }
+
+  export type SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput = {
+    where: SellerProgressWhereUniqueInput
+    data: XOR<SellerProgressUpdateWithoutSelectedListingInput, SellerProgressUncheckedUpdateWithoutSelectedListingInput>
+  }
+
+  export type SellerProgressUpdateManyWithWhereWithoutSelectedListingInput = {
+    where: SellerProgressScalarWhereInput
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyWithoutSelectedListingInput>
+  }
+
   export type UserCreateWithoutActivitiesInput = {
     id?: string
     email: string
@@ -15294,6 +16270,7 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
@@ -15315,6 +16292,7 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
@@ -15352,6 +16330,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
@@ -15373,6 +16352,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
@@ -15404,6 +16384,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
@@ -15413,6 +16394,7 @@ export namespace Prisma {
     listingId?: string | null
     uploadedAt?: Date | string | null
     downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15421,11 +16403,32 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
     fileName?: string | null
     fileSize?: number | null
     operationType?: $Enums.DocumentOperationType
     stepId?: number | null
+    buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateManyUploaderInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
     buyerId?: string | null
     listingId?: string | null
     uploadedAt?: Date | string | null
@@ -15502,6 +16505,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -15523,6 +16527,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
@@ -15550,6 +16555,8 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutSellerInput = {
@@ -15560,6 +16567,8 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
   }
 
   export type ListingUncheckedUpdateManyWithoutSellerInput = {
@@ -15575,23 +16584,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
     stepId?: NullableIntFieldUpdateOperationsInput | number | null
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
   }
 
   export type DocumentUncheckedUpdateWithoutBuyerInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
@@ -15601,6 +16613,7 @@ export namespace Prisma {
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15609,6 +16622,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
@@ -15618,6 +16632,7 @@ export namespace Prisma {
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15626,23 +16641,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
     stepId?: NullableIntFieldUpdateOperationsInput | number | null
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
   }
 
   export type DocumentUncheckedUpdateWithoutSellerInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
@@ -15652,6 +16670,7 @@ export namespace Prisma {
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15660,11 +16679,70 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
     fileName?: NullableStringFieldUpdateOperationsInput | string | null
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
     stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUpdateWithoutUploaderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
+    buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutUploaderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutUploaderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
     listingId?: NullableStringFieldUpdateOperationsInput | string | null
     uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15824,6 +16902,8 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutBuyersInput = {
@@ -15834,6 +16914,8 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
   }
 
   export type ListingUncheckedUpdateManyWithoutBuyersInput = {
@@ -15850,9 +16932,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     currentStep?: IntFieldUpdateOperationsInput | number
     completedSteps?: JsonNullValueInput | InputJsonValue
-    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    selectedListing?: ListingUpdateOneWithoutSellerProgressNestedInput
   }
 
   export type SellerProgressUncheckedUpdateWithoutSellerInput = {
@@ -15989,6 +17071,34 @@ export namespace Prisma {
     uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DocumentCreateManyListingInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressCreateManySelectedListingInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserUpdateWithoutBuyingListingsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -16004,6 +17114,7 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
@@ -16025,6 +17136,7 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
@@ -16042,6 +17154,90 @@ export namespace Prisma {
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     unreadCount?: IntFieldUpdateOperationsInput | number
     lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DocumentUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
+    buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUpdateWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerProgressNestedInput
+  }
+
+  export type SellerProgressUncheckedUpdateWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

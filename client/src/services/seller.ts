@@ -103,6 +103,14 @@ export const sellerService = {
     return res.json();
   },
 
+  async getCurrentListing() {
+    const res = await fetch(`${API_BASE_URL}/seller/current-listing`, { 
+      credentials: 'include' 
+    });
+    if (!res.ok) throw new Error('Failed to fetch current listing');
+    return res.json();
+  },
+
   async updateStep(stepId: number) {
     const res = await fetch(`${API_BASE_URL}/seller/update-step`, {
       method: 'POST',

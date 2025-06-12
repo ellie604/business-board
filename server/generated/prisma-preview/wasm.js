@@ -124,6 +124,7 @@ exports.Prisma.DocumentScalarFieldEnum = {
   id: 'id',
   type: 'type',
   status: 'status',
+  category: 'category',
   url: 'url',
   fileName: 'fileName',
   fileSize: 'fileSize',
@@ -134,6 +135,7 @@ exports.Prisma.DocumentScalarFieldEnum = {
   listingId: 'listingId',
   uploadedAt: 'uploadedAt',
   downloadedAt: 'downloadedAt',
+  uploadedBy: 'uploadedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -258,6 +260,13 @@ exports.DocumentType = exports.$Enums.DocumentType = {
 exports.DocumentStatus = exports.$Enums.DocumentStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED'
+};
+
+exports.DocumentCategory = exports.$Enums.DocumentCategory = {
+  SELLER_UPLOAD: 'SELLER_UPLOAD',
+  AGENT_PROVIDED: 'AGENT_PROVIDED',
+  BUYER_UPLOAD: 'BUYER_UPLOAD',
+  SYSTEM_GENERATED: 'SYSTEM_GENERATED'
 };
 
 exports.DocumentOperationType = exports.$Enums.DocumentOperationType = {

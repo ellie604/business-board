@@ -4,6 +4,7 @@ import { sellerService } from '../../services/seller';
 import type { SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import { API_BASE_URL } from '../../config';
 
 const SellerDueDiligence: React.FC = () => {
   const [progress, setProgress] = useState<SellerProgress | null>(null);
@@ -111,14 +112,35 @@ const SellerDueDiligence: React.FC = () => {
       setUploading(true);
       const file = files[0];
       
-      // Simulate file upload
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Get seller's selected listing first
+      const dashboardData = await sellerService.getDashboardStats();
+      const selectedListingId = dashboardData.stats.selectedListingId;
       
-      // Record the upload
-      await sellerService.uploadStepDocument(7, file.name, 'fake-url', file.size);
+      if (!selectedListingId) {
+        alert('Please select a listing first');
+        return;
+      }
+      
+      // Upload file using real API
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', 'DUE_DILIGENCE');
+
+      const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Upload failed: ${errorData.message}`);
+      }
+
+      const data = await response.json();
       
       const newDoc = {
-        id: Date.now().toString(),
+        id: data.document.id,
         fileName: file.name,
         category,
         uploadDate: new Date().toISOString(),
@@ -136,6 +158,7 @@ const SellerDueDiligence: React.FC = () => {
       }
     } catch (err) {
       console.error('Failed to upload:', err);
+      alert(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setUploading(false);
     }

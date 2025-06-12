@@ -161,27 +161,27 @@ app.use(restoreUser);
 
 // 添加调试中间件 - 仅在开发环境
 if (process.env.NODE_ENV !== 'production') {
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    console.log('=== Session Debug Info ===');
-    console.log('Session ID:', req.sessionID);
-    console.log('Session:', req.session);
-    console.log('User:', (req as any).user);
-    console.log('Cookie:', req.headers.cookie);
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('=== End Session Debug Info ===');
-    next();
-  });
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log('=== Session Debug Info ===');
+  console.log('Session ID:', req.sessionID);
+  console.log('Session:', req.session);
+  console.log('User:', (req as any).user);
+  console.log('Cookie:', req.headers.cookie);
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('=== End Session Debug Info ===');
+  next();
+});
 
   // 添加路由调试中间件 - 仅在开发环境
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    console.log('=== Request Debug Info ===');
-    console.log('Method:', req.method);
-    console.log('URL:', req.url);
-    console.log('Headers:', req.headers);
-    console.log('Body:', req.body);
-    console.log('=== End Request Debug Info ===');
-    next();
-  });
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log('=== Request Debug Info ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  console.log('=== End Request Debug Info ===');
+  next();
+});
 }
 
 // 注册路由

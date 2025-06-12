@@ -4,6 +4,7 @@ import { sellerService } from '../../services/seller';
 import type { SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import { API_BASE_URL } from '../../config';
 
 const SellerListingAgreement: React.FC = () => {
   const [progress, setProgress] = useState<SellerProgress | null>(null);
@@ -48,20 +49,113 @@ const SellerListingAgreement: React.FC = () => {
       // Update step completion
       await sellerService.updateStep(2);
       
-      // Simulate download
-      const link = document.createElement('a');
-      link.href = '#'; // In real app, this would be the actual file URL
-      link.download = 'listing_agreement.pdf';
-      link.click();
+      // 尝试获取broker为当前用户的listing上传的文件
+      try {
+        // 先获取用户的listing信息
+        const progressRes = await sellerService.getProgress();
+        const selectedListingId = progressRes.progress?.selectedListingId;
+        
+        if (selectedListingId) {
+          // 获取该listing的broker文件
+          const documentsResponse = await fetch(`${API_BASE_URL}/broker/listings/${selectedListingId}/documents`, {
+            method: 'GET',
+            credentials: 'include'
+          });
+          
+          if (documentsResponse.ok) {
+            const documentsData = await documentsResponse.json();
+            const listingAgreements = documentsData.documents?.filter(
+              (doc: any) => doc.type === 'LISTING_AGREEMENT'
+            );
+            
+            if (listingAgreements && listingAgreements.length > 0) {
+              // 下载broker上传的文件
+              const agreementDoc = listingAgreements[0];
+              const link = document.createElement('a');
+              link.href = agreementDoc.url;
+              link.download = agreementDoc.fileName;
+              link.target = '_blank';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } else {
+              // 如果没有broker上传的文件，提供示例PDF
+              await downloadExamplePDF();
+            }
+          } else {
+            await downloadExamplePDF();
+          }
+        } else {
+          await downloadExamplePDF();
+        }
+      } catch (downloadError) {
+        console.error('Download error:', downloadError);
+        await downloadExamplePDF();
+      }
       
       // Refresh progress
       const progressRes = await sellerService.getProgress();
       setProgress(progressRes.progress);
     } catch (err) {
       console.error('Failed to download:', err);
+      alert('Failed to download document. Please try again.');
     } finally {
       setDownloading(false);
     }
+  };
+
+  const downloadExamplePDF = async () => {
+    // 创建示例PDF作为备用
+    const pdfContent = `%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 100 >>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(Business Listing Agreement) Tj
+0 -20 Td
+(This is your listing agreement document.) Tj
+0 -20 Td
+(Please contact your broker for the official document.) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f
+0000000010 00000 n
+0000000079 00000 n
+0000000173 00000 n
+0000000301 00000 n
+0000000380 00000 n
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+529
+%%EOF`;
+    
+    const blob = new Blob([pdfContent], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'listing_agreement.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;

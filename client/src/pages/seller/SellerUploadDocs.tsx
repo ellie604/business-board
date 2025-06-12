@@ -4,8 +4,9 @@ import { sellerService } from '../../services/seller';
 import type { SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import { API_BASE_URL } from '../../config';
 
-const SellerFinancials: React.FC = () => {
+const SellerUploadDocs: React.FC = () => {
   const [progress, setProgress] = useState<SellerProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -95,17 +96,40 @@ const SellerFinancials: React.FC = () => {
 
     try {
       setUploading(true);
+      
+      // Get seller's selected listing first
+      const dashboardData = await sellerService.getDashboardStats();
+      const selectedListingId = dashboardData.stats.selectedListingId;
+      
+      if (!selectedListingId) {
+        alert('Please select a listing first');
+        return;
+      }
+      
       for (const file of files) {
-        // Simulate upload
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Upload file using real API
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('documentType', 'FINANCIAL_DOCUMENTS');
+
+        const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Upload failed: ${errorData.message}`);
+        }
+
+        const data = await response.json();
         
-        // Record the upload
-        await sellerService.uploadStepDocument(4, file.name, 'fake-url', file.size);
-        
+        // Add to UI list
         const newFile = {
-          id: Date.now().toString(),
+          id: data.document.id,
           name: file.name,
-          category: 'Financial Statements', // Default category
+          category: 'Financial Statements',
           size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
           uploadDate: new Date().toISOString()
         };
@@ -122,6 +146,7 @@ const SellerFinancials: React.FC = () => {
       }
     } catch (err) {
       console.error('Failed to upload:', err);
+      alert(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setUploading(false);
     }
@@ -315,4 +340,4 @@ const SellerFinancials: React.FC = () => {
   );
 };
 
-export default SellerFinancials; 
+export default SellerUploadDocs; 

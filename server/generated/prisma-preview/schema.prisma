@@ -64,10 +64,18 @@ enum MessageStatus {
   READ
 }
 
+enum DocumentCategory {
+  SELLER_UPLOAD // seller上传的文件
+  AGENT_PROVIDED // broker/agent提供给seller的文件
+  BUYER_UPLOAD // buyer上传的文件
+  SYSTEM_GENERATED // 系统生成的文件
+}
+
 model Document {
   id            String                @id @default(uuid())
   type          DocumentType
   status        DocumentStatus        @default(PENDING)
+  category      DocumentCategory      @default(SELLER_UPLOAD) // 新增：文件分类
   url           String?
   fileName      String?
   fileSize      Int?
@@ -78,33 +86,37 @@ model Document {
   buyerId       String?
   buyer         User?                 @relation("BuyerDocuments", fields: [buyerId], references: [id])
   listingId     String? // 关联到具体的listing
+  listing       Listing?              @relation(fields: [listingId], references: [id]) // 新增关联
   uploadedAt    DateTime? // 上传时间
   downloadedAt  DateTime? // 下载时间
+  uploadedBy    String? // 新增：上传者ID（可能是broker）
+  uploader      User?                 @relation("UploadedDocuments", fields: [uploadedBy], references: [id]) // 新增关联
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
 }
 
 model User {
-  id               String           @id @default(uuid())
-  email            String           @unique
-  password         String
-  name             String           @default("")
-  role             UserRole         @default(BUYER)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @default(now()) @updatedAt
-  managedBy        User?            @relation("UserManagement", fields: [managerId], references: [id])
-  managerId        String?
-  managing         User[]           @relation("UserManagement")
-  listings         Listing[]        @relation("SellerListings")
-  buyerDocs        Document[]       @relation("BuyerDocuments")
-  sellerDocs       Document[]       @relation("SellerDocuments")
-  activities       Activity[]
-  sentMessages     Message[]        @relation("SentMessages")
-  receivedMessages Message[]        @relation("ReceivedMessages")
-  unreadCount      Int              @default(0)
-  lastReadAt       DateTime?
-  buyingListings   Listing[]        @relation("BuyerListings")
-  sellerProgress   SellerProgress[]
+  id                String           @id @default(uuid())
+  email             String           @unique
+  password          String
+  name              String           @default("")
+  role              UserRole         @default(BUYER)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now()) @updatedAt
+  managedBy         User?            @relation("UserManagement", fields: [managerId], references: [id])
+  managerId         String?
+  managing          User[]           @relation("UserManagement")
+  listings          Listing[]        @relation("SellerListings")
+  buyerDocs         Document[]       @relation("BuyerDocuments")
+  sellerDocs        Document[]       @relation("SellerDocuments")
+  uploadedDocuments Document[]       @relation("UploadedDocuments") // 新增：用户上传的文档
+  activities        Activity[]
+  sentMessages      Message[]        @relation("SentMessages")
+  receivedMessages  Message[]        @relation("ReceivedMessages")
+  unreadCount       Int              @default(0)
+  lastReadAt        DateTime?
+  buyingListings    Listing[]        @relation("BuyerListings")
+  sellerProgress    SellerProgress[]
 }
 
 model SellerProgress {
@@ -114,6 +126,7 @@ model SellerProgress {
   currentStep       Int      @default(0)
   completedSteps    Json     @default("[]")
   selectedListingId String?
+  selectedListing   Listing? @relation(fields: [selectedListingId], references: [id])
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -166,15 +179,17 @@ model MessageAttachment {
 }
 
 model Listing {
-  id          String        @id @default(uuid())
-  title       String
-  description String
-  price       Float
-  status      ListingStatus @default(ACTIVE)
-  createdAt   DateTime      @default(now())
-  seller      User          @relation("SellerListings", fields: [sellerId], references: [id])
-  sellerId    String
-  buyers      User[]        @relation("BuyerListings")
+  id             String           @id @default(uuid())
+  title          String
+  description    String
+  price          Float
+  status         ListingStatus    @default(ACTIVE)
+  createdAt      DateTime         @default(now())
+  seller         User             @relation("SellerListings", fields: [sellerId], references: [id])
+  sellerId       String
+  buyers         User[]           @relation("BuyerListings")
+  documents      Document[] // 新增：listing相关的文档
+  sellerProgress SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
 }
 
 model Activity {

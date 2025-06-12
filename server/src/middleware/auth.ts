@@ -11,20 +11,20 @@ export const restoreUser = (req: Request, _res: Response, next: NextFunction) =>
   
   // 仅在开发环境记录详细日志
   if (process.env.NODE_ENV !== 'production') {
-    console.log('=== Session Restore Debug ===');
-    console.log('Request headers:', {
-      cookie: req.headers.cookie,
-      origin: req.headers.origin,
-      referer: req.headers.referer
-    });
-    console.log('Session details:', {
-      id: typedReq.sessionID,
-      cookie: typedReq.session?.cookie,
-      user: typedReq.session?.user ? {
-        id: typedReq.session.user.id,
-        role: typedReq.session.user.role
-      } : null
-    });
+  console.log('=== Session Restore Debug ===');
+  console.log('Request headers:', {
+    cookie: req.headers.cookie,
+    origin: req.headers.origin,
+    referer: req.headers.referer
+  });
+  console.log('Session details:', {
+    id: typedReq.sessionID,
+    cookie: typedReq.session?.cookie,
+    user: typedReq.session?.user ? {
+      id: typedReq.session.user.id,
+      role: typedReq.session.user.role
+    } : null
+  });
   }
   
   if (typedReq.session?.user) {
@@ -34,17 +34,17 @@ export const restoreUser = (req: Request, _res: Response, next: NextFunction) =>
     };
     
     if (process.env.NODE_ENV !== 'production') {
-      console.log('User restored successfully:', {
-        id: typedReq.user.id,
-        role: typedReq.user.role
-      });
+    console.log('User restored successfully:', {
+      id: typedReq.user.id,
+      role: typedReq.user.role
+    });
     }
   } else if (process.env.NODE_ENV !== 'production') {
     console.log('No user found in session');
   }
   
   if (process.env.NODE_ENV !== 'production') {
-    console.log('=== End Session Restore Debug ===');
+  console.log('=== End Session Restore Debug ===');
   }
   
   next();
@@ -96,29 +96,29 @@ export const authenticateBroker: RequestHandler = (req, res, next) => {
   
   // 仅在开发环境记录详细日志
   if (process.env.NODE_ENV !== 'production') {
-    console.log('=== Broker Authentication Debug ===');
-    console.log('Request details:', {
-      method: req.method,
-      path: req.path,
-      headers: {
-        cookie: req.headers.cookie,
-        origin: req.headers.origin,
-        referer: req.headers.referer
-      }
-    });
-    console.log('Session details:', {
-      id: typedReq.sessionID,
-      cookie: typedReq.session?.cookie,
-      user: typedReq.session?.user ? {
-        id: typedReq.session.user.id,
-        role: typedReq.session.user.role
-      } : null
-    });
+  console.log('=== Broker Authentication Debug ===');
+  console.log('Request details:', {
+    method: req.method,
+    path: req.path,
+    headers: {
+      cookie: req.headers.cookie,
+      origin: req.headers.origin,
+      referer: req.headers.referer
+    }
+  });
+  console.log('Session details:', {
+    id: typedReq.sessionID,
+    cookie: typedReq.session?.cookie,
+    user: typedReq.session?.user ? {
+      id: typedReq.session.user.id,
+      role: typedReq.session.user.role
+    } : null
+  });
   }
   
   if (!typedReq.user) {
     if (process.env.NODE_ENV !== 'production') {
-      console.log('Authentication failed: No user in request');
+    console.log('Authentication failed: No user in request');
     }
     res.status(401).json({ 
       message: 'Authentication required'
@@ -128,7 +128,7 @@ export const authenticateBroker: RequestHandler = (req, res, next) => {
 
   if (typedReq.user.role !== 'BROKER') {
     if (process.env.NODE_ENV !== 'production') {
-      console.log('Authorization failed: Invalid role:', typedReq.user.role);
+    console.log('Authorization failed: Invalid role:', typedReq.user.role);
     }
     res.status(403).json({ 
       message: 'Access denied. Broker role required.'
@@ -137,11 +137,11 @@ export const authenticateBroker: RequestHandler = (req, res, next) => {
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    console.log('Authentication successful:', {
-      userId: typedReq.user.id,
-      role: typedReq.user.role
-    });
-    console.log('=== End Broker Authentication Debug ===');
+  console.log('Authentication successful:', {
+    userId: typedReq.user.id,
+    role: typedReq.user.role
+  });
+  console.log('=== End Broker Authentication Debug ===');
   }
   
   next();
