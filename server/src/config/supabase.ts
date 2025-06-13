@@ -27,10 +27,10 @@ export const getStorageBucket = () => {
   const env = process.env.NODE_ENV || 'development';
   switch (env) {
     case 'production':
-      return 'message-attachments-prod';
+      return 'business-documents-prod';
     case 'preview':
-      return 'message-attachments-dev';
+      return 'business-documents-dev';
     default:
-      return 'message-attachments-dev';
+      return 'business-documents-dev';
   }
 }; 

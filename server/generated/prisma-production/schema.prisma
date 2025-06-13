@@ -97,28 +97,29 @@ model Document {
 }
 
 model User {
-  id                String           @id @default(uuid())
-  email             String           @unique
-  password          String
-  name              String           @default("")
-  role              UserRole         @default(BUYER)
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @default(now()) @updatedAt
-  managedBy         User?            @relation("UserManagement", fields: [managerId], references: [id])
-  managerId         String?
-  managing          User[]           @relation("UserManagement")
-  listings          Listing[]        @relation("SellerListings")
-  buyerDocs         Document[]       @relation("BuyerDocuments")
-  sellerDocs        Document[]       @relation("SellerDocuments")
-  uploadedDocuments Document[]       @relation("UploadedDocuments") // 新增：用户上传的文档
-  activities        Activity[]
-  sentMessages      Message[]        @relation("SentMessages")
-  receivedMessages  Message[]        @relation("ReceivedMessages")
-  unreadCount       Int              @default(0)
-  lastReadAt        DateTime?
-  buyingListings    Listing[]        @relation("BuyerListings")
-  sellerProgress    SellerProgress[]
-  buyerProgress     BuyerProgress[]
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  password            String
+  name                String               @default("")
+  role                UserRole             @default(BUYER)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+  managedBy           User?                @relation("UserManagement", fields: [managerId], references: [id])
+  managerId           String?
+  managing            User[]               @relation("UserManagement")
+  listings            Listing[]            @relation("SellerListings")
+  buyerDocs           Document[]           @relation("BuyerDocuments")
+  sellerDocs          Document[]           @relation("SellerDocuments")
+  uploadedDocuments   Document[]           @relation("UploadedDocuments") // 新增：用户上传的文档
+  activities          Activity[]
+  sentMessages        Message[]            @relation("SentMessages")
+  receivedMessages    Message[]            @relation("ReceivedMessages")
+  unreadCount         Int                  @default(0)
+  lastReadAt          DateTime?
+  buyingListings      Listing[]            @relation("BuyerListings")
+  sellerProgress      SellerProgress[]
+  buyerProgress       BuyerProgress[]
+  sellerQuestionnaire SellerQuestionnaire? @relation("SellerQuestionnaire")
 }
 
 model SellerProgress {
@@ -214,4 +215,15 @@ model Activity {
   data      Json?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model SellerQuestionnaire {
+  id          String    @id @default(uuid())
+  sellerId    String    @unique
+  seller      User      @relation("SellerQuestionnaire", fields: [sellerId], references: [id])
+  data        Json // 存储问卷答案的JSON数据
+  submitted   Boolean   @default(false)
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

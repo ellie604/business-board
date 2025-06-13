@@ -2,10 +2,152 @@
 import { PrismaClient } from './generated/prisma-production';
 import { getPrisma } from './database';
 import { UserRole } from './generated/prisma-production';
+import { createClient } from '@supabase/supabase-js';
 
 const prisma = getPrisma();
 
+// Supabase configuration for storage cleanup
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const getStorageBucket = () => {
+  const env = process.env.NODE_ENV || 'development';
+  return env === 'production' ? 'business-documents-prod' : 'business-documents-dev';
+};
+
+async function clearSupabaseStorage() {
+  try {
+    console.log('🧹 Clearing Supabase Storage...');
+    
+    // Try both old and new bucket names
+    const possibleBuckets = ['message-attachments-prod', 'business-documents-prod'];
+    
+    for (const bucketName of possibleBuckets) {
+      console.log(`   Checking bucket: ${bucketName}`);
+      
+      const { data: files, error: listError } = await supabase.storage
+        .from(bucketName)
+        .list('', {
+          limit: 1000,
+          sortBy: { column: 'name', order: 'asc' }
+        });
+      
+      if (listError) {
+        console.log(`   - Bucket ${bucketName} not found or error:`, listError.message);
+        continue;
+      }
+      
+      if (files && files.length > 0) {
+        console.log(`   - Found ${files.length} items in ${bucketName}`);
+        
+        // Get all file paths (including folders)
+        const allPaths: string[] = [];
+        
+        // Add individual files
+        files.forEach(file => {
+          if (file.name && !file.name.endsWith('/')) {
+            allPaths.push(file.name);
+          }
+        });
+        
+        // List files in folders recursively
+        for (const item of files) {
+          if (item.name && item.name.endsWith('/')) {
+            const { data: folderFiles } = await supabase.storage
+              .from(bucketName)
+              .list(item.name, { limit: 1000 });
+            
+            if (folderFiles) {
+              folderFiles.forEach(file => {
+                if (file.name) {
+                  allPaths.push(`${item.name}${file.name}`);
+                }
+              });
+            }
+          }
+        }
+        
+        // Also check for nested folders (legacy and new structure)
+        const commonFolders = [
+          'agent-docs', 'broker-docs', 'seller-docs', 'buyer-docs', 
+          'questionnaires', 'messages', 'communications', 'listings'
+        ];
+        
+        for (const folder of commonFolders) {
+          const { data: folderFiles } = await supabase.storage
+            .from(bucketName)
+            .list(folder, { limit: 1000 });
+          
+          if (folderFiles) {
+            for (const file of folderFiles) {
+              if (file.name) {
+                allPaths.push(`${folder}/${file.name}`);
+                
+                // Check for nested folders within these folders
+                if (file.name.endsWith('/')) {
+                  const { data: nestedFiles } = await supabase.storage
+                    .from(bucketName)
+                    .list(`${folder}/${file.name}`, { limit: 1000 });
+                  
+                  if (nestedFiles) {
+                    nestedFiles.forEach(nestedFile => {
+                      if (nestedFile.name) {
+                        allPaths.push(`${folder}/${file.name}${nestedFile.name}`);
+                      }
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        console.log(`   - Found ${allPaths.length} files to delete from ${bucketName}`);
+        
+        if (allPaths.length > 0) {
+          // Delete files in batches to avoid timeout
+          const batchSize = 100;
+          for (let i = 0; i < allPaths.length; i += batchSize) {
+            const batch = allPaths.slice(i, i + batchSize);
+            const { error: deleteError } = await supabase.storage
+              .from(bucketName)
+              .remove(batch);
+            
+            if (deleteError) {
+              console.error(`Error deleting batch ${i / batchSize + 1} from ${bucketName}:`, deleteError);
+            } else {
+              console.log(`   - Deleted batch ${i / batchSize + 1}/${Math.ceil(allPaths.length / batchSize)} from ${bucketName} (${batch.length} files)`);
+            }
+          }
+          console.log(`   - Successfully deleted all ${allPaths.length} files from ${bucketName}`);
+        }
+      } else {
+        console.log(`   - No files found in ${bucketName}`);
+      }
+    }
+    
+    console.log('✅ Supabase Storage cleared successfully!');
+    console.log('\n📁 Ready for new file organization structure:');
+    console.log('   listings/{listingId}/seller/documents/     - Seller documents');
+    console.log('   listings/{listingId}/seller/questionnaire.pdf - Seller questionnaire');
+    console.log('   listings/{listingId}/buyer/documents/      - Buyer documents');
+    console.log('   listings/{listingId}/broker/documents/     - Broker documents');
+    console.log('   listings/{listingId}/agent/documents/      - Agent documents');
+    console.log('   communications/attachments/                - Message attachments');
+    console.log('');
+    
+  } catch (error) {
+    console.error('❌ Error clearing Supabase Storage:', error);
+  }
+}
+
 async function main() {
+  // Clear Supabase Storage first
+  await clearSupabaseStorage();
+  
+  console.log('🌱 Starting database seeding...');
+  
   // Create broker
   const broker = await prisma.user.create({
     data: {

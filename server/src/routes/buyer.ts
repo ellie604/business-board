@@ -590,7 +590,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
 
     // 上传文件到Supabase
     const bucketName = getStorageBucket();
-    const fileName = `buyer-docs/${listingId}/${Date.now()}-${file.originalname}`;
+    const fileName = `listings/${listingId}/buyer/documents/${Date.now()}-${file.originalname}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)

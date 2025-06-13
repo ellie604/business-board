@@ -68,6 +68,7 @@ const SellerProgressView: React.FC = () => {
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [selectedDocumentType, setSelectedDocumentType] = useState('LISTING_AGREEMENT');
   const [selectedBuyerId, setSelectedBuyerId] = useState('');
@@ -129,7 +130,12 @@ const SellerProgressView: React.FC = () => {
 
   const fetchSellerDocuments = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/seller/listings/${listingId}/documents`, {
+      // Determine the correct API endpoint based on the current path
+      const apiEndpoint = location.pathname.startsWith('/broker/') 
+        ? `${API_BASE_URL}/broker/listings/${listingId}/seller-documents`
+        : `${API_BASE_URL}/agent/listings/${listingId}/seller-documents`;
+        
+      const response = await fetch(apiEndpoint, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -142,6 +148,15 @@ const SellerProgressView: React.FC = () => {
     } catch (error) {
       console.error('Error fetching seller documents:', error);
       setSellerDocuments([]);
+    }
+  };
+
+  const refreshSellerDocuments = async () => {
+    setRefreshing(true);
+    try {
+      await fetchSellerDocuments();
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -265,26 +280,52 @@ const SellerProgressView: React.FC = () => {
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+  const formatFileSize = (bytes: number | null | undefined) => {
+    if (!bytes || bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const downloadSellerFile = (doc: any) => {
-    // 直接下载真实文件
-    if (doc.url) {
+  const downloadSellerFile = async (doc: any) => {
+    try {
+      // Determine the correct URL to use
+      let fileUrl = doc.url;
+      
+      // If it's a relative path (starts with /), construct full URL with API_BASE_URL
+      // If it's already a full URL (Supabase), use it directly
+      if (doc.url.startsWith('/')) {
+        fileUrl = `${API_BASE_URL}${doc.url}`;
+      }
+      
+      // Use fetch to download the file with proper credentials and CORS handling
+      const response = await fetch(fileUrl, {
+        method: 'GET',
+        credentials: doc.url.startsWith('/') ? 'include' : 'omit' // Only include credentials for our API
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Get the file as a blob
+      const blob = await response.blob();
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = doc.url;
-      link.download = doc.fileName;
-      link.target = '_blank';
+      link.href = url;
+      link.download = doc.fileName || 'download';
       document.body.appendChild(link);
       link.click();
+      
+      // Clean up
       document.body.removeChild(link);
-    } else {
-      alert('File URL not available');
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Download failed. Please try again.');
     }
   };
 
@@ -413,10 +454,28 @@ const SellerProgressView: React.FC = () => {
 
         {/* Middle: Seller Uploaded Files */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <UserIcon className="h-6 w-6 text-green-600" />
-            Seller Uploaded Files
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <UserIcon className="h-6 w-6 text-green-600" />
+              Seller Uploaded Files
+            </h3>
+            <button
+              onClick={refreshSellerDocuments}
+              disabled={refreshing}
+              className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+              title="Refresh seller documents"
+            >
+              <svg 
+                className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
           <p className="text-sm text-gray-600 mb-4">
             Documents uploaded by the seller during their process.
           </p>

@@ -152,7 +152,7 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
       const attachmentPromises = files.map(async (file: Express.Multer.File) => {
         try {
           // Upload file to Supabase Storage
-          const fileName = `${Date.now()}-${file.originalname}`;
+          const fileName = `communications/attachments/${Date.now()}-${file.originalname}`;
           console.log('Uploading file:', fileName);
           
           const { data, error } = await supabase.storage

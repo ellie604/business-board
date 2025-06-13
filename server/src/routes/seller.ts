@@ -647,7 +647,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
 
     // 上传文件到Supabase
     const bucketName = getStorageBucket();
-    const fileName = `seller-docs/${listingId}/${Date.now()}-${file.originalname}`;
+    const fileName = `listings/${listingId}/seller/documents/${Date.now()}-${file.originalname}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)
@@ -760,16 +760,30 @@ const checkStepCompletionInternal = async (sellerId: string, stepId: number, lis
       return !!listingDoc;
       
     case 3: // Fill questionnaire
-      // Check if questionnaire was uploaded
-      const questionnaireDoc = await prisma.document.findFirst({
+      // Check if questionnaire was submitted AND PDF document was generated
+      const submittedQuestionnaire = await prisma.sellerQuestionnaire.findFirst({
         where: { 
           sellerId, 
-          stepId: 3, 
+          submitted: true,
+          submittedAt: { not: null }
+        }
+      });
+      
+      if (!submittedQuestionnaire) {
+        return false;
+      }
+      
+      // Also check if the PDF document was generated
+      const questionnaireDoc = await prisma.document.findFirst({
+        where: {
+          sellerId,
           type: 'QUESTIONNAIRE',
-          operationType: 'UPLOAD',
+          category: 'SELLER_UPLOAD',
+          stepId: 3,
           status: 'COMPLETED'
         }
       });
+      
       return !!questionnaireDoc;
       
     case 4: // Upload financial documents
@@ -881,6 +895,458 @@ const getCurrentListing: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+// 获取seller的问卷数据
+router.get('/questionnaire', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const questionnaire = await prisma.sellerQuestionnaire.findFirst({
+      where: {
+        sellerId: typedReq.user.id
+      }
+    });
+
+    res.json({ questionnaire: questionnaire?.data || null });
+  } catch (error) {
+    console.error('Error getting questionnaire:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// 保存问卷（不生成PDF）
+router.post('/questionnaire/save', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    const { questionnaire } = req.body;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    await prisma.sellerQuestionnaire.upsert({
+      where: {
+        sellerId: typedReq.user.id
+      },
+      update: {
+        data: questionnaire,
+        updatedAt: new Date()
+      },
+      create: {
+        sellerId: typedReq.user.id,
+        data: questionnaire
+      }
+    });
+
+    res.json({ message: 'Questionnaire saved successfully' });
+  } catch (error) {
+    console.error('Error saving questionnaire:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// 提交问卷并生成PDF
+router.post('/questionnaire/submit', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    const { questionnaire } = req.body;
+    
+    if (!typedReq.user || !typedReq.user.id) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 获取用户的selected listing
+    const sellerProgress = await prisma.sellerProgress.findUnique({
+      where: { sellerId: typedReq.user.id }
+    });
+
+    if (!sellerProgress?.selectedListingId) {
+      res.status(400).json({ message: 'No listing selected' });
+      return;
+    }
+
+    // 保存问卷数据
+    await prisma.sellerQuestionnaire.upsert({
+      where: {
+        sellerId: typedReq.user.id
+      },
+      update: {
+        data: questionnaire,
+        updatedAt: new Date(),
+        submitted: true,
+        submittedAt: new Date()
+      },
+      create: {
+        sellerId: typedReq.user.id,
+        data: questionnaire,
+        submitted: true,
+        submittedAt: new Date()
+      }
+    });
+
+    // 生成文件名
+    const timestamp = Date.now();
+    const fileName = `listings/${sellerProgress.selectedListingId}/seller/questionnaire.pdf`;
+
+    // 删除之前的问卷文档（如果存在）
+    const existingDocs = await prisma.document.findMany({
+      where: {
+        sellerId: typedReq.user.id,
+        listingId: sellerProgress.selectedListingId,
+        type: 'QUESTIONNAIRE',
+        category: 'SELLER_UPLOAD'
+      }
+    });
+
+    // 删除Supabase Storage中的旧文件
+    const bucketName = getStorageBucket();
+    for (const doc of existingDocs) {
+      if (doc.url) {
+        // 从URL中提取文件路径
+        const urlParts = doc.url.split('/');
+        const bucketIndex = urlParts.findIndex((part: string) => part === bucketName);
+        if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+          const filePath = urlParts.slice(bucketIndex + 1).join('/');
+          await supabase.storage.from(bucketName).remove([filePath]);
+        }
+      }
+    }
+
+    // 删除数据库记录
+    await prisma.document.deleteMany({
+      where: {
+        sellerId: typedReq.user.id,
+        listingId: sellerProgress.selectedListingId,
+        type: 'QUESTIONNAIRE',
+        category: 'SELLER_UPLOAD'
+      }
+    });
+
+    // 生成PDF内容 - 使用Promise来处理异步PDF生成
+    let pdfBuffer: Buffer | null = null;
+    try {
+      pdfBuffer = await generateQuestionnairePDFAsync(questionnaire, typedReq.user);
+      
+      // 上传PDF文件到Supabase Storage，使用时间戳避免缓存
+      const supabaseFileName = `listings/${sellerProgress.selectedListingId}/seller/questionnaire_${timestamp}.pdf`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(supabaseFileName, pdfBuffer, {
+          contentType: 'application/pdf',
+          upsert: true // 允许覆盖现有文件
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw new Error('Failed to upload PDF to storage');
+      }
+
+      // 获取文件的公共URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(supabaseFileName);
+
+      // 创建新的文档记录，使用Supabase的公共URL
+      const document = await prisma.document.create({
+        data: {
+          fileName: `questionnaire_${timestamp}.pdf`,
+          url: publicUrl, // 使用Supabase的公共URL
+          fileSize: pdfBuffer ? pdfBuffer.length : 0,
+          type: 'QUESTIONNAIRE',
+          category: 'SELLER_UPLOAD',
+          sellerId: typedReq.user.id,
+          listingId: sellerProgress.selectedListingId,
+          uploadedBy: typedReq.user.id,
+          stepId: 3,
+          status: 'COMPLETED',
+          operationType: 'UPLOAD',
+          uploadedAt: new Date()
+        }
+      });
+
+      res.json({ 
+        message: 'Questionnaire submitted successfully',
+        document: document
+      });
+    } catch (pdfError) {
+      console.error('PDF generation or upload error:', pdfError);
+      res.status(500).json({ message: 'Failed to generate or upload questionnaire PDF' });
+    }
+  } catch (error) {
+    console.error('Error submitting questionnaire:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// 异步PDF生成函数
+function generateQuestionnairePDFAsync(questionnaire: any, user: any): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const PDFDocument = require('pdfkit');
+      const doc = new PDFDocument({ margin: 50 });
+      const chunks: Buffer[] = [];
+
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+      doc.on('error', (error: Error) => {
+        reject(error);
+      });
+
+      // PDF Header
+      doc.fontSize(20).font('Helvetica-Bold').text('BUSINESS QUESTIONNAIRE', { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(14).font('Helvetica').text(`Company: ${user.name || 'N/A'}`, { align: 'center' });
+      doc.moveDown(2);
+
+      // Business Summary and History
+      addSectionHeader(doc, 'BUSINESS SUMMARY AND HISTORY');
+      addQuestion(doc, '1. Provide a general (short) description of the business, its products/services, market and customers.', questionnaire.businessDescription);
+      addQuestion(doc, '2. Provide list of current shareholders and percentages owned.', questionnaire.currentShareholders);
+      addQuestion(doc, '3. When was the company originally founded and by whom?', questionnaire.companyFounded);
+      addQuestion(doc, '4. Provide a brief history of the business – from inception to present.', questionnaire.businessHistory);
+      addQuestion(doc, '5. List any major accomplishments or setbacks from inception.', questionnaire.majorAccomplishments);
+
+      // Products and Services
+      addSectionHeader(doc, 'PRODUCTS AND SERVICES');
+      addQuestion(doc, '6. Provide a general description of each of the company\'s products and services.', questionnaire.productsServicesDescription);
+      addQuestion(doc, '7. Provide a breakdown of sales for each product and service.', questionnaire.salesBreakdown);
+      addQuestion(doc, '8. Are any of the products/services seasonal? If so, what and why?', questionnaire.seasonalProducts);
+      addQuestion(doc, '9. What future products/services do you plan to offer or the new owner could/should pursue to expand the business?', questionnaire.futureProducts);
+      addQuestion(doc, '10. How do your products/services compare to the competition?', questionnaire.competitionComparison);
+
+      // Market and Customers
+      addSectionHeader(doc, 'MARKET AND CUSTOMERS');
+      addQuestion(doc, '11. Provide general description of the market?', questionnaire.marketDescription);
+      addQuestion(doc, '12. What is the typical customer profile?', questionnaire.customerProfile);
+      addQuestion(doc, '13. What geographic market is the company servicing?', questionnaire.geographicMarket);
+      addQuestion(doc, '14. Please provide your market position – how much market share?', questionnaire.marketPosition);
+      addQuestion(doc, '15. Are there any industry trends that could affect the company – positively or negatively?', questionnaire.industryTrends);
+      addQuestion(doc, '16. List top 5 customers and their percentage of sales for last full year and projected year.', questionnaire.top5Customers);
+      addQuestion(doc, '17. Provide description of the top 3 customers including length of relationship, strength of relationship and contracts (if any).', questionnaire.top3CustomersDescription);
+
+      // Sales and Marketing
+      addSectionHeader(doc, 'SALES AND MARKETING');
+      addQuestion(doc, '18. Describe the company\'s general marketing plan. List each type of marketing media.', questionnaire.marketingPlan);
+      addQuestion(doc, '19. What type of marketing creates the most revenue?', questionnaire.mostRevenueMarketing);
+      addQuestion(doc, '20. Does the company have an Internet presence?', questionnaire.internetPresence);
+      addQuestion(doc, '21. What marketing/advertising will/should be considered in the future?', questionnaire.futureMarketing);
+      addQuestion(doc, '22. Does the company utilize sales people? If so, please describe the selling process?', questionnaire.salesPeople);
+      addQuestion(doc, '23. Are there any key sales people? If so, is there an employee contract or non-compete?', questionnaire.keySalesPeople);
+      addQuestion(doc, '24. What could make the sales process more efficient?', questionnaire.salesProcessEfficiency);
+
+      // Competition
+      addSectionHeader(doc, 'COMPETITION');
+      addQuestion(doc, '25. Provide general description of the competition.', questionnaire.competitionDescription);
+      addQuestion(doc, '26. List top 3 direct competitors and give brief description of each.', questionnaire.top3Competitors);
+      addQuestion(doc, '27. On what basis do you compete with your competitors (price, service, etc.)?', questionnaire.competitionBasis);
+      addQuestion(doc, '28. What are your competitive advantages over the competition?', questionnaire.competitiveAdvantages);
+      addQuestion(doc, '29. What are your weaknesses vs. the competition?', questionnaire.competitiveWeaknesses);
+      addQuestion(doc, '30. Do you see any future direct and/or indirect competition – if so, from where and who?', questionnaire.futureCompetition);
+
+      // Operations
+      addSectionHeader(doc, 'OPERATIONS');
+      addQuestion(doc, '31. Explain product/service distribution from initial call to collection.', questionnaire.distributionProcess);
+      addQuestion(doc, '32. Explain orders/billings/collection process and terms (A/R & A/P).', questionnaire.ordersBillingsCollection);
+      addQuestion(doc, '33. Describe the inventory process – storage, turnover, etc.', questionnaire.inventoryProcess);
+      addQuestion(doc, '34. Describe pricing structure and future pricing considerations, and bidding process, if any, for obtaining work.', questionnaire.pricingStructure);
+      addQuestion(doc, '35. List days and hours of operation.', questionnaire.operationDaysHours);
+      addQuestion(doc, '36. Are there any pending litigation matters or current lawsuits? If so, explain.', questionnaire.pendingLitigation);
+
+      // Staffing Tables
+      addSectionHeader(doc, 'ORGANIZATION - STAFFING');
+      if (questionnaire.staffingTable && questionnaire.staffingTable.length > 0) {
+        addStaffingTable(doc, questionnaire.staffingTable);
+      }
+      
+      if (questionnaire.weeklyStaffingTable && questionnaire.weeklyStaffingTable.length > 0) {
+        addWeeklyStaffingTable(doc, questionnaire.weeklyStaffingTable);
+      }
+
+      // More Organization Questions
+      addQuestion(doc, '38. Describe the importance of any key employees, will they stay, and how hard will they be to replace?', questionnaire.keyEmployeesImportance);
+      addQuestion(doc, '39. Is there an Employee Stock Ownership Plan (ESOP)? If so, when was it established?', questionnaire.esopPlan);
+      addQuestion(doc, '40. Who keeps the financials on a daily basis? How is payroll done? How often do you get P&L statements? Who does them? Who does your taxes?', questionnaire.financialKeeping);
+
+      // Owner Involvement
+      addSectionHeader(doc, 'OWNER INVOLVEMENT');
+      addQuestion(doc, '41. Do the owner(s) actively manage? If yes, please list primary duties and hours worked per week?', questionnaire.ownerManagement);
+      addQuestion(doc, '42. If the owner(s) will need to be replaced with new management, describe the job title, salary, etc. it would take to replace the owner(s)?', questionnaire.replacementManagement);
+      addQuestion(doc, '43. What is the owner(s) reason for selling?', questionnaire.sellingReason);
+      addQuestion(doc, '44. What licenses are required to operate this business?', questionnaire.requiredLicenses);
+
+      // Facilities and Assets
+      addSectionHeader(doc, 'FACILITIES AND ASSETS');
+      addQuestion(doc, '45. Describe the company\'s facilities – square ft., location, etc.', questionnaire.facilitiesDescription);
+      addQuestion(doc, '46. Are the facilities leased or owned? If leased, please describe lease terms.', questionnaire.facilitiesLeasedOwned);
+      addQuestion(doc, '47. What percentage of the company\'s facilities is fully utilized? Is there room to expand?', questionnaire.facilitiesUtilization);
+      addQuestion(doc, '48. Describe the general condition of the company\'s assets.', questionnaire.assetsCondition);
+      addQuestion(doc, '49. Approximately how much has the company spent each year on capital expenditures/improvements?', questionnaire.capitalExpenditures);
+      addQuestion(doc, '50. To reach the projected sales, approximately how much will the company have to spend on capital expenditures/improvements each year? Please describe?', questionnaire.futureCapitalExpenditures);
+
+      // Financial Overview
+      addSectionHeader(doc, 'FINANCIAL OVERVIEW');
+      addQuestion(doc, '51. Describe financial trends over the last 5 years.', questionnaire.financialTrends);
+      addQuestion(doc, '52. What factors have affected revenue and/or profitability?', questionnaire.revenueFactors);
+      addQuestion(doc, '53. What could management do to increase revenue?', questionnaire.increaseRevenue);
+      addQuestion(doc, '54. What could management do to increase profitability?', questionnaire.increaseProfitability);
+      addQuestion(doc, '55. Does the company have to rely on short-term debt for working capital purposes? Please explain the nature of the accounts receivable.', questionnaire.shortTermDebt);
+
+      // Technology Overview
+      addSectionHeader(doc, 'TECHNOLOGY OVERVIEW');
+      addQuestion(doc, '56. Describe technology used in daily operations.', questionnaire.technologyDescription);
+      addQuestion(doc, '57. Is technology up to date?', questionnaire.technologyUpToDate);
+      addQuestion(doc, '58. Would newer technology increase efficiency?', questionnaire.newerTechnologyEfficiency);
+      addQuestion(doc, '59. Does company rely upon its own technology and if so, how often is it updated?', questionnaire.ownTechnologyReliance);
+
+      // Other Important Information
+      addSectionHeader(doc, 'OTHER IMPORTANT INFORMATION');
+      addQuestion(doc, '60. Please list any other important factors not included above?', questionnaire.otherImportantInfo);
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+function addSectionHeader(doc: any, title: string) {
+  // Add a new page if not enough space
+  if (doc.y > 700) {
+    doc.addPage();
+  }
+  
+  // Ensure we're starting from the left margin
+  doc.x = 50;
+  
+  doc.fontSize(16).font('Helvetica-Bold').text(title, 50, doc.y, { underline: true });
+  doc.moveDown();
+}
+
+function addQuestion(doc: any, question: string, answer: string) {
+  // Add a new page if not enough space
+  if (doc.y > 720) {
+    doc.addPage();
+  }
+  
+  // Ensure we're starting from the left margin
+  doc.x = 50;
+  
+  doc.fontSize(12).font('Helvetica-Bold').text(question, 50, doc.y);
+  doc.moveDown(0.5);
+  doc.fontSize(11).font('Helvetica').text(answer || 'No answer provided.', 50, doc.y);
+  doc.moveDown(1);
+}
+
+function addStaffingTable(doc: any, staffingData: any[]) {
+  doc.addPage();
+  doc.fontSize(14).font('Helvetica-Bold').text('Staffing, Wages, and Benefits', { underline: true });
+  doc.moveDown();
+
+  const startX = 50;
+  let startY = doc.y;
+  const rowHeight = 25;
+  const colWidths = [100, 60, 60, 60, 80, 60, 80];
+
+  // Table headers
+  const headers = ['Title/Job', 'Pay Rate', 'Weekly Hours', 'Years of Service', 'Health Insurance', 'Vacation (Weeks)', 'Staying With Business?'];
+  
+  // Draw header row
+  doc.fontSize(10).font('Helvetica-Bold');
+  let currentX = startX;
+  headers.forEach((header, i) => {
+    doc.rect(currentX, startY, colWidths[i], rowHeight).stroke();
+    doc.text(header, currentX + 2, startY + 5, { width: colWidths[i] - 4, align: 'center' });
+    currentX += colWidths[i];
+  });
+
+  // Draw data rows
+  doc.font('Helvetica');
+  staffingData.forEach((row, rowIndex) => {
+    startY += rowHeight;
+    currentX = startX;
+    
+    const values = [
+      row.titleJob || '',
+      row.payRate || '',
+      row.weeklyHours || '',
+      row.yearsOfService || '',
+      row.healthInsurance || '',
+      row.vacationWeeks || '',
+      row.stayingWithBusiness || ''
+    ];
+
+    values.forEach((value, colIndex) => {
+      doc.rect(currentX, startY, colWidths[colIndex], rowHeight).stroke();
+      doc.text(value, currentX + 2, startY + 5, { width: colWidths[colIndex] - 4, align: 'center' });
+      currentX += colWidths[colIndex];
+    });
+  });
+  
+  // Reset document position after table
+  doc.y = startY + rowHeight + 20; // Move Y position below the table with some spacing
+  doc.x = 50; // Reset X position to left margin
+}
+
+function addWeeklyStaffingTable(doc: any, weeklyData: any[]) {
+  doc.addPage();
+  doc.fontSize(14).font('Helvetica-Bold').text('Weekly Staffing', { underline: true });
+  doc.moveDown();
+
+  const startX = 50;
+  let startY = doc.y;
+  const rowHeight = 25;
+  const colWidths = [100, 60, 60, 60, 60, 60, 60, 60];
+
+  // Table headers
+  const headers = ['Title/Job', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  // Draw header row
+  doc.fontSize(10).font('Helvetica-Bold');
+  let currentX = startX;
+  headers.forEach((header, i) => {
+    doc.rect(currentX, startY, colWidths[i], rowHeight).stroke();
+    doc.text(header, currentX + 2, startY + 5, { width: colWidths[i] - 4, align: 'center' });
+    currentX += colWidths[i];
+  });
+
+  // Draw data rows
+  doc.font('Helvetica');
+  weeklyData.forEach((row, rowIndex) => {
+    startY += rowHeight;
+    currentX = startX;
+    
+    const values = [
+      row.titleJob || '',
+      row.mon || '',
+      row.tue || '',
+      row.wed || '',
+      row.thu || '',
+      row.fri || '',
+      row.sat || '',
+      row.sun || ''
+    ];
+
+    values.forEach((value, colIndex) => {
+      doc.rect(currentX, startY, colWidths[colIndex], rowHeight).stroke();
+      doc.text(value, currentX + 2, startY + 5, { width: colWidths[colIndex] - 4, align: 'center' });
+      currentX += colWidths[colIndex];
+    });
+  });
+  
+  // Reset document position after table
+  doc.y = startY + rowHeight + 20; // Move Y position below the table with some spacing
+  doc.x = 50; // Reset X position to left margin
+}
 
 router.get('/dashboard', authenticateSeller, getDashboardStats);
 router.get('/listings', authenticateSeller, getListings);

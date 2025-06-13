@@ -53,6 +53,11 @@ export type Listing = $Result.DefaultSelection<Prisma.$ListingPayload>
  * 
  */
 export type Activity = $Result.DefaultSelection<Prisma.$ActivityPayload>
+/**
+ * Model SellerQuestionnaire
+ * 
+ */
+export type SellerQuestionnaire = $Result.DefaultSelection<Prisma.$SellerQuestionnairePayload>
 
 /**
  * Enums
@@ -367,6 +372,16 @@ export class PrismaClient<
     * ```
     */
   get activity(): Prisma.ActivityDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.sellerQuestionnaire`: Exposes CRUD operations for the **SellerQuestionnaire** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SellerQuestionnaires
+    * const sellerQuestionnaires = await prisma.sellerQuestionnaire.findMany()
+    * ```
+    */
+  get sellerQuestionnaire(): Prisma.SellerQuestionnaireDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -425,8 +440,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.7.0
-   * Query Engine version: 3cff47a7f5d65c3ea74883f1d736e41d68ce91ed
+   * Prisma Client JS version: 6.9.0
+   * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
    */
   export type PrismaVersion = {
     client: string
@@ -814,7 +829,8 @@ export namespace Prisma {
     Message: 'Message',
     MessageAttachment: 'MessageAttachment',
     Listing: 'Listing',
-    Activity: 'Activity'
+    Activity: 'Activity',
+    SellerQuestionnaire: 'SellerQuestionnaire'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -833,7 +849,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "document" | "user" | "sellerProgress" | "buyerProgress" | "message" | "messageAttachment" | "listing" | "activity"
+      modelProps: "document" | "user" | "sellerProgress" | "buyerProgress" | "message" | "messageAttachment" | "listing" | "activity" | "sellerQuestionnaire"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1429,6 +1445,80 @@ export namespace Prisma {
           }
         }
       }
+      SellerQuestionnaire: {
+        payload: Prisma.$SellerQuestionnairePayload<ExtArgs>
+        fields: Prisma.SellerQuestionnaireFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SellerQuestionnaireFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SellerQuestionnaireFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          findFirst: {
+            args: Prisma.SellerQuestionnaireFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SellerQuestionnaireFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          findMany: {
+            args: Prisma.SellerQuestionnaireFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>[]
+          }
+          create: {
+            args: Prisma.SellerQuestionnaireCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          createMany: {
+            args: Prisma.SellerQuestionnaireCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SellerQuestionnaireCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>[]
+          }
+          delete: {
+            args: Prisma.SellerQuestionnaireDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          update: {
+            args: Prisma.SellerQuestionnaireUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          deleteMany: {
+            args: Prisma.SellerQuestionnaireDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SellerQuestionnaireUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SellerQuestionnaireUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>[]
+          }
+          upsert: {
+            args: Prisma.SellerQuestionnaireUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          aggregate: {
+            args: Prisma.SellerQuestionnaireAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSellerQuestionnaire>
+          }
+          groupBy: {
+            args: Prisma.SellerQuestionnaireGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SellerQuestionnaireGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SellerQuestionnaireCountArgs<ExtArgs>
+            result: $Utils.Optional<SellerQuestionnaireCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1521,6 +1611,7 @@ export namespace Prisma {
     messageAttachment?: MessageAttachmentOmit
     listing?: ListingOmit
     activity?: ActivityOmit
+    sellerQuestionnaire?: SellerQuestionnaireOmit
   }
 
   /* Types for Logging */
@@ -3416,6 +3507,7 @@ export namespace Prisma {
     buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
     sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
     buyerProgress?: boolean | User$buyerProgressArgs<ExtArgs>
+    sellerQuestionnaire?: boolean | User$sellerQuestionnaireArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3474,6 +3566,7 @@ export namespace Prisma {
     buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
     sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
     buyerProgress?: boolean | User$buyerProgressArgs<ExtArgs>
+    sellerQuestionnaire?: boolean | User$sellerQuestionnaireArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3498,6 +3591,7 @@ export namespace Prisma {
       buyingListings: Prisma.$ListingPayload<ExtArgs>[]
       sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
       buyerProgress: Prisma.$BuyerProgressPayload<ExtArgs>[]
+      sellerQuestionnaire: Prisma.$SellerQuestionnairePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3916,6 +4010,7 @@ export namespace Prisma {
     buyingListings<T extends User$buyingListingsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyingListingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sellerProgress<T extends User$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyerProgress<T extends User$buyerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerQuestionnaire<T extends User$sellerQuestionnaireArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerQuestionnaireArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4631,6 +4726,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * User.sellerQuestionnaire
+   */
+  export type User$sellerQuestionnaireArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    where?: SellerQuestionnaireWhereInput
   }
 
   /**
@@ -11646,6 +11760,1086 @@ export namespace Prisma {
 
 
   /**
+   * Model SellerQuestionnaire
+   */
+
+  export type AggregateSellerQuestionnaire = {
+    _count: SellerQuestionnaireCountAggregateOutputType | null
+    _min: SellerQuestionnaireMinAggregateOutputType | null
+    _max: SellerQuestionnaireMaxAggregateOutputType | null
+  }
+
+  export type SellerQuestionnaireMinAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerQuestionnaireMaxAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerQuestionnaireCountAggregateOutputType = {
+    id: number
+    sellerId: number
+    data: number
+    submitted: number
+    submittedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SellerQuestionnaireMinAggregateInputType = {
+    id?: true
+    sellerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerQuestionnaireMaxAggregateInputType = {
+    id?: true
+    sellerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerQuestionnaireCountAggregateInputType = {
+    id?: true
+    sellerId?: true
+    data?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SellerQuestionnaireAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerQuestionnaire to aggregate.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SellerQuestionnaires
+    **/
+    _count?: true | SellerQuestionnaireCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SellerQuestionnaireMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SellerQuestionnaireMaxAggregateInputType
+  }
+
+  export type GetSellerQuestionnaireAggregateType<T extends SellerQuestionnaireAggregateArgs> = {
+        [P in keyof T & keyof AggregateSellerQuestionnaire]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSellerQuestionnaire[P]>
+      : GetScalarType<T[P], AggregateSellerQuestionnaire[P]>
+  }
+
+
+
+
+  export type SellerQuestionnaireGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerQuestionnaireWhereInput
+    orderBy?: SellerQuestionnaireOrderByWithAggregationInput | SellerQuestionnaireOrderByWithAggregationInput[]
+    by: SellerQuestionnaireScalarFieldEnum[] | SellerQuestionnaireScalarFieldEnum
+    having?: SellerQuestionnaireScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SellerQuestionnaireCountAggregateInputType | true
+    _min?: SellerQuestionnaireMinAggregateInputType
+    _max?: SellerQuestionnaireMaxAggregateInputType
+  }
+
+  export type SellerQuestionnaireGroupByOutputType = {
+    id: string
+    sellerId: string
+    data: JsonValue
+    submitted: boolean
+    submittedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SellerQuestionnaireCountAggregateOutputType | null
+    _min: SellerQuestionnaireMinAggregateOutputType | null
+    _max: SellerQuestionnaireMaxAggregateOutputType | null
+  }
+
+  type GetSellerQuestionnaireGroupByPayload<T extends SellerQuestionnaireGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SellerQuestionnaireGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SellerQuestionnaireGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SellerQuestionnaireGroupByOutputType[P]>
+            : GetScalarType<T[P], SellerQuestionnaireGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SellerQuestionnaireSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerQuestionnaire"]>
+
+  export type SellerQuestionnaireSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerQuestionnaire"]>
+
+  export type SellerQuestionnaireSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerQuestionnaire"]>
+
+  export type SellerQuestionnaireSelectScalar = {
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SellerQuestionnaireOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sellerId" | "data" | "submitted" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerQuestionnaire"]>
+  export type SellerQuestionnaireInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SellerQuestionnaireIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SellerQuestionnaireIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SellerQuestionnairePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SellerQuestionnaire"
+    objects: {
+      seller: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sellerId: string
+      data: Prisma.JsonValue
+      submitted: boolean
+      submittedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["sellerQuestionnaire"]>
+    composites: {}
+  }
+
+  type SellerQuestionnaireGetPayload<S extends boolean | null | undefined | SellerQuestionnaireDefaultArgs> = $Result.GetResult<Prisma.$SellerQuestionnairePayload, S>
+
+  type SellerQuestionnaireCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SellerQuestionnaireFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SellerQuestionnaireCountAggregateInputType | true
+    }
+
+  export interface SellerQuestionnaireDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SellerQuestionnaire'], meta: { name: 'SellerQuestionnaire' } }
+    /**
+     * Find zero or one SellerQuestionnaire that matches the filter.
+     * @param {SellerQuestionnaireFindUniqueArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SellerQuestionnaireFindUniqueArgs>(args: SelectSubset<T, SellerQuestionnaireFindUniqueArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SellerQuestionnaire that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SellerQuestionnaireFindUniqueOrThrowArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SellerQuestionnaireFindUniqueOrThrowArgs>(args: SelectSubset<T, SellerQuestionnaireFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerQuestionnaire that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireFindFirstArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SellerQuestionnaireFindFirstArgs>(args?: SelectSubset<T, SellerQuestionnaireFindFirstArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerQuestionnaire that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireFindFirstOrThrowArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SellerQuestionnaireFindFirstOrThrowArgs>(args?: SelectSubset<T, SellerQuestionnaireFindFirstOrThrowArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SellerQuestionnaires that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SellerQuestionnaires
+     * const sellerQuestionnaires = await prisma.sellerQuestionnaire.findMany()
+     * 
+     * // Get first 10 SellerQuestionnaires
+     * const sellerQuestionnaires = await prisma.sellerQuestionnaire.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sellerQuestionnaireWithIdOnly = await prisma.sellerQuestionnaire.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SellerQuestionnaireFindManyArgs>(args?: SelectSubset<T, SellerQuestionnaireFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SellerQuestionnaire.
+     * @param {SellerQuestionnaireCreateArgs} args - Arguments to create a SellerQuestionnaire.
+     * @example
+     * // Create one SellerQuestionnaire
+     * const SellerQuestionnaire = await prisma.sellerQuestionnaire.create({
+     *   data: {
+     *     // ... data to create a SellerQuestionnaire
+     *   }
+     * })
+     * 
+     */
+    create<T extends SellerQuestionnaireCreateArgs>(args: SelectSubset<T, SellerQuestionnaireCreateArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SellerQuestionnaires.
+     * @param {SellerQuestionnaireCreateManyArgs} args - Arguments to create many SellerQuestionnaires.
+     * @example
+     * // Create many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SellerQuestionnaireCreateManyArgs>(args?: SelectSubset<T, SellerQuestionnaireCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SellerQuestionnaires and returns the data saved in the database.
+     * @param {SellerQuestionnaireCreateManyAndReturnArgs} args - Arguments to create many SellerQuestionnaires.
+     * @example
+     * // Create many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SellerQuestionnaires and only return the `id`
+     * const sellerQuestionnaireWithIdOnly = await prisma.sellerQuestionnaire.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SellerQuestionnaireCreateManyAndReturnArgs>(args?: SelectSubset<T, SellerQuestionnaireCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SellerQuestionnaire.
+     * @param {SellerQuestionnaireDeleteArgs} args - Arguments to delete one SellerQuestionnaire.
+     * @example
+     * // Delete one SellerQuestionnaire
+     * const SellerQuestionnaire = await prisma.sellerQuestionnaire.delete({
+     *   where: {
+     *     // ... filter to delete one SellerQuestionnaire
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SellerQuestionnaireDeleteArgs>(args: SelectSubset<T, SellerQuestionnaireDeleteArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SellerQuestionnaire.
+     * @param {SellerQuestionnaireUpdateArgs} args - Arguments to update one SellerQuestionnaire.
+     * @example
+     * // Update one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SellerQuestionnaireUpdateArgs>(args: SelectSubset<T, SellerQuestionnaireUpdateArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SellerQuestionnaires.
+     * @param {SellerQuestionnaireDeleteManyArgs} args - Arguments to filter SellerQuestionnaires to delete.
+     * @example
+     * // Delete a few SellerQuestionnaires
+     * const { count } = await prisma.sellerQuestionnaire.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SellerQuestionnaireDeleteManyArgs>(args?: SelectSubset<T, SellerQuestionnaireDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerQuestionnaires.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SellerQuestionnaireUpdateManyArgs>(args: SelectSubset<T, SellerQuestionnaireUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerQuestionnaires and returns the data updated in the database.
+     * @param {SellerQuestionnaireUpdateManyAndReturnArgs} args - Arguments to update many SellerQuestionnaires.
+     * @example
+     * // Update many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SellerQuestionnaires and only return the `id`
+     * const sellerQuestionnaireWithIdOnly = await prisma.sellerQuestionnaire.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SellerQuestionnaireUpdateManyAndReturnArgs>(args: SelectSubset<T, SellerQuestionnaireUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SellerQuestionnaire.
+     * @param {SellerQuestionnaireUpsertArgs} args - Arguments to update or create a SellerQuestionnaire.
+     * @example
+     * // Update or create a SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.upsert({
+     *   create: {
+     *     // ... data to create a SellerQuestionnaire
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SellerQuestionnaire we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SellerQuestionnaireUpsertArgs>(args: SelectSubset<T, SellerQuestionnaireUpsertArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SellerQuestionnaires.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireCountArgs} args - Arguments to filter SellerQuestionnaires to count.
+     * @example
+     * // Count the number of SellerQuestionnaires
+     * const count = await prisma.sellerQuestionnaire.count({
+     *   where: {
+     *     // ... the filter for the SellerQuestionnaires we want to count
+     *   }
+     * })
+    **/
+    count<T extends SellerQuestionnaireCountArgs>(
+      args?: Subset<T, SellerQuestionnaireCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SellerQuestionnaireCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SellerQuestionnaire.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SellerQuestionnaireAggregateArgs>(args: Subset<T, SellerQuestionnaireAggregateArgs>): Prisma.PrismaPromise<GetSellerQuestionnaireAggregateType<T>>
+
+    /**
+     * Group by SellerQuestionnaire.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SellerQuestionnaireGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SellerQuestionnaireGroupByArgs['orderBy'] }
+        : { orderBy?: SellerQuestionnaireGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SellerQuestionnaireGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSellerQuestionnaireGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SellerQuestionnaire model
+   */
+  readonly fields: SellerQuestionnaireFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SellerQuestionnaire.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SellerQuestionnaireClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SellerQuestionnaire model
+   */
+  interface SellerQuestionnaireFieldRefs {
+    readonly id: FieldRef<"SellerQuestionnaire", 'String'>
+    readonly sellerId: FieldRef<"SellerQuestionnaire", 'String'>
+    readonly data: FieldRef<"SellerQuestionnaire", 'Json'>
+    readonly submitted: FieldRef<"SellerQuestionnaire", 'Boolean'>
+    readonly submittedAt: FieldRef<"SellerQuestionnaire", 'DateTime'>
+    readonly createdAt: FieldRef<"SellerQuestionnaire", 'DateTime'>
+    readonly updatedAt: FieldRef<"SellerQuestionnaire", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SellerQuestionnaire findUnique
+   */
+  export type SellerQuestionnaireFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire findUniqueOrThrow
+   */
+  export type SellerQuestionnaireFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire findFirst
+   */
+  export type SellerQuestionnaireFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerQuestionnaires.
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerQuestionnaires.
+     */
+    distinct?: SellerQuestionnaireScalarFieldEnum | SellerQuestionnaireScalarFieldEnum[]
+  }
+
+  /**
+   * SellerQuestionnaire findFirstOrThrow
+   */
+  export type SellerQuestionnaireFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerQuestionnaires.
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerQuestionnaires.
+     */
+    distinct?: SellerQuestionnaireScalarFieldEnum | SellerQuestionnaireScalarFieldEnum[]
+  }
+
+  /**
+   * SellerQuestionnaire findMany
+   */
+  export type SellerQuestionnaireFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaires to fetch.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SellerQuestionnaires.
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    distinct?: SellerQuestionnaireScalarFieldEnum | SellerQuestionnaireScalarFieldEnum[]
+  }
+
+  /**
+   * SellerQuestionnaire create
+   */
+  export type SellerQuestionnaireCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SellerQuestionnaire.
+     */
+    data: XOR<SellerQuestionnaireCreateInput, SellerQuestionnaireUncheckedCreateInput>
+  }
+
+  /**
+   * SellerQuestionnaire createMany
+   */
+  export type SellerQuestionnaireCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SellerQuestionnaires.
+     */
+    data: SellerQuestionnaireCreateManyInput | SellerQuestionnaireCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SellerQuestionnaire createManyAndReturn
+   */
+  export type SellerQuestionnaireCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * The data used to create many SellerQuestionnaires.
+     */
+    data: SellerQuestionnaireCreateManyInput | SellerQuestionnaireCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerQuestionnaire update
+   */
+  export type SellerQuestionnaireUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SellerQuestionnaire.
+     */
+    data: XOR<SellerQuestionnaireUpdateInput, SellerQuestionnaireUncheckedUpdateInput>
+    /**
+     * Choose, which SellerQuestionnaire to update.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire updateMany
+   */
+  export type SellerQuestionnaireUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SellerQuestionnaires.
+     */
+    data: XOR<SellerQuestionnaireUpdateManyMutationInput, SellerQuestionnaireUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerQuestionnaires to update
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * Limit how many SellerQuestionnaires to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerQuestionnaire updateManyAndReturn
+   */
+  export type SellerQuestionnaireUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * The data used to update SellerQuestionnaires.
+     */
+    data: XOR<SellerQuestionnaireUpdateManyMutationInput, SellerQuestionnaireUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerQuestionnaires to update
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * Limit how many SellerQuestionnaires to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerQuestionnaire upsert
+   */
+  export type SellerQuestionnaireUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SellerQuestionnaire to update in case it exists.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+    /**
+     * In case the SellerQuestionnaire found by the `where` argument doesn't exist, create a new SellerQuestionnaire with this data.
+     */
+    create: XOR<SellerQuestionnaireCreateInput, SellerQuestionnaireUncheckedCreateInput>
+    /**
+     * In case the SellerQuestionnaire was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SellerQuestionnaireUpdateInput, SellerQuestionnaireUncheckedUpdateInput>
+  }
+
+  /**
+   * SellerQuestionnaire delete
+   */
+  export type SellerQuestionnaireDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter which SellerQuestionnaire to delete.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire deleteMany
+   */
+  export type SellerQuestionnaireDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerQuestionnaires to delete
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * Limit how many SellerQuestionnaires to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerQuestionnaire without action
+   */
+  export type SellerQuestionnaireDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -11782,6 +12976,19 @@ export namespace Prisma {
   };
 
   export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+
+
+  export const SellerQuestionnaireScalarFieldEnum: {
+    id: 'id',
+    sellerId: 'sellerId',
+    data: 'data',
+    submitted: 'submitted',
+    submittedAt: 'submittedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SellerQuestionnaireScalarFieldEnum = (typeof SellerQuestionnaireScalarFieldEnum)[keyof typeof SellerQuestionnaireScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -12167,6 +13374,7 @@ export namespace Prisma {
     buyingListings?: ListingListRelationFilter
     sellerProgress?: SellerProgressListRelationFilter
     buyerProgress?: BuyerProgressListRelationFilter
+    sellerQuestionnaire?: XOR<SellerQuestionnaireNullableScalarRelationFilter, SellerQuestionnaireWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -12192,6 +13400,7 @@ export namespace Prisma {
     buyingListings?: ListingOrderByRelationAggregateInput
     sellerProgress?: SellerProgressOrderByRelationAggregateInput
     buyerProgress?: BuyerProgressOrderByRelationAggregateInput
+    sellerQuestionnaire?: SellerQuestionnaireOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -12220,6 +13429,7 @@ export namespace Prisma {
     buyingListings?: ListingListRelationFilter
     sellerProgress?: SellerProgressListRelationFilter
     buyerProgress?: BuyerProgressListRelationFilter
+    sellerQuestionnaire?: XOR<SellerQuestionnaireNullableScalarRelationFilter, SellerQuestionnaireWhereInput> | null
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -12724,6 +13934,71 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Activity"> | Date | string
   }
 
+  export type SellerQuestionnaireWhereInput = {
+    AND?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    OR?: SellerQuestionnaireWhereInput[]
+    NOT?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    id?: StringFilter<"SellerQuestionnaire"> | string
+    sellerId?: StringFilter<"SellerQuestionnaire"> | string
+    data?: JsonFilter<"SellerQuestionnaire">
+    submitted?: BoolFilter<"SellerQuestionnaire"> | boolean
+    submittedAt?: DateTimeNullableFilter<"SellerQuestionnaire"> | Date | string | null
+    createdAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SellerQuestionnaireOrderByWithRelationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    seller?: UserOrderByWithRelationInput
+  }
+
+  export type SellerQuestionnaireWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sellerId?: string
+    AND?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    OR?: SellerQuestionnaireWhereInput[]
+    NOT?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    data?: JsonFilter<"SellerQuestionnaire">
+    submitted?: BoolFilter<"SellerQuestionnaire"> | boolean
+    submittedAt?: DateTimeNullableFilter<"SellerQuestionnaire"> | Date | string | null
+    createdAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "sellerId">
+
+  export type SellerQuestionnaireOrderByWithAggregationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SellerQuestionnaireCountOrderByAggregateInput
+    _max?: SellerQuestionnaireMaxOrderByAggregateInput
+    _min?: SellerQuestionnaireMinOrderByAggregateInput
+  }
+
+  export type SellerQuestionnaireScalarWhereWithAggregatesInput = {
+    AND?: SellerQuestionnaireScalarWhereWithAggregatesInput | SellerQuestionnaireScalarWhereWithAggregatesInput[]
+    OR?: SellerQuestionnaireScalarWhereWithAggregatesInput[]
+    NOT?: SellerQuestionnaireScalarWhereWithAggregatesInput | SellerQuestionnaireScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SellerQuestionnaire"> | string
+    sellerId?: StringWithAggregatesFilter<"SellerQuestionnaire"> | string
+    data?: JsonWithAggregatesFilter<"SellerQuestionnaire">
+    submitted?: BoolWithAggregatesFilter<"SellerQuestionnaire"> | boolean
+    submittedAt?: DateTimeNullableWithAggregatesFilter<"SellerQuestionnaire"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SellerQuestionnaire"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SellerQuestionnaire"> | Date | string
+  }
+
   export type DocumentCreateInput = {
     id?: string
     type: $Enums.DocumentType
@@ -12882,6 +14157,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -12906,6 +14182,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserUpdateInput = {
@@ -12930,6 +14207,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -12954,6 +14232,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -13484,6 +14763,75 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SellerQuestionnaireCreateInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerQuestionnaireInput
+  }
+
+  export type SellerQuestionnaireUncheckedCreateInput = {
+    id?: string
+    sellerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerQuestionnaireNestedInput
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerQuestionnaireCreateManyInput = {
+    id?: string
+    sellerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -13843,6 +15191,11 @@ export namespace Prisma {
     every?: BuyerProgressWhereInput
     some?: BuyerProgressWhereInput
     none?: BuyerProgressWhereInput
+  }
+
+  export type SellerQuestionnaireNullableScalarRelationFilter = {
+    is?: SellerQuestionnaireWhereInput | null
+    isNot?: SellerQuestionnaireWhereInput | null
   }
 
   export type UserOrderByRelationAggregateInput = {
@@ -14368,6 +15721,34 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
+  export type SellerQuestionnaireCountOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerQuestionnaireMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerQuestionnaireMinOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type UserCreateNestedOneWithoutSellerDocsInput = {
     create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
@@ -14552,6 +15933,12 @@ export namespace Prisma {
     connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
   }
 
+  export type SellerQuestionnaireCreateNestedOneWithoutSellerInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    connect?: SellerQuestionnaireWhereUniqueInput
+  }
+
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -14626,6 +16013,12 @@ export namespace Prisma {
     connectOrCreate?: BuyerProgressCreateOrConnectWithoutBuyerInput | BuyerProgressCreateOrConnectWithoutBuyerInput[]
     createMany?: BuyerProgressCreateManyBuyerInputEnvelope
     connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+  }
+
+  export type SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    connect?: SellerQuestionnaireWhereUniqueInput
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -14803,6 +16196,16 @@ export namespace Prisma {
     deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
   }
 
+  export type SellerQuestionnaireUpdateOneWithoutSellerNestedInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    upsert?: SellerQuestionnaireUpsertWithoutSellerInput
+    disconnect?: SellerQuestionnaireWhereInput | boolean
+    delete?: SellerQuestionnaireWhereInput | boolean
+    connect?: SellerQuestionnaireWhereUniqueInput
+    update?: XOR<XOR<SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput, SellerQuestionnaireUpdateWithoutSellerInput>, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+  }
+
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -14954,6 +16357,16 @@ export namespace Prisma {
     update?: BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput | BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput[]
     updateMany?: BuyerProgressUpdateManyWithWhereWithoutBuyerInput | BuyerProgressUpdateManyWithWhereWithoutBuyerInput[]
     deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    upsert?: SellerQuestionnaireUpsertWithoutSellerInput
+    disconnect?: SellerQuestionnaireWhereInput | boolean
+    delete?: SellerQuestionnaireWhereInput | boolean
+    connect?: SellerQuestionnaireWhereUniqueInput
+    update?: XOR<XOR<SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput, SellerQuestionnaireUpdateWithoutSellerInput>, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
   }
 
   export type UserCreateNestedOneWithoutSellerProgressInput = {
@@ -15370,6 +16783,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActivitiesInput, UserUpdateWithoutActivitiesInput>, UserUncheckedUpdateWithoutActivitiesInput>
   }
 
+  export type UserCreateNestedOneWithoutSellerQuestionnaireInput = {
+    create?: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerQuestionnaireInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSellerQuestionnaireNestedInput = {
+    create?: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerQuestionnaireInput
+    upsert?: UserUpsertWithoutSellerQuestionnaireInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerQuestionnaireInput, UserUpdateWithoutSellerQuestionnaireInput>, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -15773,6 +17200,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSellerDocsInput = {
@@ -15796,6 +17224,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSellerDocsInput = {
@@ -15824,6 +17253,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBuyerDocsInput = {
@@ -15847,6 +17277,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBuyerDocsInput = {
@@ -15906,6 +17337,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutUploadedDocumentsInput = {
@@ -15929,6 +17361,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutUploadedDocumentsInput = {
@@ -15968,6 +17401,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerDocsInput = {
@@ -15991,6 +17425,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUpsertWithoutBuyerDocsInput = {
@@ -16025,6 +17460,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerDocsInput = {
@@ -16048,6 +17484,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type ListingUpsertWithoutDocumentsInput = {
@@ -16119,6 +17556,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUploadedDocumentsInput = {
@@ -16142,6 +17580,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserCreateWithoutManagingInput = {
@@ -16165,6 +17604,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -16188,6 +17628,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -16216,6 +17657,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -16239,6 +17681,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -16646,6 +18089,29 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SellerQuestionnaireCreateWithoutSellerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireUncheckedCreateWithoutSellerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireCreateOrConnectWithoutSellerInput = {
+    where: SellerQuestionnaireWhereUniqueInput
+    create: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -16678,6 +18144,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -16701,6 +18168,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -16991,6 +18459,35 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"BuyerProgress"> | Date | string
   }
 
+  export type SellerQuestionnaireUpsertWithoutSellerInput = {
+    update: XOR<SellerQuestionnaireUpdateWithoutSellerInput, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+    create: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    where?: SellerQuestionnaireWhereInput
+  }
+
+  export type SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput = {
+    where?: SellerQuestionnaireWhereInput
+    data: XOR<SellerQuestionnaireUpdateWithoutSellerInput, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type SellerQuestionnaireUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateWithoutSellerProgressInput = {
     id?: string
     email: string
@@ -17012,6 +18509,7 @@ export namespace Prisma {
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSellerProgressInput = {
@@ -17035,6 +18533,7 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSellerProgressInput = {
@@ -17105,6 +18604,7 @@ export namespace Prisma {
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerProgressInput = {
@@ -17128,6 +18628,7 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type ListingUpsertWithoutSellerProgressInput = {
@@ -17188,6 +18689,7 @@ export namespace Prisma {
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBuyerProgressInput = {
@@ -17211,6 +18713,7 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBuyerProgressInput = {
@@ -17281,6 +18784,7 @@ export namespace Prisma {
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerProgressInput = {
@@ -17304,6 +18808,7 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type ListingUpsertWithoutBuyerSelectedProgressInput = {
@@ -17364,6 +18869,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -17387,6 +18893,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -17415,6 +18922,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -17438,6 +18946,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -17604,6 +19113,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -17627,6 +19137,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -17661,6 +19172,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -17684,6 +19196,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type MessageUpsertWithoutRepliesInput = {
@@ -17905,6 +19418,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -17928,6 +19442,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
@@ -17956,6 +19471,7 @@ export namespace Prisma {
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutBuyingListingsInput = {
@@ -17979,6 +19495,7 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutBuyingListingsInput = {
@@ -18122,6 +19639,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -18145,6 +19663,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutBuyingListingsInput = {
@@ -18232,6 +19751,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -18255,6 +19775,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -18294,6 +19815,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -18312,6 +19834,119 @@ export namespace Prisma {
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
     uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+  }
+
+  export type UserCreateWithoutSellerQuestionnaireInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutSellerQuestionnaireInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutSellerQuestionnaireInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+  }
+
+  export type UserUpsertWithoutSellerQuestionnaireInput = {
+    update: XOR<UserUpdateWithoutSellerQuestionnaireInput, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+    create: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSellerQuestionnaireInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSellerQuestionnaireInput, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+  }
+
+  export type UserUpdateWithoutSellerQuestionnaireInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSellerQuestionnaireInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
@@ -18481,6 +20116,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -18504,6 +20140,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -19131,6 +20768,7 @@ export namespace Prisma {
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyingListingsInput = {
@@ -19154,6 +20792,7 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutBuyingListingsInput = {

@@ -503,6 +503,69 @@ router.get('/listings/:listingId/documents', authenticateBroker, async (req, res
   }
 });
 
+// 获取listing的seller上传的文件 - 供broker查看
+router.get('/listings/:listingId/seller-documents', authenticateBroker, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    
+    // 验证listing存在
+    const listing = await getPrisma().listing.findUnique({
+      where: { id: listingId }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    const documents = await getPrisma().document.findMany({
+      where: {
+        listingId,
+        category: 'SELLER_UPLOAD', // 只获取seller上传的文件
+        type: {
+          in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
+        }
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: [
+        {
+          stepId: 'asc' // 按步骤排序
+        },
+        {
+          type: 'asc' // 然后按文档类型
+        },
+        {
+          createdAt: 'desc' // 最后按创建时间（最新的在前）
+        }
+      ]
+    });
+
+    res.json({ documents });
+  } catch (error: unknown) {
+    console.error('Error fetching seller documents:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch seller documents',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // broker为listing上传文件
 router.post('/listings/:listingId/documents', upload.single('file'), authenticateBroker, async (req, res): Promise<void> => {
   try {
@@ -548,7 +611,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
 
     // 上传文件到Supabase
     const bucketName = getStorageBucket();
-    const fileName = `broker-docs/${listingId}/${Date.now()}-${file.originalname}`;
+    const fileName = `listings/${listingId}/broker/documents/${Date.now()}-${file.originalname}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)
@@ -638,7 +701,7 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
       if (fileName) {
         const { error: deleteError } = await supabase.storage
           .from(getStorageBucket())
-          .remove([`broker-docs/${listingId}/${fileName}`]);
+          .remove([`listings/${listingId}/broker/documents/${fileName}`]);
 
         if (deleteError) {
           console.error('Supabase delete error:', deleteError);

@@ -814,6 +814,79 @@ router.get('/listings/:listingId/documents', authenticateAgent, async (req, res)
   }
 });
 
+// 获取listing的seller上传的文件 - 供agent查看
+router.get('/listings/:listingId/seller-documents', authenticateAgent, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    const agentId = typedReq.user?.id;
+
+    if (!agentId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // Verify the listing belongs to a seller managed by this agent
+    const listing = await getPrisma().listing.findFirst({
+      where: { id: listingId },
+      include: {
+        seller: true
+      }
+    });
+
+    if (!listing || listing.seller.managerId !== agentId) {
+      res.status(403).json({ message: 'Access denied - listing not under your management' });
+      return;
+    }
+    
+    const documents = await getPrisma().document.findMany({
+      where: {
+        listingId,
+        category: 'SELLER_UPLOAD', // 只获取seller上传的文件
+        type: {
+          in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
+        }
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: [
+        {
+          stepId: 'asc' // 按步骤排序
+        },
+        {
+          type: 'asc' // 然后按文档类型
+        },
+        {
+          createdAt: 'desc' // 最后按创建时间（最新的在前）
+        }
+      ]
+    });
+
+    res.json({ documents });
+  } catch (error: unknown) {
+    console.error('Error fetching seller documents:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch seller documents',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // agent为listing上传文件
 router.post('/listings/:listingId/documents', upload.single('file'), authenticateAgent, async (req, res): Promise<void> => {
   try {
@@ -868,7 +941,7 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
 
     // 上传文件到Supabase
     const bucketName = getStorageBucket();
-    const fileName = `agent-docs/${listingId}/${Date.now()}-${file.originalname}`;
+    const fileName = `listings/${listingId}/agent/documents/${Date.now()}-${file.originalname}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)
@@ -972,7 +1045,7 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateAgent, a
       if (fileName) {
         const { error: deleteError } = await supabase.storage
           .from(getStorageBucket())
-          .remove([`agent-docs/${listingId}/${fileName}`]);
+          .remove([`listings/${listingId}/agent/documents/${fileName}`]);
 
         if (deleteError) {
           console.error('Supabase delete error:', deleteError);

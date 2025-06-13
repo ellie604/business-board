@@ -86,3 +86,20 @@ Routing:
 /broker/buyers/:buyerId/:listingId: Shows detailed buyer listing view
 /broker/sellers/:sellerId/:listingId/documents: Shows all documents for a seller's listing
 /broker/buyers/:buyerId/:listingId/documents: Shows all documents for a buyer's listing
+
+supabase storage目前的架构：
+business-documents-dev bucket:
+business-documents-dev bucket:
+├── listings/
+│   └── {listingId}/
+│       ├── seller/
+│       │   ├── documents/          # Seller业务文档
+│       │   └── questionnaire.pdf   # Seller问卷PDF
+│       ├── buyer/
+│       │   └── documents/          # Buyer文档
+│       ├── broker/
+│       │   └── documents/          # Broker提供的文档
+│       └── agent/
+│           └── documents/          # Agent提供的文档
+└── communications/
+    └── attachments/                # 消息通信附件
