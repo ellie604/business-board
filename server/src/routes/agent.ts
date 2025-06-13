@@ -837,6 +837,8 @@ router.get('/listings/:listingId/seller-documents', authenticateAgent, async (re
     const typedReq = req as AuthenticatedRequest;
     const agentId = typedReq.user?.id;
 
+    console.log('Agent fetching seller documents for listing:', listingId, 'agentId:', agentId);
+
     if (!agentId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -854,15 +856,19 @@ router.get('/listings/:listingId/seller-documents', authenticateAgent, async (re
       res.status(403).json({ message: 'Access denied - listing not under your management' });
       return;
     }
+
+    const queryConditions = {
+      listingId,
+      category: 'SELLER_UPLOAD', // 只获取seller上传的文件
+      type: {
+        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
+      }
+    };
+
+    console.log('Agent query conditions:', queryConditions);
     
     const documents = await getPrisma().document.findMany({
-      where: {
-        listingId,
-        category: 'SELLER_UPLOAD', // 只获取seller上传的文件
-        type: {
-          in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
-        }
-      },
+      where: queryConditions,
       include: {
         uploader: {
           select: {
@@ -892,6 +898,16 @@ router.get('/listings/:listingId/seller-documents', authenticateAgent, async (re
         }
       ]
     });
+
+    console.log('Agent found seller documents:', documents.map((doc: any) => ({
+      id: doc.id,
+      fileName: doc.fileName,
+      type: doc.type,
+      category: doc.category,
+      sellerId: doc.sellerId,
+      listingId: doc.listingId,
+      createdAt: doc.createdAt
+    })));
 
     res.json({ documents });
   } catch (error: unknown) {

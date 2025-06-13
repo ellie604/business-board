@@ -508,6 +508,8 @@ router.get('/listings/:listingId/seller-documents', authenticateBroker, async (r
   try {
     const { listingId } = req.params;
     
+    console.log('Broker fetching seller documents for listing:', listingId);
+    
     // 验证listing存在
     const listing = await getPrisma().listing.findUnique({
       where: { id: listingId }
@@ -518,14 +520,18 @@ router.get('/listings/:listingId/seller-documents', authenticateBroker, async (r
       return;
     }
 
+    const queryConditions = {
+      listingId,
+      category: 'SELLER_UPLOAD', // 只获取seller上传的文件
+      type: {
+        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
+      }
+    };
+
+    console.log('Broker query conditions:', queryConditions);
+
     const documents = await getPrisma().document.findMany({
-      where: {
-        listingId,
-        category: 'SELLER_UPLOAD', // 只获取seller上传的文件
-        type: {
-          in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
-        }
-      },
+      where: queryConditions,
       include: {
         uploader: {
           select: {
@@ -555,6 +561,16 @@ router.get('/listings/:listingId/seller-documents', authenticateBroker, async (r
         }
       ]
     });
+
+    console.log('Broker found seller documents:', documents.map((doc: any) => ({
+      id: doc.id,
+      fileName: doc.fileName,
+      type: doc.type,
+      category: doc.category,
+      sellerId: doc.sellerId,
+      listingId: doc.listingId,
+      createdAt: doc.createdAt
+    })));
 
     res.json({ documents });
   } catch (error: unknown) {

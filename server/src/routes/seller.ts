@@ -548,6 +548,12 @@ router.get('/listings/:listingId/documents', authenticateSeller, async (req, res
       return;
     }
 
+    console.log('Fetching documents for:', {
+      listingId,
+      sellerId: typedReq.user.id,
+      category: 'SELLER_UPLOAD'
+    });
+
     const documents = await prisma.document.findMany({
       where: {
         listingId,
@@ -567,6 +573,15 @@ router.get('/listings/:listingId/documents', authenticateSeller, async (req, res
         createdAt: 'desc'
       }
     });
+
+    console.log('Found documents:', documents.map((doc: any) => ({
+      id: doc.id,
+      type: doc.type,
+      fileName: doc.fileName,
+      category: doc.category,
+      sellerId: doc.sellerId,
+      listingId: doc.listingId
+    })));
 
     res.json({ documents });
   } catch (error: unknown) {
@@ -658,6 +673,13 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
     const typedReq = req as AuthenticatedRequest;
     const file = req.file;
 
+    console.log('Upload request received:', {
+      listingId,
+      documentType,
+      fileName: file?.originalname,
+      sellerId: typedReq.user?.id
+    });
+
     if (!file) {
       res.status(400).json({ message: 'No file uploaded' });
       return;
@@ -706,17 +728,17 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
     // 创建文档记录
     const document = await prisma.document.create({
       data: {
-        type: 'UPLOADED_DOC',                // Use UPLOADED_DOC instead of BUSINESS_DOCUMENTS
-        category: 'SELLER_UPLOAD',          // seller上传的文件
+        type: documentType || 'UPLOADED_DOC',   // Use documentType from request, fallback to UPLOADED_DOC
+        category: 'SELLER_UPLOAD',              // seller上传的文件
         fileName: file.originalname,
         fileSize: file.size,
         url: publicUrl,
         listingId,
         sellerId: typedReq.user.id,
-        uploadedBy: typedReq.user.id,       // seller自己上传
+        uploadedBy: typedReq.user.id,           // seller自己上传
         uploadedAt: new Date(),
         status: 'COMPLETED',
-        operationType: 'UPLOAD'             // 这是上传操作
+        operationType: 'UPLOAD'                 // 这是上传操作
       }
     });
 
@@ -754,6 +776,8 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateSeller, 
     const { listingId, documentId } = req.params;
     const typedReq = req as AuthenticatedRequest;
     
+    console.log('Seller deleting document:', { listingId, documentId, sellerId: typedReq.user?.id });
+    
     if (!typedReq.user) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -782,6 +806,13 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateSeller, 
       }
     });
 
+    console.log('Document to delete:', document ? {
+      id: document.id,
+      fileName: document.fileName,
+      type: document.type,
+      category: document.category
+    } : 'Not found');
+
     if (!document) {
       res.status(404).json({ message: 'Document not found or not owned by seller' });
       return;
@@ -803,6 +834,8 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateSeller, 
           if (deleteError) {
             console.error('Supabase delete error:', deleteError);
             // Continue with database deletion even if storage deletion fails
+          } else {
+            console.log('Successfully deleted file from storage:', filePath);
           }
         }
       } catch (storageError) {
@@ -815,6 +848,8 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateSeller, 
     await prisma.document.delete({
       where: { id: documentId }
     });
+
+    console.log('Successfully deleted document from database:', documentId);
 
     res.json({ message: 'Document deleted successfully' });
   } catch (error: unknown) {

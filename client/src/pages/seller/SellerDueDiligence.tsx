@@ -10,7 +10,7 @@ const SellerDueDiligence: React.FC = () => {
   const [progress, setProgress] = useState<SellerProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [uploadedDocs, setUploadedDocs] = useState<any[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const navigate = useNavigate();
   
   const steps = [
@@ -27,7 +27,7 @@ const SellerDueDiligence: React.FC = () => {
     'After The Sale'
   ];
 
-  // Due diligence document categories
+  // Due diligence document categories for reference
   const documentCategories = [
     {
       category: 'Legal Documents',
@@ -77,23 +77,34 @@ const SellerDueDiligence: React.FC = () => {
         const progressRes = await sellerService.getProgress();
         setProgress(progressRes.progress);
         
-        // Mock uploaded documents
-        setUploadedDocs([
-          {
-            id: '1',
-            fileName: 'Operating_Agreement_2024.pdf',
-            category: 'Legal Documents',
-            uploadDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            size: '1.2 MB'
-          },
-          {
-            id: '2',
-            fileName: 'Bank_Statements_Q4_2023.pdf',
-            category: 'Financial Records',
-            uploadDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-            size: '3.5 MB'
+        // Fetch uploaded due diligence files from backend
+        const dashboardData = await sellerService.getDashboardStats();
+        const selectedListingId = dashboardData.stats.selectedListingId;
+        
+        if (selectedListingId) {
+          const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
+            credentials: 'include'
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            // Filter to only show DUE_DILIGENCE type documents for this step
+            const dueDiligenceFiles = data.documents?.filter((doc: any) => doc.type === 'DUE_DILIGENCE') || [];
+            
+            // Map the database document structure to match our UI structure
+            const mappedFiles = dueDiligenceFiles.map((doc: any) => ({
+              id: doc.id,
+              fileName: doc.fileName,
+              fileSize: doc.fileSize,
+              uploadedAt: doc.uploadedAt,
+              url: doc.url,
+              type: doc.type
+            }));
+            
+            console.log('Fetched due diligence files from backend:', mappedFiles);
+            setUploadedFiles(mappedFiles);
           }
-        ]);
+        }
       } catch (err) {
         console.error('Failed to fetch data:', err);
       } finally {
@@ -104,13 +115,46 @@ const SellerDueDiligence: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, category: string) => {
+  const refreshFileList = async () => {
+    try {
+      const dashboardData = await sellerService.getDashboardStats();
+      const selectedListingId = dashboardData.stats.selectedListingId;
+      
+      if (selectedListingId) {
+        const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          // Filter to only show DUE_DILIGENCE type documents
+          const dueDiligenceFiles = data.documents?.filter((doc: any) => doc.type === 'DUE_DILIGENCE') || [];
+          
+          // Map the database document structure to match our UI structure
+          const mappedFiles = dueDiligenceFiles.map((doc: any) => ({
+            id: doc.id,
+            fileName: doc.fileName,
+            fileSize: doc.fileSize,
+            uploadedAt: doc.uploadedAt,
+            url: doc.url,
+            type: doc.type
+          }));
+          
+          console.log('Refreshed due diligence files from backend:', mappedFiles);
+          setUploadedFiles(mappedFiles);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh file list:', err);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
     try {
       setUploading(true);
-      const file = files[0];
       
       // Get seller's selected listing first
       const dashboardData = await sellerService.getDashboardStats();
@@ -121,36 +165,35 @@ const SellerDueDiligence: React.FC = () => {
         return;
       }
       
-      // Upload file using real API
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('documentType', 'DUE_DILIGENCE');
+      // Check if this was the first upload by checking current state before upload
+      const wasEmpty = uploadedFiles.length === 0;
+      
+      for (const file of files) {
+        // Upload file using real API
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('documentType', 'DUE_DILIGENCE');
 
-      const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formData
-      });
+        const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Upload failed: ${errorData.message}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Upload failed: ${errorData.message}`);
+        }
+
+        const data = await response.json();
+        console.log('Uploaded due diligence file data:', data.document);
       }
-
-      const data = await response.json();
       
-      const newDoc = {
-        id: data.document.id,
-        fileName: file.name,
-        category,
-        uploadDate: new Date().toISOString(),
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-      };
+      // Refresh the file list from backend to ensure consistency
+      await refreshFileList();
       
-      setUploadedDocs(prev => [newDoc, ...prev]);
-      
-      // Update step completion if this is the first upload
-      if (uploadedDocs.length === 0) {
+      // Mark step as completed after first successful upload
+      if (wasEmpty) {
         await sellerService.updateStep(7);
         // Refresh progress
         const progressRes = await sellerService.getProgress();
@@ -164,14 +207,50 @@ const SellerDueDiligence: React.FC = () => {
     }
   };
 
-  const handleRemoveDocument = (docId: string) => {
-    setUploadedDocs(prev => prev.filter(doc => doc.id !== docId));
+  const handleDeleteFile = async (fileId: string) => {
+    try {
+      // Get seller's selected listing first
+      const dashboardData = await sellerService.getDashboardStats();
+      const selectedListingId = dashboardData.stats.selectedListingId;
+      
+      if (!selectedListingId) {
+        alert('No listing selected');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents/${fileId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Delete failed: ${errorData.message}`);
+      }
+
+      // Remove from UI list after successful deletion
+      setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
+      
+      alert('File deleted successfully');
+    } catch (err) {
+      console.error('Failed to delete file:', err);
+      alert(`Delete failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
   };
 
-  const getUploadProgress = () => {
-    const totalRequired = documentCategories.reduce((sum, cat) => sum + cat.items.length, 0);
-    const uploaded = uploadedDocs.length;
-    return Math.round((uploaded / totalRequired) * 100);
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files) {
+      const fakeEvent = {
+        target: { files }
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleFileUpload(fakeEvent);
+    }
   };
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
@@ -203,7 +282,7 @@ const SellerDueDiligence: React.FC = () => {
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Finished
+                  Completed
                 </span>
               ) : isCurrentStep ? (
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
@@ -218,72 +297,21 @@ const SellerDueDiligence: React.FC = () => {
           </div>
         </div>
 
-        {/* Due Diligence Progress */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <div className="flex items-center mb-4">
-            <svg className="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4h6m-6 4h6" />
-            </svg>
-            <h2 className="text-xl font-semibold text-blue-800">Due Diligence Period Active</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-blue-600">Buyer</p>
-              <p className="font-medium text-blue-800">Michael Brown - Brown Industries</p>
-            </div>
-            <div>
-              <p className="text-sm text-blue-600">Due Diligence Deadline</p>
-              <p className="font-medium text-blue-800">February 14, 2024</p>
-            </div>
-            <div>
-              <p className="text-sm text-blue-600">Days Remaining</p>
-              <p className="font-medium text-blue-800">18 days</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Document Upload Progress */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Upload Progress</h2>
-            <span className="text-sm text-gray-500">{uploadedDocs.length} documents uploaded</span>
-          </div>
-          
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div 
-              className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-              style={{ width: `${getUploadProgress()}%` }}
-            ></div>
-          </div>
-          <p className="text-sm text-gray-600 mt-2">{getUploadProgress()}% of recommended documents uploaded</p>
-        </div>
-
-        {/* Document Categories */}
-        <div className="space-y-6">
-          {documentCategories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">{category.category}</h3>
-                <input
-                  type="file"
-                  id={`upload-${categoryIndex}`}
-                  className="hidden"
-                  onChange={(e) => handleFileUpload(e, category.category)}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
-                  disabled={uploading}
-                />
-                <label
-                  htmlFor={`upload-${categoryIndex}`}
-                  className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {uploading ? 'Uploading...' : 'Upload Documents'}
-                </label>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Required Documents:</h4>
+        {/* Main Content */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {/* Document Categories Reference */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Due Diligence Document Categories
+            </h2>
+            <p className="text-gray-600 mb-6">
+              The buyer may request documents from the following categories. Please upload any relevant documents you have available.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {documentCategories.map((category, categoryIndex) => (
+                <div key={categoryIndex} className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-3">{category.category}</h3>
                   <ul className="space-y-1">
                     {category.items.map((item, itemIndex) => (
                       <li key={itemIndex} className="text-sm text-gray-600 flex items-center">
@@ -293,38 +321,109 @@ const SellerDueDiligence: React.FC = () => {
                     ))}
                   </ul>
                 </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Uploaded Documents:</h4>
-                  <div className="space-y-2">
-                    {uploadedDocs
-                      .filter(doc => doc.category === category.category)
-                      .map((doc) => (
-                        <div key={doc.id} className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-green-800">{doc.fileName}</p>
-                            <p className="text-xs text-green-600">
-                              {doc.size} • {new Date(doc.uploadDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleRemoveDocument(doc.id)}
-                            className="ml-2 text-red-600 hover:text-red-800"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    {uploadedDocs.filter(doc => doc.category === category.category).length === 0 && (
-                      <p className="text-sm text-gray-500 italic">No documents uploaded yet</p>
-                    )}
+              ))}
+            </div>
+          </div>
+
+          {/* Upload Area */}
+          <div className="bg-blue-50 rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white bg-blue-600 px-4 py-2 rounded-md">
+                Upload Due Diligence Documents
+              </h3>
+              <span className="text-sm text-gray-600">
+                {uploadedFiles.length} files uploaded
+              </span>
+            </div>
+            
+            <div 
+              className="border-2 border-dashed border-blue-300 rounded-lg p-12 text-center bg-white"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+              
+              <p className="text-lg font-medium text-gray-900 mb-2">
+                Drop your files here or{' '}
+                <label htmlFor="file-upload" className="text-blue-600 hover:text-blue-800 cursor-pointer underline">
+                  browse for files
+                </label>
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                Select multiple files for due diligence review
+              </p>
+              
+              <input
+                id="file-upload"
+                name="file-upload"
+                type="file"
+                className="sr-only"
+                multiple
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                onChange={handleFileUpload}
+                disabled={uploading}
+              />
+              
+              {uploading && (
+                <div className="mt-4">
+                  <div className="inline-flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-blue-600">Uploading...</span>
                   </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Uploaded Files List */}
+          {uploadedFiles.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Uploaded Due Diligence Documents ({uploadedFiles.length})
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="space-y-2">
+                  {uploadedFiles.map((file) => (
+                    <div key={file.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                          <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{file.fileName}</p>
+                          <p className="text-sm text-gray-500">
+                            {file.fileSize && file.fileSize > 0 ? 
+                              (file.fileSize < 1024 * 1024 ? 
+                                `${(file.fileSize / 1024).toFixed(1)} KB` : 
+                                `${(file.fileSize / (1024 * 1024)).toFixed(2)} MB`
+                              ) : 'Unknown size'} • {' '}
+                            {file.uploadedAt ? new Date(file.uploadedAt).toLocaleDateString() : 'Invalid Date'}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteFile(file.id)}
+                        className="text-red-600 hover:text-red-800 p-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Important Notice */}
@@ -336,8 +435,9 @@ const SellerDueDiligence: React.FC = () => {
             <div>
               <h4 className="font-medium text-yellow-900">Important Reminder</h4>
               <p className="text-sm text-yellow-700 mt-1">
-                All documents must be uploaded before the due diligence deadline. The buyer may request additional 
-                documents during this period. Ensure all information is accurate and up-to-date.
+                Upload documents as requested by the buyer during their due diligence period. 
+                The buyer may request additional documents throughout this process. 
+                Ensure all information is accurate and up-to-date.
               </p>
             </div>
           </div>
