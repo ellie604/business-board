@@ -944,8 +944,17 @@ const checkStepCompletionInternal = async (sellerId: string, stepId: number, lis
       return isStep5Completed;
       
     case 6: // Download purchase contract
-      // Mock - will be replaced with real logic
-      return false; // Usually not completed until later in process
+      // Check if purchase agreement was downloaded
+      const purchaseDoc = await prisma.document.findFirst({
+        where: { 
+          sellerId, 
+          stepId: 6, 
+          type: 'PURCHASE_AGREEMENT',
+          operationType: 'DOWNLOAD',
+          downloadedAt: { not: null }
+        }
+      });
+      return !!purchaseDoc;
       
     case 7: // Upload due diligence
       // Check if due diligence documents were uploaded

@@ -4,12 +4,16 @@ import { sellerService } from '../../services/seller';
 import type { SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import { API_BASE_URL } from '../../config';
 
 const SellerPurchaseAgreement: React.FC = () => {
   const [progress, setProgress] = useState<SellerProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
-  const [contractAvailable, setContractAvailable] = useState(true); // Mock: contract is ready
+  const [downloadMessage, setDownloadMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [contractAvailable, setContractAvailable] = useState(false);
+  const [availableContract, setAvailableContract] = useState<any>(null);
   const navigate = useNavigate();
   
   const steps = [
@@ -26,28 +30,14 @@ const SellerPurchaseAgreement: React.FC = () => {
     'After The Sale'
   ];
 
-  // Mock accepted offer data
-  const acceptedOffer = {
-    buyerName: 'Michael Brown',
-    company: 'Brown Industries',
-    offerAmount: 485000,
-    acceptedDate: '2024-01-15',
-    closingDate: '2024-02-28',
-    terms: [
-      'Purchase price: $485,000',
-      'Earnest money: $25,000',
-      'Closing date: February 28, 2024',
-      'Asset purchase (excluding real estate)',
-      'Seller financing: None',
-      'Due diligence period: 30 days'
-    ]
-  };
-
   useEffect(() => {
     const fetchProgress = async () => {
       try {
         const progressRes = await sellerService.getProgress();
         setProgress(progressRes.progress);
+        
+        // Check if purchase agreement is available
+        await checkContractAvailability(progressRes.progress?.selectedListingId);
       } catch (err) {
         console.error('Failed to fetch progress:', err);
       } finally {
@@ -58,25 +48,129 @@ const SellerPurchaseAgreement: React.FC = () => {
     fetchProgress();
   }, []);
 
+  const checkContractAvailability = async (selectedListingId?: string | null) => {
+    if (!selectedListingId) {
+      setContractAvailable(false);
+      return;
+    }
+
+    try {
+      // 获取该listing的broker文件 - 使用seller专用的端点
+      const documentsResponse = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/broker-documents`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (documentsResponse.ok) {
+        const documentsData = await documentsResponse.json();
+        
+        // 扩展检查逻辑：不仅检查类型，还检查文件名
+        const purchaseAgreements = documentsData.documents?.filter((doc: any) => {
+          // 检查文档类型
+          const typeMatches = [
+            'PURCHASE_AGREEMENT', 
+            'PURCHASE_CONTRACT', 
+            'UPLOADED_DOC'
+          ].includes(doc.type);
+          
+          // 检查文件名是否包含purchase相关关键词
+          const fileName = (doc.fileName || '').toLowerCase();
+          const nameMatches = fileName.includes('purchase') || 
+                             fileName.includes('contract') || 
+                             fileName.includes('agreement');
+          
+          // 如果类型是PURCHASE_AGREEMENT或PURCHASE_CONTRACT，直接匹配
+          if (doc.type === 'PURCHASE_AGREEMENT' || doc.type === 'PURCHASE_CONTRACT') {
+            return true;
+          }
+          
+          // 如果类型是UPLOADED_DOC，需要文件名也匹配
+          if (doc.type === 'UPLOADED_DOC' && nameMatches) {
+            return true;
+          }
+          
+          return false;
+        });
+        
+        console.log('Purchase agreement check:', {
+          allDocuments: documentsData.documents,
+          filteredAgreements: purchaseAgreements
+        });
+        
+        if (purchaseAgreements && purchaseAgreements.length > 0) {
+          // 优先选择broker上传的文件，其次是agent的
+          const brokerAgreements = purchaseAgreements.filter((doc: any) => doc.uploader?.role === 'BROKER');
+          const agentAgreements = purchaseAgreements.filter((doc: any) => doc.uploader?.role === 'AGENT');
+          
+          const selectedAgreement = brokerAgreements.length > 0 ? brokerAgreements[0] : agentAgreements[0];
+          
+          console.log('Selected purchase agreement:', selectedAgreement);
+          
+          setContractAvailable(true);
+          setAvailableContract(selectedAgreement);
+        } else {
+          console.log('No purchase agreements found');
+          setContractAvailable(false);
+          setAvailableContract(null);
+        }
+      } else {
+        console.error('Failed to fetch documents:', documentsResponse.status);
+        setContractAvailable(false);
+        setAvailableContract(null);
+      }
+    } catch (error) {
+      console.error('Error checking contract availability:', error);
+      setContractAvailable(false);
+      setAvailableContract(null);
+    }
+  };
+
   const handleDownload = async () => {
     try {
       setDownloading(true);
-      // Record the download
+      setDownloadMessage('');
+      setMessageType('');
+      
+      // 先获取用户的listing信息
+      const progressRes = await sellerService.getProgress();
+      const selectedListingId = progressRes.progress?.selectedListingId;
+      
+      if (!selectedListingId) {
+        setDownloadMessage('No listing selected. Please contact your broker or agent.');
+        setMessageType('error');
+        return;
+      }
+
+      if (!availableContract) {
+        setDownloadMessage('Purchase agreement not available yet. Please contact your broker or agent.');
+        setMessageType('error');
+        return;
+      }
+
+      // Record the download and update step completion
       await sellerService.recordStepDownload(6);
-      // Update step completion
       await sellerService.updateStep(6);
       
-      // Simulate download
+      // 下载文件 - 修改下载逻辑避免弹窗阻止
       const link = document.createElement('a');
-      link.href = '#'; // In real app, this would be the actual file URL
-      link.download = 'purchase_agreement.pdf';
+      link.href = availableContract.url;
+      link.download = availableContract.fileName || 'purchase_agreement.pdf';
+      // 不使用 target="_blank" 来避免弹窗阻止
+      link.style.display = 'none';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      
+      setDownloadMessage('Purchase agreement downloaded successfully!');
+      setMessageType('success');
       
       // Refresh progress
-      const progressRes = await sellerService.getProgress();
-      setProgress(progressRes.progress);
+      const newProgressRes = await sellerService.getProgress();
+      setProgress(newProgressRes.progress);
     } catch (err) {
       console.error('Failed to download:', err);
+      setDownloadMessage('Failed to download purchase agreement. Please try again or contact your broker/agent.');
+      setMessageType('error');
     } finally {
       setDownloading(false);
     }
@@ -134,37 +228,6 @@ const SellerPurchaseAgreement: React.FC = () => {
 
         {contractAvailable ? (
           <>
-            {/* Accepted Offer Summary */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-              <div className="flex items-center mb-4">
-                <svg className="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h2 className="text-xl font-semibold text-green-800">Offer Accepted!</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-medium text-green-800 mb-2">Buyer Information</h3>
-                  <p className="text-green-700"><strong>{acceptedOffer.buyerName}</strong></p>
-                  <p className="text-green-600">{acceptedOffer.company}</p>
-                  <p className="text-sm text-green-600 mt-2">
-                    Offer accepted on {new Date(acceptedOffer.acceptedDate).toLocaleDateString()}
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-green-800 mb-2">Offer Details</h3>
-                  <p className="text-2xl font-bold text-green-700">
-                    ${acceptedOffer.offerAmount.toLocaleString()}
-                  </p>
-                  <p className="text-sm text-green-600">
-                    Expected closing: {new Date(acceptedOffer.closingDate).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Agreement Download */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Purchase Agreement</h2>
@@ -176,10 +239,17 @@ const SellerPurchaseAgreement: React.FC = () => {
                     <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <h3 className="mt-4 text-lg font-medium text-gray-900">Purchase Agreement.pdf</h3>
+                    <h3 className="mt-4 text-lg font-medium text-gray-900">
+                      {availableContract?.fileName || 'Purchase Agreement.pdf'}
+                    </h3>
                     <p className="mt-2 text-sm text-gray-500">
-                      Signed purchase agreement with {acceptedOffer.buyerName}
+                      Purchase agreement prepared by your broker/agent
                     </p>
+                    {availableContract?.uploader && (
+                      <p className="mt-1 text-xs text-gray-400">
+                        Provided by: {availableContract.uploader.name} ({availableContract.uploader.role})
+                      </p>
+                    )}
                     <div className="mt-4">
                       <button
                         onClick={handleDownload}
@@ -205,6 +275,23 @@ const SellerPurchaseAgreement: React.FC = () => {
                       </button>
                     </div>
                     
+                    {/* Download Message */}
+                    {downloadMessage && (
+                      <div className={`mt-4 p-3 rounded-lg ${
+                        messageType === 'success' 
+                          ? 'bg-green-50 border border-green-200' 
+                          : 'bg-red-50 border border-red-200'
+                      }`}>
+                        <p className={`text-sm ${
+                          messageType === 'success' ? 'text-green-700' : 'text-red-700'
+                        }`}>
+                          {messageType === 'success' && '✓ '}
+                          {messageType === 'error' && '⚠ '}
+                          {downloadMessage}
+                        </p>
+                      </div>
+                    )}
+                    
                     {stepCompleted && (
                       <div className="mt-4 p-3 bg-green-50 rounded-lg">
                         <p className="text-sm text-green-700">
@@ -215,24 +302,34 @@ const SellerPurchaseAgreement: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Agreement Terms */}
+                {/* Information */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Key Terms</h3>
+                  <h3 className="text-lg font-medium mb-4">About This Document</h3>
                   <div className="space-y-3">
-                    {acceptedOffer.terms.map((term, index) => (
-                      <div key={index} className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        </div>
-                        <p className="text-gray-700">{term}</p>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       </div>
-                    ))}
+                      <p className="text-gray-700">This is your official purchase agreement prepared by your broker or agent</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      </div>
+                      <p className="text-gray-700">Review all terms and conditions carefully before proceeding</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      </div>
+                      <p className="text-gray-700">Contact your broker or agent if you have any questions</p>
+                    </div>
                   </div>
                   
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                     <h4 className="font-medium text-blue-900">Next Steps</h4>
                     <p className="text-sm text-blue-700 mt-1">
-                      Review the agreement thoroughly. The buyer will now begin their due diligence process. 
+                      After downloading and reviewing the purchase agreement, the buyer will begin their due diligence process. 
                       You'll need to provide additional documentation in the next step.
                     </p>
                   </div>
@@ -241,15 +338,15 @@ const SellerPurchaseAgreement: React.FC = () => {
             </div>
           </>
         ) : (
-          /* No Accepted Offer */
+          /* No Purchase Agreement Available */
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="text-center py-12">
               <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 4h6m-6 4h6" />
               </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No Accepted Offer Yet</h3>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">Purchase Agreement Not Available Yet</h3>
               <p className="mt-2 text-gray-500">
-                Once you accept a buyer's offer, the purchase agreement will be available here for download.
+                Once you accept a buyer's offer and your broker/agent prepares the purchase agreement, it will be available here for download.
               </p>
               <div className="mt-6">
                 <button

@@ -395,7 +395,17 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
           return completedStepsStep5.includes(5);
           
         case 6: // Download purchase contract
-          return false;
+          // Check if purchase agreement was downloaded
+          const purchaseDoc = await getPrisma().document.findFirst({
+            where: { 
+              sellerId, 
+              stepId: 6, 
+              type: 'PURCHASE_AGREEMENT',
+              operationType: 'DOWNLOAD',
+              downloadedAt: { not: null }
+            }
+          });
+          return !!purchaseDoc;
           
         case 7: // Upload due diligence
           const dueDiligenceDocs = await getPrisma().document.findMany({
