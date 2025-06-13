@@ -670,18 +670,26 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
     // 创建文档记录
     const document = await prisma.document.create({
       data: {
-        type: documentType || 'UPLOADED_DOC',
-        category: 'SELLER_UPLOAD',        // seller上传的文件
+        type: 'UPLOADED_DOC',                // Use UPLOADED_DOC instead of BUSINESS_DOCUMENTS
+        category: 'SELLER_UPLOAD',          // seller上传的文件
         fileName: file.originalname,
         fileSize: file.size,
         url: publicUrl,
         listingId,
         sellerId: typedReq.user.id,
-        uploadedBy: typedReq.user.id,     // seller自己上传
+        uploadedBy: typedReq.user.id,       // seller自己上传
         uploadedAt: new Date(),
         status: 'COMPLETED',
-        operationType: 'UPLOAD'           // 这是上传操作
+        operationType: 'UPLOAD'             // 这是上传操作
       }
+    });
+
+    console.log('File upload debug info:', {
+      originalname: file.originalname,
+      size: file.size,
+      mimetype: file.mimetype,
+      buffer_length: file.buffer?.length,
+      document_fileSize: document.fileSize
     });
 
     res.json({ 
@@ -699,6 +707,84 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
     console.error('Error uploading seller document:', error);
     res.status(500).json({ 
       message: 'Failed to upload document',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// seller删除listing的文档
+router.delete('/listings/:listingId/documents/:documentId', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const { listingId, documentId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证listing是否属于该seller
+    const listing = await prisma.listing.findFirst({
+      where: { 
+        id: listingId,
+        sellerId: typedReq.user.id
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found or not owned by seller' });
+      return;
+    }
+
+    // 查找要删除的文档
+    const document = await prisma.document.findFirst({
+      where: {
+        id: documentId,
+        listingId,
+        sellerId: typedReq.user.id,
+        category: 'SELLER_UPLOAD' // 只能删除seller自己上传的文档
+      }
+    });
+
+    if (!document) {
+      res.status(404).json({ message: 'Document not found or not owned by seller' });
+      return;
+    }
+
+    // 从Supabase Storage删除文件
+    if (document.url) {
+      try {
+        const bucketName = getStorageBucket();
+        // 从URL中提取文件路径
+        const urlParts = document.url.split('/');
+        const bucketIndex = urlParts.findIndex((part: string) => part === bucketName);
+        if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+          const filePath = urlParts.slice(bucketIndex + 1).join('/');
+          const { error: deleteError } = await supabase.storage
+            .from(bucketName)
+            .remove([filePath]);
+          
+          if (deleteError) {
+            console.error('Supabase delete error:', deleteError);
+            // Continue with database deletion even if storage deletion fails
+          }
+        }
+      } catch (storageError) {
+        console.error('Error deleting file from storage:', storageError);
+        // Continue with database deletion even if storage deletion fails
+      }
+    }
+
+    // 从数据库删除文档记录
+    await prisma.document.delete({
+      where: { id: documentId }
+    });
+
+    res.json({ message: 'Document deleted successfully' });
+  } catch (error: unknown) {
+    console.error('Error deleting seller document:', error);
+    res.status(500).json({ 
+      message: 'Failed to delete document',
       error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
@@ -793,7 +879,7 @@ const checkStepCompletionInternal = async (sellerId: string, stepId: number, lis
           sellerId, 
           listingId,
           category: 'SELLER_UPLOAD',
-          type: 'FINANCIAL_DOCUMENTS'
+          type: 'UPLOADED_DOC'
         }
       });
       return financialDocs.length > 0;

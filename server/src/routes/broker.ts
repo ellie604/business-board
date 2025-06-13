@@ -899,7 +899,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
               sellerId, 
               listingId,
               category: 'SELLER_UPLOAD',
-              type: 'FINANCIAL_DOCUMENTS'
+              type: 'UPLOADED_DOC'
             }
           });
           return financialDocs.length > 0;
