@@ -281,5 +281,15 @@ export const sellerService = {
     }
 
     return response.json();
+  },
+
+  // 获取当前listing的所有buyers
+  async getListingBuyers() {
+    const res = await fetch(`${API_BASE_URL}/seller/current-listing`, { 
+      credentials: 'include' 
+    });
+    if (!res.ok) throw new Error('Failed to fetch listing buyers');
+    const data = await res.json();
+    return data.listing?.buyers || [];
   }
 }; 

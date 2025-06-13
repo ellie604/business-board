@@ -386,7 +386,13 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
           return financialDocs.length > 0;
           
         case 5: // Buyer activity
-          return false; // Keep sequential for now
+          // Check if it was manually marked as completed in the progress
+          const sellerProgressStep5 = await getPrisma().sellerProgress.findFirst({
+            where: { sellerId }
+          });
+          
+          const completedStepsStep5 = sellerProgressStep5?.completedSteps as number[] || [];
+          return completedStepsStep5.includes(5);
           
         case 6: // Download purchase contract
           return false;

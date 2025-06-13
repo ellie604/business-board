@@ -315,6 +315,12 @@ const updateStep: RequestHandler = async (req, res, next) => {
     const sellerId = typedReq.user?.id;
     const { stepId } = req.body;
     
+    console.log(`updateStep called:`, {
+      sellerId,
+      stepId,
+      stepIdType: typeof stepId
+    });
+    
     if (!sellerId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
@@ -322,6 +328,12 @@ const updateStep: RequestHandler = async (req, res, next) => {
 
     let sellerProgress = await prisma.sellerProgress.findFirst({
       where: { sellerId }
+    });
+
+    console.log(`Current seller progress:`, {
+      id: sellerProgress?.id,
+      currentStep: sellerProgress?.currentStep,
+      completedSteps: sellerProgress?.completedSteps
     });
 
     if (!sellerProgress) {
@@ -333,19 +345,34 @@ const updateStep: RequestHandler = async (req, res, next) => {
           selectedListingId: null
         }
       });
+      console.log(`Created new seller progress:`, sellerProgress);
     }
 
     const completedStepsArray = sellerProgress.completedSteps as number[] || [];
     
+    console.log(`Before update:`, {
+      completedStepsArray,
+      stepIdToAdd: stepId,
+      alreadyIncluded: completedStepsArray.includes(stepId)
+    });
+    
     // If the step hasn't been completed, add it to the completed list
     if (!completedStepsArray.includes(stepId)) {
       completedStepsArray.push(stepId);
+      console.log(`Added step ${stepId} to completed steps`);
+    } else {
+      console.log(`Step ${stepId} already in completed steps`);
     }
 
     // Update current step (if this step is greater than the current step)
     const newCurrentStep = Math.max(sellerProgress.currentStep, stepId + 1);
 
-    await prisma.sellerProgress.update({
+    console.log(`Updating database with:`, {
+      newCurrentStep,
+      completedStepsArray
+    });
+
+    const updatedProgress = await prisma.sellerProgress.update({
       where: { id: sellerProgress.id },
       data: {
         currentStep: newCurrentStep,
@@ -353,7 +380,16 @@ const updateStep: RequestHandler = async (req, res, next) => {
       }
     });
 
-    res.json({ message: 'Step updated successfully' });
+    console.log(`Database updated successfully:`, {
+      id: updatedProgress.id,
+      currentStep: updatedProgress.currentStep,
+      completedSteps: updatedProgress.completedSteps
+    });
+
+    res.json({ 
+      message: 'Step updated successfully',
+      progress: updatedProgress
+    });
   } catch (error) {
     console.error('Error updating step:', error);
     next(error);
@@ -885,20 +921,27 @@ const checkStepCompletionInternal = async (sellerId: string, stepId: number, lis
       return financialDocs.length > 0;
       
     case 5: // Buyer activity
-      // This step should only be considered completed if previous steps are done
-      // AND there are buyers interested in the listing
-      // For now, we'll make it automatically complete when there are buyers
-      // but in a real implementation, this might require seller to review buyer activity
-      if (listingId) {
-        const listing = await prisma.listing.findFirst({
-          where: { id: listingId },
-          include: { buyers: true }
-        });
-        // Only mark as completed if there are buyers AND this step should be accessible
-        // For now, let's make it not auto-complete to maintain proper sequence
-        return false; // Changed to false to maintain proper step sequence
-      }
-      return false;
+      // This step should be considered completed when the seller accesses the buyer activity page
+      // The frontend will call updateStep to mark it as completed
+      // We should not auto-check completion here, but allow it to be manually completed
+      console.log(`Checking step 5 completion for sellerId: ${sellerId}`);
+      
+      // Check if it was manually marked as completed in the progress
+      const sellerProgress = await prisma.sellerProgress.findFirst({
+        where: { sellerId }
+      });
+      
+      const completedSteps = sellerProgress?.completedSteps as number[] || [];
+      const isStep5Completed = completedSteps.includes(5);
+      
+      console.log(`Step 5 completion check:`, {
+        sellerId,
+        completedSteps,
+        isStep5Completed,
+        sellerProgressId: sellerProgress?.id
+      });
+      
+      return isStep5Completed;
       
     case 6: // Download purchase contract
       // Mock - will be replaced with real logic
