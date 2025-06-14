@@ -323,7 +323,12 @@ function checkStepCompletionOptimized(stepId: number, data: {
       return completedStepsFromDB && Array.isArray(completedStepsFromDB) && completedStepsFromDB.includes(8);
       
     case 9: // Download closing docs
-      return false; // Usually not completed until end of process
+      return documents.some(doc => 
+        doc.stepId === 9 && 
+        doc.type === 'CLOSING_DOCS' &&
+        doc.operationType === 'DOWNLOAD' &&
+        doc.downloadedAt
+      );
       
     case 10: // After sale
       return false; // Only completed after successful sale
