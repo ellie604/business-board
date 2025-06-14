@@ -58,6 +58,11 @@ export type Activity = $Result.DefaultSelection<Prisma.$ActivityPayload>
  * 
  */
 export type SellerQuestionnaire = $Result.DefaultSelection<Prisma.$SellerQuestionnairePayload>
+/**
+ * Model PreCloseChecklist
+ * 
+ */
+export type PreCloseChecklist = $Result.DefaultSelection<Prisma.$PreCloseChecklistPayload>
 
 /**
  * Enums
@@ -382,6 +387,16 @@ export class PrismaClient<
     * ```
     */
   get sellerQuestionnaire(): Prisma.SellerQuestionnaireDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.preCloseChecklist`: Exposes CRUD operations for the **PreCloseChecklist** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PreCloseChecklists
+    * const preCloseChecklists = await prisma.preCloseChecklist.findMany()
+    * ```
+    */
+  get preCloseChecklist(): Prisma.PreCloseChecklistDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -830,7 +845,8 @@ export namespace Prisma {
     MessageAttachment: 'MessageAttachment',
     Listing: 'Listing',
     Activity: 'Activity',
-    SellerQuestionnaire: 'SellerQuestionnaire'
+    SellerQuestionnaire: 'SellerQuestionnaire',
+    PreCloseChecklist: 'PreCloseChecklist'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -849,7 +865,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "document" | "user" | "sellerProgress" | "buyerProgress" | "message" | "messageAttachment" | "listing" | "activity" | "sellerQuestionnaire"
+      modelProps: "document" | "user" | "sellerProgress" | "buyerProgress" | "message" | "messageAttachment" | "listing" | "activity" | "sellerQuestionnaire" | "preCloseChecklist"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1519,6 +1535,80 @@ export namespace Prisma {
           }
         }
       }
+      PreCloseChecklist: {
+        payload: Prisma.$PreCloseChecklistPayload<ExtArgs>
+        fields: Prisma.PreCloseChecklistFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PreCloseChecklistFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PreCloseChecklistFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          findFirst: {
+            args: Prisma.PreCloseChecklistFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PreCloseChecklistFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          findMany: {
+            args: Prisma.PreCloseChecklistFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>[]
+          }
+          create: {
+            args: Prisma.PreCloseChecklistCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          createMany: {
+            args: Prisma.PreCloseChecklistCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PreCloseChecklistCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>[]
+          }
+          delete: {
+            args: Prisma.PreCloseChecklistDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          update: {
+            args: Prisma.PreCloseChecklistUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          deleteMany: {
+            args: Prisma.PreCloseChecklistDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PreCloseChecklistUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PreCloseChecklistUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>[]
+          }
+          upsert: {
+            args: Prisma.PreCloseChecklistUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          aggregate: {
+            args: Prisma.PreCloseChecklistAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePreCloseChecklist>
+          }
+          groupBy: {
+            args: Prisma.PreCloseChecklistGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PreCloseChecklistGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PreCloseChecklistCountArgs<ExtArgs>
+            result: $Utils.Optional<PreCloseChecklistCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1612,6 +1702,7 @@ export namespace Prisma {
     listing?: ListingOmit
     activity?: ActivityOmit
     sellerQuestionnaire?: SellerQuestionnaireOmit
+    preCloseChecklist?: PreCloseChecklistOmit
   }
 
   /* Types for Logging */
@@ -1717,6 +1808,7 @@ export namespace Prisma {
     buyingListings: number
     sellerProgress: number
     buyerProgress: number
+    updatedChecklists: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1731,6 +1823,7 @@ export namespace Prisma {
     buyingListings?: boolean | UserCountOutputTypeCountBuyingListingsArgs
     sellerProgress?: boolean | UserCountOutputTypeCountSellerProgressArgs
     buyerProgress?: boolean | UserCountOutputTypeCountBuyerProgressArgs
+    updatedChecklists?: boolean | UserCountOutputTypeCountUpdatedChecklistsArgs
   }
 
   // Custom InputTypes
@@ -1819,6 +1912,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountBuyerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BuyerProgressWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUpdatedChecklistsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PreCloseChecklistWhereInput
   }
 
 
@@ -3508,6 +3608,7 @@ export namespace Prisma {
     sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
     buyerProgress?: boolean | User$buyerProgressArgs<ExtArgs>
     sellerQuestionnaire?: boolean | User$sellerQuestionnaireArgs<ExtArgs>
+    updatedChecklists?: boolean | User$updatedChecklistsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3567,6 +3668,7 @@ export namespace Prisma {
     sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
     buyerProgress?: boolean | User$buyerProgressArgs<ExtArgs>
     sellerQuestionnaire?: boolean | User$sellerQuestionnaireArgs<ExtArgs>
+    updatedChecklists?: boolean | User$updatedChecklistsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3592,6 +3694,7 @@ export namespace Prisma {
       sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
       buyerProgress: Prisma.$BuyerProgressPayload<ExtArgs>[]
       sellerQuestionnaire: Prisma.$SellerQuestionnairePayload<ExtArgs> | null
+      updatedChecklists: Prisma.$PreCloseChecklistPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4011,6 +4114,7 @@ export namespace Prisma {
     sellerProgress<T extends User$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyerProgress<T extends User$buyerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sellerQuestionnaire<T extends User$sellerQuestionnaireArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerQuestionnaireArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    updatedChecklists<T extends User$updatedChecklistsArgs<ExtArgs> = {}>(args?: Subset<T, User$updatedChecklistsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4745,6 +4849,30 @@ export namespace Prisma {
      */
     include?: SellerQuestionnaireInclude<ExtArgs> | null
     where?: SellerQuestionnaireWhereInput
+  }
+
+  /**
+   * User.updatedChecklists
+   */
+  export type User$updatedChecklistsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    where?: PreCloseChecklistWhereInput
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    cursor?: PreCloseChecklistWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
   }
 
   /**
@@ -9692,6 +9820,7 @@ export namespace Prisma {
     documents?: boolean | Listing$documentsArgs<ExtArgs>
     sellerProgress?: boolean | Listing$sellerProgressArgs<ExtArgs>
     buyerSelectedProgress?: boolean | Listing$buyerSelectedProgressArgs<ExtArgs>
+    preCloseChecklist?: boolean | Listing$preCloseChecklistArgs<ExtArgs>
     _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
@@ -9734,6 +9863,7 @@ export namespace Prisma {
     documents?: boolean | Listing$documentsArgs<ExtArgs>
     sellerProgress?: boolean | Listing$sellerProgressArgs<ExtArgs>
     buyerSelectedProgress?: boolean | Listing$buyerSelectedProgressArgs<ExtArgs>
+    preCloseChecklist?: boolean | Listing$preCloseChecklistArgs<ExtArgs>
     _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ListingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9751,6 +9881,7 @@ export namespace Prisma {
       documents: Prisma.$DocumentPayload<ExtArgs>[]
       sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
       buyerSelectedProgress: Prisma.$BuyerProgressPayload<ExtArgs>[]
+      preCloseChecklist: Prisma.$PreCloseChecklistPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10159,6 +10290,7 @@ export namespace Prisma {
     documents<T extends Listing$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Listing$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sellerProgress<T extends Listing$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, Listing$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyerSelectedProgress<T extends Listing$buyerSelectedProgressArgs<ExtArgs> = {}>(args?: Subset<T, Listing$buyerSelectedProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    preCloseChecklist<T extends Listing$preCloseChecklistArgs<ExtArgs> = {}>(args?: Subset<T, Listing$preCloseChecklistArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10684,6 +10816,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.preCloseChecklist
+   */
+  export type Listing$preCloseChecklistArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    where?: PreCloseChecklistWhereInput
   }
 
   /**
@@ -12840,6 +12991,1118 @@ export namespace Prisma {
 
 
   /**
+   * Model PreCloseChecklist
+   */
+
+  export type AggregatePreCloseChecklist = {
+    _count: PreCloseChecklistCountAggregateOutputType | null
+    _min: PreCloseChecklistMinAggregateOutputType | null
+    _max: PreCloseChecklistMaxAggregateOutputType | null
+  }
+
+  export type PreCloseChecklistMinAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    lastUpdatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PreCloseChecklistMaxAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    lastUpdatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PreCloseChecklistCountAggregateOutputType = {
+    id: number
+    listingId: number
+    buyerItems: number
+    sellerItems: number
+    brokerItems: number
+    lastUpdatedBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PreCloseChecklistMinAggregateInputType = {
+    id?: true
+    listingId?: true
+    lastUpdatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PreCloseChecklistMaxAggregateInputType = {
+    id?: true
+    listingId?: true
+    lastUpdatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PreCloseChecklistCountAggregateInputType = {
+    id?: true
+    listingId?: true
+    buyerItems?: true
+    sellerItems?: true
+    brokerItems?: true
+    lastUpdatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PreCloseChecklistAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PreCloseChecklist to aggregate.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PreCloseChecklists
+    **/
+    _count?: true | PreCloseChecklistCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PreCloseChecklistMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PreCloseChecklistMaxAggregateInputType
+  }
+
+  export type GetPreCloseChecklistAggregateType<T extends PreCloseChecklistAggregateArgs> = {
+        [P in keyof T & keyof AggregatePreCloseChecklist]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePreCloseChecklist[P]>
+      : GetScalarType<T[P], AggregatePreCloseChecklist[P]>
+  }
+
+
+
+
+  export type PreCloseChecklistGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PreCloseChecklistWhereInput
+    orderBy?: PreCloseChecklistOrderByWithAggregationInput | PreCloseChecklistOrderByWithAggregationInput[]
+    by: PreCloseChecklistScalarFieldEnum[] | PreCloseChecklistScalarFieldEnum
+    having?: PreCloseChecklistScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PreCloseChecklistCountAggregateInputType | true
+    _min?: PreCloseChecklistMinAggregateInputType
+    _max?: PreCloseChecklistMaxAggregateInputType
+  }
+
+  export type PreCloseChecklistGroupByOutputType = {
+    id: string
+    listingId: string
+    buyerItems: JsonValue
+    sellerItems: JsonValue
+    brokerItems: JsonValue
+    lastUpdatedBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PreCloseChecklistCountAggregateOutputType | null
+    _min: PreCloseChecklistMinAggregateOutputType | null
+    _max: PreCloseChecklistMaxAggregateOutputType | null
+  }
+
+  type GetPreCloseChecklistGroupByPayload<T extends PreCloseChecklistGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PreCloseChecklistGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PreCloseChecklistGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PreCloseChecklistGroupByOutputType[P]>
+            : GetScalarType<T[P], PreCloseChecklistGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PreCloseChecklistSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["preCloseChecklist"]>
+
+  export type PreCloseChecklistSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["preCloseChecklist"]>
+
+  export type PreCloseChecklistSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["preCloseChecklist"]>
+
+  export type PreCloseChecklistSelectScalar = {
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PreCloseChecklistOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "buyerItems" | "sellerItems" | "brokerItems" | "lastUpdatedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["preCloseChecklist"]>
+  export type PreCloseChecklistInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }
+  export type PreCloseChecklistIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }
+  export type PreCloseChecklistIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }
+
+  export type $PreCloseChecklistPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PreCloseChecklist"
+    objects: {
+      listing: Prisma.$ListingPayload<ExtArgs>
+      lastUpdatedByUser: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      listingId: string
+      buyerItems: Prisma.JsonValue
+      sellerItems: Prisma.JsonValue
+      brokerItems: Prisma.JsonValue
+      lastUpdatedBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["preCloseChecklist"]>
+    composites: {}
+  }
+
+  type PreCloseChecklistGetPayload<S extends boolean | null | undefined | PreCloseChecklistDefaultArgs> = $Result.GetResult<Prisma.$PreCloseChecklistPayload, S>
+
+  type PreCloseChecklistCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PreCloseChecklistFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PreCloseChecklistCountAggregateInputType | true
+    }
+
+  export interface PreCloseChecklistDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PreCloseChecklist'], meta: { name: 'PreCloseChecklist' } }
+    /**
+     * Find zero or one PreCloseChecklist that matches the filter.
+     * @param {PreCloseChecklistFindUniqueArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PreCloseChecklistFindUniqueArgs>(args: SelectSubset<T, PreCloseChecklistFindUniqueArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PreCloseChecklist that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PreCloseChecklistFindUniqueOrThrowArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PreCloseChecklistFindUniqueOrThrowArgs>(args: SelectSubset<T, PreCloseChecklistFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PreCloseChecklist that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistFindFirstArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PreCloseChecklistFindFirstArgs>(args?: SelectSubset<T, PreCloseChecklistFindFirstArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PreCloseChecklist that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistFindFirstOrThrowArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PreCloseChecklistFindFirstOrThrowArgs>(args?: SelectSubset<T, PreCloseChecklistFindFirstOrThrowArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PreCloseChecklists that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PreCloseChecklists
+     * const preCloseChecklists = await prisma.preCloseChecklist.findMany()
+     * 
+     * // Get first 10 PreCloseChecklists
+     * const preCloseChecklists = await prisma.preCloseChecklist.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const preCloseChecklistWithIdOnly = await prisma.preCloseChecklist.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PreCloseChecklistFindManyArgs>(args?: SelectSubset<T, PreCloseChecklistFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PreCloseChecklist.
+     * @param {PreCloseChecklistCreateArgs} args - Arguments to create a PreCloseChecklist.
+     * @example
+     * // Create one PreCloseChecklist
+     * const PreCloseChecklist = await prisma.preCloseChecklist.create({
+     *   data: {
+     *     // ... data to create a PreCloseChecklist
+     *   }
+     * })
+     * 
+     */
+    create<T extends PreCloseChecklistCreateArgs>(args: SelectSubset<T, PreCloseChecklistCreateArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PreCloseChecklists.
+     * @param {PreCloseChecklistCreateManyArgs} args - Arguments to create many PreCloseChecklists.
+     * @example
+     * // Create many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PreCloseChecklistCreateManyArgs>(args?: SelectSubset<T, PreCloseChecklistCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PreCloseChecklists and returns the data saved in the database.
+     * @param {PreCloseChecklistCreateManyAndReturnArgs} args - Arguments to create many PreCloseChecklists.
+     * @example
+     * // Create many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PreCloseChecklists and only return the `id`
+     * const preCloseChecklistWithIdOnly = await prisma.preCloseChecklist.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PreCloseChecklistCreateManyAndReturnArgs>(args?: SelectSubset<T, PreCloseChecklistCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PreCloseChecklist.
+     * @param {PreCloseChecklistDeleteArgs} args - Arguments to delete one PreCloseChecklist.
+     * @example
+     * // Delete one PreCloseChecklist
+     * const PreCloseChecklist = await prisma.preCloseChecklist.delete({
+     *   where: {
+     *     // ... filter to delete one PreCloseChecklist
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PreCloseChecklistDeleteArgs>(args: SelectSubset<T, PreCloseChecklistDeleteArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PreCloseChecklist.
+     * @param {PreCloseChecklistUpdateArgs} args - Arguments to update one PreCloseChecklist.
+     * @example
+     * // Update one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PreCloseChecklistUpdateArgs>(args: SelectSubset<T, PreCloseChecklistUpdateArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PreCloseChecklists.
+     * @param {PreCloseChecklistDeleteManyArgs} args - Arguments to filter PreCloseChecklists to delete.
+     * @example
+     * // Delete a few PreCloseChecklists
+     * const { count } = await prisma.preCloseChecklist.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PreCloseChecklistDeleteManyArgs>(args?: SelectSubset<T, PreCloseChecklistDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PreCloseChecklists.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PreCloseChecklistUpdateManyArgs>(args: SelectSubset<T, PreCloseChecklistUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PreCloseChecklists and returns the data updated in the database.
+     * @param {PreCloseChecklistUpdateManyAndReturnArgs} args - Arguments to update many PreCloseChecklists.
+     * @example
+     * // Update many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PreCloseChecklists and only return the `id`
+     * const preCloseChecklistWithIdOnly = await prisma.preCloseChecklist.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PreCloseChecklistUpdateManyAndReturnArgs>(args: SelectSubset<T, PreCloseChecklistUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PreCloseChecklist.
+     * @param {PreCloseChecklistUpsertArgs} args - Arguments to update or create a PreCloseChecklist.
+     * @example
+     * // Update or create a PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.upsert({
+     *   create: {
+     *     // ... data to create a PreCloseChecklist
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PreCloseChecklist we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PreCloseChecklistUpsertArgs>(args: SelectSubset<T, PreCloseChecklistUpsertArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PreCloseChecklists.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistCountArgs} args - Arguments to filter PreCloseChecklists to count.
+     * @example
+     * // Count the number of PreCloseChecklists
+     * const count = await prisma.preCloseChecklist.count({
+     *   where: {
+     *     // ... the filter for the PreCloseChecklists we want to count
+     *   }
+     * })
+    **/
+    count<T extends PreCloseChecklistCountArgs>(
+      args?: Subset<T, PreCloseChecklistCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PreCloseChecklistCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PreCloseChecklist.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PreCloseChecklistAggregateArgs>(args: Subset<T, PreCloseChecklistAggregateArgs>): Prisma.PrismaPromise<GetPreCloseChecklistAggregateType<T>>
+
+    /**
+     * Group by PreCloseChecklist.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PreCloseChecklistGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PreCloseChecklistGroupByArgs['orderBy'] }
+        : { orderBy?: PreCloseChecklistGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PreCloseChecklistGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPreCloseChecklistGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PreCloseChecklist model
+   */
+  readonly fields: PreCloseChecklistFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PreCloseChecklist.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PreCloseChecklistClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    listing<T extends ListingDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ListingDefaultArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    lastUpdatedByUser<T extends PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs> = {}>(args?: Subset<T, PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PreCloseChecklist model
+   */
+  interface PreCloseChecklistFieldRefs {
+    readonly id: FieldRef<"PreCloseChecklist", 'String'>
+    readonly listingId: FieldRef<"PreCloseChecklist", 'String'>
+    readonly buyerItems: FieldRef<"PreCloseChecklist", 'Json'>
+    readonly sellerItems: FieldRef<"PreCloseChecklist", 'Json'>
+    readonly brokerItems: FieldRef<"PreCloseChecklist", 'Json'>
+    readonly lastUpdatedBy: FieldRef<"PreCloseChecklist", 'String'>
+    readonly createdAt: FieldRef<"PreCloseChecklist", 'DateTime'>
+    readonly updatedAt: FieldRef<"PreCloseChecklist", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PreCloseChecklist findUnique
+   */
+  export type PreCloseChecklistFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist findUniqueOrThrow
+   */
+  export type PreCloseChecklistFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist findFirst
+   */
+  export type PreCloseChecklistFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PreCloseChecklists.
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PreCloseChecklists.
+     */
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * PreCloseChecklist findFirstOrThrow
+   */
+  export type PreCloseChecklistFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PreCloseChecklists.
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PreCloseChecklists.
+     */
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * PreCloseChecklist findMany
+   */
+  export type PreCloseChecklistFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklists to fetch.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PreCloseChecklists.
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * PreCloseChecklist create
+   */
+  export type PreCloseChecklistCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PreCloseChecklist.
+     */
+    data: XOR<PreCloseChecklistCreateInput, PreCloseChecklistUncheckedCreateInput>
+  }
+
+  /**
+   * PreCloseChecklist createMany
+   */
+  export type PreCloseChecklistCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PreCloseChecklists.
+     */
+    data: PreCloseChecklistCreateManyInput | PreCloseChecklistCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PreCloseChecklist createManyAndReturn
+   */
+  export type PreCloseChecklistCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * The data used to create many PreCloseChecklists.
+     */
+    data: PreCloseChecklistCreateManyInput | PreCloseChecklistCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PreCloseChecklist update
+   */
+  export type PreCloseChecklistUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PreCloseChecklist.
+     */
+    data: XOR<PreCloseChecklistUpdateInput, PreCloseChecklistUncheckedUpdateInput>
+    /**
+     * Choose, which PreCloseChecklist to update.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist updateMany
+   */
+  export type PreCloseChecklistUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PreCloseChecklists.
+     */
+    data: XOR<PreCloseChecklistUpdateManyMutationInput, PreCloseChecklistUncheckedUpdateManyInput>
+    /**
+     * Filter which PreCloseChecklists to update
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * Limit how many PreCloseChecklists to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PreCloseChecklist updateManyAndReturn
+   */
+  export type PreCloseChecklistUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * The data used to update PreCloseChecklists.
+     */
+    data: XOR<PreCloseChecklistUpdateManyMutationInput, PreCloseChecklistUncheckedUpdateManyInput>
+    /**
+     * Filter which PreCloseChecklists to update
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * Limit how many PreCloseChecklists to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PreCloseChecklist upsert
+   */
+  export type PreCloseChecklistUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PreCloseChecklist to update in case it exists.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+    /**
+     * In case the PreCloseChecklist found by the `where` argument doesn't exist, create a new PreCloseChecklist with this data.
+     */
+    create: XOR<PreCloseChecklistCreateInput, PreCloseChecklistUncheckedCreateInput>
+    /**
+     * In case the PreCloseChecklist was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PreCloseChecklistUpdateInput, PreCloseChecklistUncheckedUpdateInput>
+  }
+
+  /**
+   * PreCloseChecklist delete
+   */
+  export type PreCloseChecklistDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter which PreCloseChecklist to delete.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist deleteMany
+   */
+  export type PreCloseChecklistDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PreCloseChecklists to delete
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * Limit how many PreCloseChecklists to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PreCloseChecklist.lastUpdatedByUser
+   */
+  export type PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * PreCloseChecklist without action
+   */
+  export type PreCloseChecklistDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -12989,6 +14252,20 @@ export namespace Prisma {
   };
 
   export type SellerQuestionnaireScalarFieldEnum = (typeof SellerQuestionnaireScalarFieldEnum)[keyof typeof SellerQuestionnaireScalarFieldEnum]
+
+
+  export const PreCloseChecklistScalarFieldEnum: {
+    id: 'id',
+    listingId: 'listingId',
+    buyerItems: 'buyerItems',
+    sellerItems: 'sellerItems',
+    brokerItems: 'brokerItems',
+    lastUpdatedBy: 'lastUpdatedBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PreCloseChecklistScalarFieldEnum = (typeof PreCloseChecklistScalarFieldEnum)[keyof typeof PreCloseChecklistScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -13375,6 +14652,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressListRelationFilter
     buyerProgress?: BuyerProgressListRelationFilter
     sellerQuestionnaire?: XOR<SellerQuestionnaireNullableScalarRelationFilter, SellerQuestionnaireWhereInput> | null
+    updatedChecklists?: PreCloseChecklistListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -13401,6 +14679,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressOrderByRelationAggregateInput
     buyerProgress?: BuyerProgressOrderByRelationAggregateInput
     sellerQuestionnaire?: SellerQuestionnaireOrderByWithRelationInput
+    updatedChecklists?: PreCloseChecklistOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -13430,6 +14709,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressListRelationFilter
     buyerProgress?: BuyerProgressListRelationFilter
     sellerQuestionnaire?: XOR<SellerQuestionnaireNullableScalarRelationFilter, SellerQuestionnaireWhereInput> | null
+    updatedChecklists?: PreCloseChecklistListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -13816,6 +15096,7 @@ export namespace Prisma {
     documents?: DocumentListRelationFilter
     sellerProgress?: SellerProgressListRelationFilter
     buyerSelectedProgress?: BuyerProgressListRelationFilter
+    preCloseChecklist?: XOR<PreCloseChecklistNullableScalarRelationFilter, PreCloseChecklistWhereInput> | null
   }
 
   export type ListingOrderByWithRelationInput = {
@@ -13831,6 +15112,7 @@ export namespace Prisma {
     documents?: DocumentOrderByRelationAggregateInput
     sellerProgress?: SellerProgressOrderByRelationAggregateInput
     buyerSelectedProgress?: BuyerProgressOrderByRelationAggregateInput
+    preCloseChecklist?: PreCloseChecklistOrderByWithRelationInput
   }
 
   export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -13849,6 +15131,7 @@ export namespace Prisma {
     documents?: DocumentListRelationFilter
     sellerProgress?: SellerProgressListRelationFilter
     buyerSelectedProgress?: BuyerProgressListRelationFilter
+    preCloseChecklist?: XOR<PreCloseChecklistNullableScalarRelationFilter, PreCloseChecklistWhereInput> | null
   }, "id">
 
   export type ListingOrderByWithAggregationInput = {
@@ -13997,6 +15280,79 @@ export namespace Prisma {
     submittedAt?: DateTimeNullableWithAggregatesFilter<"SellerQuestionnaire"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SellerQuestionnaire"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SellerQuestionnaire"> | Date | string
+  }
+
+  export type PreCloseChecklistWhereInput = {
+    AND?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    OR?: PreCloseChecklistWhereInput[]
+    NOT?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    id?: StringFilter<"PreCloseChecklist"> | string
+    listingId?: StringFilter<"PreCloseChecklist"> | string
+    buyerItems?: JsonFilter<"PreCloseChecklist">
+    sellerItems?: JsonFilter<"PreCloseChecklist">
+    brokerItems?: JsonFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+    lastUpdatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type PreCloseChecklistOrderByWithRelationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerItems?: SortOrder
+    sellerItems?: SortOrder
+    brokerItems?: SortOrder
+    lastUpdatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    listing?: ListingOrderByWithRelationInput
+    lastUpdatedByUser?: UserOrderByWithRelationInput
+  }
+
+  export type PreCloseChecklistWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    listingId?: string
+    AND?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    OR?: PreCloseChecklistWhereInput[]
+    NOT?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    buyerItems?: JsonFilter<"PreCloseChecklist">
+    sellerItems?: JsonFilter<"PreCloseChecklist">
+    brokerItems?: JsonFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+    lastUpdatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "listingId">
+
+  export type PreCloseChecklistOrderByWithAggregationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerItems?: SortOrder
+    sellerItems?: SortOrder
+    brokerItems?: SortOrder
+    lastUpdatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PreCloseChecklistCountOrderByAggregateInput
+    _max?: PreCloseChecklistMaxOrderByAggregateInput
+    _min?: PreCloseChecklistMinOrderByAggregateInput
+  }
+
+  export type PreCloseChecklistScalarWhereWithAggregatesInput = {
+    AND?: PreCloseChecklistScalarWhereWithAggregatesInput | PreCloseChecklistScalarWhereWithAggregatesInput[]
+    OR?: PreCloseChecklistScalarWhereWithAggregatesInput[]
+    NOT?: PreCloseChecklistScalarWhereWithAggregatesInput | PreCloseChecklistScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PreCloseChecklist"> | string
+    listingId?: StringWithAggregatesFilter<"PreCloseChecklist"> | string
+    buyerItems?: JsonWithAggregatesFilter<"PreCloseChecklist">
+    sellerItems?: JsonWithAggregatesFilter<"PreCloseChecklist">
+    brokerItems?: JsonWithAggregatesFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableWithAggregatesFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PreCloseChecklist"> | Date | string
   }
 
   export type DocumentCreateInput = {
@@ -14158,6 +15514,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -14183,6 +15540,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUpdateInput = {
@@ -14208,6 +15566,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -14233,6 +15592,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -14635,6 +15995,7 @@ export namespace Prisma {
     documents?: DocumentCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
   }
 
   export type ListingUncheckedCreateInput = {
@@ -14649,6 +16010,7 @@ export namespace Prisma {
     documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
   }
 
   export type ListingUpdateInput = {
@@ -14663,6 +16025,7 @@ export namespace Prisma {
     documents?: DocumentUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateInput = {
@@ -14677,6 +16040,7 @@ export namespace Prisma {
     documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
   }
 
   export type ListingCreateManyInput = {
@@ -14828,6 +16192,81 @@ export namespace Prisma {
     data?: JsonNullValueInput | InputJsonValue
     submitted?: BoolFieldUpdateOperationsInput | boolean
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistCreateInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutPreCloseChecklistInput
+    lastUpdatedByUser?: UserCreateNestedOneWithoutUpdatedChecklistsInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutPreCloseChecklistNestedInput
+    lastUpdatedByUser?: UserUpdateOneWithoutUpdatedChecklistsNestedInput
+  }
+
+  export type PreCloseChecklistUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistCreateManyInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15198,6 +16637,12 @@ export namespace Prisma {
     isNot?: SellerQuestionnaireWhereInput | null
   }
 
+  export type PreCloseChecklistListRelationFilter = {
+    every?: PreCloseChecklistWhereInput
+    some?: PreCloseChecklistWhereInput
+    none?: PreCloseChecklistWhereInput
+  }
+
   export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -15223,6 +16668,10 @@ export namespace Prisma {
   }
 
   export type BuyerProgressOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PreCloseChecklistOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15586,6 +17035,11 @@ export namespace Prisma {
     not?: NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
   }
 
+  export type PreCloseChecklistNullableScalarRelationFilter = {
+    is?: PreCloseChecklistWhereInput | null
+    isNot?: PreCloseChecklistWhereInput | null
+  }
+
   export type ListingCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
@@ -15745,6 +17199,38 @@ export namespace Prisma {
     sellerId?: SortOrder
     submitted?: SortOrder
     submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ListingScalarRelationFilter = {
+    is?: ListingWhereInput
+    isNot?: ListingWhereInput
+  }
+
+  export type PreCloseChecklistCountOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerItems?: SortOrder
+    sellerItems?: SortOrder
+    brokerItems?: SortOrder
+    lastUpdatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PreCloseChecklistMaxOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    lastUpdatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PreCloseChecklistMinOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    lastUpdatedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15939,6 +17425,13 @@ export namespace Prisma {
     connect?: SellerQuestionnaireWhereUniqueInput
   }
 
+  export type PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -16019,6 +17512,13 @@ export namespace Prisma {
     create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
     connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
     connect?: SellerQuestionnaireWhereUniqueInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -16206,6 +17706,20 @@ export namespace Prisma {
     update?: XOR<XOR<SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput, SellerQuestionnaireUpdateWithoutSellerInput>, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
   }
 
+  export type PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    upsert?: PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    set?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    disconnect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    delete?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    update?: PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    updateMany?: PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput[]
+    deleteMany?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
     create?: XOR<UserCreateWithoutManagedByInput, UserUncheckedCreateWithoutManagedByInput> | UserCreateWithoutManagedByInput[] | UserUncheckedCreateWithoutManagedByInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagedByInput | UserCreateOrConnectWithoutManagedByInput[]
@@ -16367,6 +17881,20 @@ export namespace Prisma {
     delete?: SellerQuestionnaireWhereInput | boolean
     connect?: SellerQuestionnaireWhereUniqueInput
     update?: XOR<XOR<SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput, SellerQuestionnaireUpdateWithoutSellerInput>, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    upsert?: PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    set?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    disconnect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    delete?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    update?: PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    updateMany?: PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput[]
+    deleteMany?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSellerProgressInput = {
@@ -16612,6 +18140,12 @@ export namespace Prisma {
     connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
   }
 
+  export type PreCloseChecklistCreateNestedOneWithoutListingInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    connect?: PreCloseChecklistWhereUniqueInput
+  }
+
   export type UserUncheckedCreateNestedManyWithoutBuyingListingsInput = {
     create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
@@ -16637,6 +18171,12 @@ export namespace Prisma {
     connectOrCreate?: BuyerProgressCreateOrConnectWithoutSelectedListingInput | BuyerProgressCreateOrConnectWithoutSelectedListingInput[]
     createMany?: BuyerProgressCreateManySelectedListingInputEnvelope
     connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+  }
+
+  export type PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    connect?: PreCloseChecklistWhereUniqueInput
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -16714,6 +18254,16 @@ export namespace Prisma {
     deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
   }
 
+  export type PreCloseChecklistUpdateOneWithoutListingNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    upsert?: PreCloseChecklistUpsertWithoutListingInput
+    disconnect?: PreCloseChecklistWhereInput | boolean
+    delete?: PreCloseChecklistWhereInput | boolean
+    connect?: PreCloseChecklistWhereUniqueInput
+    update?: XOR<XOR<PreCloseChecklistUpdateToOneWithWhereWithoutListingInput, PreCloseChecklistUpdateWithoutListingInput>, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+  }
+
   export type UserUncheckedUpdateManyWithoutBuyingListingsNestedInput = {
     create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
@@ -16769,6 +18319,16 @@ export namespace Prisma {
     deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
   }
 
+  export type PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    upsert?: PreCloseChecklistUpsertWithoutListingInput
+    disconnect?: PreCloseChecklistWhereInput | boolean
+    delete?: PreCloseChecklistWhereInput | boolean
+    connect?: PreCloseChecklistWhereUniqueInput
+    update?: XOR<XOR<PreCloseChecklistUpdateToOneWithWhereWithoutListingInput, PreCloseChecklistUpdateWithoutListingInput>, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+  }
+
   export type UserCreateNestedOneWithoutActivitiesInput = {
     create?: XOR<UserCreateWithoutActivitiesInput, UserUncheckedCreateWithoutActivitiesInput>
     connectOrCreate?: UserCreateOrConnectWithoutActivitiesInput
@@ -16795,6 +18355,36 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSellerQuestionnaireInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerQuestionnaireInput, UserUpdateWithoutSellerQuestionnaireInput>, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+  }
+
+  export type ListingCreateNestedOneWithoutPreCloseChecklistInput = {
+    create?: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutPreCloseChecklistInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutUpdatedChecklistsInput = {
+    create?: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUpdatedChecklistsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ListingUpdateOneRequiredWithoutPreCloseChecklistNestedInput = {
+    create?: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutPreCloseChecklistInput
+    upsert?: ListingUpsertWithoutPreCloseChecklistInput
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutPreCloseChecklistInput, ListingUpdateWithoutPreCloseChecklistInput>, ListingUncheckedUpdateWithoutPreCloseChecklistInput>
+  }
+
+  export type UserUpdateOneWithoutUpdatedChecklistsNestedInput = {
+    create?: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUpdatedChecklistsInput
+    upsert?: UserUpsertWithoutUpdatedChecklistsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUpdatedChecklistsInput, UserUpdateWithoutUpdatedChecklistsInput>, UserUncheckedUpdateWithoutUpdatedChecklistsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -17201,6 +18791,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutSellerDocsInput = {
@@ -17225,6 +18816,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutSellerDocsInput = {
@@ -17254,6 +18846,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutBuyerDocsInput = {
@@ -17278,6 +18871,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutBuyerDocsInput = {
@@ -17296,6 +18890,7 @@ export namespace Prisma {
     buyers?: UserCreateNestedManyWithoutBuyingListingsInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
   }
 
   export type ListingUncheckedCreateWithoutDocumentsInput = {
@@ -17309,6 +18904,7 @@ export namespace Prisma {
     buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
   }
 
   export type ListingCreateOrConnectWithoutDocumentsInput = {
@@ -17338,6 +18934,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutUploadedDocumentsInput = {
@@ -17362,6 +18959,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutUploadedDocumentsInput = {
@@ -17402,6 +19000,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerDocsInput = {
@@ -17426,6 +19025,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUpsertWithoutBuyerDocsInput = {
@@ -17461,6 +19061,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerDocsInput = {
@@ -17485,6 +19086,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type ListingUpsertWithoutDocumentsInput = {
@@ -17509,6 +19111,7 @@ export namespace Prisma {
     buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutDocumentsInput = {
@@ -17522,6 +19125,7 @@ export namespace Prisma {
     buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
   }
 
   export type UserUpsertWithoutUploadedDocumentsInput = {
@@ -17557,6 +19161,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUploadedDocumentsInput = {
@@ -17581,6 +19186,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserCreateWithoutManagingInput = {
@@ -17605,6 +19211,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -17629,6 +19236,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -17658,6 +19266,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -17682,6 +19291,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -17705,6 +19315,7 @@ export namespace Prisma {
     documents?: DocumentCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
   }
 
   export type ListingUncheckedCreateWithoutSellerInput = {
@@ -17718,6 +19329,7 @@ export namespace Prisma {
     documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
   }
 
   export type ListingCreateOrConnectWithoutSellerInput = {
@@ -18013,6 +19625,7 @@ export namespace Prisma {
     documents?: DocumentCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
   }
 
   export type ListingUncheckedCreateWithoutBuyersInput = {
@@ -18026,6 +19639,7 @@ export namespace Prisma {
     documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
     buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
   }
 
   export type ListingCreateOrConnectWithoutBuyersInput = {
@@ -18112,6 +19726,36 @@ export namespace Prisma {
     create: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
   }
 
+  export type PreCloseChecklistCreateWithoutLastUpdatedByUserInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutPreCloseChecklistInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    create: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope = {
+    data: PreCloseChecklistCreateManyLastUpdatedByUserInput | PreCloseChecklistCreateManyLastUpdatedByUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -18145,6 +19789,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -18169,6 +19814,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -18488,6 +20134,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    update: XOR<PreCloseChecklistUpdateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedUpdateWithoutLastUpdatedByUserInput>
+    create: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    data: XOR<PreCloseChecklistUpdateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedUpdateWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistScalarWhereInput
+    data: XOR<PreCloseChecklistUpdateManyMutationInput, PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistScalarWhereInput = {
+    AND?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+    OR?: PreCloseChecklistScalarWhereInput[]
+    NOT?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+    id?: StringFilter<"PreCloseChecklist"> | string
+    listingId?: StringFilter<"PreCloseChecklist"> | string
+    buyerItems?: JsonFilter<"PreCloseChecklist">
+    sellerItems?: JsonFilter<"PreCloseChecklist">
+    brokerItems?: JsonFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+  }
+
   export type UserCreateWithoutSellerProgressInput = {
     id?: string
     email: string
@@ -18510,6 +20186,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutSellerProgressInput = {
@@ -18534,6 +20211,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutSellerProgressInput = {
@@ -18552,6 +20230,7 @@ export namespace Prisma {
     buyers?: UserCreateNestedManyWithoutBuyingListingsInput
     documents?: DocumentCreateNestedManyWithoutListingInput
     buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
   }
 
   export type ListingUncheckedCreateWithoutSellerProgressInput = {
@@ -18565,6 +20244,7 @@ export namespace Prisma {
     buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
     documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
     buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
   }
 
   export type ListingCreateOrConnectWithoutSellerProgressInput = {
@@ -18605,6 +20285,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerProgressInput = {
@@ -18629,6 +20310,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type ListingUpsertWithoutSellerProgressInput = {
@@ -18653,6 +20335,7 @@ export namespace Prisma {
     buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
     documents?: DocumentUpdateManyWithoutListingNestedInput
     buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutSellerProgressInput = {
@@ -18666,6 +20349,7 @@ export namespace Prisma {
     buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
     buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
   }
 
   export type UserCreateWithoutBuyerProgressInput = {
@@ -18690,6 +20374,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutBuyerProgressInput = {
@@ -18714,6 +20399,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutBuyerProgressInput = {
@@ -18732,6 +20418,7 @@ export namespace Prisma {
     buyers?: UserCreateNestedManyWithoutBuyingListingsInput
     documents?: DocumentCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
   }
 
   export type ListingUncheckedCreateWithoutBuyerSelectedProgressInput = {
@@ -18745,6 +20432,7 @@ export namespace Prisma {
     buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
     documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
   }
 
   export type ListingCreateOrConnectWithoutBuyerSelectedProgressInput = {
@@ -18785,6 +20473,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerProgressInput = {
@@ -18809,6 +20498,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type ListingUpsertWithoutBuyerSelectedProgressInput = {
@@ -18833,6 +20523,7 @@ export namespace Prisma {
     buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
     documents?: DocumentUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutBuyerSelectedProgressInput = {
@@ -18846,6 +20537,7 @@ export namespace Prisma {
     buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
     documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
   }
 
   export type UserCreateWithoutSentMessagesInput = {
@@ -18870,6 +20562,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -18894,6 +20587,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -18923,6 +20617,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -18947,6 +20642,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -19114,6 +20810,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -19138,6 +20835,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -19173,6 +20871,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -19197,6 +20896,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type MessageUpsertWithoutRepliesInput = {
@@ -19419,6 +21119,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -19443,6 +21144,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
@@ -19472,6 +21174,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutBuyingListingsInput = {
@@ -19496,6 +21199,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutBuyingListingsInput = {
@@ -19607,6 +21311,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PreCloseChecklistCreateWithoutListingInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lastUpdatedByUser?: UserCreateNestedOneWithoutUpdatedChecklistsInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateWithoutListingInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistCreateOrConnectWithoutListingInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    create: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+  }
+
   export type UserUpsertWithoutListingsInput = {
     update: XOR<UserUpdateWithoutListingsInput, UserUncheckedUpdateWithoutListingsInput>
     create: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
@@ -19640,6 +21369,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -19664,6 +21394,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutBuyingListingsInput = {
@@ -19730,6 +21461,37 @@ export namespace Prisma {
     data: XOR<BuyerProgressUpdateManyMutationInput, BuyerProgressUncheckedUpdateManyWithoutSelectedListingInput>
   }
 
+  export type PreCloseChecklistUpsertWithoutListingInput = {
+    update: XOR<PreCloseChecklistUpdateWithoutListingInput, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+    create: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    where?: PreCloseChecklistWhereInput
+  }
+
+  export type PreCloseChecklistUpdateToOneWithWhereWithoutListingInput = {
+    where?: PreCloseChecklistWhereInput
+    data: XOR<PreCloseChecklistUpdateWithoutListingInput, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+  }
+
+  export type PreCloseChecklistUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdatedByUser?: UserUpdateOneWithoutUpdatedChecklistsNestedInput
+  }
+
+  export type PreCloseChecklistUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateWithoutActivitiesInput = {
     id?: string
     email: string
@@ -19752,6 +21514,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -19776,6 +21539,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -19816,6 +21580,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -19840,6 +21605,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserCreateWithoutSellerQuestionnaireInput = {
@@ -19864,6 +21630,7 @@ export namespace Prisma {
     buyingListings?: ListingCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserUncheckedCreateWithoutSellerQuestionnaireInput = {
@@ -19888,6 +21655,7 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
     sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
     buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
   }
 
   export type UserCreateOrConnectWithoutSellerQuestionnaireInput = {
@@ -19928,6 +21696,7 @@ export namespace Prisma {
     buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerQuestionnaireInput = {
@@ -19952,6 +21721,195 @@ export namespace Prisma {
     buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+  }
+
+  export type ListingCreateWithoutPreCloseChecklistInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutPreCloseChecklistInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutPreCloseChecklistInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+  }
+
+  export type UserCreateWithoutUpdatedChecklistsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+  }
+
+  export type UserUncheckedCreateWithoutUpdatedChecklistsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+  }
+
+  export type UserCreateOrConnectWithoutUpdatedChecklistsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+  }
+
+  export type ListingUpsertWithoutPreCloseChecklistInput = {
+    update: XOR<ListingUpdateWithoutPreCloseChecklistInput, ListingUncheckedUpdateWithoutPreCloseChecklistInput>
+    create: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutPreCloseChecklistInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutPreCloseChecklistInput, ListingUncheckedUpdateWithoutPreCloseChecklistInput>
+  }
+
+  export type ListingUpdateWithoutPreCloseChecklistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutPreCloseChecklistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+  }
+
+  export type UserUpsertWithoutUpdatedChecklistsInput = {
+    update: XOR<UserUpdateWithoutUpdatedChecklistsInput, UserUncheckedUpdateWithoutUpdatedChecklistsInput>
+    create: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUpdatedChecklistsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUpdatedChecklistsInput, UserUncheckedUpdateWithoutUpdatedChecklistsInput>
+  }
+
+  export type UserUpdateWithoutUpdatedChecklistsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUpdatedChecklistsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
   }
 
   export type UserCreateManyManagedByInput = {
@@ -20095,6 +22053,16 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type PreCloseChecklistCreateManyLastUpdatedByUserInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserUpdateWithoutManagedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -20117,6 +22085,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -20141,6 +22110,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -20166,6 +22136,7 @@ export namespace Prisma {
     documents?: DocumentUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutSellerInput = {
@@ -20179,6 +22150,7 @@ export namespace Prisma {
     documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateManyWithoutSellerInput = {
@@ -20515,6 +22487,7 @@ export namespace Prisma {
     documents?: DocumentUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutBuyersInput = {
@@ -20528,6 +22501,7 @@ export namespace Prisma {
     documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
     buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateManyWithoutBuyersInput = {
@@ -20590,6 +22564,36 @@ export namespace Prisma {
     currentStep?: IntFieldUpdateOperationsInput | number
     completedSteps?: JsonNullValueInput | InputJsonValue
     selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUpdateWithoutLastUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutPreCloseChecklistNestedInput
+  }
+
+  export type PreCloseChecklistUncheckedUpdateWithoutLastUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20769,6 +22773,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyingListingsInput = {
@@ -20793,6 +22798,7 @@ export namespace Prisma {
     sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
     buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
     sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutBuyingListingsInput = {

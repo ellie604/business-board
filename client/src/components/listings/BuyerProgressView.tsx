@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { DocumentArrowUpIcon, FolderOpenIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid';
 import { API_BASE_URL } from '../../config';
 import ProgressSteps from '../ProgressSteps';
+import PreCloseChecklist from '../PreCloseChecklist';
 
 interface Document {
   id: string;
@@ -610,6 +611,30 @@ const BuyerProgressView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Pre-Close Checklist - Show when buyer reaches step 8 */}
+      {buyerProgress && buyerProgress.currentStep >= 8 && listingId && (
+        <div className="mt-8">
+          <PreCloseChecklist
+            listingId={listingId}
+            userRole="BUYER"
+            currentUserName={buyer?.name}
+            className="shadow-lg"
+          />
+        </div>
+      )}
+
+      {/* Pre-Close Checklist - Available for Broker/Agent editing */}
+      {listingId && (isBroker || isAgent) && (
+        <div className="mt-8">
+          <PreCloseChecklist
+            listingId={listingId}
+            userRole={isBroker ? "BROKER" : "AGENT"}
+            currentUserName={undefined} // Will use default from session
+            className="shadow-lg"
+          />
+        </div>
+      )}
     </div>
   );
 };

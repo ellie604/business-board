@@ -231,6 +231,17 @@ exports.Prisma.SellerQuestionnaireScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.PreCloseChecklistScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  buyerItems: 'buyerItems',
+  sellerItems: 'sellerItems',
+  brokerItems: 'brokerItems',
+  lastUpdatedBy: 'lastUpdatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -324,7 +335,8 @@ exports.Prisma.ModelName = {
   MessageAttachment: 'MessageAttachment',
   Listing: 'Listing',
   Activity: 'Activity',
-  SellerQuestionnaire: 'SellerQuestionnaire'
+  SellerQuestionnaire: 'SellerQuestionnaire',
+  PreCloseChecklist: 'PreCloseChecklist'
 };
 
 /**

@@ -27,46 +27,46 @@ export function getPrisma() {
       }
     };
 
-    if (process.env.NODE_ENV === 'production') {
-      console.log('Using production database');
-      prisma = new ProductionPrismaClient(prismaOptions);
-    } else {
-      console.log('Using preview database');
-      prisma = new PreviewPrismaClient(prismaOptions);
-    }
-
-    // 简化错误处理中间件 - 减少重连尝试
-    prisma.$use(async (params: any, next: any) => {
-      const startTime = Date.now();
-      try {
-        const result = await next(params);
-        const duration = Date.now() - startTime;
-        
-        // 只在查询时间过长时记录日志
-        if (duration > 1000) {
-          console.log(`Slow query detected: ${params.model}.${params.action} took ${duration}ms`);
-        }
-        
-        return result;
-      } catch (error: any) {
-        const duration = Date.now() - startTime;
-        console.error(`Database error after ${duration}ms:`, error.message);
-        
-        // 简化错误处理，避免无限重连
-        if (error?.code === 'P1017' || error?.code === 'P2028') {
-          console.log('Connection issue detected, will reconnect on next request');
-          await prisma.$disconnect();
-          prisma = null;
-        }
-        throw error;
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        console.log('Using production database');
+        prisma = new ProductionPrismaClient(prismaOptions);
+      } else {
+        console.log('Using preview database');
+        prisma = new PreviewPrismaClient(prismaOptions);
       }
-    });
 
-    // 设置连接预热
-    if (process.env.NODE_ENV === 'production') {
-      prisma.$connect().catch((error: any) => {
-        console.error('Failed to connect to database:', error);
+      // 简化错误处理中间件 - 减少重连尝试
+      prisma.$use(async (params: any, next: any) => {
+        const startTime = Date.now();
+        try {
+          const result = await next(params);
+          const duration = Date.now() - startTime;
+          
+          // 只在查询时间过长时记录日志
+          if (duration > 1000) {
+            console.log(`Slow query detected: ${params.model}.${params.action} took ${duration}ms`);
+          }
+          
+          return result;
+        } catch (error: any) {
+          const duration = Date.now() - startTime;
+          console.error(`Database error after ${duration}ms:`, error.message);
+          
+          // 不要重置prisma实例，让它自己处理重连
+          throw error;
+        }
       });
+
+      // 设置连接预热
+      if (process.env.NODE_ENV === 'production') {
+        prisma.$connect().catch((error: any) => {
+          console.error('Failed to connect to database:', error);
+        });
+      }
+    } catch (error: any) {
+      console.error('Failed to initialize Prisma client:', error);
+      throw error;
     }
   }
   return prisma;

@@ -56,8 +56,10 @@ const SellerUploadDocs: React.FC = () => {
           
           if (response.ok) {
             const data = await response.json();
-            // Filter to only show UPLOADED_DOC type documents (current step documents)
-            const currentStepFiles = data.documents?.filter((doc: any) => doc.type === 'UPLOADED_DOC') || [];
+            // Filter to show all documents for step 4 (financial documents)
+            const currentStepFiles = data.documents?.filter((doc: any) => 
+              doc.stepId === 4 && doc.category === 'SELLER_UPLOAD'
+            ) || [];
             
             // Map the database document structure to match our UI structure
             const mappedFiles = currentStepFiles.map((doc: any) => ({
@@ -95,8 +97,10 @@ const SellerUploadDocs: React.FC = () => {
         
         if (response.ok) {
           const data = await response.json();
-          // Filter to only show UPLOADED_DOC type documents (current step documents)
-          const currentStepFiles = data.documents?.filter((doc: any) => doc.type === 'UPLOADED_DOC') || [];
+          // Filter to show all documents for step 4 (financial documents)
+          const currentStepFiles = data.documents?.filter((doc: any) => 
+            doc.stepId === 4 && doc.category === 'SELLER_UPLOAD'
+          ) || [];
           
           // Map the database document structure to match our UI structure
           const mappedFiles = currentStepFiles.map((doc: any) => ({
@@ -137,7 +141,8 @@ const SellerUploadDocs: React.FC = () => {
         // Upload file using real API
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('documentType', 'UPLOADED_DOC');
+        formData.append('documentType', 'FINANCIAL_DOCUMENTS');
+        formData.append('stepId', '4'); // 明确指定这是第4步的文档
 
         const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
           method: 'POST',

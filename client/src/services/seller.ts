@@ -73,6 +73,100 @@ interface StepDocumentsResponse {
   requirement: DocumentRequirement;
 }
 
+// Add simple in-memory cache
+interface CacheItem<T> {
+  data: T;
+  timestamp: number;
+  expiry: number;
+}
+
+class Cache {
+  private cache = new Map<string, CacheItem<any>>();
+  private readonly DEFAULT_TTL = 30000; // 30 seconds default TTL
+
+  set<T>(key: string, data: T, ttl: number = this.DEFAULT_TTL): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      expiry: Date.now() + ttl
+    });
+  }
+
+  get<T>(key: string): T | null {
+    const item = this.cache.get(key);
+    if (!item) return null;
+    
+    if (Date.now() > item.expiry) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return item.data as T;
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  delete(key: string): void {
+    this.cache.delete(key);
+  }
+}
+
+// Global cache instance
+const cache = new Cache();
+
+// Request deduplication
+const pendingRequests = new Map<string, Promise<any>>();
+
+async function makeRequest<T>(
+  url: string, 
+  options: RequestInit = {},
+  cacheKey?: string,
+  cacheTTL: number = 30000
+): Promise<T> {
+  // Check cache first
+  if (cacheKey) {
+    const cached = cache.get<T>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  }
+
+  // Check for pending request
+  const requestKey = `${url}_${JSON.stringify(options)}`;
+  if (pendingRequests.has(requestKey)) {
+    return pendingRequests.get(requestKey);
+  }
+
+  // Make new request
+  const request = fetch(`${API_BASE_URL}${url}`, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...options,
+  }).then(async (res) => {
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    const data = await res.json();
+    
+    // Cache successful responses
+    if (cacheKey && res.ok) {
+      cache.set(cacheKey, data, cacheTTL);
+    }
+    
+    return data;
+  }).finally(() => {
+    // Clean up pending request
+    pendingRequests.delete(requestKey);
+  });
+
+  pendingRequests.set(requestKey, request);
+  return request;
+}
+
 export const sellerService = {
   async getDashboardStats() {
     const res = await fetch(`${API_BASE_URL}/seller/dashboard`, { credentials: 'include' });
@@ -80,78 +174,112 @@ export const sellerService = {
     return res.json();
   },
 
-  async getListings() {
-    const res = await fetch(`${API_BASE_URL}/seller/listings`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to fetch listings');
-    return res.json();
+  async getListings(): Promise<any[]> {
+    return makeRequest<any[]>(
+      '/seller/listings',
+      {},
+      'seller_listings',
+      60000 // Cache for 1 minute since listings don't change often
+    );
   },
 
-  async getProgress() {
-    const res = await fetch(`${API_BASE_URL}/seller/progress`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to fetch progress');
-    return res.json();
+  async getProgress(): Promise<{ progress: SellerProgress }> {
+    return makeRequest<{ progress: SellerProgress }>(
+      '/seller/progress',
+      {},
+      'seller_progress',
+      10000 // Cache for 10 seconds since progress changes frequently
+    );
   },
 
-  async selectListing(listingId: string) {
-    const res = await fetch(`${API_BASE_URL}/seller/select-listing`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ listingId })
-    });
-    if (!res.ok) throw new Error('Failed to select listing');
-    return res.json();
+  async selectListing(listingId: string): Promise<{ message: string; listing: any; progress: any }> {
+    // Clear both progress and listings cache when selecting
+    cache.delete('seller_progress');
+    cache.delete('current_listing');
+    return makeRequest<{ message: string; listing: any; progress: any }>(
+      '/seller/select-listing',
+      {
+        method: 'POST',
+        body: JSON.stringify({ listingId }),
+      }
+    );
   },
 
-  async getCurrentListing() {
-    const res = await fetch(`${API_BASE_URL}/seller/current-listing`, { 
-      credentials: 'include' 
-    });
-    if (!res.ok) throw new Error('Failed to fetch current listing');
-    return res.json();
+  async getCurrentListing(): Promise<{ listing: any; needsSelection: boolean }> {
+    return makeRequest<{ listing: any; needsSelection: boolean }>(
+      '/seller/current-listing',
+      {},
+      'current_listing',
+      30000 // Cache for 30 seconds
+    );
   },
 
-  async updateStep(stepId: number) {
-    const res = await fetch(`${API_BASE_URL}/seller/update-step`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ stepId })
-    });
-    if (!res.ok) throw new Error('Failed to update step');
-    return res.json();
+  async updateStep(stepId: number): Promise<{ message: string; progress: any }> {
+    // Clear progress cache when updating
+    cache.delete('seller_progress');
+    return makeRequest<{ message: string; progress: any }>(
+      '/seller/update-step',
+      {
+        method: 'POST',
+        body: JSON.stringify({ stepId }),
+      }
+    );
   },
 
-  // 获取特定步骤的文档
-  async getStepDocuments(stepId: number): Promise<StepDocumentsResponse> {
-    const res = await fetch(`${API_BASE_URL}/seller/step/${stepId}/documents`, { 
-      credentials: 'include' 
-    });
-    if (!res.ok) throw new Error('Failed to fetch step documents');
-    return res.json();
+  async markStepCompleted(stepId: number): Promise<{ message: string; progress: any }> {
+    // Clear progress cache when marking step as completed
+    cache.delete('seller_progress');
+    return makeRequest<{ message: string; progress: any }>(
+      '/seller/mark-step-completed',
+      {
+        method: 'POST',
+        body: JSON.stringify({ stepId }),
+      }
+    );
   },
 
-  // 为特定步骤上传文档
-  async uploadStepDocument(stepId: number, fileName: string, fileUrl: string, fileSize: number): Promise<{ document: StepDocument }> {
-    const res = await fetch(`${API_BASE_URL}/seller/step/${stepId}/upload`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ fileName, fileUrl, fileSize })
-    });
-    if (!res.ok) throw new Error('Failed to upload step document');
-    return res.json();
+  async markStepIncomplete(stepId: number): Promise<{ message: string; progress: any }> {
+    // Clear progress cache when marking step as incomplete
+    cache.delete('seller_progress');
+    return makeRequest<{ message: string; progress: any }>(
+      '/seller/mark-step-incomplete',
+      {
+        method: 'POST',
+        body: JSON.stringify({ stepId }),
+      }
+    );
   },
 
-  // 记录特定步骤的文档下载
-  async recordStepDownload(stepId: number): Promise<{ document: StepDocument }> {
-    const res = await fetch(`${API_BASE_URL}/seller/step/${stepId}/download`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
-    });
-    if (!res.ok) throw new Error('Failed to record download');
-    return res.json();
+  async getStepDocuments(stepId: number): Promise<{ documents: any[]; requirement: DocumentRequirement }> {
+    return makeRequest<{ documents: any[]; requirement: DocumentRequirement }>(
+      `/seller/step/${stepId}/documents`,
+      {},
+      `step_${stepId}_documents`,
+      30000
+    );
+  },
+
+  async uploadStepDocument(stepId: number, fileName: string, fileUrl: string, fileSize: number): Promise<{ document: any }> {
+    // Clear step documents cache when uploading
+    cache.delete(`step_${stepId}_documents`);
+    return makeRequest<{ document: any }>(
+      `/seller/step/${stepId}/upload`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ fileName, fileUrl, fileSize }),
+      }
+    );
+  },
+
+  async downloadStepDocument(stepId: number): Promise<{ document: any }> {
+    // Clear step documents cache when downloading
+    cache.delete(`step_${stepId}_documents`);
+    return makeRequest<{ document: any }>(
+      `/seller/step/${stepId}/download`,
+      {
+        method: 'POST',
+      }
+    );
   },
 
   async getDocuments(): Promise<DocumentsResponse> {
@@ -199,19 +327,17 @@ export const sellerService = {
     }
   },
 
-  async submitQuestionnaire(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/seller/questionnaire`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit questionnaire');
-    }
+  async submitQuestionnaire(questionnaire: any): Promise<{ message: string; document: any }> {
+    // Clear questionnaire cache when submitting
+    cache.delete('seller_questionnaire');
+    cache.delete('seller_progress'); // Also clear progress since this affects step completion
+    return makeRequest<{ message: string; document: any }>(
+      '/seller/questionnaire/submit',
+      {
+        method: 'POST',
+        body: JSON.stringify({ questionnaire }),
+      }
+    );
   },
 
   async submitPurchaseAgreement(data: any): Promise<void> {
@@ -283,13 +409,43 @@ export const sellerService = {
     return response.json();
   },
 
-  // 获取当前listing的所有buyers
-  async getListingBuyers() {
-    const res = await fetch(`${API_BASE_URL}/seller/current-listing`, { 
-      credentials: 'include' 
-    });
-    if (!res.ok) throw new Error('Failed to fetch listing buyers');
-    const data = await res.json();
-    return data.listing?.buyers || [];
+  async getListingBuyers(): Promise<any[]> {
+    return makeRequest<any[]>(
+      '/seller/listing-buyers',
+      {},
+      'listing_buyers',
+      60000 // Cache for 1 minute
+    );
+  },
+
+  async getQuestionnaire(): Promise<{ questionnaire: any }> {
+    return makeRequest<{ questionnaire: any }>(
+      '/seller/questionnaire',
+      {},
+      'seller_questionnaire',
+      300000 // Cache for 5 minutes since questionnaire doesn't change often
+    );
+  },
+
+  async saveQuestionnaire(questionnaire: any): Promise<{ message: string }> {
+    // Clear questionnaire cache when saving
+    cache.delete('seller_questionnaire');
+    return makeRequest<{ message: string }>(
+      '/seller/questionnaire/save',
+      {
+        method: 'POST',
+        body: JSON.stringify({ questionnaire }),
+      }
+    );
+  },
+
+  // Clear all cache (useful when logging out or major state changes)
+  clearCache(): void {
+    cache.clear();
+  },
+
+  // Clear specific cache entries
+  clearCacheFor(keys: string[]): void {
+    keys.forEach(key => cache.delete(key));
   }
 }; 

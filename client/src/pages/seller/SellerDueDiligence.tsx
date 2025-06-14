@@ -88,8 +88,10 @@ const SellerDueDiligence: React.FC = () => {
           
           if (response.ok) {
             const data = await response.json();
-            // Filter to only show DUE_DILIGENCE type documents for this step
-            const dueDiligenceFiles = data.documents?.filter((doc: any) => doc.type === 'DUE_DILIGENCE') || [];
+            // Filter to show all documents for step 7 (due diligence documents)
+            const dueDiligenceFiles = data.documents?.filter((doc: any) => 
+              doc.stepId === 7 && doc.category === 'SELLER_UPLOAD'
+            ) || [];
             
             // Map the database document structure to match our UI structure
             const mappedFiles = dueDiligenceFiles.map((doc: any) => ({
@@ -127,8 +129,10 @@ const SellerDueDiligence: React.FC = () => {
         
         if (response.ok) {
           const data = await response.json();
-          // Filter to only show DUE_DILIGENCE type documents
-          const dueDiligenceFiles = data.documents?.filter((doc: any) => doc.type === 'DUE_DILIGENCE') || [];
+          // Filter to show all documents for step 7 (due diligence documents)
+          const dueDiligenceFiles = data.documents?.filter((doc: any) => 
+            doc.stepId === 7 && doc.category === 'SELLER_UPLOAD'
+          ) || [];
           
           // Map the database document structure to match our UI structure
           const mappedFiles = dueDiligenceFiles.map((doc: any) => ({
@@ -173,6 +177,7 @@ const SellerDueDiligence: React.FC = () => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('documentType', 'DUE_DILIGENCE');
+        formData.append('stepId', '7');
 
         const response = await fetch(`${API_BASE_URL}/seller/listings/${selectedListingId}/documents`, {
           method: 'POST',

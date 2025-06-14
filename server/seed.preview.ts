@@ -523,6 +523,7 @@ async function main() {
   console.log(`- All sellers start at step 0 with no progress and no selected listing`);
   console.log(`- All buyers start at step 0 with no progress and no selected listing`);
   console.log(`- NO documents created - clean slate for testing uploads/downloads`);
+  console.log(`- NO pre-close checklists created - all items will be unchecked by default when first accessed`);
 }
 
 main()

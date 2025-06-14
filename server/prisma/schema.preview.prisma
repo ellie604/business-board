@@ -93,6 +93,16 @@ model Document {
   uploader        User?                  @relation("UploadedDocuments", fields: [uploadedBy], references: [id])  // 新增关联
   createdAt       DateTime               @default(now())
   updatedAt       DateTime               @updatedAt
+
+  @@index([sellerId])
+  @@index([buyerId])
+  @@index([listingId])
+  @@index([stepId])
+  @@index([type])
+  @@index([category])
+  @@index([sellerId, stepId])
+  @@index([sellerId, type, category])
+  @@index([listingId, category])
 }
 
 model User {
@@ -119,6 +129,7 @@ model User {
   sellerProgress   SellerProgress[]
   buyerProgress    BuyerProgress[]
   sellerQuestionnaire SellerQuestionnaire? @relation("SellerQuestionnaire")
+  updatedChecklists PreCloseChecklist[] @relation("ChecklistUpdater")
 }
 
 model SellerProgress {
@@ -205,6 +216,7 @@ model Listing {
   documents       Document[]    // 新增：listing相关的文档
   sellerProgress  SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
   buyerSelectedProgress BuyerProgress[] @relation("BuyerSelectedListing") // 关联到buyer进度
+  preCloseChecklist PreCloseChecklist? @relation("ListingPreCloseChecklist")
 }
 
 model Activity {
@@ -223,6 +235,19 @@ model SellerQuestionnaire {
   data        Json     // 存储问卷答案的JSON数据
   submitted   Boolean  @default(false)
   submittedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PreCloseChecklist {
+  id          String   @id @default(uuid())
+  listingId   String   @unique
+  listing     Listing  @relation("ListingPreCloseChecklist", fields: [listingId], references: [id])
+  buyerItems  Json     @default("{}") // 存储buyer需要完成的checklist项目
+  sellerItems Json     @default("{}") // 存储seller需要完成的checklist项目
+  brokerItems Json     @default("{}") // 存储broker/agent需要完成的checklist项目
+  lastUpdatedBy String?
+  lastUpdatedByUser User? @relation("ChecklistUpdater", fields: [lastUpdatedBy], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

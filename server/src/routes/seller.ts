@@ -142,13 +142,28 @@ const getProgress: RequestHandler = async (req, res, next) => {
       });
     }
 
-    // Get documents for each step
-    const documents = await prisma.document.findMany({
-      where: { 
-        sellerId,
-        stepId: { not: null }
-      }
-    });
+    // Batch fetch all required data to avoid N+1 queries
+    const [documents, messages, questionnaire, preCloseChecklist] = await Promise.all([
+      prisma.document.findMany({
+        where: { 
+          sellerId,
+          stepId: { not: null }
+        }
+      }),
+      prisma.message.findFirst({
+        where: { senderId: sellerId }
+      }),
+      prisma.sellerQuestionnaire.findFirst({
+        where: { 
+          sellerId, 
+          submitted: true,
+          submittedAt: { not: null }
+        }
+      }),
+      sellerProgress.selectedListingId ? prisma.preCloseChecklist.findUnique({
+        where: { listingId: sellerProgress.selectedListingId }
+      }) : Promise.resolve(null)
+    ]);
 
     const steps = [
       { id: 0, title: 'Select your business listing', completed: false, accessible: true },
@@ -164,21 +179,23 @@ const getProgress: RequestHandler = async (req, res, next) => {
       { id: 10, title: 'After the Sale: Learn about ways mitigate taxes', completed: false, accessible: false }
     ];
 
-    // Check real step completion status
+    // Optimized step completion check using batched data
     let currentStep = 0;
     const completedSteps: number[] = [];
     
-    // Check each step individually
+    // Check each step using batched data
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
-      
-      console.log(`Checking step ${step.id}: ${step.title}`);
-      
-      // Check if this step is completed using real logic
-      const isCompleted = await checkStepCompletion(sellerId, step.id, sellerProgress.selectedListingId);
+      const isCompleted = checkStepCompletionOptimized(i, {
+        sellerId,
+        listingId: sellerProgress.selectedListingId,
+        documents,
+        messages,
+        questionnaire,
+        preCloseChecklist,
+        completedStepsFromDB: sellerProgress.completedSteps as number[]
+      });
       step.completed = isCompleted;
-      
-      console.log(`Step ${step.id} completed: ${isCompleted}`);
       
       if (isCompleted) {
         completedSteps.push(step.id);
@@ -199,13 +216,10 @@ const getProgress: RequestHandler = async (req, res, next) => {
     }
     
     // Update accessibility based on sequential completion
-    // A step is accessible only if all previous steps are completed
     steps.forEach((step, index) => {
       if (index === 0) {
-        // First step is always accessible
         step.accessible = true;
       } else {
-        // Other steps are accessible only if the previous step is completed
         step.accessible = steps[index - 1].completed;
       }
       
@@ -217,14 +231,19 @@ const getProgress: RequestHandler = async (req, res, next) => {
       }
     });
 
-    // Update seller progress in database
-    await prisma.sellerProgress.update({
-      where: { id: sellerProgress.id },
-      data: {
-        currentStep,
-        completedSteps
-      }
-    });
+    // Update seller progress in database only if changed
+    const completedStepsChanged = JSON.stringify(completedSteps) !== JSON.stringify(sellerProgress.completedSteps);
+    const currentStepChanged = currentStep !== sellerProgress.currentStep;
+    
+    if (completedStepsChanged || currentStepChanged) {
+      await prisma.sellerProgress.update({
+        where: { id: sellerProgress.id },
+        data: {
+          currentStep,
+          completedSteps
+        }
+      });
+    }
 
     res.json({
       progress: {
@@ -238,6 +257,81 @@ const getProgress: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+// Optimized step completion check using batched data
+function checkStepCompletionOptimized(stepId: number, data: {
+  sellerId: string;
+  listingId?: string | null;
+  documents: any[];
+  messages: any;
+  questionnaire: any;
+  preCloseChecklist: any;
+  completedStepsFromDB: number[];
+}): boolean {
+  const { sellerId, listingId, documents, messages, questionnaire, preCloseChecklist, completedStepsFromDB } = data;
+  
+  switch (stepId) {
+    case 0: // Select listing
+      return !!listingId;
+      
+    case 1: // Email agent
+      return !!messages;
+      
+    case 2: // Download listing agreement  
+      return documents.some(doc => 
+        doc.stepId === 2 && 
+        doc.type === 'LISTING_AGREEMENT' &&
+        doc.operationType === 'DOWNLOAD' &&
+        doc.downloadedAt
+      );
+      
+    case 3: // Fill questionnaire
+      if (!questionnaire) return false;
+      return documents.some(doc =>
+        doc.type === 'QUESTIONNAIRE' &&
+        doc.category === 'SELLER_UPLOAD' &&
+        doc.stepId === 3 &&
+        doc.status === 'COMPLETED'
+      );
+      
+    case 4: // Upload financial documents
+      return documents.some(doc => 
+        doc.stepId === 4 &&
+        doc.category === 'SELLER_UPLOAD' &&
+        doc.status === 'COMPLETED'
+      );
+      
+    case 5: // Buyer activity (manually marked)
+      return completedStepsFromDB.includes(5);
+      
+    case 6: // Download purchase contract
+      return documents.some(doc => 
+        doc.stepId === 6 && 
+        doc.type === 'PURCHASE_AGREEMENT' &&
+        doc.operationType === 'DOWNLOAD' &&
+        doc.downloadedAt
+      );
+      
+    case 7: // Upload due diligence
+      return documents.some(doc => 
+        doc.stepId === 7 &&
+        doc.category === 'SELLER_UPLOAD' &&
+        doc.status === 'COMPLETED'
+      );
+      
+    case 8: // Complete pre-closing checklist
+      return completedStepsFromDB && Array.isArray(completedStepsFromDB) && completedStepsFromDB.includes(8);
+      
+    case 9: // Download closing docs
+      return false; // Usually not completed until end of process
+      
+    case 10: // After sale
+      return false; // Only completed after successful sale
+      
+    default:
+      return false;
+  }
+}
 
 // Select a listing - updated to return listing info
 const selectListing: RequestHandler = async (req, res, next) => {
@@ -392,6 +486,135 @@ const updateStep: RequestHandler = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error updating step:', error);
+    next(error);
+  }
+};
+
+// Mark step as completed manually (for steps that require manual confirmation)
+const markStepCompleted: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const sellerId = typedReq.user?.id;
+    const { stepId } = req.body;
+    
+    console.log(`markStepCompleted called:`, {
+      sellerId,
+      stepId,
+      stepIdType: typeof stepId
+    });
+    
+    if (!sellerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    let sellerProgress = await prisma.sellerProgress.findFirst({
+      where: { sellerId }
+    });
+
+    if (!sellerProgress) {
+      sellerProgress = await prisma.sellerProgress.create({
+        data: {
+          sellerId,
+          currentStep: 0,
+          completedSteps: [],
+          selectedListingId: null
+        }
+      });
+    }
+
+    const completedStepsArray = sellerProgress.completedSteps as number[] || [];
+    
+    // Add the step to completed steps if not already there
+    if (!completedStepsArray.includes(stepId)) {
+      completedStepsArray.push(stepId);
+      console.log(`Manually marked step ${stepId} as completed`);
+    }
+
+    // Update current step to the next step if this step advances progress
+    const newCurrentStep = Math.max(sellerProgress.currentStep, stepId + 1);
+
+    const updatedProgress = await prisma.sellerProgress.update({
+      where: { id: sellerProgress.id },
+      data: {
+        currentStep: newCurrentStep,
+        completedSteps: completedStepsArray
+      }
+    });
+
+    console.log(`Step ${stepId} manually marked as completed:`, {
+      currentStep: updatedProgress.currentStep,
+      completedSteps: updatedProgress.completedSteps
+    });
+
+    res.json({ 
+      message: 'Step marked as completed successfully',
+      progress: updatedProgress
+    });
+  } catch (error) {
+    console.error('Error marking step as completed:', error);
+    next(error);
+  }
+};
+
+// Mark step as incomplete manually (for steps that require manual confirmation)
+const markStepIncomplete: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const sellerId = typedReq.user?.id;
+    const { stepId } = req.body;
+    
+    console.log(`markStepIncomplete called:`, {
+      sellerId,
+      stepId,
+      stepIdType: typeof stepId
+    });
+    
+    if (!sellerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    let sellerProgress = await prisma.sellerProgress.findFirst({
+      where: { sellerId }
+    });
+
+    if (!sellerProgress) {
+      res.status(404).json({ message: 'Seller progress not found' });
+      return;
+    }
+
+    const completedStepsArray = sellerProgress.completedSteps as number[] || [];
+    
+    // Remove the step from completed steps if it exists
+    const updatedCompletedSteps = completedStepsArray.filter(step => step !== stepId);
+    console.log(`Manually marked step ${stepId} as incomplete`);
+
+    // Update current step - if we're removing the current step, go back to the previous step
+    let newCurrentStep = sellerProgress.currentStep;
+    if (sellerProgress.currentStep > stepId) {
+      newCurrentStep = stepId; // Go back to this step since it's now incomplete
+    }
+
+    const updatedProgress = await prisma.sellerProgress.update({
+      where: { id: sellerProgress.id },
+      data: {
+        currentStep: newCurrentStep,
+        completedSteps: updatedCompletedSteps
+      }
+    });
+
+    console.log(`Step ${stepId} manually marked as incomplete:`, {
+      currentStep: updatedProgress.currentStep,
+      completedSteps: updatedProgress.completedSteps
+    });
+
+    res.json({ 
+      message: 'Step marked as incomplete successfully',
+      progress: updatedProgress
+    });
+  } catch (error) {
+    console.error('Error marking step as incomplete:', error);
     next(error);
   }
 };
@@ -669,13 +892,14 @@ router.get('/listings/:listingId/broker-documents', authenticateSeller, async (r
 router.post('/listings/:listingId/documents', upload.single('file'), authenticateSeller, async (req, res): Promise<void> => {
   try {
     const { listingId } = req.params;
-    const { documentType } = req.body;
+    const { documentType, stepId } = req.body;
     const typedReq = req as AuthenticatedRequest;
     const file = req.file;
 
     console.log('Upload request received:', {
       listingId,
       documentType,
+      stepId,
       fileName: file?.originalname,
       sellerId: typedReq.user?.id
     });
@@ -725,6 +949,20 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
       .from(bucketName)
       .getPublicUrl(fileName);
 
+    // 智能推断stepId（如果前端没有传递）
+    let finalStepId = stepId ? parseInt(stepId) : null;
+    
+    // 如果没有传递stepId，根据documentType推断
+    if (!finalStepId && documentType) {
+      if (documentType === 'FINANCIAL_DOCUMENTS' || documentType === 'UPLOADED_DOC') {
+        finalStepId = 4; // 财务文档上传步骤
+      } else if (documentType === 'DUE_DILIGENCE') {
+        finalStepId = 7; // 尽调文档上传步骤
+      } else if (documentType === 'QUESTIONNAIRE') {
+        finalStepId = 3; // 问卷步骤
+      }
+    }
+
     // 创建文档记录
     const document = await prisma.document.create({
       data: {
@@ -738,7 +976,8 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
         uploadedBy: typedReq.user.id,           // seller自己上传
         uploadedAt: new Date(),
         status: 'COMPLETED',
-        operationType: 'UPLOAD'                 // 这是上传操作
+        operationType: 'UPLOAD',                // 这是上传操作
+        stepId: finalStepId                     // 设置stepId
       }
     });
 
@@ -747,7 +986,9 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
       size: file.size,
       mimetype: file.mimetype,
       buffer_length: file.buffer?.length,
-      document_fileSize: document.fileSize
+      document_fileSize: document.fileSize,
+      stepId: finalStepId,
+      documentType: documentType
     });
 
     res.json({ 
@@ -758,7 +999,8 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
         fileSize: document.fileSize,
         type: document.type,
         uploadedAt: document.uploadedAt,
-        url: document.url
+        url: document.url,
+        stepId: document.stepId
       }
     });
   } catch (error: unknown) {
@@ -860,165 +1102,6 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateSeller, 
     });
   }
 });
-
-// Check if a specific step is completed
-const checkStepCompletion = async (sellerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
-  console.log(`checkStepCompletion called for sellerId: ${sellerId}, stepId: ${stepId}, listingId: ${listingId}`);
-  
-  // First, check if all previous steps are completed (except for step 0)
-  if (stepId > 0) {
-    // Check all previous steps
-    for (let i = 0; i < stepId; i++) {
-      const previousStepCompleted = await checkStepCompletionInternal(sellerId, i, listingId);
-      if (!previousStepCompleted) {
-        console.log(`Step ${stepId} cannot be completed because step ${i} is not completed`);
-        return false;
-      }
-    }
-  }
-  
-  // If all previous steps are completed (or this is step 0), check this step
-  return await checkStepCompletionInternal(sellerId, stepId, listingId);
-};
-
-// Internal function to check step completion without considering dependencies
-const checkStepCompletionInternal = async (sellerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
-  switch (stepId) {
-    case 0: // Select listing
-      // Check if listing has been selected
-      const result0 = !!listingId;
-      console.log(`Step 0 result: ${result0}`);
-      return result0;
-      
-    case 1: // Email agent
-      // Check if seller has sent any messages
-      console.log(`Checking messages for sellerId: ${sellerId}`);
-      const sentMessages = await prisma.message.findFirst({
-        where: { 
-          senderId: sellerId
-        }
-      });
-      console.log(`Found sent messages:`, sentMessages);
-      const result1 = !!sentMessages;
-      console.log(`Step 1 result: ${result1}`);
-      return result1;
-      
-    case 2: // Download listing agreement  
-      // Check if listing agreement was downloaded
-      const listingDoc = await prisma.document.findFirst({
-        where: { 
-          sellerId, 
-          stepId: 2, 
-          type: 'LISTING_AGREEMENT',
-          operationType: 'DOWNLOAD',
-          downloadedAt: { not: null }
-        }
-      });
-      return !!listingDoc;
-      
-    case 3: // Fill questionnaire
-      // Check if questionnaire was submitted AND PDF document was generated
-      const submittedQuestionnaire = await prisma.sellerQuestionnaire.findFirst({
-        where: { 
-          sellerId, 
-          submitted: true,
-          submittedAt: { not: null }
-        }
-      });
-      
-      if (!submittedQuestionnaire) {
-        return false;
-      }
-      
-      // Also check if the PDF document was generated
-      const questionnaireDoc = await prisma.document.findFirst({
-        where: {
-          sellerId,
-          type: 'QUESTIONNAIRE',
-          category: 'SELLER_UPLOAD',
-          stepId: 3,
-          status: 'COMPLETED'
-        }
-      });
-      
-      return !!questionnaireDoc;
-      
-    case 4: // Upload financial documents
-      // Check if financial documents were uploaded
-      const financialDocs = await prisma.document.findMany({
-        where: { 
-          sellerId, 
-          listingId,
-          category: 'SELLER_UPLOAD',
-          type: 'UPLOADED_DOC'
-        }
-      });
-      return financialDocs.length > 0;
-      
-    case 5: // Buyer activity
-      // This step should be considered completed when the seller accesses the buyer activity page
-      // The frontend will call updateStep to mark it as completed
-      // We should not auto-check completion here, but allow it to be manually completed
-      console.log(`Checking step 5 completion for sellerId: ${sellerId}`);
-      
-      // Check if it was manually marked as completed in the progress
-      const sellerProgress = await prisma.sellerProgress.findFirst({
-        where: { sellerId }
-      });
-      
-      const completedSteps = sellerProgress?.completedSteps as number[] || [];
-      const isStep5Completed = completedSteps.includes(5);
-      
-      console.log(`Step 5 completion check:`, {
-        sellerId,
-        completedSteps,
-        isStep5Completed,
-        sellerProgressId: sellerProgress?.id
-      });
-      
-      return isStep5Completed;
-      
-    case 6: // Download purchase contract
-      // Check if purchase agreement was downloaded
-      const purchaseDoc = await prisma.document.findFirst({
-        where: { 
-          sellerId, 
-          stepId: 6, 
-          type: 'PURCHASE_AGREEMENT',
-          operationType: 'DOWNLOAD',
-          downloadedAt: { not: null }
-        }
-      });
-      return !!purchaseDoc;
-      
-    case 7: // Upload due diligence
-      // Check if due diligence documents were uploaded
-      const dueDiligenceDocs = await prisma.document.findMany({
-        where: { 
-          sellerId, 
-          listingId,
-          category: 'SELLER_UPLOAD',
-          type: 'DUE_DILIGENCE'
-        }
-      });
-      return dueDiligenceDocs.length > 0;
-      
-    case 8: // Complete pre-closing checklist
-      // Mock - will be replaced with real logic
-      return false; // Usually not completed until end of process
-      
-    case 9: // Download closing docs
-      // Mock - will be replaced with real logic
-      return false; // Usually not completed until end of process
-      
-    case 10: // After sale
-      // Mock - will be replaced with real logic  
-      return false; // Only completed after successful sale
-      
-    default:
-      return false;
-  }
-};
 
 // Get seller's currently selected listing
 const getCurrentListing: RequestHandler = async (req, res, next) => {
@@ -1526,9 +1609,348 @@ router.get('/listings', authenticateSeller, getListings);
 router.get('/progress', authenticateSeller, getProgress);
 router.post('/select-listing', authenticateSeller, selectListing);
 router.post('/update-step', authenticateSeller, updateStep);
+router.post('/mark-step-completed', authenticateSeller, markStepCompleted);
+router.post('/mark-step-incomplete', authenticateSeller, markStepIncomplete);
 router.get('/step/:stepId/documents', authenticateSeller, getStepDocuments);
 router.post('/step/:stepId/upload', authenticateSeller, uploadStepDocument);
 router.post('/step/:stepId/download', authenticateSeller, downloadStepDocument);
 router.get('/current-listing', authenticateSeller, getCurrentListing);
+
+// Pre-Close Checklist APIs
+// 获取listing的pre-close checklist
+router.get('/listings/:listingId/pre-close-checklist', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证listing是否属于该seller
+    const listing = await prisma.listing.findFirst({
+      where: { 
+        id: listingId,
+        sellerId: typedReq.user.id
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found or not owned by seller' });
+      return;
+    }
+
+    // 获取或创建checklist
+    let checklist = await prisma.preCloseChecklist.findUnique({
+      where: { listingId },
+      include: {
+        lastUpdatedByUser: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    if (!checklist) {
+      // 创建默认的checklist
+      const defaultChecklistData = getDefaultChecklistData();
+      checklist = await prisma.preCloseChecklist.create({
+        data: {
+          listingId,
+          buyerItems: defaultChecklistData.buyerItems,
+          sellerItems: defaultChecklistData.sellerItems,
+          brokerItems: defaultChecklistData.brokerItems
+        },
+        include: {
+          lastUpdatedByUser: {
+            select: {
+              name: true
+            }
+          }
+        }
+      });
+    }
+
+    // 合并所有items到一个checklist结构
+    const mergedChecklist = mergeChecklistItems(checklist.buyerItems as any, checklist.sellerItems as any, checklist.brokerItems as any);
+
+    res.json({
+      checklist: mergedChecklist,
+      lastUpdatedBy: checklist.lastUpdatedByUser?.name,
+      updatedAt: checklist.updatedAt
+    });
+  } catch (error: unknown) {
+    console.error('Error fetching pre-close checklist:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch pre-close checklist',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// 更新checklist item
+router.put('/listings/:listingId/pre-close-checklist/item', authenticateSeller, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const { categoryId, itemId, userRole } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证listing是否属于该seller
+    const listing = await prisma.listing.findFirst({
+      where: { 
+        id: listingId,
+        sellerId: typedReq.user.id
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found or not owned by seller' });
+      return;
+    }
+
+    // 获取或创建checklist
+    let checklist = await prisma.preCloseChecklist.findUnique({
+      where: { listingId }
+    });
+
+    if (!checklist) {
+      const defaultChecklistData = getDefaultChecklistData();
+      checklist = await prisma.preCloseChecklist.create({
+        data: {
+          listingId,
+          buyerItems: defaultChecklistData.buyerItems,
+          sellerItems: defaultChecklistData.sellerItems,
+          brokerItems: defaultChecklistData.brokerItems
+        }
+      });
+    }
+
+    // 更新对应的item
+    const updatedChecklist = await updateChecklistItem(
+      checklist,
+      categoryId,
+      itemId,
+      typedReq.user.id,
+      typedReq.user.name,
+      userRole
+    );
+
+    // 合并所有items到一个checklist结构
+    const mergedChecklist = mergeChecklistItems(
+      updatedChecklist.buyerItems as any, 
+      updatedChecklist.sellerItems as any, 
+      updatedChecklist.brokerItems as any
+    );
+
+    res.json({
+      checklist: mergedChecklist,
+      lastUpdatedBy: typedReq.user.name,
+      updatedAt: updatedChecklist.updatedAt
+    });
+  } catch (error: unknown) {
+    console.error('Error updating checklist item:', error);
+    res.status(500).json({ 
+      message: 'Failed to update checklist item',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Helper functions
+function getDefaultChecklistData() {
+  const defaultStructure = {
+    'letter-of-intent': {
+      title: 'A. Letter Of Intent',
+      items: {
+        'buyer-offer': { task: 'Buyer offer', completed: false, responsible: 'buyer', required: true },
+        'seller-counter': { task: 'Seller counter', completed: false, responsible: 'seller', required: false },
+        'negotiate-agreement': { task: 'Negotiate mutual agreement', completed: false, responsible: 'seller', required: false },
+        'buyer-earnest-money': { task: 'Buyer provides Earnest Money', completed: false, responsible: 'buyer', required: true },
+        'broker-deposits-earnest': { task: 'Broker deposits Earnest Money', completed: false, responsible: 'broker', required: true },
+      }
+    },
+    'asset-purchase-agreement': {
+      title: 'B. Asset Purchase Agreement',
+      items: {
+        'buyer-offer-apa': { task: 'Buyer offer', completed: false, responsible: 'buyer', required: true },
+        'buyer-attorney-review': { task: 'Attorney review', completed: false, responsible: 'buyer', required: true },
+        'buyer-accountant-review': { task: 'Accountant review', completed: false, responsible: 'buyer', required: true },
+        'seller-counter-apa': { task: 'Seller counter', completed: false, responsible: 'seller', required: false },
+        'seller-attorney-review': { task: 'Attorney review', completed: false, responsible: 'seller', required: false },
+        'seller-accountant-review': { task: 'Accountant review', completed: false, responsible: 'seller', required: false },
+        'negotiate-execute-agreement': { task: 'Negotiate and execute mutual agreement', completed: false, responsible: 'buyer', required: true },
+        'negotiate-execute-agreement-seller': { task: 'Negotiate and execute mutual agreement', completed: false, responsible: 'seller', required: true },
+      }
+    },
+    'exhibits': {
+      title: 'C. Exhibits',
+      items: {
+        'asset-list': { task: 'Current Furniture, Fixtures & Equipment List ("Asset List")', completed: false, responsible: 'broker', required: true },
+        'seller-financial-info': { task: "Seller's financial information", completed: false, responsible: 'seller', required: true },
+        'buyer-financial-info': { task: "Buyer's financial information", completed: false, responsible: 'buyer', required: true },
+        'contract-rights': { task: 'Contract Rights', completed: false, responsible: 'seller', required: true },
+        'other-1': { task: 'Other:', completed: false, responsible: 'broker', required: false },
+        'other-2': { task: 'Other:', completed: false, responsible: 'broker', required: false },
+        'other-3': { task: 'Other:', completed: false, responsible: 'broker', required: false },
+      }
+    },
+    'contingencies': {
+      title: 'D. Asset Purchase Agreement Contingencies',
+      items: {
+        'seller-contacts-landlord': { task: 'Seller contacts landlord', completed: false, responsible: 'seller', required: true },
+        'buyer-meeting-landlord': { task: 'Buyer meeting with landlord', completed: false, responsible: 'buyer', required: true },
+        'lease-documents-prep': { task: 'Preparation of lease documents', completed: false, responsible: 'buyer', required: true },
+        'lease-assignment': { task: 'Lease assignment or new lease', completed: false, responsible: 'buyer', required: true },
+        'seller-security-deposit': { task: "Seller's security deposit", completed: false, responsible: 'seller', required: false },
+        'buyer-security-deposit': { task: "Buyer's security deposit", completed: false, responsible: 'buyer', required: false },
+        'rent-proration': { task: 'Rent proration', completed: false, responsible: 'seller', required: true },
+        'seller-walkthrough': { task: 'Seller walk thru with landlord and/or Buyer', completed: false, responsible: 'buyer', required: true },
+        'seller-walkthrough-seller': { task: 'Seller walk thru with landlord and/or Buyer', completed: false, responsible: 'seller', required: true },
+        'conditional-lease-assignment': { task: 'Conditional lease assignment', completed: false, responsible: 'broker', required: false },
+        'guaranty-lease': { task: 'Guaranty of lease', completed: false, responsible: 'buyer', required: true },
+        'right-inspection': { task: 'Right of Inspection', completed: false, responsible: 'buyer', required: true },
+        'due-diligence-list': { task: 'Buyer provide list of due diligence requirements', completed: false, responsible: 'buyer', required: true },
+        'due-diligence-list-seller': { task: 'Buyer provide list of due diligence requirements', completed: false, responsible: 'seller', required: true },
+        'action-plan-buyer': { task: 'Buyer & Seller agree on plan of action to satisfy contingencies', completed: false, responsible: 'buyer', required: true },
+        'action-plan-seller': { task: 'Buyer & Seller agree on plan of action to satisfy contingencies', completed: false, responsible: 'seller', required: true },
+        'financials-buyer': { task: 'Financials', completed: false, responsible: 'buyer', required: true },
+        'financials-seller': { task: 'Financials', completed: false, responsible: 'seller', required: true },
+        'premises-inspection-buyer': { task: 'Premises inspections', completed: false, responsible: 'buyer', required: true },
+        'premises-inspection-seller': { task: 'Premises inspections', completed: false, responsible: 'seller', required: true },
+      }
+    }
+  };
+
+  // 分离不同角色的items
+  const buyerItems: any = {};
+  const sellerItems: any = {};
+  const brokerItems: any = {};
+
+  Object.entries(defaultStructure).forEach(([categoryId, category]) => {
+    buyerItems[categoryId] = { title: category.title, items: {} };
+    sellerItems[categoryId] = { title: category.title, items: {} };
+    brokerItems[categoryId] = { title: category.title, items: {} };
+
+    Object.entries(category.items).forEach(([itemId, item]) => {
+      if (item.responsible === 'buyer') {
+        buyerItems[categoryId].items[itemId] = item;
+      } else if (item.responsible === 'seller') {
+        sellerItems[categoryId].items[itemId] = item;
+      } else if (item.responsible === 'broker') {
+        brokerItems[categoryId].items[itemId] = item;
+      }
+    });
+  });
+
+  return {
+    buyerItems,
+    sellerItems, 
+    brokerItems
+  };
+}
+
+function mergeChecklistItems(buyerItems: any, sellerItems: any, brokerItems: any) {
+  const mergedChecklist: any[] = [];
+  const allCategories = new Set([
+    ...Object.keys(buyerItems || {}),
+    ...Object.keys(sellerItems || {}),
+    ...Object.keys(brokerItems || {})
+  ]);
+
+  Array.from(allCategories).forEach(categoryId => {
+    const category = {
+      id: categoryId,
+      title: (buyerItems[categoryId]?.title || sellerItems[categoryId]?.title || brokerItems[categoryId]?.title),
+      items: [] as any[]
+    };
+
+    // 合并所有items
+    const allItems = new Set([
+      ...Object.keys(buyerItems[categoryId]?.items || {}),
+      ...Object.keys(sellerItems[categoryId]?.items || {}),
+      ...Object.keys(brokerItems[categoryId]?.items || {})
+    ]);
+
+    Array.from(allItems).forEach(itemId => {
+      const item = 
+        buyerItems[categoryId]?.items[itemId] ||
+        sellerItems[categoryId]?.items[itemId] ||
+        brokerItems[categoryId]?.items[itemId];
+      
+      if (item) {
+        category.items.push({
+          id: itemId,
+          ...item
+        });
+      }
+    });
+
+    mergedChecklist.push(category);
+  });
+
+  return mergedChecklist;
+}
+
+async function updateChecklistItem(
+  checklist: any,
+  categoryId: string,
+  itemId: string,
+  userId: string,
+  userName: string,
+  userRole: string
+) {
+  const buyerItems = (checklist.buyerItems as any) || {};
+  const sellerItems = (checklist.sellerItems as any) || {};
+  const brokerItems = (checklist.brokerItems as any) || {};
+
+  // 找到要更新的item
+  let itemToUpdate: any = null;
+  let targetItems: any = null;
+
+  if (buyerItems[categoryId]?.items[itemId]) {
+    itemToUpdate = buyerItems[categoryId].items[itemId];
+    targetItems = buyerItems;
+  } else if (sellerItems[categoryId]?.items[itemId]) {
+    itemToUpdate = sellerItems[categoryId].items[itemId];
+    targetItems = sellerItems;
+  } else if (brokerItems[categoryId]?.items[itemId]) {
+    itemToUpdate = brokerItems[categoryId].items[itemId];
+    targetItems = brokerItems;
+  }
+
+  if (itemToUpdate && targetItems) {
+    // 切换完成状态
+    itemToUpdate.completed = !itemToUpdate.completed;
+    
+    if (itemToUpdate.completed) {
+      itemToUpdate.completedBy = userName;
+      itemToUpdate.completedAt = new Date().toISOString();
+    } else {
+      delete itemToUpdate.completedBy;
+      delete itemToUpdate.completedAt;
+    }
+
+    // 更新数据库
+    return await prisma.preCloseChecklist.update({
+      where: { id: checklist.id },
+      data: {
+        buyerItems,
+        sellerItems,
+        brokerItems,
+        lastUpdatedBy: userId,
+        updatedAt: new Date()
+      }
+    });
+  }
+
+  return checklist;
+}
 
 export default router; 
