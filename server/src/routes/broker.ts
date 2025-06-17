@@ -749,6 +749,20 @@ router.get('/listings', authenticateBroker, async (req, res): Promise<void> => {
           select: {
             id: true,
             name: true,
+            email: true,
+            managedBy: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
+          }
+        },
+        buyers: {
+          select: {
+            id: true,
+            name: true,
             email: true
           }
         }
@@ -1058,16 +1072,32 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
         case 0: // Select listing
           return !!listingId;
           
-        case 1: // Email agent
+        case 1: // Email agent - FIXED: Only check if this buyer has selected this specific listing
+          // For buyer, step 1 completion should only count if they've selected this listing AND sent messages
+          if (!listingId) return false; // No listing selected means step 1 cannot be completed
+          
+          // Check if buyer has selected this specific listing
+          const buyerProgress = await getPrisma().buyerProgress.findFirst({
+            where: { 
+              buyerId,
+              selectedListingId: listingId 
+            }
+          });
+          
+          if (!buyerProgress) return false; // Haven't selected this listing
+          
+          // If they've selected this listing, check if they've sent any messages (global check is acceptable for now)
           const sentMessages = await getPrisma().message.findFirst({
             where: { senderId: buyerId }
           });
           return !!sentMessages;
           
-        case 2: // Fill out NDA
+        case 2: // Fill out NDA - should be tied to specific listing
+          if (!listingId) return false;
           const ndaDoc = await getPrisma().document.findFirst({
             where: { 
               buyerId, 
+              listingId, // Make sure it's for this specific listing
               stepId: 2, 
               type: 'NDA',
               operationType: 'UPLOAD',
@@ -1076,10 +1106,12 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           });
           return !!ndaDoc;
           
-        case 3: // Fill out financial statement
+        case 3: // Fill out financial statement - should be tied to specific listing
+          if (!listingId) return false;
           const financialDoc = await getPrisma().document.findFirst({
             where: { 
               buyerId, 
+              listingId, // Make sure it's for this specific listing
               stepId: 3, 
               type: 'FINANCIAL_STATEMENT',
               operationType: 'UPLOAD',
@@ -1088,10 +1120,12 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           });
           return !!financialDoc;
           
-        case 4: // Download CBR/CIM
+        case 4: // Download CBR/CIM - should be tied to specific listing
+          if (!listingId) return false;
           const cbrDoc = await getPrisma().document.findFirst({
             where: { 
               buyerId, 
+              listingId, // Make sure it's for this specific listing
               stepId: 4, 
               type: 'CBR_CIM',
               operationType: 'DOWNLOAD',
@@ -1100,7 +1134,8 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           });
           return !!cbrDoc;
           
-        case 5: // Upload documents
+        case 5: // Upload documents - already correctly tied to listing
+          if (!listingId) return false;
           const uploadedDocs = await getPrisma().document.findMany({
             where: { 
               buyerId, 
@@ -1111,10 +1146,12 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           });
           return uploadedDocs.length > 0;
           
-        case 6: // Download purchase contract
+        case 6: // Download purchase contract - should be tied to specific listing
+          if (!listingId) return false;
           const purchaseDoc = await getPrisma().document.findFirst({
             where: { 
               buyerId, 
+              listingId, // Make sure it's for this specific listing
               stepId: 6, 
               type: 'PURCHASE_CONTRACT',
               operationType: 'DOWNLOAD',
@@ -1123,10 +1160,12 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           });
           return !!purchaseDoc;
           
-        case 7: // Download due diligence documents
+        case 7: // Download due diligence documents - should be tied to specific listing
+          if (!listingId) return false;
           const dueDiligenceDoc = await getPrisma().document.findFirst({
             where: { 
               buyerId, 
+              listingId, // Make sure it's for this specific listing
               stepId: 7, 
               type: 'DUE_DILIGENCE',
               operationType: 'DOWNLOAD',
@@ -1155,8 +1194,9 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
     
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
-      // Use buyer's actual selectedListingId for step completion check
-      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, actualSelectedListingId);
+      // FIXED: Use the URL listingId for step completion check, not buyer's selectedListingId
+      // This allows broker to see buyer's progress on ANY listing, not just the one buyer selected
+      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, listingId);
       step.completed = isCompleted;
       
       if (isCompleted) {

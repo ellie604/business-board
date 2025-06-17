@@ -1,5 +1,30 @@
 import { API_BASE_URL } from '../config';
 
+export interface Listing {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface ExtendedListing extends Listing {
+  createdAt: string;
+  seller?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface CurrentListingResponse {
+  listing: ExtendedListing | null;
+  needsSelection: boolean;
+  currentStep?: number;
+  completedSteps?: number[];
+}
+
 export interface DashboardStats {
   emailAgent: 'completed' | 'pending';
   nda: 'completed' | 'pending';
@@ -61,7 +86,7 @@ class BuyerService {
     }
 
     const data = await response.json();
-    return data.stats;
+    return data.stats || {};
   }
 
   async getDocuments(): Promise<Document[]> {
@@ -293,7 +318,7 @@ class BuyerService {
   }
 
   // Get buyer's listings
-  async getListings(): Promise<any> {
+  async getListings(): Promise<ExtendedListing[]> {
     const response = await fetch(`${API_BASE_URL}/buyer/listings`, {
       method: 'GET',
       credentials: 'include',
@@ -306,7 +331,8 @@ class BuyerService {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data.listings || [];
   }
 }
 

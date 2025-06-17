@@ -676,8 +676,27 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       console.log(`Buyer step 0 result: ${result0}`);
       return result0;
       
-    case 1: // Email agent
-      // Check if buyer has sent any messages
+    case 1: // Email agent - FIXED: Only check if this buyer has selected this specific listing
+      // For buyer, step 1 completion should only count if they've selected this listing AND sent messages
+      if (!listingId) {
+        console.log(`Buyer step 1: No listing selected`);
+        return false; // No listing selected means step 1 cannot be completed
+      }
+      
+      // Check if buyer has selected this specific listing
+      const buyerProgress = await getPrisma().buyerProgress.findFirst({
+        where: { 
+          buyerId,
+          selectedListingId: listingId 
+        }
+      });
+      
+      if (!buyerProgress) {
+        console.log(`Buyer step 1: Haven't selected this listing (${listingId})`);
+        return false; // Haven't selected this listing
+      }
+      
+      // If they've selected this listing, check if they've sent any messages (global check is acceptable for now)
       console.log(`Checking messages for buyerId: ${buyerId}`);
       const sentMessages = await getPrisma().message.findFirst({
         where: { 
@@ -689,11 +708,12 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       console.log(`Buyer step 1 result: ${result1}`);
       return result1;
       
-    case 2: // Fill out NDA
-      // Check if NDA was uploaded/completed
+    case 2: // Fill out NDA - should be tied to specific listing
+      if (!listingId) return false;
       const ndaDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
+          listingId, // Make sure it's for this specific listing
           stepId: 2, 
           type: 'NDA',
           operationType: 'UPLOAD',
@@ -702,11 +722,12 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return !!ndaDoc;
       
-    case 3: // Fill out financial statement
-      // Check if financial statement was uploaded/completed
+    case 3: // Fill out financial statement - should be tied to specific listing
+      if (!listingId) return false;
       const financialDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
+          listingId, // Make sure it's for this specific listing
           stepId: 3, 
           type: 'FINANCIAL_STATEMENT',
           operationType: 'UPLOAD',
@@ -715,11 +736,12 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return !!financialDoc;
       
-    case 4: // Download CBR/CIM
-      // Check if CBR/CIM was downloaded
+    case 4: // Download CBR/CIM - should be tied to specific listing
+      if (!listingId) return false;
       const cbrDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
+          listingId, // Make sure it's for this specific listing
           stepId: 4, 
           type: 'CBR_CIM',
           operationType: 'DOWNLOAD',
@@ -728,8 +750,8 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return !!cbrDoc;
       
-    case 5: // Upload documents
-      // Check if buyer uploaded any documents
+    case 5: // Upload documents - already correctly tied to listing
+      if (!listingId) return false;
       const uploadedDocs = await getPrisma().document.findMany({
         where: { 
           buyerId, 
@@ -740,11 +762,12 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return uploadedDocs.length > 0;
       
-    case 6: // Download purchase contract
-      // Check if purchase contract was downloaded
+    case 6: // Download purchase contract - should be tied to specific listing
+      if (!listingId) return false;
       const purchaseDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
+          listingId, // Make sure it's for this specific listing
           stepId: 6, 
           type: 'PURCHASE_CONTRACT',
           operationType: 'DOWNLOAD',
@@ -753,11 +776,12 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return !!purchaseDoc;
       
-    case 7: // Download due diligence documents
-      // Check if due diligence documents were downloaded
+    case 7: // Download due diligence documents - should be tied to specific listing
+      if (!listingId) return false;
       const dueDiligenceDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
+          listingId, // Make sure it's for this specific listing
           stepId: 7, 
           type: 'DUE_DILIGENCE',
           operationType: 'DOWNLOAD',
