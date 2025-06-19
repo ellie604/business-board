@@ -39,7 +39,7 @@ const upload = multer({
 const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
   0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
   1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
-  2: { type: 'NDA', operationType: 'UPLOAD', description: 'Fill out Non Disclosure agreement online' },
+  2: { type: 'NDA', operationType: 'UPLOAD', description: 'Download, sign, and upload Non Disclosure Agreement' },
   3: { type: 'FINANCIAL_STATEMENT', operationType: 'UPLOAD', description: 'Fill out financial statement online' },
   4: { type: 'CBR_CIM', operationType: 'DOWNLOAD', description: 'Download CBR or CIM for the business' },
   5: { type: 'UPLOADED_DOC', operationType: 'UPLOAD', description: 'Upload documents' },
@@ -123,16 +123,17 @@ const getProgress: RequestHandler = async (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
   try {
     const buyerId = typedReq.user?.id;
+    
     if (!buyerId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
 
+    // Get buyer progress
     let buyerProgress = await getPrisma().buyerProgress.findFirst({
       where: { buyerId }
     });
 
-    // If no progress record exists, create a new one
     if (!buyerProgress) {
       buyerProgress = await getPrisma().buyerProgress.create({
         data: {
@@ -144,13 +145,24 @@ const getProgress: RequestHandler = async (req, res, next) => {
       });
     }
 
-    // Get documents for each step
-    const documents = await getPrisma().document.findMany({
-      where: {
-        buyerId,
-        stepId: { not: null }
-      }
-    });
+    // Get all relevant data at once for optimization
+    const selectedListingId = buyerProgress.selectedListingId;
+    
+    // Batch data fetch for optimization
+    const [documents, messages] = await Promise.all([
+      // Get all documents for this buyer and listing
+      selectedListingId ? getPrisma().document.findMany({
+        where: { 
+          buyerId,
+          listingId: selectedListingId
+        }
+      }) : Promise.resolve([]),
+      
+      // Get messages for this buyer
+      getPrisma().message.findFirst({
+        where: { senderId: buyerId }
+      })
+    ]);
 
     const steps = [
       { id: 0, title: 'Select listing you are interested in', completed: false, accessible: true },
@@ -166,21 +178,20 @@ const getProgress: RequestHandler = async (req, res, next) => {
       { id: 10, title: 'After the Sale: Tips to make your transition smoother', completed: false, accessible: false }
     ];
 
-    // Check real step completion status
+    // Optimized step completion check using batched data
     let currentStep = 0;
     const completedSteps: number[] = [];
     
-    // Check each step individually
+    // Check each step using batched data
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
-      
-      console.log(`Checking buyer step ${step.id}: ${step.title}`);
-      
-      // Check if this step is completed using real logic
-      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, buyerProgress.selectedListingId);
+      const isCompleted = checkBuyerStepCompletionOptimized(i, {
+        buyerId,
+        listingId: selectedListingId,
+        documents,
+        messages
+      });
       step.completed = isCompleted;
-      
-      console.log(`Buyer step ${step.id} completed: ${isCompleted}`);
       
       if (isCompleted) {
         completedSteps.push(step.id);
@@ -216,27 +227,98 @@ const getProgress: RequestHandler = async (req, res, next) => {
       }
     });
 
-    // Update buyer progress in database
-    await getPrisma().buyerProgress.update({
-      where: { id: buyerProgress.id },
-      data: {
-        currentStep,
-        completedSteps
-      }
-    });
-
     res.json({
       progress: {
         currentStep,
+        completedSteps,
+        selectedListingId,
         steps,
-        selectedListingId: buyerProgress.selectedListingId
+        isViewingSelectedListing: true
       }
     });
   } catch (error) {
-    console.error('Error fetching buyer progress:', error);
+    console.error('Error getting buyer progress:', error);
     next(error);
   }
 };
+
+// Optimized step completion check using batched data
+function checkBuyerStepCompletionOptimized(stepId: number, data: {
+  buyerId: string;
+  listingId?: string | null;
+  documents: any[];
+  messages: any;
+}): boolean {
+  const { buyerId, listingId, documents, messages } = data;
+  
+  switch (stepId) {
+    case 0: // Select listing
+      return !!listingId;
+      
+    case 1: // Email agent
+      return !!messages;
+      
+    case 2: // Fill out NDA - now requires upload of signed NDA
+      return documents.some(doc => 
+        doc.stepId === 2 && 
+        doc.type === 'NDA' &&
+        doc.operationType === 'UPLOAD' &&
+        doc.category === 'BUYER_UPLOAD' &&
+        doc.status === 'COMPLETED'
+      );
+      
+    case 3: // Fill out financial statement
+      return documents.some(doc => 
+        doc.stepId === 3 &&
+        doc.type === 'FINANCIAL_STATEMENT' &&
+        doc.operationType === 'UPLOAD' &&
+        doc.status === 'COMPLETED'
+      );
+      
+    case 4: // Download CBR/CIM
+      return documents.some(doc => 
+        doc.stepId === 4 &&
+        doc.type === 'CBR_CIM' &&
+        doc.operationType === 'DOWNLOAD' &&
+        doc.downloadedAt
+      );
+      
+    case 5: // Upload documents
+      return documents.some(doc => 
+        doc.stepId === 5 &&
+        doc.category === 'BUYER_UPLOAD' &&
+        doc.type === 'UPLOADED_DOC'
+      );
+      
+    case 6: // Download purchase contract
+      return documents.some(doc => 
+        doc.stepId === 6 &&
+        doc.type === 'PURCHASE_CONTRACT' &&
+        doc.operationType === 'DOWNLOAD' &&
+        doc.downloadedAt
+      );
+      
+    case 7: // Download due diligence documents
+      return documents.some(doc => 
+        doc.stepId === 7 &&
+        doc.type === 'DUE_DILIGENCE' &&
+        doc.operationType === 'DOWNLOAD' &&
+        doc.downloadedAt
+      );
+      
+    case 8: // Complete pre-closing checklist
+      return false; // Only completed manually
+      
+    case 9: // Download closing docs
+      return false; // Only completed after closing
+      
+    case 10: // After sale
+      return false; // Only completed after successful sale
+      
+    default:
+      return false;
+  }
+}
 
 // Select a listing - updated to return listing info
 const selectListing: RequestHandler = async (req, res, next) => {
@@ -619,11 +701,13 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
         fileSize: file.size,
         url: publicUrl,
         listingId,
+        sellerId: listing.sellerId,      // 使用 listing 的实际 sellerId
         buyerId: typedReq.user.id,
         uploadedBy: typedReq.user.id,     // buyer自己上传
         uploadedAt: new Date(),
         status: 'COMPLETED',
-        operationType: 'UPLOAD'           // 这是上传操作
+        operationType: 'UPLOAD',          // 这是上传操作
+        stepId: req.body.stepId ? parseInt(req.body.stepId) : undefined  // 添加 stepId
       }
     });
 
@@ -647,165 +731,61 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
   }
 });
 
-// Check if a specific buyer step is completed
-const checkBuyerStepCompletion = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
-  console.log(`checkBuyerStepCompletion called for buyerId: ${buyerId}, stepId: ${stepId}, listingId: ${listingId}`);
-  
-  // First, check if all previous steps are completed (except for step 0)
-  if (stepId > 0) {
-    // Check all previous steps
-    for (let i = 0; i < stepId; i++) {
-      const previousStepCompleted = await checkBuyerStepCompletionInternal(buyerId, i, listingId);
-      if (!previousStepCompleted) {
-        console.log(`Buyer step ${stepId} cannot be completed because step ${i} is not completed`);
-        return false;
+// buyer删除自己上传的文件
+router.delete('/listings/:listingId/documents/:documentId', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId, documentId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 查找文档，确保是该buyer上传的
+    const document = await getPrisma().document.findFirst({
+      where: {
+        id: documentId,
+        listingId,
+        buyerId: typedReq.user.id,
+        category: 'BUYER_UPLOAD'
+      }
+    });
+
+    if (!document) {
+      res.status(404).json({ message: 'Document not found or access denied' });
+      return;
+    }
+
+    // 从Supabase存储中删除文件
+    if (document.url) {
+      const bucketName = getStorageBucket();
+      // 从URL中提取文件路径
+      const urlParts = document.url.split('/');
+      const filePathIndex = urlParts.findIndex((part: string) => part === 'public') + 1;
+      if (filePathIndex > 0) {
+        const filePath = urlParts.slice(filePathIndex + 1).join('/'); // 跳过bucket名称
+        
+        await supabase.storage
+          .from(bucketName)
+          .remove([filePath]);
       }
     }
-  }
-  
-  // If all previous steps are completed (or this is step 0), check this step
-  return await checkBuyerStepCompletionInternal(buyerId, stepId, listingId);
-};
 
-// Internal function to check buyer step completion without considering dependencies
-const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
-  switch (stepId) {
-    case 0: // Select listing
-      // Check if listing has been selected
-      const result0 = !!listingId;
-      console.log(`Buyer step 0 result: ${result0}`);
-      return result0;
-      
-    case 1: // Email agent - FIXED: Only check if this buyer has selected this specific listing
-      // For buyer, step 1 completion should only count if they've selected this listing AND sent messages
-      if (!listingId) {
-        console.log(`Buyer step 1: No listing selected`);
-        return false; // No listing selected means step 1 cannot be completed
-      }
-      
-      // Check if buyer has selected this specific listing
-      const buyerProgress = await getPrisma().buyerProgress.findFirst({
-        where: { 
-          buyerId,
-          selectedListingId: listingId 
-        }
-      });
-      
-      if (!buyerProgress) {
-        console.log(`Buyer step 1: Haven't selected this listing (${listingId})`);
-        return false; // Haven't selected this listing
-      }
-      
-      // If they've selected this listing, check if they've sent any messages (global check is acceptable for now)
-      console.log(`Checking messages for buyerId: ${buyerId}`);
-      const sentMessages = await getPrisma().message.findFirst({
-        where: { 
-          senderId: buyerId
-        }
-      });
-      console.log(`Found sent messages:`, sentMessages);
-      const result1 = !!sentMessages;
-      console.log(`Buyer step 1 result: ${result1}`);
-      return result1;
-      
-    case 2: // Fill out NDA - should be tied to specific listing
-      if (!listingId) return false;
-      const ndaDoc = await getPrisma().document.findFirst({
-        where: { 
-          buyerId, 
-          listingId, // Make sure it's for this specific listing
-          stepId: 2, 
-          type: 'NDA',
-          operationType: 'UPLOAD',
-          status: 'COMPLETED'
-        }
-      });
-      return !!ndaDoc;
-      
-    case 3: // Fill out financial statement - should be tied to specific listing
-      if (!listingId) return false;
-      const financialDoc = await getPrisma().document.findFirst({
-        where: { 
-          buyerId, 
-          listingId, // Make sure it's for this specific listing
-          stepId: 3, 
-          type: 'FINANCIAL_STATEMENT',
-          operationType: 'UPLOAD',
-          status: 'COMPLETED'
-        }
-      });
-      return !!financialDoc;
-      
-    case 4: // Download CBR/CIM - should be tied to specific listing
-      if (!listingId) return false;
-      const cbrDoc = await getPrisma().document.findFirst({
-        where: { 
-          buyerId, 
-          listingId, // Make sure it's for this specific listing
-          stepId: 4, 
-          type: 'CBR_CIM',
-          operationType: 'DOWNLOAD',
-          downloadedAt: { not: null }
-        }
-      });
-      return !!cbrDoc;
-      
-    case 5: // Upload documents - already correctly tied to listing
-      if (!listingId) return false;
-      const uploadedDocs = await getPrisma().document.findMany({
-        where: { 
-          buyerId, 
-          listingId,
-          category: 'BUYER_UPLOAD',
-          type: 'UPLOADED_DOC'
-        }
-      });
-      return uploadedDocs.length > 0;
-      
-    case 6: // Download purchase contract - should be tied to specific listing
-      if (!listingId) return false;
-      const purchaseDoc = await getPrisma().document.findFirst({
-        where: { 
-          buyerId, 
-          listingId, // Make sure it's for this specific listing
-          stepId: 6, 
-          type: 'PURCHASE_CONTRACT',
-          operationType: 'DOWNLOAD',
-          downloadedAt: { not: null }
-        }
-      });
-      return !!purchaseDoc;
-      
-    case 7: // Download due diligence documents - should be tied to specific listing
-      if (!listingId) return false;
-      const dueDiligenceDoc = await getPrisma().document.findFirst({
-        where: { 
-          buyerId, 
-          listingId, // Make sure it's for this specific listing
-          stepId: 7, 
-          type: 'DUE_DILIGENCE',
-          operationType: 'DOWNLOAD',
-          downloadedAt: { not: null }
-        }
-      });
-      return !!dueDiligenceDoc;
-      
-    case 8: // Complete pre-closing checklist
-      // Mock - will be replaced with real logic
-      return false; // Usually not completed until later in process
-      
-    case 9: // Download closing docs
-      // Mock - will be replaced with real logic
-      return false; // Usually not completed until end of process
-      
-    case 10: // After sale
-      // Mock - will be replaced with real logic  
-      return false; // Only completed after successful sale
-      
-    default:
-      return false;
+    // 从数据库中删除记录
+    await getPrisma().document.delete({
+      where: { id: documentId }
+    });
+
+    res.json({ message: 'Document deleted successfully' });
+  } catch (error: unknown) {
+    console.error('Error deleting buyer document:', error);
+    res.status(500).json({ 
+      message: 'Failed to delete document',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
-};
+});
 
 // Get buyer's currently selected listing
 const getCurrentListing: RequestHandler = async (req, res, next) => {
@@ -855,6 +835,195 @@ const getCurrentListing: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+// 获取broker/agent为buyer的listing提供的文件
+router.get('/listings/:listingId/agent-documents', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证buyer是否对该listing有兴趣
+    const buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { 
+        buyerId: typedReq.user.id,
+        selectedListingId: listingId
+      }
+    });
+
+    if (!buyerProgress) {
+      res.status(404).json({ message: 'Listing not found or not in your interests' });
+      return;
+    }
+
+    // 获取broker/agent为该listing提供的文档
+    const documents = await getPrisma().document.findMany({
+      where: {
+        listingId,
+        category: 'AGENT_PROVIDED' // 获取broker/agent提供的文件
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        }
+      },
+      orderBy: [
+        {
+          uploader: {
+            role: 'desc' // BROKER first, then AGENT
+          }
+        },
+        {
+          type: 'asc' // Then by document type
+        },
+        {
+          createdAt: 'desc' // Finally by creation time (newest first)
+        }
+      ]
+    });
+
+    console.log('=== Debug: Buyer Agent Documents Query ===');
+    console.log('Buyer ID:', typedReq.user.id);
+    console.log('Listing ID:', listingId);
+    console.log('Query conditions:', { listingId, category: 'AGENT_PROVIDED' });
+    console.log('Found documents count:', documents.length);
+    console.log('Found documents:', documents.map((doc: any) => ({
+      id: doc.id,
+      type: doc.type,
+      fileName: doc.fileName,
+      url: doc.url,
+      category: doc.category,
+      uploadedBy: doc.uploadedBy
+    })));
+
+    res.json({ documents });
+  } catch (error: unknown) {
+    console.error('Error fetching broker/agent documents:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch broker/agent documents',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// 记录buyer下载agent提供的文档
+router.post('/download-agent-document/:documentId', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { documentId } = req.params;
+    const { stepId } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    const buyerId = typedReq.user?.id;
+    
+    console.log('=== Download Agent Document Debug ===');
+    console.log('documentId:', documentId);
+    console.log('stepId from body:', stepId);
+    console.log('buyerId:', buyerId);
+    
+    if (!buyerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 获取要下载的文档
+    const sourceDocument = await getPrisma().document.findFirst({
+      where: {
+        id: documentId,
+        category: 'AGENT_PROVIDED'
+      }
+    });
+
+    if (!sourceDocument) {
+      res.status(404).json({ message: 'Document not found' });
+      return;
+    }
+
+    console.log('Source document found:', {
+      id: sourceDocument.id,
+      type: sourceDocument.type,
+      listingId: sourceDocument.listingId
+    });
+
+    // 获取buyer进度以验证listing
+    const buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { buyerId }
+    });
+
+    if (!buyerProgress || buyerProgress.selectedListingId !== sourceDocument.listingId) {
+      res.status(403).json({ message: 'Access denied: listing not selected' });
+      return;
+    }
+
+    console.log('Buyer progress validated');
+
+    const parsedStepId = parseInt(stepId);
+    console.log('Parsed stepId:', parsedStepId);
+
+    // 检查是否已有下载记录
+    const existingDownload = await getPrisma().document.findFirst({
+      where: {
+        buyerId,
+        stepId: parsedStepId,
+        type: sourceDocument.type,
+        operationType: 'DOWNLOAD'
+      }
+    });
+
+    console.log('Existing download record:', existingDownload ? 'Found' : 'None');
+
+    let downloadDocument;
+    
+    if (!existingDownload) {
+      console.log('Creating minimal download record...');
+      
+      // 创建最简化的下载记录 - 包含必要的stepId和listingId
+      downloadDocument = await getPrisma().document.create({
+        data: {
+          type: sourceDocument.type,
+          sellerId: buyerId,  // 使用sellerId字段（必需字段）
+          buyerId: buyerId,
+          stepId: parsedStepId,        // 设置stepId
+          listingId: sourceDocument.listingId,  // 设置listingId
+          operationType: 'DOWNLOAD',
+          status: 'COMPLETED',
+          category: 'AGENT_PROVIDED',
+          downloadedAt: new Date()
+        }
+      });
+      console.log('Minimal download record created:', downloadDocument.id);
+    } else {
+      // 更新下载时间
+      downloadDocument = await getPrisma().document.update({
+        where: { id: existingDownload.id },
+        data: { 
+          downloadedAt: new Date(),
+          status: 'COMPLETED'
+        }
+      });
+      console.log('Existing download record updated:', downloadDocument.id);
+    }
+
+    res.json({ 
+      message: 'Download recorded successfully',
+      document: downloadDocument
+    });
+  } catch (error: any) {
+    console.error('Error recording document download:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Failed to record download',
+      error: error.message 
+    });
+  }
+});
 
 router.get('/dashboard', authenticateBuyer, getDashboardStats);
 router.get('/listings', authenticateBuyer, getListings);

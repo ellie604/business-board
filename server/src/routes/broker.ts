@@ -524,7 +524,7 @@ router.get('/listings/:listingId/seller-documents', authenticateBroker, async (r
       listingId,
       category: 'SELLER_UPLOAD', // 只获取seller上传的文件
       type: {
-        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
+        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'LISTING_AGREEMENT', 'PURCHASE_AGREEMENT', 'PURCHASE_CONTRACT', 'UPLOADED_DOC'] // 包括签完字的协议文件
       }
     };
 
@@ -697,12 +697,37 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
       return;
     }
 
+    // Verify listing exists and get agent information for access control
+    const listing = await getPrisma().listing.findFirst({
+      where: { id: listingId },
+      include: {
+        seller: {
+          include: {
+            managedBy: true // Get the agent managing this seller
+          }
+        }
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    // Check if the listing's agent is managed by this broker
+    const agent = listing.seller.managedBy;
+    if (!agent || agent.managerId !== typedReq.user.id) {
+      res.status(403).json({ message: 'Access denied - listing not under your management' });
+      return;
+    }
+
+    // Broker can delete any AGENT_PROVIDED document for listings under their management
     const document = await getPrisma().document.findFirst({
       where: {
         id: documentId,
         listingId,
-        category: 'AGENT_PROVIDED',
-        uploadedBy: typedReq.user.id
+        category: 'AGENT_PROVIDED'
+        // 移除了 uploadedBy 检查，broker可以删除所有AGENT_PROVIDED文档
       }
     });
 
@@ -711,17 +736,27 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
       return;
     }
 
-    // 从Supabase删除文件
+    // Extract file path for deletion from Supabase
+    let filePath = '';
     if (document.url) {
-      const fileName = document.url.split('/').pop();
-      if (fileName) {
-        const { error: deleteError } = await supabase.storage
-          .from(getStorageBucket())
-          .remove([`listings/${listingId}/broker/documents/${fileName}`]);
+      const url = new URL(document.url);
+      const pathParts = url.pathname.split('/');
+      // Remove the bucket name from the path
+      const bucketIndex = pathParts.findIndex(part => part === getStorageBucket());
+      if (bucketIndex !== -1) {
+        filePath = pathParts.slice(bucketIndex + 1).join('/');
+      }
+    }
 
-        if (deleteError) {
-          console.error('Supabase delete error:', deleteError);
-        }
+    // 从Supabase删除文件
+    if (filePath) {
+      const { error: deleteError } = await supabase.storage
+        .from(getStorageBucket())
+        .remove([filePath]);
+
+      if (deleteError) {
+        console.error('Supabase delete error:', deleteError);
+        // Continue with database deletion even if file deletion fails
       }
     }
 
@@ -1024,7 +1059,7 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
     const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
       0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
       1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
-      2: { type: 'NDA', operationType: 'UPLOAD', description: 'Fill out Non Disclosure agreement online' },
+      2: { type: 'NDA', operationType: 'UPLOAD', description: 'Download, sign, and upload Non Disclosure Agreement' },
       3: { type: 'FINANCIAL_STATEMENT', operationType: 'UPLOAD', description: 'Fill out financial statement online' },
       4: { type: 'CBR_CIM', operationType: 'DOWNLOAD', description: 'Download CBR or CIM for the business' },
       5: { type: 'UPLOADED_DOC', operationType: 'UPLOAD', description: 'Upload documents' },
@@ -1100,6 +1135,7 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
               listingId, // Make sure it's for this specific listing
               stepId: 2, 
               type: 'NDA',
+              category: 'BUYER_UPLOAD',
               operationType: 'UPLOAD',
               status: 'COMPLETED'
             }

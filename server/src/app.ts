@@ -71,33 +71,35 @@ const getAllowedOrigins = () => {
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = getAllowedOrigins();
-    console.log('=== CORS Debug Info ===');
-    console.log('Incoming request origin:', origin);
-    console.log('Current NODE_ENV:', process.env.NODE_ENV);
-    console.log('Allowed origins:', allowedOrigins);
+    const hostname = process.env.HOST;
     
-    // 允许没有 origin 的请求（比如同源请求）
-    if (!origin) {
-      console.log('No origin provided, allowing request');
-      return callback(null, true);
+    // CORS configuration
+    console.log('Current environment:', process.env.NODE_ENV);
+    console.log('Current hostname:', hostname);
+    console.log('Available origins for this environment:', allowedOrigins);
+    
+    // 减少CORS调试日志 - 只在出错时显示
+    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
+      console.log('=== CORS Debug Info ===');
+      console.log('Incoming request origin:', origin);
+      console.log('Current NODE_ENV:', process.env.NODE_ENV);
+      console.log('Allowed origins:', allowedOrigins);
     }
-
-    // 检查是否匹配允许的域名
-    const isAllowed = allowedOrigins.some(allowed => {
-      if (allowed instanceof RegExp) {
-        return allowed.test(origin);
+    
+    if (allowedOrigins.includes(origin || '')) {
+      if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
+        console.log('Origin allowed:', origin);
       }
-      return allowed === origin;
-    });
-
-    if (isAllowed) {
-      console.log('Origin allowed:', origin);
-      return callback(null, origin);
+      callback(null, true);
+    } else {
+      console.error('CORS Error: Origin not allowed:', origin);
+      console.error('Allowed origins:', allowedOrigins);
+      callback(new Error('Not allowed by CORS'), false);
     }
-
-    console.log('Origin not allowed:', origin);
-    console.log('=== End CORS Debug Info ===');
-    callback(new Error('Not allowed by CORS'));
+    
+    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
+      console.log('=== End CORS Debug Info ===');
+    }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -159,30 +161,31 @@ app.use((req, res, next) => {
 // 从 session 恢复用户信息
 app.use(restoreUser);
 
-// 添加调试中间件 - 仅在开发环境
-if (process.env.NODE_ENV !== 'production') {
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log('=== Session Debug Info ===');
-  console.log('Session ID:', req.sessionID);
-  console.log('Session:', req.session);
-  console.log('User:', (req as any).user);
-  console.log('Cookie:', req.headers.cookie);
-  console.log('Environment:', process.env.NODE_ENV);
-  console.log('=== End Session Debug Info ===');
+// 添加请求日志中间件
+app.use((req, res, next) => {
+  // 减少Session调试日志 - 只在需要时显示
+  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_SESSION) {
+    console.log('=== Session Debug Info ===');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session:', req.session);
+    console.log('User:', req.session?.user);
+    console.log('Cookie:', req.headers.cookie);
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('=== End Session Debug Info ===');
+  }
+  
+  // 减少Request调试日志 - 只在需要时显示
+  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_REQUESTS) {
+    console.log('=== Request Debug Info ===');
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+    console.log('=== End Request Debug Info ===');
+  }
+  
   next();
 });
-
-  // 添加路由调试中间件 - 仅在开发环境
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log('=== Request Debug Info ===');
-  console.log('Method:', req.method);
-  console.log('URL:', req.url);
-  console.log('Headers:', req.headers);
-  console.log('Body:', req.body);
-  console.log('=== End Request Debug Info ===');
-  next();
-});
-}
 
 // 注册路由
 app.use('/api/auth', authRouter);

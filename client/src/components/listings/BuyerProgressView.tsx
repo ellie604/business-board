@@ -72,6 +72,7 @@ const BuyerProgressView: React.FC = () => {
   const [buyerProgress, setBuyerProgress] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [selectedDocumentType, setSelectedDocumentType] = useState('NDA');
   const [isViewingSelectedListing, setIsViewingSelectedListing] = useState(true);
@@ -177,6 +178,15 @@ const BuyerProgressView: React.FC = () => {
     }
   };
 
+  const refreshBuyerDocuments = async () => {
+    setRefreshing(true);
+    try {
+      await fetchBuyerDocuments();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const fetchBuyerProgress = async () => {
     try {
       // Determine the correct API endpoint based on the current path
@@ -277,7 +287,8 @@ const BuyerProgressView: React.FC = () => {
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    // 处理NaN、null、undefined和0的情况
+    if (!bytes || bytes === 0 || isNaN(bytes)) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -287,13 +298,40 @@ const BuyerProgressView: React.FC = () => {
   const downloadBuyerFile = (doc: any) => {
     // 直接下载真实文件
     if (doc.url) {
-      const link = document.createElement('a');
-      link.href = doc.url;
-      link.download = doc.fileName;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const link = document.createElement('a');
+        link.href = doc.url;
+        link.download = doc.fileName || `document_${doc.id}.pdf`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Download failed. Please try again.');
+      }
+    } else {
+      alert('File URL not available');
+    }
+  };
+
+  const downloadBrokerFile = (doc: any) => {
+    // 下载broker/agent上传的文件
+    if (doc.url) {
+      try {
+        const link = document.createElement('a');
+        link.href = doc.url;
+        link.download = doc.fileName || `document_${doc.id}.pdf`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Download failed. Please try again.');
+      }
     } else {
       alert('File URL not available');
     }
@@ -334,8 +372,10 @@ const BuyerProgressView: React.FC = () => {
               {buyer && (
                 <p>Buyer: {buyer.name} ({buyer.email})</p>
               )}
-              <p>Seller: {listing.seller.name} ({listing.seller.email})</p>
-              <p>Price: ${listing.price.toLocaleString()}</p>
+              {listing.seller && (
+                <p>Seller: {listing.seller.name} ({listing.seller.email})</p>
+              )}
+              <p>Price: ${listing.price?.toLocaleString() || 'N/A'}</p>
             </div>
           )}
         </div>
@@ -427,10 +467,28 @@ const BuyerProgressView: React.FC = () => {
 
         {/* Middle: Buyer Uploaded Files */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <UserIcon className="h-6 w-6 text-blue-600" />
-            Buyer Uploaded Files
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <UserIcon className="h-6 w-6 text-blue-600" />
+              Buyer Uploaded Files
+            </h3>
+            <button
+              onClick={refreshBuyerDocuments}
+              disabled={refreshing}
+              className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+              title="Refresh buyer documents"
+            >
+              <svg 
+                className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
           <p className="text-sm text-gray-600 mb-4">
             Documents uploaded by the buyer during their process.
           </p>
@@ -568,14 +626,14 @@ const BuyerProgressView: React.FC = () => {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          doc.uploader.role === 'BROKER' 
+                          doc.uploader?.role === 'BROKER' 
                             ? 'bg-purple-100 text-purple-800' 
                             : 'bg-green-100 text-green-800'
                         }`}>
-                          {doc.uploader.role === 'BROKER' ? '🏢 Broker' : '👤 Agent'}
+                          {doc.uploader?.role === 'BROKER' ? '🏢 Broker' : '👤 Agent'}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {doc.uploader.name} • {new Date(doc.uploadedAt).toLocaleDateString()} {new Date(doc.uploadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          {doc.uploader?.name || 'Unknown'} • {new Date(doc.uploadedAt).toLocaleDateString()} {new Date(doc.uploadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </span>
                       </div>
                       {doc.listing && (
@@ -587,7 +645,7 @@ const BuyerProgressView: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => window.open(doc.url, '_blank')}
+                      onClick={() => downloadBrokerFile(doc)}
                       className="p-1 text-green-600 hover:text-green-800 transition-colors"
                       title="Download"
                     >

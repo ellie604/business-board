@@ -479,7 +479,7 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
     const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
       0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
       1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
-      2: { type: 'NDA', operationType: 'UPLOAD', description: 'Fill out Non Disclosure agreement online' },
+      2: { type: 'NDA', operationType: 'UPLOAD', description: 'Download, sign, and upload Non Disclosure Agreement' },
       3: { type: 'FINANCIAL_STATEMENT', operationType: 'UPLOAD', description: 'Fill out financial statement online' },
       4: { type: 'CBR_CIM', operationType: 'DOWNLOAD', description: 'Download CBR or CIM for the business' },
       5: { type: 'UPLOADED_DOC', operationType: 'UPLOAD', description: 'Upload documents' },
@@ -610,6 +610,7 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
           listingId, // Make sure it's for this specific listing
           stepId: 2, 
           type: 'NDA',
+          category: 'BUYER_UPLOAD',
           operationType: 'UPLOAD',
           status: 'COMPLETED'
         }
@@ -801,7 +802,7 @@ router.get('/listings/:listingId/seller-documents', authenticateAgent, async (re
       listingId,
       category: 'SELLER_UPLOAD', // 只获取seller上传的文件
       type: {
-        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'UPLOADED_DOC'] // 只显示seller真正上传的文件类型
+        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'LISTING_AGREEMENT', 'PURCHASE_AGREEMENT', 'PURCHASE_CONTRACT', 'UPLOADED_DOC'] // 包括签完字的协议文件
       }
     };
 
@@ -1092,12 +1093,16 @@ router.get('/buyers/:buyerId/listings/:listingId/documents', authenticateAgent, 
     }
 
     // Get buyer's documents for this listing
+    const queryConditions = {
+      listingId,
+      category: 'BUYER_UPLOAD', // 只获取buyer上传的文件
+      type: {
+        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'NDA', 'UPLOADED_DOC'] // 包括签完字的NDA文件
+      }
+    };
+
     const documents = await getPrisma().document.findMany({
-      where: {
-        listingId,
-        buyerId,
-        category: 'BUYER_UPLOAD'
-      },
+      where: queryConditions,
       include: {
         uploader: {
           select: {

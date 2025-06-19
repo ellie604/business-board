@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 interface Contact {
   id: string;
@@ -17,7 +17,7 @@ interface MessageComposeProps {
   }) => Promise<void>;
 }
 
-const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => {
+const MessageCompose: React.FC<MessageComposeProps> = React.memo(({ contacts, onSend }) => {
   const [receiverId, setReceiverId] = useState('');
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
@@ -27,7 +27,7 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
   // Ensure contacts is always an array
   const safeContacts = Array.isArray(contacts) ? contacts : [];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!receiverId || !subject || !content) {
       return;
@@ -51,13 +51,25 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [receiverId, subject, content, attachments, onSend]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setAttachments(Array.from(e.target.files));
     }
-  };
+  }, []);
+
+  const handleReceiverChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setReceiverId(e.target.value);
+  }, []);
+
+  const handleSubjectChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSubject(e.target.value);
+  }, []);
+
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,7 +80,7 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
         <select
           id="receiver"
           value={receiverId}
-          onChange={(e) => setReceiverId(e.target.value)}
+          onChange={handleReceiverChange}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         >
@@ -89,7 +101,7 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
           type="text"
           id="subject"
           value={subject}
-          onChange={(e) => setSubject(e.target.value)}
+          onChange={handleSubjectChange}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         />
@@ -102,7 +114,7 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
         <textarea
           id="content"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleContentChange}
           rows={5}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
@@ -145,6 +157,8 @@ const MessageCompose: React.FC<MessageComposeProps> = ({ contacts, onSend }) => 
       </div>
     </form>
   );
-};
+});
+
+MessageCompose.displayName = 'MessageCompose';
 
 export default MessageCompose; 

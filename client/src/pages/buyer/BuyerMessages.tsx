@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MessageList from '../../components/messages/MessageList';
 import MessageCompose from '../../components/messages/MessageCompose';
@@ -7,7 +7,6 @@ import StepGuard from '../../components/StepGuard';
 
 import { API_BASE_URL } from '../../config';
 import { buyerService } from '../../services/buyer';
-import type { BuyerProgress } from '../../services/buyer';
 
 interface User {
   id: string;
@@ -19,11 +18,9 @@ interface User {
 const BuyerMessages: React.FC = () => {
   const [isComposing, setIsComposing] = useState(false);
   const [activeTab, setActiveTab] = useState<'inbox' | 'sent'>('inbox');
-  const [progress, setProgress] = useState<BuyerProgress | null>(null);
-  const [loading, setLoading] = useState(true);
   const queryClient = useQueryClient();
 
-  const steps = [
+  const steps = useMemo(() => [
     'Select Listing',
     'Messages',
     'Non Disclosure',
@@ -35,89 +32,62 @@ const BuyerMessages: React.FC = () => {
     'Pre Close Checklist',
     'Closing Docs',
     'After The Sale'
-  ];
+  ], []);
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        const progressRes = await buyerService.getProgress();
-        console.log('BuyerMessages - Progress data received:', JSON.stringify(progressRes, null, 2));
-        setProgress(progressRes.progress);
-      } catch (err) {
-        console.error('Failed to fetch progress:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch progress data
+  const { data: progressData, isLoading: isLoadingProgress } = useQuery({
+    queryKey: ['buyer-progress'],
+    queryFn: async () => {
+      const progressRes = await buyerService.getProgress();
+      return progressRes.progress;
+    },
+  });
 
-    fetchProgress();
-  }, []);
-
-  // Fetch inbox messages
-  const { data: inboxMessages, isLoading: isLoadingInbox, error: inboxError } = useQuery({
+  // Fetch inbox messages (prioritize over sent messages)
+  const { data: inboxMessages, isLoading: isLoadingInbox } = useQuery({
     queryKey: ['messages', 'inbox'],
     queryFn: async () => {
-      try {
-        console.log('Fetching inbox messages...');
-        const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Inbox response:', data);
-        return data;
-      } catch (error) {
-        console.error('Error fetching inbox:', error);
-        throw error;
+      const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      return data;
     },
   });
 
-  // Fetch sent messages
-  const { data: sentMessages, isLoading: isLoadingSent, error: sentError } = useQuery({
+  // Fetch sent messages (lower priority)
+  const { data: sentMessages, isLoading: isLoadingSent } = useQuery({
     queryKey: ['messages', 'sent'],
     queryFn: async () => {
-      try {
-        console.log('Fetching sent messages...');
-        const response = await fetch(`${API_BASE_URL}/messages/sent`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Sent response:', data);
-        return data;
-      } catch (error) {
-        console.error('Error fetching sent:', error);
-        throw error;
+      const response = await fetch(`${API_BASE_URL}/messages/sent`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      return data;
     },
+    enabled: activeTab === 'sent', // Only fetch when needed
   });
 
-  // Fetch all users except current user
-  const { data: contacts, isLoading: isLoadingContacts, error: contactsError } = useQuery({
+  // Fetch contacts (only when composing)
+  const { data: contacts, isLoading: isLoadingContacts } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      try {
-        console.log('Fetching users...');
-        const response = await fetch(`${API_BASE_URL}/users`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Users response:', data);
-        // Return the users array from the response object
-        return data.users || [];
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        throw error;
+      const response = await fetch(`${API_BASE_URL}/users`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      return data.users || [];
     },
+    enabled: isComposing, // Only fetch when composing
   });
 
   // Send message mutation
@@ -138,13 +108,6 @@ const BuyerMessages: React.FC = () => {
         });
       }
       
-      console.log('Sending message with formData:', {
-        receiverId: data.receiverId,
-        subject: data.subject,
-        content: data.content,
-        attachmentsCount: data.attachments?.length || 0
-      });
-      
       const response = await fetch(`${API_BASE_URL}/messages/send`, {
         method: 'POST',
         credentials: 'include',
@@ -158,23 +121,16 @@ const BuyerMessages: React.FC = () => {
       return response.json();
     },
     onSuccess: async () => {
-      // Invalidate message queries
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      // Invalidate and refetch queries efficiently
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['messages'] }),
+        buyerService.updateStep(1).then(() => {
+          queryClient.invalidateQueries({ queryKey: ['buyer-progress'] });
+        })
+      ]);
+      
       setIsComposing(false);
       setActiveTab('sent');
-      
-      // Update step progress - mark step 1 (Messages) as completed
-      try {
-        await buyerService.updateStep(1);
-        
-        // Refresh progress data
-        const progressRes = await buyerService.getProgress();
-        setProgress(progressRes.progress);
-        
-        console.log('Step 1 (Messages) marked as completed');
-      } catch (error) {
-        console.error('Failed to update step progress:', error);
-      }
     },
     onError: (error) => {
       console.error('Failed to send message:', error);
@@ -194,26 +150,42 @@ const BuyerMessages: React.FC = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', 'inbox'] });
     },
   });
 
-  const handleMessageClick = async (message: any) => {
+  const handleMessageClick = useCallback(async (message: any) => {
     if (!message.isRead) {
       await markAsReadMutation.mutateAsync(message.id);
     }
-  };
+  }, [markAsReadMutation]);
 
-  const handleSendMessage = async (data: {
+  const handleSendMessage = useCallback(async (data: {
     receiverId: string;
     subject: string;
     content: string;
     attachments?: File[];
   }) => {
     await sendMessageMutation.mutateAsync(data);
-  };
+  }, [sendMessageMutation]);
 
-  if (isLoadingInbox || isLoadingSent || isLoadingContacts) {
+  // Memoize step calculations
+  const stepStatus = useMemo(() => {
+    if (!progressData) return { stepCompleted: false, currentStepIndex: 0, isStepFinished: false, isCurrentStep: false, isAccessible: false };
+    
+    const stepCompleted = progressData.steps[1]?.completed || false;
+    const currentStepIndex = progressData.currentStep || 0;
+    const isStepFinished = stepCompleted || currentStepIndex > 1;
+    const isCurrentStep = currentStepIndex === 1;
+    const isAccessible = currentStepIndex >= 1;
+
+    return { stepCompleted, currentStepIndex, isStepFinished, isCurrentStep, isAccessible };
+  }, [progressData]);
+
+  // Show loading only for critical data
+  const isLoadingCritical = isLoadingProgress || (activeTab === 'inbox' && isLoadingInbox);
+  
+  if (isLoadingCritical) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -221,26 +193,11 @@ const BuyerMessages: React.FC = () => {
     );
   }
 
-  const stepCompleted = progress?.steps[1]?.completed || false;
-  const currentStepIndex = progress?.currentStep || 0;
-  const isStepFinished = stepCompleted || currentStepIndex > 1;
-  const isCurrentStep = currentStepIndex === 1;
-  const isAccessible = currentStepIndex >= 1;
-
-  console.log('BuyerMessages - Step status debug:', {
-    stepCompleted,
-    currentStepIndex,
-    isStepFinished,
-    isCurrentStep,
-    isAccessible,
-    step1Data: progress?.steps[1]
-  });
-
   return (
     <StepGuard stepName="Messages">
       <div className="max-w-6xl mx-auto">
         {/* Progress Bar */}
-        <ProgressBar currentStep={progress?.currentStep || 0} steps={steps} />
+        <ProgressBar currentStep={progressData?.currentStep || 0} steps={steps} />
         
         {/* Step Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -253,14 +210,14 @@ const BuyerMessages: React.FC = () => {
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 2 of 11
               </span>
-              {isStepFinished ? (
+              {stepStatus.isStepFinished ? (
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   Finished
                 </span>
-              ) : isCurrentStep ? (
+              ) : stepStatus.isCurrentStep ? (
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
                   In Progress
                 </span>
@@ -290,10 +247,16 @@ const BuyerMessages: React.FC = () => {
           {isComposing ? (
             <div className="border rounded-lg p-6 mb-6">
               <h3 className="text-lg font-semibold mb-4">New Message</h3>
-              <MessageCompose
-                contacts={contacts || []}
-                onSend={handleSendMessage}
-              />
+              {isLoadingContacts ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+              ) : (
+                <MessageCompose
+                  contacts={contacts || []}
+                  onSend={handleSendMessage}
+                />
+              )}
             </div>
           ) : (
             <div className="border rounded-lg">
@@ -334,16 +297,22 @@ const BuyerMessages: React.FC = () => {
                   </div>
                 )
               ) : (
-                sentMessages && sentMessages.length > 0 ? (
-                  <MessageList
-                    messages={sentMessages}
-                    onMessageClick={handleMessageClick}
-                  />
-                ) : (
-                  <div className="p-6 text-center text-gray-500">
-                    No sent messages
-                  </div>
-                )
+                <>
+                  {isLoadingSent ? (
+                    <div className="flex items-center justify-center p-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    </div>
+                  ) : sentMessages && sentMessages.length > 0 ? (
+                    <MessageList
+                      messages={sentMessages}
+                      onMessageClick={handleMessageClick}
+                    />
+                  ) : (
+                    <div className="p-6 text-center text-gray-500">
+                      No sent messages
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}

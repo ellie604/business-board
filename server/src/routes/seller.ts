@@ -40,11 +40,11 @@ const upload = multer({
 const STEP_DOCUMENT_REQUIREMENTS = {
   0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select your business listing' },
   1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
-  2: { type: 'LISTING_AGREEMENT', operationType: 'DOWNLOAD', description: 'Download listing agreement' },
+  2: { type: 'LISTING_AGREEMENT', operationType: 'BOTH', description: 'Download, sign, and upload listing agreement' },
   3: { type: 'QUESTIONNAIRE', operationType: 'UPLOAD', description: 'Fill out business questionnaire' },
   4: { type: 'FINANCIAL_DOCUMENTS', operationType: 'UPLOAD', description: 'Upload financial documents' },
   5: { type: 'BUYER_ACTIVITY', operationType: 'NONE', description: 'View buyer activity updates' },
-  6: { type: 'PURCHASE_AGREEMENT', operationType: 'DOWNLOAD', description: 'Download purchase contract' },
+  6: { type: 'PURCHASE_AGREEMENT', operationType: 'BOTH', description: 'Download, sign, and upload purchase contract' },
   7: { type: 'DUE_DILIGENCE', operationType: 'UPLOAD', description: 'Upload due diligence documents' },
   8: { type: 'PRE_CLOSE_CHECKLIST', operationType: 'BOTH', description: 'Complete pre-closing checklist' },
   9: { type: 'CLOSING_DOCS', operationType: 'DOWNLOAD', description: 'Download closing documents' },
@@ -277,12 +277,13 @@ function checkStepCompletionOptimized(stepId: number, data: {
     case 1: // Email agent
       return !!messages;
       
-    case 2: // Download listing agreement  
+    case 2: // Listing agreement - now requires upload of signed agreement
       return documents.some(doc => 
         doc.stepId === 2 && 
         doc.type === 'LISTING_AGREEMENT' &&
-        doc.operationType === 'DOWNLOAD' &&
-        doc.downloadedAt
+        doc.operationType === 'UPLOAD' &&
+        doc.category === 'SELLER_UPLOAD' &&
+        doc.status === 'COMPLETED'
       );
       
     case 3: // Fill questionnaire
@@ -304,12 +305,13 @@ function checkStepCompletionOptimized(stepId: number, data: {
     case 5: // Buyer activity (manually marked)
       return completedStepsFromDB.includes(5);
       
-    case 6: // Download purchase contract
+    case 6: // Purchase agreement - now requires upload of signed agreement
       return documents.some(doc => 
         doc.stepId === 6 && 
-        doc.type === 'PURCHASE_AGREEMENT' &&
-        doc.operationType === 'DOWNLOAD' &&
-        doc.downloadedAt
+        (doc.type === 'PURCHASE_AGREEMENT' || doc.type === 'PURCHASE_CONTRACT') &&
+        doc.operationType === 'UPLOAD' &&
+        doc.category === 'SELLER_UPLOAD' &&
+        doc.status === 'COMPLETED'
       );
       
     case 7: // Upload due diligence
