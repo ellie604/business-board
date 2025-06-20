@@ -158,7 +158,7 @@ const BuyerNonDisclosure: React.FC = () => {
     
         if (!response.ok) {
           console.error('Failed to record download');
-        }
+    }
       }
     } catch (error) {
       console.error('Failed to record download:', error);
@@ -559,8 +559,8 @@ const BuyerNonDisclosure: React.FC = () => {
                 </p>
               </div>
             )}
-            </div>
           </div>
+        </div>
         </div>
 
         {/* Uploaded Files List */}

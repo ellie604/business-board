@@ -130,6 +130,7 @@ model User {
   buyerProgress    BuyerProgress[]
   sellerQuestionnaire SellerQuestionnaire? @relation("SellerQuestionnaire")
   updatedChecklists PreCloseChecklist[] @relation("ChecklistUpdater")
+  dueDiligenceRequests DueDiligenceRequest[] @relation("BuyerDueDiligenceRequests")
 }
 
 model SellerProgress {
@@ -217,6 +218,7 @@ model Listing {
   sellerProgress  SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
   buyerSelectedProgress BuyerProgress[] @relation("BuyerSelectedListing") // 关联到buyer进度
   preCloseChecklist PreCloseChecklist? @relation("ListingPreCloseChecklist")
+  dueDiligenceRequests DueDiligenceRequest[]
 }
 
 model Activity {
@@ -250,4 +252,29 @@ model PreCloseChecklist {
   lastUpdatedByUser User? @relation("ChecklistUpdater", fields: [lastUpdatedBy], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum DueDiligenceStatus {
+  REQUESTED
+  FULFILLED
+  CANCELLED
+}
+
+model DueDiligenceRequest {
+  id           String              @id @default(uuid())
+  listingId    String
+  listing      Listing             @relation(fields: [listingId], references: [id])
+  buyerId      String
+  buyer        User                @relation("BuyerDueDiligenceRequests", fields: [buyerId], references: [id])
+  documentName String              // 请求的文档名称
+  status       DueDiligenceStatus  @default(REQUESTED)
+  requestedAt  DateTime            @default(now())
+  fulfilledAt  DateTime?           // broker/agent上传文档后的时间
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@unique([listingId, buyerId, documentName])
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([status])
 }

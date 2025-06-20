@@ -107,30 +107,31 @@ model Document {
 }
 
 model User {
-  id                  String               @id @default(uuid())
-  email               String               @unique
-  password            String
-  name                String               @default("")
-  role                UserRole             @default(BUYER)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @default(now()) @updatedAt
-  managedBy           User?                @relation("UserManagement", fields: [managerId], references: [id])
-  managerId           String?
-  managing            User[]               @relation("UserManagement")
-  listings            Listing[]            @relation("SellerListings")
-  buyerDocs           Document[]           @relation("BuyerDocuments")
-  sellerDocs          Document[]           @relation("SellerDocuments")
-  uploadedDocuments   Document[]           @relation("UploadedDocuments") // 新增：用户上传的文档
-  activities          Activity[]
-  sentMessages        Message[]            @relation("SentMessages")
-  receivedMessages    Message[]            @relation("ReceivedMessages")
-  unreadCount         Int                  @default(0)
-  lastReadAt          DateTime?
-  buyingListings      Listing[]            @relation("BuyerListings")
-  sellerProgress      SellerProgress[]
-  buyerProgress       BuyerProgress[]
-  sellerQuestionnaire SellerQuestionnaire? @relation("SellerQuestionnaire")
-  updatedChecklists   PreCloseChecklist[]  @relation("ChecklistUpdater")
+  id                   String                @id @default(uuid())
+  email                String                @unique
+  password             String
+  name                 String                @default("")
+  role                 UserRole              @default(BUYER)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @default(now()) @updatedAt
+  managedBy            User?                 @relation("UserManagement", fields: [managerId], references: [id])
+  managerId            String?
+  managing             User[]                @relation("UserManagement")
+  listings             Listing[]             @relation("SellerListings")
+  buyerDocs            Document[]            @relation("BuyerDocuments")
+  sellerDocs           Document[]            @relation("SellerDocuments")
+  uploadedDocuments    Document[]            @relation("UploadedDocuments") // 新增：用户上传的文档
+  activities           Activity[]
+  sentMessages         Message[]             @relation("SentMessages")
+  receivedMessages     Message[]             @relation("ReceivedMessages")
+  unreadCount          Int                   @default(0)
+  lastReadAt           DateTime?
+  buyingListings       Listing[]             @relation("BuyerListings")
+  sellerProgress       SellerProgress[]
+  buyerProgress        BuyerProgress[]
+  sellerQuestionnaire  SellerQuestionnaire?  @relation("SellerQuestionnaire")
+  updatedChecklists    PreCloseChecklist[]   @relation("ChecklistUpdater")
+  dueDiligenceRequests DueDiligenceRequest[] @relation("BuyerDueDiligenceRequests")
 }
 
 model SellerProgress {
@@ -205,19 +206,20 @@ model MessageAttachment {
 }
 
 model Listing {
-  id                    String             @id @default(uuid())
+  id                    String                @id @default(uuid())
   title                 String
   description           String
   price                 Float
-  status                ListingStatus      @default(ACTIVE)
-  createdAt             DateTime           @default(now())
-  seller                User               @relation("SellerListings", fields: [sellerId], references: [id])
+  status                ListingStatus         @default(ACTIVE)
+  createdAt             DateTime              @default(now())
+  seller                User                  @relation("SellerListings", fields: [sellerId], references: [id])
   sellerId              String
-  buyers                User[]             @relation("BuyerListings")
+  buyers                User[]                @relation("BuyerListings")
   documents             Document[] // 新增：listing相关的文档
   sellerProgress        SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
-  buyerSelectedProgress BuyerProgress[]    @relation("BuyerSelectedListing") // 关联到buyer进度
-  preCloseChecklist     PreCloseChecklist? @relation("ListingPreCloseChecklist")
+  buyerSelectedProgress BuyerProgress[]       @relation("BuyerSelectedListing") // 关联到buyer进度
+  preCloseChecklist     PreCloseChecklist?    @relation("ListingPreCloseChecklist")
+  dueDiligenceRequests  DueDiligenceRequest[]
 }
 
 model Activity {
@@ -251,4 +253,29 @@ model PreCloseChecklist {
   lastUpdatedByUser User?    @relation("ChecklistUpdater", fields: [lastUpdatedBy], references: [id])
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+enum DueDiligenceStatus {
+  REQUESTED
+  FULFILLED
+  CANCELLED
+}
+
+model DueDiligenceRequest {
+  id           String             @id @default(uuid())
+  listingId    String
+  listing      Listing            @relation(fields: [listingId], references: [id])
+  buyerId      String
+  buyer        User               @relation("BuyerDueDiligenceRequests", fields: [buyerId], references: [id])
+  documentName String // 请求的文档名称
+  status       DueDiligenceStatus @default(REQUESTED)
+  requestedAt  DateTime           @default(now())
+  fulfilledAt  DateTime? // broker/agent上传文档后的时间
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@unique([listingId, buyerId, documentName])
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([status])
 }

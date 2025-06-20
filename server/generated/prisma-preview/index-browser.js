@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.10.0
- * Query Engine version: aee10d5a411e4360c6d3445ce4810ca65adbf3e8
+ * Prisma Client JS version: 6.9.0
+ * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
  */
 Prisma.prismaVersion = {
-  client: "6.10.0",
-  engine: "aee10d5a411e4360c6d3445ce4810ca65adbf3e8"
+  client: "6.9.0",
+  engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -242,6 +242,18 @@ exports.Prisma.PreCloseChecklistScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DueDiligenceRequestScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  buyerId: 'buyerId',
+  documentName: 'documentName',
+  status: 'status',
+  requestedAt: 'requestedAt',
+  fulfilledAt: 'fulfilledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -326,6 +338,12 @@ exports.ListingStatus = exports.$Enums.ListingStatus = {
   CLOSED: 'CLOSED'
 };
 
+exports.DueDiligenceStatus = exports.$Enums.DueDiligenceStatus = {
+  REQUESTED: 'REQUESTED',
+  FULFILLED: 'FULFILLED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
@@ -336,7 +354,8 @@ exports.Prisma.ModelName = {
   Listing: 'Listing',
   Activity: 'Activity',
   SellerQuestionnaire: 'SellerQuestionnaire',
-  PreCloseChecklist: 'PreCloseChecklist'
+  PreCloseChecklist: 'PreCloseChecklist',
+  DueDiligenceRequest: 'DueDiligenceRequest'
 };
 
 /**

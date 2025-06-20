@@ -4,6 +4,7 @@ import { DocumentArrowUpIcon, FolderOpenIcon, TrashIcon, UserIcon } from '@heroi
 import { API_BASE_URL } from '../../config';
 import ProgressSteps from '../ProgressSteps';
 import PreCloseChecklist from '../PreCloseChecklist';
+import DueDiligenceManager from '../DueDiligenceManager';
 
 interface Document {
   id: string;
@@ -689,6 +690,19 @@ const BuyerProgressView: React.FC = () => {
             listingId={listingId}
             userRole={isBroker ? "BROKER" : "AGENT"}
             currentUserName={undefined} // Will use default from session
+            className="shadow-lg"
+          />
+        </div>
+      )}
+
+      {/* Due Diligence Manager */}
+      {listingId && buyerId && (
+        <div className="mt-8">
+          <DueDiligenceManager
+            listingId={listingId}
+            buyerId={buyerId}
+            userRole={isBroker ? "BROKER" : "AGENT"}
+            userId="" // This should be the current authenticated user's ID, not buyerId
             className="shadow-lg"
           />
         </div>

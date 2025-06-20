@@ -602,7 +602,10 @@ router.post('/listings/:listingId/documents', upload.single('file'), authenticat
 
     // 检查listing是否存在
     const listing = await getPrisma().listing.findUnique({
-      where: { id: listingId }
+      where: { id: listingId },
+      include: {
+        seller: true
+      }
     });
 
     if (!listing) {
@@ -770,6 +773,131 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
     console.error('Error deleting broker document:', error);
     res.status(500).json({ 
       message: 'Failed to delete document',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// broker上传尽职调查文档
+router.post('/listings/:listingId/due-diligence/upload', upload.single('file'), authenticateBroker, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const { documentName, buyerId } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ message: 'No file uploaded' });
+      return;
+    }
+
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    if (!documentName) {
+      res.status(400).json({ message: 'Document name is required' });
+      return;
+    }
+
+    // 检查listing是否存在
+    const listing = await getPrisma().listing.findFirst({
+      where: { id: listingId },
+      include: {
+        seller: true
+      }
+    });
+
+    if (!listing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    // Broker可以为任何listing上传due diligence文档
+    // 简化权限验证，只要listing存在即可
+
+    // 上传文件到Supabase
+    const bucketName = getStorageBucket();
+    const fileName = `listings/${listingId}/due-diligence/${Date.now()}-${file.originalname}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Supabase upload error:', uploadError);
+      res.status(500).json({ message: 'Failed to upload file to storage' });
+      return;
+    }
+
+    // 获取文件URL
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(fileName);
+
+    // 创建文档记录
+    const document = await getPrisma().document.create({
+      data: {
+        type: 'DUE_DILIGENCE',
+        category: 'AGENT_PROVIDED',
+        fileName: `${documentName} - ${file.originalname}`,
+        fileSize: file.size,
+        url: publicUrl,
+        listingId,
+        sellerId: listing.sellerId,
+        buyerId: buyerId,
+        uploadedBy: typedReq.user.id,
+        uploadedAt: new Date(),
+        status: 'COMPLETED',
+        operationType: 'DOWNLOAD',
+        stepId: 7
+      }
+    });
+
+    // 如果存在对应的请求，更新请求状态
+    const dueDiligenceRequest = await getPrisma().dueDiligenceRequest.findFirst({
+      where: {
+        listingId,
+        buyerId,
+        documentName
+      }
+    });
+
+    if (dueDiligenceRequest) {
+      await getPrisma().dueDiligenceRequest.update({
+        where: {
+          listingId_buyerId_documentName: {
+            listingId,
+            buyerId,
+            documentName
+          }
+        },
+        data: {
+          status: 'FULFILLED',
+          fulfilledAt: new Date()
+        }
+      });
+    }
+
+    res.json({ 
+      message: 'Due diligence document uploaded successfully',
+      document: {
+        id: document.id,
+        fileName: document.fileName,
+        fileSize: document.fileSize,
+        documentName: documentName,
+        uploadedAt: document.uploadedAt,
+        url: document.url
+      }
+    });
+  } catch (error: unknown) {
+    console.error('Error uploading due diligence document:', error);
+    res.status(500).json({ 
+      message: 'Failed to upload due diligence document',
       error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
@@ -1196,19 +1324,19 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           });
           return !!purchaseDoc;
           
-        case 7: // Download due diligence documents - should be tied to specific listing
+        case 7: // Due diligence step - automatically completed when buyer reaches this step
+          // Step 7 is considered complete as soon as the buyer can access it
+          // (i.e., when all previous steps are completed)
           if (!listingId) return false;
-          const dueDiligenceDoc = await getPrisma().document.findFirst({
-            where: { 
-              buyerId, 
-              listingId, // Make sure it's for this specific listing
-              stepId: 7, 
-              type: 'DUE_DILIGENCE',
-              operationType: 'DOWNLOAD',
-              downloadedAt: { not: null }
+          
+          // Check if all previous steps (0-6) are completed
+          for (let i = 0; i < 7; i++) {
+            const previousStepCompleted = await checkBuyerStepCompletionInternal(buyerId, i, listingId);
+            if (!previousStepCompleted) {
+              return false;
             }
-          });
-          return !!dueDiligenceDoc;
+          }
+          return true; // Automatically complete step 7 when buyer reaches it
           
         case 8: // Complete pre-closing checklist
           return false;
@@ -1701,5 +1829,107 @@ async function updateChecklistItem(
 
   return checklist;
 }
+
+// 获取特定buyer和listing的尽职调查文档请求和上传文件
+router.get('/buyers/:buyerId/listings/:listingId/due-diligence', authenticateBroker, async (req, res): Promise<void> => {
+  try {
+    const { buyerId, listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    const brokerId = typedReq.user?.id;
+
+    if (!brokerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证broker对该listing的访问权限
+    const listing = await getPrisma().listing.findFirst({
+      where: { 
+        id: listingId,
+        seller: {
+          managedBy: {
+            managerId: brokerId
+          }
+        }
+      },
+      include: {
+        seller: {
+          include: {
+            managedBy: true
+          }
+        }
+      }
+    });
+
+    if (!listing) {
+      res.status(403).json({ message: 'Access denied to this listing' });
+      return;
+    }
+
+    // 验证buyer存在
+    const buyer = await getPrisma().user.findFirst({
+      where: { 
+        id: buyerId,
+        role: 'BUYER'
+      }
+    });
+
+    if (!buyer) {
+      res.status(404).json({ message: 'Buyer not found' });
+      return;
+    }
+
+    // 获取文档请求记录
+    const requests = await getPrisma().dueDiligenceRequest.findMany({
+      where: {
+        listingId,
+        buyerId
+      }
+    });
+
+    // 获取已上传的尽职调查文档
+    const documents = await getPrisma().document.findMany({
+      where: {
+        listingId,
+        buyerId,
+        type: 'DUE_DILIGENCE',
+        category: 'AGENT_PROVIDED'
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({ 
+      requests,
+      documents: documents.map((doc: any) => ({
+        id: doc.id,
+        documentName: doc.fileName?.split(' - ')[0] || doc.fileName?.replace(/\.[^/.]+$/, "") || doc.type,
+        fileName: doc.fileName,
+        url: doc.url,
+        uploadedAt: doc.uploadedAt,
+        uploadedBy: doc.uploadedBy,
+        uploaderName: doc.uploader?.name,
+        fileSize: doc.fileSize
+      }))
+    });
+  } catch (error: unknown) {
+    console.error('Error fetching broker due diligence data:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch due diligence data',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
 
 export default router;

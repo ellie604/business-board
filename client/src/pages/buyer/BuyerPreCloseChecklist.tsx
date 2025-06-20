@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sellerService } from '../../services/seller';
-import type { SellerProgress } from '../../services/seller';
+import { buyerService } from '../../services/buyer';
+import type { BuyerProgress } from '../../services/buyer';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import PreCloseChecklist from '../../components/PreCloseChecklist';
 
 const BuyerPreCloseChecklist: React.FC = () => {
-  const [progress, setProgress] = useState<SellerProgress | null>(null);
+  const [progress, setProgress] = useState<BuyerProgress | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [currentListing, setCurrentListing] = useState<any>(null);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const navigate = useNavigate();
+  
   const steps = [
     'Home',
     'Contact your agent via messages',
@@ -24,19 +28,49 @@ const BuyerPreCloseChecklist: React.FC = () => {
   ];
 
   useEffect(() => {
-    const fetchProgress = async () => {
+    const fetchData = async () => {
       try {
-        const progressRes = await sellerService.getProgress();
+        const progressRes = await buyerService.getProgress();
         setProgress(progressRes.progress);
+        
+        // Get current listing
+        const listingRes = await buyerService.getCurrentListing();
+        setCurrentListing(listingRes.listing);
       } catch (err) {
-        console.error('Failed to fetch progress:', err);
+        console.error('Failed to fetch data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProgress();
+    fetchData();
   }, []);
+
+  const handleMarkAsFinished = async () => {
+    setIsCompleting(true);
+    try {
+      // For buyer, we'll use updateStep to mark step 8 as completed
+      // This is a simplified version - in a full implementation, you might want
+      // specific logic for marking the pre-close checklist step as complete
+      if (stepCompleted) {
+        // If currently completed, we could implement mark as incomplete logic here
+        alert('Step is already completed.');
+      } else {
+        // Mark step 8 as completed
+        await buyerService.updateStep(8);
+        alert('Pre-Close Checklist marked as completed successfully!');
+      }
+      
+      // Refresh progress
+      const progressRes = await buyerService.getProgress();
+      setProgress(progressRes.progress);
+    } catch (err) {
+      console.error('Failed to toggle step completion:', err);
+      alert('Failed to update step status. Please try again.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
 
@@ -48,13 +82,15 @@ const BuyerPreCloseChecklist: React.FC = () => {
   return (
     <StepGuard stepName="Pre Close Checklist">
       <div className="max-w-6xl mx-auto">
+        {/* Progress Bar */}
         <ProgressBar currentStep={progress?.currentStep || 0} steps={steps} />
         
+        {/* Step Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Step 9: Pre Close Checklist</h1>
-              <p className="text-gray-600 mt-2">Check off your to do list. See if others have done theirs</p>
+              <p className="text-gray-600 mt-2">Complete all required tasks before the closing date</p>
             </div>
             <div className="flex items-center space-x-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -67,9 +103,9 @@ const BuyerPreCloseChecklist: React.FC = () => {
                   </svg>
                   Finished
                 </span>
-              ) : isCurrentStep ? (
+              ) : isAccessible ? (
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                  In Progress
+                  Available - Click "Mark as Finished" below
                 </span>
               ) : (
                 <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
@@ -80,80 +116,152 @@ const BuyerPreCloseChecklist: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Buyer Checklist */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4 text-blue-800">Your Checklist (Buyer)</h2>
-            <div className="space-y-3">
-              {[
-                { task: 'Final loan approval secured', completed: true },
-                { task: 'Business license transfer initiated', completed: true },
-                { task: 'Insurance policies transferred', completed: false },
-                { task: 'Closing funds ready', completed: true },
-                { task: 'Final walkthrough scheduled', completed: false }
-              ].map((item, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={item.completed}
-                    className="w-5 h-5 text-blue-600"
-                    readOnly
-                  />
-                  <span className={item.completed ? 'text-green-600' : 'text-gray-600'}>
-                    {item.task}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Debug Info */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6">
+            <h4 className="font-medium text-gray-900">Debug Info:</h4>
+            <p className="text-sm text-gray-700">Current Step: {currentStepIndex}</p>
+            <p className="text-sm text-gray-700">Step 8 Completed: {stepCompleted ? 'Yes' : 'No'}</p>
+            <p className="text-sm text-gray-700">Is Accessible: {isAccessible ? 'Yes' : 'No'}</p>
+            <p className="text-sm text-gray-700">Show Button: {(currentListing && !stepCompleted && isAccessible) ? 'Yes' : 'No'}</p>
           </div>
+        )}
 
-          {/* Seller Checklist */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4 text-green-800">Seller Checklist</h2>
-            <div className="space-y-3">
-              {[
-                { task: 'Final financial statements provided', completed: true },
-                { task: 'Asset transfer documents prepared', completed: true },
-                { task: 'Employee notifications sent', completed: false },
-                { task: 'Vendor/supplier notifications', completed: false },
-                { task: 'Keys and access cards ready', completed: true }
-              ].map((item, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                    item.completed ? 'bg-green-500 border-green-500' : 'border-gray-300'
-                  }`}>
-                    {item.completed && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className={item.completed ? 'text-green-600' : 'text-gray-600'}>
-                    {item.task}
-                  </span>
-                </div>
-              ))}
+        {/* Closing Timeline */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center mb-4">
+            <svg className="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 className="text-xl font-semibold text-blue-800">Closing Information</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm text-blue-600">Scheduled Closing Date</p>
+              <p className="font-medium text-blue-800">TBD</p>
+            </div>
+            <div>
+              <p className="text-sm text-blue-600">Current Listing</p>
+              <p className="font-medium text-blue-800">{currentListing?.title || 'No listing selected'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-blue-600">Closing Location</p>
+              <p className="font-medium text-blue-800">TBD</p>
             </div>
           </div>
         </div>
 
-        {/* Progress Summary */}
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mt-8">
-          <h3 className="text-lg font-semibold text-purple-800 mb-3">Closing Progress Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">3/5</div>
-              <div className="text-sm text-gray-600">Your tasks completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">3/5</div>
-              <div className="text-sm text-gray-600">Seller tasks completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">3 days</div>
-              <div className="text-sm text-gray-600">Until scheduled closing</div>
+        {/* Pre-Close Checklist Component */}
+        {currentListing ? (
+          <PreCloseChecklist
+            listingId={currentListing.id}
+            userRole="BUYER"
+            className="mb-6"
+          />
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+            <div className="flex items-center">
+              <svg className="h-6 w-6 text-yellow-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <div>
+                <h4 className="font-medium text-yellow-900">No Listing Selected</h4>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Please select a listing first to access the pre-close checklist.
+                </p>
+              </div>
             </div>
           </div>
+        )}
+
+        {/* Manual Completion Section - Show when step is accessible */}
+        {currentListing && isAccessible && (
+          <div className={`rounded-lg shadow-md p-6 mb-6 border-2 ${
+            stepCompleted 
+              ? 'bg-green-50 border-green-200' 
+              : 'bg-white border-orange-200'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className={`text-lg font-semibold ${
+                  stepCompleted ? 'text-green-900' : 'text-gray-900'
+                }`}>
+                  {stepCompleted ? 'Step Completed' : 'Mark Step as Complete'}
+                </h3>
+                <p className={`mt-1 ${
+                  stepCompleted ? 'text-green-700' : 'text-gray-600'
+                }`}>
+                  {stepCompleted 
+                    ? 'You have successfully completed the Pre-Close Checklist step.'
+                    : 'Once you have reviewed and completed all checklist items above, click the button below to mark this step as finished.'
+                  }
+                </p>
+                {!stepCompleted && (
+                  <p className="text-sm text-orange-600 mt-2 font-medium">
+                    ⚠️ This step requires manual completion by clicking the button below.
+                  </p>
+                )}
+              </div>
+              {!stepCompleted && (
+                <button
+                  onClick={handleMarkAsFinished}
+                  disabled={isCompleting}
+                  className="px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center text-lg font-semibold bg-green-600 text-white hover:bg-green-700"
+                >
+                  {isCompleting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Marking Complete...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Mark as Complete
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Important Notice */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-6">
+          <div className="flex items-start">
+            <svg className="h-6 w-6 text-yellow-600 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <div>
+              <h4 className="font-medium text-yellow-900">Critical Deadline</h4>
+              <p className="text-sm text-yellow-700 mt-1">
+                All required tasks must be completed before the closing date. This checklist allows 
+                real-time collaboration between you, the seller, and your agent/broker. 
+                Contact your agent immediately if you need assistance with any tasks.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between mt-6">
+          <button
+            onClick={() => navigate('/buyer/due-diligence')}
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Previous: Due Diligence
+          </button>
+          <button
+            onClick={() => navigate('/buyer/closing-docs')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Next: Closing Docs
+          </button>
         </div>
       </div>
     </StepGuard>

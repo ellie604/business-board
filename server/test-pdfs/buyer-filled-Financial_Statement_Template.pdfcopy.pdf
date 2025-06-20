@@ -1,0 +1,59 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 643 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(BUSINESS FINANCIAL STATEMENT) Tj
+0 -30 Td
+/F1 12 Tf
+(FINANCIAL INFORMATION SUMMARY) Tj
+0 -20 Td
+(Revenue (Last 3 Years):) Tj
+0 -20 Td
+(Year 1: $__________________) Tj
+0 -20 Td
+(Year 2: $__________________) Tj
+0 -20 Td
+(Year 3: $__________________) Tj
+0 -20 Td
+(Operating Expenses:) Tj
+0 -20 Td
+(Rent: $___________________) Tj
+0 -20 Td
+(Payroll: $_________________) Tj
+0 -20 Td
+(Utilities: $________________) Tj
+0 -20 Td
+(Other: $___________________) Tj
+0 -20 Td
+(Net Profit: $_______________) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f
+0000000010 00000 n
+0000000079 00000 n
+0000000173 00000 n
+0000000301 00000 n
+0000000380 00000 n
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1043
+%%EOF

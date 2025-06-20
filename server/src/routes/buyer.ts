@@ -43,7 +43,7 @@ const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
   3: { type: 'FINANCIAL_STATEMENT', operationType: 'UPLOAD', description: 'Fill out financial statement online' },
   4: { type: 'CBR_CIM', operationType: 'DOWNLOAD', description: 'Download CBR or CIM for the business' },
   5: { type: 'UPLOADED_DOC', operationType: 'UPLOAD', description: 'Upload documents' },
-  6: { type: 'PURCHASE_CONTRACT', operationType: 'DOWNLOAD', description: 'Download your purchase contract' },
+  6: { type: 'PURCHASE_CONTRACT', operationType: 'UPLOAD', description: 'Download, sign, and upload purchase contract' },
   7: { type: 'DUE_DILIGENCE', operationType: 'DOWNLOAD', description: 'Request & Download Due Diligence documents' },
   8: { type: 'PRE_CLOSE_CHECKLIST', operationType: 'BOTH', description: 'Checklist: Check off your to do list' },
   9: { type: 'CLOSING_DOCS', operationType: 'DOWNLOAD', description: 'Download Closing document once we are closed' },
@@ -171,7 +171,7 @@ const getProgress: RequestHandler = async (req, res, next) => {
       { id: 3, title: 'Fill out a simple financial statement online', completed: false, accessible: false },
       { id: 4, title: 'Download a CBR or CIM for the business your interested in', completed: false, accessible: false },
       { id: 5, title: 'Upload documents', completed: false, accessible: false },
-      { id: 6, title: 'Download your purchase contract', completed: false, accessible: false },
+      { id: 6, title: 'Download, sign, and upload purchase contract', completed: false, accessible: false },
       { id: 7, title: 'Request & Download Due Diligence documents', completed: false, accessible: false },
       { id: 8, title: 'Checklist: Check off your to do list', completed: false, accessible: false },
       { id: 9, title: 'Download Closing document once we are closed', completed: false, accessible: false },
@@ -182,15 +182,29 @@ const getProgress: RequestHandler = async (req, res, next) => {
     let currentStep = 0;
     const completedSteps: number[] = [];
     
+    // Get the completed steps from database first
+    const completedStepsFromDB = buyerProgress.completedSteps as number[] || [];
+    
     // Check each step using batched data
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
-      const isCompleted = checkBuyerStepCompletionOptimized(i, {
-        buyerId,
-        listingId: selectedListingId,
-        documents,
-        messages
-      });
+      
+      // For manual completion steps (like step 8), check the database first
+      let isCompleted = false;
+      
+      if (step.id === 8 || step.id === 9 || step.id === 10) {
+        // Steps 8, 9, 10 (Pre-close checklist, Closing docs, After sale) are manually completed
+        isCompleted = completedStepsFromDB.includes(step.id);
+      } else {
+        // For other steps, use the optimized completion check
+        isCompleted = checkBuyerStepCompletionOptimized(i, {
+          buyerId,
+          listingId: selectedListingId,
+          documents,
+          messages
+        });
+      }
+      
       step.completed = isCompleted;
       
       if (isCompleted) {
@@ -232,6 +246,7 @@ const getProgress: RequestHandler = async (req, res, next) => {
         currentStep,
         completedSteps,
         selectedListingId,
+        buyerId,
         steps,
         isViewingSelectedListing: true
       }
@@ -286,28 +301,41 @@ function checkBuyerStepCompletionOptimized(stepId: number, data: {
     case 5: // Upload documents
       return documents.some(doc => 
         doc.stepId === 5 &&
-        doc.category === 'BUYER_UPLOAD' &&
-        doc.type === 'UPLOADED_DOC'
+        doc.category === 'BUYER_UPLOAD'
       );
       
-    case 6: // Download purchase contract
+    case 6: // Download and upload purchase contract
       return documents.some(doc => 
         doc.stepId === 6 &&
         doc.type === 'PURCHASE_CONTRACT' &&
-        doc.operationType === 'DOWNLOAD' &&
-        doc.downloadedAt
+        doc.operationType === 'UPLOAD' &&
+        doc.category === 'BUYER_UPLOAD' &&
+        doc.status === 'COMPLETED'
       );
       
-    case 7: // Download due diligence documents
-      return documents.some(doc => 
-        doc.stepId === 7 &&
-        doc.type === 'DUE_DILIGENCE' &&
-        doc.operationType === 'DOWNLOAD' &&
-        doc.downloadedAt
-      );
+    case 7: // Due diligence step - automatically completed when buyer reaches this step
+      // Step 7 is considered complete as soon as the buyer can access it
+      // (i.e., when all previous steps are completed)
+      if (!listingId) return false;
+      
+      // Check if all previous steps (0-6) are completed
+      for (let i = 0; i < 7; i++) {
+        if (!checkBuyerStepCompletionOptimized(i, data)) {
+          return false;
+        }
+      }
+      return true; // Automatically complete step 7 when buyer reaches it
       
     case 8: // Complete pre-closing checklist
-      return false; // Only completed manually
+      // Check if step 8 is manually marked as completed in the completedSteps array
+      // This step requires manual completion by clicking the "Mark as Complete" button
+      const manuallyCompleted = data.documents.some(doc => 
+        doc.stepId === 8 && doc.operationType === 'MANUAL_COMPLETION'
+      );
+      
+      // For now, we'll check if the step is in completedSteps from buyerProgress
+      // This is a simplified approach - in the future we could add a specific completion record
+      return false; // This will be handled by the manual completion check in the main logic
       
     case 9: // Download closing docs
       return false; // Only completed after closing
@@ -1024,6 +1052,532 @@ router.post('/download-agent-document/:documentId', authenticateBuyer, async (re
     });
   }
 });
+
+// 获取尽职调查文档请求和上传文件
+router.get('/listings/:listingId/due-diligence', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证buyer是否对该listing有兴趣
+    const buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { 
+        buyerId: typedReq.user.id,
+        selectedListingId: listingId
+      }
+    });
+
+    if (!buyerProgress) {
+      res.status(404).json({ message: 'Listing not found or not in your interests' });
+      return;
+    }
+
+    // 获取文档请求记录
+    const requests = await getPrisma().dueDiligenceRequest.findMany({
+      where: {
+        listingId,
+        buyerId: typedReq.user.id
+      }
+    });
+
+    // 获取已上传的尽职调查文档
+    const documents = await getPrisma().document.findMany({
+      where: {
+        listingId,
+        buyerId: typedReq.user.id, // Add buyerId filter to get documents for this specific buyer
+        type: 'DUE_DILIGENCE',
+        category: 'AGENT_PROVIDED'
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({ 
+      requests,
+      documents: documents.map((doc: any) => ({
+        id: doc.id,
+        documentName: doc.fileName?.split(' - ')[0] || doc.fileName?.replace(/\.[^/.]+$/, "") || doc.type, // Extract document name from fileName format "DocumentName - originalfile.ext"
+        fileName: doc.fileName,
+        url: doc.url,
+        uploadedAt: doc.uploadedAt,
+        uploadedBy: doc.uploadedBy,
+        uploaderName: doc.uploader?.name,
+        fileSize: doc.fileSize
+      }))
+    });
+  } catch (error: unknown) {
+    console.error('Error fetching due diligence data:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch due diligence data',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// buyer请求特定的尽职调查文档
+router.post('/listings/:listingId/due-diligence/request', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const { documentName, requested } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // Use the authenticated user's ID directly
+    const buyerId = typedReq.user.id;
+
+    if (requested) {
+      // 创建或更新请求记录
+      await getPrisma().dueDiligenceRequest.upsert({
+        where: {
+          listingId_buyerId_documentName: {
+            listingId,
+            buyerId,
+            documentName
+          }
+        },
+        update: {
+          requestedAt: new Date(),
+          status: 'REQUESTED'
+        },
+        create: {
+          listingId,
+          buyerId,
+          documentName,
+          requestedAt: new Date(),
+          status: 'REQUESTED'
+        }
+      });
+    } else {
+      // 删除请求记录
+      await getPrisma().dueDiligenceRequest.deleteMany({
+        where: {
+          listingId,
+          buyerId,
+          documentName
+        }
+      });
+    }
+
+    res.json({ message: 'Document request updated successfully' });
+  } catch (error: unknown) {
+    console.error('Error updating document request:', error);
+    res.status(500).json({ 
+      message: 'Failed to update document request',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// buyer记录下载尽职调查文档
+router.post('/listings/:listingId/due-diligence/download', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const { documentId, stepId } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 获取原始文档
+    const sourceDocument = await getPrisma().document.findFirst({
+      where: {
+        id: documentId,
+        listingId,
+        type: 'DUE_DILIGENCE',
+        category: 'AGENT_PROVIDED'
+      }
+    });
+
+    if (!sourceDocument) {
+      res.status(404).json({ message: 'Document not found' });
+      return;
+    }
+
+    // 记录下载
+    await getPrisma().document.create({
+      data: {
+        type: 'DUE_DILIGENCE',
+        sellerId: typedReq.user.id, // Required field
+        buyerId: typedReq.user.id,
+        stepId: parseInt(stepId),
+        listingId,
+        operationType: 'DOWNLOAD',
+        status: 'COMPLETED',
+        category: 'AGENT_PROVIDED',
+        downloadedAt: new Date(),
+        fileName: sourceDocument.fileName,
+        url: sourceDocument.url
+      }
+    });
+
+    res.json({ message: 'Download recorded successfully' });
+  } catch (error: unknown) {
+    console.error('Error recording download:', error);
+    res.status(500).json({ 
+      message: 'Failed to record download',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Pre-Close Checklist APIs for Buyer
+// 获取listing的pre-close checklist (Buyer只能访问自己选择的listing的checklist)
+router.get('/listings/:listingId/pre-close-checklist', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证buyer是否对该listing有兴趣
+    const buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { 
+        buyerId: typedReq.user.id,
+        selectedListingId: listingId
+      }
+    });
+
+    if (!buyerProgress) {
+      res.status(404).json({ message: 'Listing not found or not in your interests' });
+      return;
+    }
+
+    // 获取或创建checklist
+    let checklist = await getPrisma().preCloseChecklist.findUnique({
+      where: { listingId },
+      include: {
+        lastUpdatedByUser: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    if (!checklist) {
+      // 创建默认的checklist
+      const defaultChecklistData = getDefaultChecklistData();
+      checklist = await getPrisma().preCloseChecklist.create({
+        data: {
+          listingId,
+          buyerItems: defaultChecklistData.buyerItems,
+          sellerItems: defaultChecklistData.sellerItems,
+          brokerItems: defaultChecklistData.brokerItems
+        },
+        include: {
+          lastUpdatedByUser: {
+            select: {
+              name: true
+            }
+          }
+        }
+      });
+    }
+
+    // 合并所有items到一个checklist结构
+    const mergedChecklist = mergeChecklistItems(checklist.buyerItems as any, checklist.sellerItems as any, checklist.brokerItems as any);
+
+    res.json({
+      checklist: mergedChecklist,
+      lastUpdatedBy: checklist.lastUpdatedByUser?.name,
+      updatedAt: checklist.updatedAt
+    });
+  } catch (error: unknown) {
+    console.error('Error fetching pre-close checklist:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch pre-close checklist',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// 更新checklist item (Buyer可以更新任何item，实现协作)
+router.put('/listings/:listingId/pre-close-checklist/item', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const { listingId } = req.params;
+    const { categoryId, itemId, userRole } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证buyer是否对该listing有兴趣
+    const buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { 
+        buyerId: typedReq.user.id,
+        selectedListingId: listingId
+      }
+    });
+
+    if (!buyerProgress) {
+      res.status(404).json({ message: 'Listing not found or not in your interests' });
+      return;
+    }
+
+    // 获取或创建checklist
+    let checklist = await getPrisma().preCloseChecklist.findUnique({
+      where: { listingId }
+    });
+
+    if (!checklist) {
+      const defaultChecklistData = getDefaultChecklistData();
+      checklist = await getPrisma().preCloseChecklist.create({
+        data: {
+          listingId,
+          buyerItems: defaultChecklistData.buyerItems,
+          sellerItems: defaultChecklistData.sellerItems,
+          brokerItems: defaultChecklistData.brokerItems
+        }
+      });
+    }
+
+    // 更新对应的item
+    const updatedChecklist = await updateChecklistItem(
+      checklist,
+      categoryId,
+      itemId,
+      typedReq.user.id,
+      typedReq.user.name,
+      userRole
+    );
+
+    // 合并所有items到一个checklist结构
+    const mergedChecklist = mergeChecklistItems(
+      updatedChecklist.buyerItems as any, 
+      updatedChecklist.sellerItems as any, 
+      updatedChecklist.brokerItems as any
+    );
+
+    res.json({
+      checklist: mergedChecklist,
+      lastUpdatedBy: typedReq.user.name,
+      updatedAt: updatedChecklist.updatedAt
+    });
+  } catch (error: unknown) {
+    console.error('Error updating checklist item:', error);
+    res.status(500).json({ 
+      message: 'Failed to update checklist item',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Helper functions (same as in seller.ts and broker.ts)
+function getDefaultChecklistData() {
+  const defaultStructure = {
+    'letter-of-intent': {
+      title: 'A. Letter Of Intent',
+      items: {
+        'buyer-offer': { task: 'Buyer offer', completed: false, responsible: 'buyer', required: true },
+        'seller-counter': { task: 'Seller counter', completed: false, responsible: 'seller', required: false },
+        'negotiate-agreement': { task: 'Negotiate mutual agreement', completed: false, responsible: 'seller', required: false },
+        'buyer-earnest-money': { task: 'Buyer provides Earnest Money', completed: false, responsible: 'buyer', required: true },
+        'broker-deposits-earnest': { task: 'Broker deposits Earnest Money', completed: false, responsible: 'broker', required: true },
+      }
+    },
+    'asset-purchase-agreement': {
+      title: 'B. Asset Purchase Agreement',
+      items: {
+        'buyer-offer-apa': { task: 'Buyer offer', completed: false, responsible: 'buyer', required: true },
+        'buyer-attorney-review': { task: 'Attorney review', completed: false, responsible: 'buyer', required: true },
+        'buyer-accountant-review': { task: 'Accountant review', completed: false, responsible: 'buyer', required: true },
+        'seller-counter-apa': { task: 'Seller counter', completed: false, responsible: 'seller', required: false },
+        'seller-attorney-review': { task: 'Attorney review', completed: false, responsible: 'seller', required: false },
+        'seller-accountant-review': { task: 'Accountant review', completed: false, responsible: 'seller', required: false },
+        'negotiate-execute-agreement': { task: 'Negotiate and execute mutual agreement', completed: false, responsible: 'buyer', required: true },
+        'negotiate-execute-agreement-seller': { task: 'Negotiate and execute mutual agreement', completed: false, responsible: 'seller', required: true },
+      }
+    },
+    'exhibits': {
+      title: 'C. Exhibits',
+      items: {
+        'asset-list': { task: 'Current Furniture, Fixtures & Equipment List ("Asset List")', completed: false, responsible: 'broker', required: true },
+        'seller-financial-info': { task: "Seller's financial information", completed: false, responsible: 'seller', required: true },
+        'buyer-financial-info': { task: "Buyer's financial information", completed: false, responsible: 'buyer', required: true },
+        'contract-rights': { task: 'Contract Rights', completed: false, responsible: 'seller', required: true },
+        'other-1': { task: 'Other:', completed: false, responsible: 'broker', required: false },
+        'other-2': { task: 'Other:', completed: false, responsible: 'broker', required: false },
+        'other-3': { task: 'Other:', completed: false, responsible: 'broker', required: false },
+      }
+    },
+    'contingencies': {
+      title: 'D. Asset Purchase Agreement Contingencies',
+      items: {
+        'seller-contacts-landlord': { task: 'Seller contacts landlord', completed: false, responsible: 'seller', required: true },
+        'buyer-meeting-landlord': { task: 'Buyer meeting with landlord', completed: false, responsible: 'buyer', required: true },
+        'lease-documents-prep': { task: 'Preparation of lease documents', completed: false, responsible: 'buyer', required: true },
+        'lease-assignment': { task: 'Lease assignment or new lease', completed: false, responsible: 'buyer', required: true },
+        'seller-security-deposit': { task: "Seller's security deposit", completed: false, responsible: 'seller', required: false },
+        'buyer-security-deposit': { task: "Buyer's security deposit", completed: false, responsible: 'buyer', required: false },
+        'rent-proration': { task: 'Rent proration', completed: false, responsible: 'seller', required: true },
+        'seller-walkthrough': { task: 'Seller walk thru with landlord and/or Buyer', completed: false, responsible: 'buyer', required: true },
+        'seller-walkthrough-seller': { task: 'Seller walk thru with landlord and/or Buyer', completed: false, responsible: 'seller', required: true },
+        'conditional-lease-assignment': { task: 'Conditional lease assignment', completed: false, responsible: 'broker', required: false },
+        'guaranty-lease': { task: 'Guaranty of lease', completed: false, responsible: 'buyer', required: true },
+        'right-inspection': { task: 'Right of Inspection', completed: false, responsible: 'buyer', required: true },
+        'due-diligence-list': { task: 'Buyer provide list of due diligence requirements', completed: false, responsible: 'buyer', required: true },
+        'due-diligence-list-seller': { task: 'Buyer provide list of due diligence requirements', completed: false, responsible: 'seller', required: true },
+        'action-plan-buyer': { task: 'Buyer & Seller agree on plan of action to satisfy contingencies', completed: false, responsible: 'buyer', required: true },
+        'action-plan-seller': { task: 'Buyer & Seller agree on plan of action to satisfy contingencies', completed: false, responsible: 'seller', required: true },
+        'financials-buyer': { task: 'Financials', completed: false, responsible: 'buyer', required: true },
+        'financials-seller': { task: 'Financials', completed: false, responsible: 'seller', required: true },
+        'premises-inspection-buyer': { task: 'Premises inspections', completed: false, responsible: 'buyer', required: true },
+        'premises-inspection-seller': { task: 'Premises inspections', completed: false, responsible: 'seller', required: true },
+      }
+    }
+  };
+
+  // 分离不同角色的items
+  const buyerItems: any = {};
+  const sellerItems: any = {};
+  const brokerItems: any = {};
+
+  Object.entries(defaultStructure).forEach(([categoryId, category]) => {
+    buyerItems[categoryId] = { title: category.title, items: {} };
+    sellerItems[categoryId] = { title: category.title, items: {} };
+    brokerItems[categoryId] = { title: category.title, items: {} };
+
+    Object.entries(category.items).forEach(([itemId, item]) => {
+      if (item.responsible === 'buyer') {
+        buyerItems[categoryId].items[itemId] = item;
+      } else if (item.responsible === 'seller') {
+        sellerItems[categoryId].items[itemId] = item;
+      } else if (item.responsible === 'broker') {
+        brokerItems[categoryId].items[itemId] = item;
+      }
+    });
+  });
+
+  return {
+    buyerItems,
+    sellerItems, 
+    brokerItems
+  };
+}
+
+function mergeChecklistItems(buyerItems: any, sellerItems: any, brokerItems: any) {
+  const mergedChecklist: any[] = [];
+  const allCategories = new Set([
+    ...Object.keys(buyerItems || {}),
+    ...Object.keys(sellerItems || {}),
+    ...Object.keys(brokerItems || {})
+  ]);
+
+  Array.from(allCategories).forEach(categoryId => {
+    const category = {
+      id: categoryId,
+      title: (buyerItems[categoryId]?.title || sellerItems[categoryId]?.title || brokerItems[categoryId]?.title),
+      items: [] as any[]
+    };
+
+    // 合并所有items
+    const allItems = new Set([
+      ...Object.keys(buyerItems[categoryId]?.items || {}),
+      ...Object.keys(sellerItems[categoryId]?.items || {}),
+      ...Object.keys(brokerItems[categoryId]?.items || {})
+    ]);
+
+    Array.from(allItems).forEach(itemId => {
+      const item = 
+        buyerItems[categoryId]?.items[itemId] ||
+        sellerItems[categoryId]?.items[itemId] ||
+        brokerItems[categoryId]?.items[itemId];
+      
+      if (item) {
+        category.items.push({
+          id: itemId,
+          ...item
+        });
+      }
+    });
+
+    mergedChecklist.push(category);
+  });
+
+  return mergedChecklist;
+}
+
+async function updateChecklistItem(
+  checklist: any,
+  categoryId: string,
+  itemId: string,
+  userId: string,
+  userName: string,
+  userRole: string
+) {
+  const buyerItems = (checklist.buyerItems as any) || {};
+  const sellerItems = (checklist.sellerItems as any) || {};
+  const brokerItems = (checklist.brokerItems as any) || {};
+
+  // 找到要更新的item
+  let itemToUpdate: any = null;
+  let targetItems: any = null;
+
+  if (buyerItems[categoryId]?.items[itemId]) {
+    itemToUpdate = buyerItems[categoryId].items[itemId];
+    targetItems = buyerItems;
+  } else if (sellerItems[categoryId]?.items[itemId]) {
+    itemToUpdate = sellerItems[categoryId].items[itemId];
+    targetItems = sellerItems;
+  } else if (brokerItems[categoryId]?.items[itemId]) {
+    itemToUpdate = brokerItems[categoryId].items[itemId];
+    targetItems = brokerItems;
+  }
+
+  if (itemToUpdate && targetItems) {
+    // 切换完成状态
+    itemToUpdate.completed = !itemToUpdate.completed;
+    
+    if (itemToUpdate.completed) {
+      itemToUpdate.completedBy = userName;
+      itemToUpdate.completedAt = new Date().toISOString();
+    } else {
+      delete itemToUpdate.completedBy;
+      delete itemToUpdate.completedAt;
+    }
+
+    // 更新数据库
+    return await getPrisma().preCloseChecklist.update({
+      where: { id: checklist.id },
+      data: {
+        buyerItems,
+        sellerItems,
+        brokerItems,
+        lastUpdatedBy: userId,
+        updatedAt: new Date()
+      }
+    });
+  }
+
+  return checklist;
+}
 
 router.get('/dashboard', authenticateBuyer, getDashboardStats);
 router.get('/listings', authenticateBuyer, getListings);

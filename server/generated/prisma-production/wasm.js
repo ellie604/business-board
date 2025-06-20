@@ -242,6 +242,18 @@ exports.Prisma.PreCloseChecklistScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DueDiligenceRequestScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  buyerId: 'buyerId',
+  documentName: 'documentName',
+  status: 'status',
+  requestedAt: 'requestedAt',
+  fulfilledAt: 'fulfilledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -326,6 +338,12 @@ exports.ListingStatus = exports.$Enums.ListingStatus = {
   CLOSED: 'CLOSED'
 };
 
+exports.DueDiligenceStatus = exports.$Enums.DueDiligenceStatus = {
+  REQUESTED: 'REQUESTED',
+  FULFILLED: 'FULFILLED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
@@ -336,7 +354,8 @@ exports.Prisma.ModelName = {
   Listing: 'Listing',
   Activity: 'Activity',
   SellerQuestionnaire: 'SellerQuestionnaire',
-  PreCloseChecklist: 'PreCloseChecklist'
+  PreCloseChecklist: 'PreCloseChecklist',
+  DueDiligenceRequest: 'DueDiligenceRequest'
 };
 
 /**
