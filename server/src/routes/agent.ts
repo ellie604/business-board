@@ -1093,16 +1093,12 @@ router.get('/buyers/:buyerId/listings/:listingId/documents', authenticateAgent, 
     }
 
     // Get buyer's documents for this listing
-    const queryConditions = {
-      listingId,
-      category: 'BUYER_UPLOAD', // 只获取buyer上传的文件
-      type: {
-        in: ['QUESTIONNAIRE', 'FINANCIAL_DOCUMENTS', 'DUE_DILIGENCE', 'NDA', 'UPLOADED_DOC'] // 包括签完字的NDA文件
-      }
-    };
-
     const documents = await getPrisma().document.findMany({
-      where: queryConditions,
+      where: {
+        listingId,
+        buyerId,
+        category: 'BUYER_UPLOAD'
+      },
       include: {
         uploader: {
           select: {

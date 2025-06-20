@@ -148,14 +148,14 @@ const BuyerNonDisclosure: React.FC = () => {
       if (progressData?.selectedListingId) {
         // 使用现有的download API来记录下载
         const response = await fetch(`${API_BASE_URL}/buyer/download-agent-document/${ndaDoc.id}`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ stepId: 2 }),
-        });
-        
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ stepId: 2 }),
+    });
+    
         if (!response.ok) {
           console.error('Failed to record download');
         }
@@ -171,7 +171,7 @@ const BuyerNonDisclosure: React.FC = () => {
       setDownloading(true);
       setDownloadMessage('');
       setMessageType('');
-
+      
       if (!ndaDocuments || ndaDocuments.length === 0) {
         setDownloadMessage('No NDA document available for download');
         setMessageType('error');
@@ -419,81 +419,81 @@ const BuyerNonDisclosure: React.FC = () => {
         {/* Download and Upload Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Download Section */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">1. Download NDA</h2>
+          
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5-8a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2h10z" />
+            </svg>
             
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5-8a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2h10z" />
-              </svg>
-              
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Non-Disclosure Agreement</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                {hasNdaDocument 
-                  ? 'Standard NDA for business acquisition due diligence'
-                  : 'Waiting for broker/agent to provide NDA document'
-                }
-              </p>
-              
-              {documentsLoading ? (
-                <div className="mt-6 flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                </div>
-              ) : hasNdaDocument ? (
-                <div className="mt-6 flex justify-center space-x-4">
-                  <button
-                    onClick={handleDownload}
-                    disabled={downloading}
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {downloading ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Downloading...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+            <h3 className="mt-4 text-lg font-medium text-gray-900">Non-Disclosure Agreement</h3>
+            <p className="mt-2 text-sm text-gray-500">
+              {hasNdaDocument 
+                ? 'Standard NDA for business acquisition due diligence'
+                : 'Waiting for broker/agent to provide NDA document'
+              }
+            </p>
+            
+            {documentsLoading ? (
+              <div className="mt-6 flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+              </div>
+            ) : hasNdaDocument ? (
+              <div className="mt-6 flex justify-center space-x-4">
+                <button
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {downloading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Downloading...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
                         Download NDA
-                      </>
-                    )}
-                  </button>
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="mt-6">
+                <div className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-500 bg-gray-50 cursor-not-allowed">
+                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Waiting for NDA Document
                 </div>
-              ) : (
-                <div className="mt-6">
-                  <div className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-500 bg-gray-50 cursor-not-allowed">
-                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Waiting for NDA Document
-                  </div>
-                  <p className="mt-2 text-sm text-gray-500">
-                    Your broker or agent will provide the NDA document for this listing.
-                  </p>
-                </div>
-              )}
-              
-              {/* Download Message */}
-              {downloadMessage && (
-                <div className={`mt-4 p-3 rounded-lg ${
-                  messageType === 'success' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-red-50 border border-red-200'
+                <p className="mt-2 text-sm text-gray-500">
+                  Your broker or agent will provide the NDA document for this listing.
+                </p>
+              </div>
+            )}
+            
+            {/* Download Message */}
+            {downloadMessage && (
+              <div className={`mt-4 p-3 rounded-lg ${
+                messageType === 'success' 
+                  ? 'bg-green-50 border border-green-200' 
+                  : 'bg-red-50 border border-red-200'
+              }`}>
+                <p className={`text-sm ${
+                  messageType === 'success' ? 'text-green-700' : 'text-red-700'
                 }`}>
-                  <p className={`text-sm ${
-                    messageType === 'success' ? 'text-green-700' : 'text-red-700'
-                  }`}>
-                    {messageType === 'success' && '✓ '}
-                    {messageType === 'error' && '⚠ '}
-                    {downloadMessage}
-                  </p>
-                </div>
-              )}
+                  {messageType === 'success' && '✓ '}
+                  {messageType === 'error' && '⚠ '}
+                  {downloadMessage}
+                </p>
+              </div>
+            )}
             </div>
           </div>
 
@@ -556,9 +556,9 @@ const BuyerNonDisclosure: React.FC = () => {
                     {uploadMessageType === 'success' && '✓ '}
                     {uploadMessageType === 'error' && '⚠ '}
                     {uploadMessage}
-                  </p>
-                </div>
-              )}
+                </p>
+              </div>
+            )}
             </div>
           </div>
         </div>
@@ -620,7 +620,7 @@ const BuyerNonDisclosure: React.FC = () => {
               <h4 className="font-medium text-yellow-900">Important</h4>
               <p className="text-sm text-yellow-700 mt-1">
                 Please download, review, sign, and upload the NDA to complete this step. 
-                By signing this NDA, you agree to maintain strict confidentiality of all business information.
+                By signing this NDA, you agree to maintain strict confidentiality of all business information. 
               </p>
             </div>
           </div>
