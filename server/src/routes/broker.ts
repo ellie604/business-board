@@ -1615,7 +1615,7 @@ router.put('/listings/:listingId/pre-close-checklist/item', authenticateBroker, 
       categoryId,
       itemId,
       typedReq.user.id,
-      typedReq.user.name,
+      typedReq.user.name || 'Unknown User',
       userRole
     );
 
@@ -1628,7 +1628,7 @@ router.put('/listings/:listingId/pre-close-checklist/item', authenticateBroker, 
 
     res.json({
       checklist: mergedChecklist,
-      lastUpdatedBy: typedReq.user.name,
+      lastUpdatedBy: typedReq.user.name || 'Unknown User',
       updatedAt: updatedChecklist.updatedAt
     });
   } catch (error: unknown) {
