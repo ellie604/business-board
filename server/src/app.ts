@@ -40,13 +40,15 @@ const getAllowedOrigins = () => {
   const origins: Record<string, OriginType[]> = {
     production: [
       'https://business-board.vercel.app',  // 生产环境主域名
-      /https:\/\/business-board-git-main-.*\.vercel\.app/  // 生产环境的其他 Vercel 域名
+      'https://business-board-git-main-xinyis-projects-6c0795d6.vercel.app',  // 生产环境 git 域名
+      /https:\/\/business-board-git-main-.*\.vercel\.app/,  // 生产环境的其他 main 分支域名
+      /https:\/\/business-board-.*-xinyis-projects-6c0795d6\.vercel\.app/  // 用户特定的生产域名
     ],
     preview: [
       'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app',  // 你的具体预览环境域名
-      /https:\/\/business-board-git-dev-.*\.vercel\.app/,  // 预览环境的 Vercel 域名
-      /https:\/\/business-board-.*\.vercel\.app/,  // 其他 Vercel 预览域名
-      'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app'  // 确保完全匹配
+      /https:\/\/business-board-git-dev-.*\.vercel\.app/,  // 预览环境的 dev 分支域名
+      /https:\/\/business-board-.*-xinyis-projects-6c0795d6\.vercel\.app/,  // 用户特定的预览域名
+      /https:\/\/business-board-.*\.vercel\.app/  // 所有 business-board 相关的 Vercel 域名
     ],
     development: [
       'http://localhost:5174', 
@@ -54,8 +56,21 @@ const getAllowedOrigins = () => {
     ]
   };
 
-  const env = process.env.NODE_ENV || 'development';
+  // 检测环境：优先使用 VERCEL_ENV，然后是 NODE_ENV
+  let env = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
+  
+  // Vercel 环境映射
+  if (env === 'production') {
+    env = 'production';
+  } else if (env === 'preview') {
+    env = 'preview';
+  } else {
+    env = 'development';
+  }
+  
   console.log('Current environment:', env);
+  console.log('VERCEL_ENV:', process.env.VERCEL_ENV);
+  console.log('NODE_ENV:', process.env.NODE_ENV);
   console.log('Current hostname:', process.env.HOST);
   
   if (!(env in origins)) {
@@ -86,17 +101,23 @@ app.use(cors({
       console.log('Allowed origins:', allowedOrigins);
     }
     
-    // 检查 origin 是否在允许的列表中
+    // 允许没有 origin 的请求 (比如移动app或者一些工具)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    
+    // 检查 origin 是否在允许列表中 (支持字符串和正则表达式)
     const isAllowed = allowedOrigins.some(allowedOrigin => {
       if (typeof allowedOrigin === 'string') {
         return allowedOrigin === origin;
       } else if (allowedOrigin instanceof RegExp) {
-        return allowedOrigin.test(origin || '');
+        return allowedOrigin.test(origin);
       }
       return false;
     });
     
-    if (isAllowed || !origin) { // !origin 用于处理同源请求
+    if (isAllowed) {
       if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
         console.log('Origin allowed:', origin);
       }
