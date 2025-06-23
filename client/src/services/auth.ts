@@ -90,15 +90,10 @@ export const authService = {
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
 
       try {
-        // 检查是否在无痕模式
-        const isIncognito = await isIncognitoMode();
-        console.log('Browser mode:', isIncognito ? 'Incognito' : 'Normal');
-
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'X-Browser-Mode': isIncognito ? 'incognito' : 'normal'
+            'Content-Type': 'application/json'
           },
           credentials: 'include',
           body: JSON.stringify({ email, password }),
@@ -122,15 +117,10 @@ export const authService = {
           localStorage.setItem('user', JSON.stringify(data.user));
           console.log('User data saved to localStorage:', data.user);
 
-          // 如果在无痕模式下，保存额外的认证信息
-          if (isIncognito && data.token) {
-            sessionStorage.setItem('auth_token', data.token);
-            console.log('Auth token saved for incognito mode');
-          }
-
-          // 设置认证头
+          // 如果有 token，保存它
           if (data.token) {
-            this.setAuthHeader(data.token);
+            localStorage.setItem('auth_token', data.token);
+            console.log('Auth token saved');
           }
         }
         
@@ -162,9 +152,11 @@ export const authService = {
   // 检查并恢复会话
   checkSession: async (): Promise<boolean> => {
     try {
-      const requestOptions = createAuthenticatedRequest();
       const response = await fetch(`${API_BASE_URL}/auth/check-session`, {
-        ...requestOptions
+        credentials: 'include',
+        headers: {
+          'Authorization': localStorage.getItem('auth_header') || ''
+        }
       });
 
       if (!response.ok) {
@@ -180,5 +172,19 @@ export const authService = {
   },
 
   // 获取认证请求配置
-  getAuthenticatedRequestConfig: () => createAuthenticatedRequest()
+  getAuthenticatedRequestConfig: () => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+
+    const authHeader = localStorage.getItem('auth_header');
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+
+    return {
+      headers,
+      credentials: 'include' as const
+    };
+  }
 }; 

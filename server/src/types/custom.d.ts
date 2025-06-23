@@ -4,9 +4,10 @@ import { Session } from 'express-session';
 // User interface
 export interface User {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   role: string;
+  managing?: any[];
 }
 
 // Extend express-session

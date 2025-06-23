@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/react-router-dom": "^5.3.3",
+    "bcrypt": "^6.0.0",
     "react-router-dom": "^7.6.2"
   }
 }
