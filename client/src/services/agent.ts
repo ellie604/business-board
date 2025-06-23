@@ -1,56 +1,127 @@
 import { API_BASE_URL } from '../config';
-import { authService } from './auth';
 
 export interface DashboardStats {
-  totalAssignedListings: number;
-  totalAssignedSellers: number;
-  totalAssignedBuyers: number;
-  activeDeals: number;
-  completedDeals: number;
+  totalActiveListings: number;
+  totalUnderContract: number;
+  newListingsThisMonth: number;
+  totalNDA: number;
+  totalClosedDeals: number;
 }
 
-export const agentService = {
-  getDashboardStats: async () => {
-    const requestConfig = authService.getAuthenticatedRequestConfig();
-    const res = await fetch(`${API_BASE_URL}/agent/dashboard`, requestConfig);
+// 统一的认证请求函数
+const makeAuthenticatedRequest = async (
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> => {
+  // 获取用户信息
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  
+  // 检测无痕模式
+  const isIncognito = (() => {
+    try {
+      // 检测私有模式的多种方法
+      const testKey = '__test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return false;
+    } catch {
+      return true;
+    }
+  })();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>
+  };
+
+  // 添加浏览器模式标识
+  if (isIncognito) {
+    headers['X-Browser-Mode'] = 'incognito';
+  }
+
+  // 添加用户会话令牌（如果有）
+  if (user?.id) {
+    headers['X-Session-Token'] = user.id;
+  }
+
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include' // 确保发送 cookies
+  };
+
+  console.log('Making authenticated request:', {
+    url,
+    isIncognito,
+    hasUser: !!user,
+    headers: Object.keys(headers)
+  });
+
+  try {
+    const response = await fetch(url, config);
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch dashboard stats');
+    // 如果是认证错误，尝试清理本地状态并重定向到登录
+    if (response.status === 401) {
+      console.warn('Authentication failed, clearing local storage');
+      localStorage.removeItem('user');
+      // 可以在这里添加重定向到登录页面的逻辑
+      throw new Error('Authentication required');
     }
     
-    return res.json();
+    return response;
+  } catch (error) {
+    console.error('Request failed:', error);
+    throw error;
+  }
+};
+
+export const agentService = {
+  getDashboardStats: async (): Promise<{ stats: DashboardStats }> => {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/agent/dashboard`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Dashboard stats request failed:', response.status, errorText);
+      throw new Error(`Failed to fetch dashboard stats: ${response.status} ${response.statusText}`);
+    }
+    
+    return response.json();
   },
 
   getListings: async () => {
-    const requestConfig = authService.getAuthenticatedRequestConfig();
-    const res = await fetch(`${API_BASE_URL}/agent/listings`, requestConfig);
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/agent/listings`);
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch listings');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Listings request failed:', response.status, errorText);
+      throw new Error(`Failed to fetch listings: ${response.status} ${response.statusText}`);
     }
     
-    return res.json();
+    return response.json();
   },
 
   getSellers: async () => {
-    const requestConfig = authService.getAuthenticatedRequestConfig();
-    const res = await fetch(`${API_BASE_URL}/agent/sellers`, requestConfig);
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/agent/sellers`);
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch sellers');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Sellers request failed:', response.status, errorText);
+      throw new Error(`Failed to fetch sellers: ${response.status} ${response.statusText}`);
     }
     
-    return res.json();
+    return response.json();
   },
 
   getBuyers: async () => {
-    const requestConfig = authService.getAuthenticatedRequestConfig();
-    const res = await fetch(`${API_BASE_URL}/agent/buyers`, requestConfig);
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/agent/buyers`);
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch buyers');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Buyers request failed:', response.status, errorText);
+      throw new Error(`Failed to fetch buyers: ${response.status} ${response.statusText}`);
     }
     
-    return res.json();
+    return response.json();
   }
 }; 
