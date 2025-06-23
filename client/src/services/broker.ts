@@ -1,111 +1,90 @@
 // client/src/services/broker.ts
 import { API_BASE_URL } from '../config';
+import { authService } from './auth';
 
-interface DashboardStats {
-  totalActiveListings: number;
-  totalUnderContract: number;
-  newListingsThisMonth: number;
-  totalNDA: number;
-  totalClosedDeals: number;
+export interface BrokerDashboardStats {
+  totalAgents: number;
+  totalListings: number;
+  totalSellers: number;
+  totalBuyers: number;
+  activeDeals: number;
+  completedDeals: number;
 }
 
-interface Agent {
+export interface AgentStats {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
+  assignedListings: number;
+  activeSellers: number;
+  activeBuyers: number;
+  completedDeals: number;
 }
 
-interface DashboardResponse {
-  stats: DashboardStats;
-  message: string;
-}
-
-interface AgentsResponse {
-  agents: Agent[];
-  message: string;
-}
-
-interface AgentStats {
-  numberOfListings: number;
-  numberUnderContract: number;
-  closingsToDate: number;
-}
-
-class BrokerService {
-  async getDashboardStats(): Promise<DashboardResponse> {
-    try {
-      console.log('Fetching dashboard stats...');
-      const response = await fetch(`${API_BASE_URL}/broker/dashboard`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        mode: 'cors'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to fetch dashboard stats' }));
-        console.error('Dashboard stats error:', errorData);
-        throw new Error(errorData.message || 'Failed to fetch dashboard stats');
-      }
-
-      const data = await response.json();
-      console.log('Dashboard stats response:', data);
-      return data;
-    } catch (error) {
-      console.error('Error in getDashboardStats:', error);
-      throw error;
+// 创建一个通用的 API 请求函数
+const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const requestConfig = authService.getAuthenticatedRequestConfig();
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...requestConfig,
+    ...options,
+    headers: {
+      ...requestConfig.headers,
+      ...(options.headers || {})
     }
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new Error(error.message || `Failed to ${options.method || 'GET'} ${endpoint}`);
   }
 
-  async getAgents(): Promise<AgentsResponse> {
-    const response = await fetch(`${API_BASE_URL}/broker/agents`, {
-      credentials: 'include',
-    });
+  return response.json();
+};
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch agents');
+export const brokerService = {
+  getDashboardStats: () => makeAuthenticatedRequest('/broker/dashboard'),
+  
+  getAgents: () => makeAuthenticatedRequest('/broker/agents'),
+  
+  getAgentStats: (agentId: string) => makeAuthenticatedRequest(`/broker/agent/${agentId}/stats`),
+  
+  getAgentsWithStats: () => makeAuthenticatedRequest('/broker/agents-with-stats'),
+  
+  getAgentDetails: (agentId: string) => makeAuthenticatedRequest(`/broker/agent/${agentId}`),
+  
+  getListings: () => makeAuthenticatedRequest('/broker/listings'),
+  
+  getListingDetails: (listingId: string) => makeAuthenticatedRequest(`/broker/listings/${listingId}`),
+  
+  updateListing: (listingId: string, data: any) => makeAuthenticatedRequest(`/broker/listings/${listingId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  }),
+  
+  getSellers: () => makeAuthenticatedRequest('/broker/sellers'),
+  
+  getBuyers: () => makeAuthenticatedRequest('/broker/buyers'),
+  
+  // 文档相关
+  getListingDocuments: (listingId: string) => makeAuthenticatedRequest(`/broker/listings/${listingId}/documents`),
+  
+  uploadListingDocument: (listingId: string, formData: FormData) => makeAuthenticatedRequest(`/broker/listings/${listingId}/documents`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      // 不设置 Content-Type，让浏览器自动设置
     }
-
-    return response.json();
-  }
-
-  async getAgentStats(agentId: string): Promise<AgentStats> {
-    const response = await fetch(`${API_BASE_URL}/broker/agent/${agentId}/stats`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch agent stats');
-    }
-
-    const data = await response.json();
-    return data.stats;
-  }
-
-  async getAgentsWithStats() {
-    const response = await fetch(`${API_BASE_URL}/broker/agents-with-stats`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch agents with stats');
-    }
-    return response.json();
-  }
-
-  async deleteAgent(agentId: string) {
-    const response = await fetch(`${API_BASE_URL}/broker/agent/${agentId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to delete agent');
-    }
-    return response.json();
-  }
-}
-
-export const brokerService = new BrokerService();
+  }),
+  
+  deleteListingDocument: (listingId: string, documentId: string) => makeAuthenticatedRequest(`/broker/listings/${listingId}/documents/${documentId}`, {
+    method: 'DELETE'
+  }),
+  
+  // 预关闭清单
+  getPreCloseChecklist: (listingId: string) => makeAuthenticatedRequest(`/broker/listings/${listingId}/pre-close-checklist`),
+  
+  updatePreCloseChecklist: (listingId: string, data: any) => makeAuthenticatedRequest(`/broker/listings/${listingId}/pre-close-checklist`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
+};

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { authService } from './auth';
 
 export interface Listing {
   id: string;
@@ -75,265 +76,90 @@ export interface BuyerProgressResponse {
   progress: BuyerProgress;
 }
 
-class BuyerService {
-  async getDashboardStats(): Promise<DashboardStats> {
-    const response = await fetch(`${API_BASE_URL}/buyer/dashboard`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch dashboard stats');
+// 创建一个通用的 API 请求函数
+const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const requestConfig = authService.getAuthenticatedRequestConfig();
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...requestConfig,
+    ...options,
+    headers: {
+      ...requestConfig.headers,
+      ...(options.headers || {})
     }
+  });
 
-    const data = await response.json();
-    return data.stats || {};
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new Error(error.message || `Failed to ${options.method || 'GET'} ${endpoint}`);
   }
 
-  async getDocuments(): Promise<Document[]> {
-    const response = await fetch(`${API_BASE_URL}/buyer/documents`, {
-      credentials: 'include',
-    });
+  return response.json();
+};
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch documents');
+export const buyerService = {
+  getDashboardStats: () => makeAuthenticatedRequest('/buyer/dashboard'),
+  
+  getDocuments: () => makeAuthenticatedRequest('/buyer/documents'),
+  
+  uploadDocument: (formData: FormData) => makeAuthenticatedRequest('/buyer/documents/upload', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      // 不设置 Content-Type，让浏览器自动设置
     }
+  }),
+  
+  emailAgent: (data: any) => makeAuthenticatedRequest('/buyer/email-agent', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  
+  getNDA: () => makeAuthenticatedRequest('/buyer/nda'),
+  
+  getFinancialStatement: () => makeAuthenticatedRequest('/buyer/financial-statement'),
+  
+  getCbrCim: () => makeAuthenticatedRequest('/buyer/cbr-cim'),
+  
+  getPurchaseContract: () => makeAuthenticatedRequest('/buyer/purchase-contract'),
+  
+  getDueDiligence: () => makeAuthenticatedRequest('/buyer/due-diligence'),
+  
+  getPreCloseChecklist: () => makeAuthenticatedRequest('/buyer/pre-close-checklist'),
+  
+  updatePreCloseChecklist: (data: any) => makeAuthenticatedRequest('/buyer/pre-close-checklist', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  }),
+  
+  getClosingDocuments: () => makeAuthenticatedRequest('/buyer/closing-documents'),
+  
+  getProgress: () => makeAuthenticatedRequest('/buyer/progress'),
+  
+  updateStep: (step: number, completed: boolean) => makeAuthenticatedRequest('/buyer/update-step', {
+    method: 'PUT',
+    body: JSON.stringify({ step, completed })
+  }),
+  
+  selectListing: (listingId: string) => makeAuthenticatedRequest('/buyer/select-listing', {
+    method: 'POST',
+    body: JSON.stringify({ listingId })
+  }),
+  
+  getCurrentListing: () => makeAuthenticatedRequest('/buyer/current-listing'),
+  
+  getListings: () => makeAuthenticatedRequest('/buyer/listings'),
 
-    const data = await response.json();
-    return data.documents;
-  }
-
-  async uploadDocument(file: File, type: string): Promise<Document> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-
-    const response = await fetch(`${API_BASE_URL}/buyer/documents/upload`, {
-      method: 'POST',
-      credentials: 'include',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload document');
-    }
-
-    const data = await response.json();
-    return data.document;
-  }
-
-  async contactAgent(message: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/email-agent`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to contact agent');
-    }
-  }
-
-  async submitNDA(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/nda`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit NDA');
-    }
-  }
-
-  async submitFinancialStatement(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/financial-statement`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit financial statement');
-    }
-  }
-
-  async downloadCBRCIM(): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/buyer/cbr-cim`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to download CBR/CIM');
-    }
-
-    return response.blob();
-  }
-
-  async submitPurchaseContract(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/purchase-contract`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit purchase contract');
-    }
-  }
-
-  async submitDueDiligence(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/due-diligence`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit due diligence');
-    }
-  }
-
-  async getPreCloseChecklist(): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/buyer/pre-close-checklist`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get pre-close checklist');
-    }
-
-    const data = await response.json();
-    return data.checklist;
-  }
-
-  async submitPreCloseChecklist(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/pre-close-checklist`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit pre-close checklist');
-    }
-  }
-
-  async getClosingDocuments(): Promise<Document[]> {
-    const response = await fetch(`${API_BASE_URL}/buyer/closing-documents`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch closing documents');
-    }
-
-    const data = await response.json();
-    return data.documents;
-  }
-
-  // Get buyer progress
-  async getProgress(): Promise<BuyerProgressResponse> {
-    const response = await fetch(`${API_BASE_URL}/buyer/progress`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  }
-
-  // Update step progress
-  async updateStep(stepId: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/buyer/update-step`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ stepId }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  }
-
-  // Select a listing
-  async selectListing(listingId: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/buyer/select-listing`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ listingId }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  }
-
-  // Get buyer's current listing
-  async getCurrentListing(): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/buyer/current-listing`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  }
-
-  // Get buyer's listings
-  async getListings(): Promise<ExtendedListing[]> {
-    const response = await fetch(`${API_BASE_URL}/buyer/listings`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.listings || [];
-  }
-}
-
-export const buyerService = new BuyerService(); 
+  // 新增的方法
+  downloadDocument: (documentId: string) => makeAuthenticatedRequest(`/buyer/download-document/${documentId}`),
+  
+  requestDueDiligence: (listingId: string, documentTypes: string[]) => makeAuthenticatedRequest(`/buyer/listings/${listingId}/due-diligence/request`, {
+    method: 'POST',
+    body: JSON.stringify({ documentTypes })
+  }),
+  
+  downloadDueDiligenceDocument: (listingId: string, documentId: string) => makeAuthenticatedRequest(`/buyer/listings/${listingId}/due-diligence/download/${documentId}`),
+  
+  getAgentDocuments: (listingId: string) => makeAuthenticatedRequest(`/buyer/listings/${listingId}/agent-documents`),
+  
+  downloadAgentDocument: (documentId: string) => makeAuthenticatedRequest(`/buyer/download-agent-document/${documentId}`)
+}; 

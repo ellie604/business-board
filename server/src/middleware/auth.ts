@@ -11,20 +11,49 @@ export const restoreUser = (req: Request, _res: Response, next: NextFunction) =>
   
   // 仅在开发环境记录详细日志
   if (process.env.NODE_ENV !== 'production') {
-  console.log('=== Session Restore Debug ===');
-  console.log('Request headers:', {
-    cookie: req.headers.cookie,
-    origin: req.headers.origin,
-    referer: req.headers.referer
-  });
-  console.log('Session details:', {
-    id: typedReq.sessionID,
-    cookie: typedReq.session?.cookie,
-    user: typedReq.session?.user ? {
-      id: typedReq.session.user.id,
-      role: typedReq.session.user.role
-    } : null
-  });
+    console.log('=== Session Restore Debug ===');
+    console.log('Request headers:', {
+      cookie: req.headers.cookie,
+      origin: req.headers.origin,
+      referer: req.headers.referer,
+      authorization: req.headers.authorization,
+      'user-agent': req.headers['user-agent']
+    });
+    console.log('Session details:', {
+      id: typedReq.sessionID,
+      cookie: typedReq.session?.cookie,
+      user: typedReq.session?.user ? {
+        id: typedReq.session.user.id,
+        role: typedReq.session.user.role
+      } : null
+    });
+  }
+
+  // 尝试从多个来源恢复用户会话
+  if (!typedReq.session?.user) {
+    // 1. 尝试从 Authorization header 恢复
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        // 这里应该验证 token 并恢复会话
+        console.log('Attempting to restore session from Authorization header');
+        // TODO: 实现 token 验证逻辑
+      } catch (error) {
+        console.error('Failed to restore session from token:', error);
+      }
+    }
+
+    // 2. 尝试从自定义 header 恢复
+    const sessionToken = req.headers['x-session-token'];
+    if (sessionToken) {
+      try {
+        console.log('Attempting to restore session from x-session-token');
+        // TODO: 实现从自定义 header 恢复会话的逻辑
+      } catch (error) {
+        console.error('Failed to restore session from x-session-token:', error);
+      }
+    }
   }
   
   if (typedReq.session?.user) {
@@ -33,18 +62,32 @@ export const restoreUser = (req: Request, _res: Response, next: NextFunction) =>
       id: typedReq.session.user.id.toString()
     };
     
+    // 确保会话持久化
+    if (!typedReq.session.cookie.maxAge) {
+      typedReq.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    }
+    
+    // 在无痕模式下特殊处理
+    const isIncognito = !req.headers.referer && req.headers['sec-fetch-dest'] === 'document';
+    if (isIncognito) {
+      typedReq.session.cookie.sameSite = 'none';
+      typedReq.session.cookie.secure = true;
+      console.log('Adjusted cookie settings for incognito mode');
+    }
+    
     if (process.env.NODE_ENV !== 'production') {
-    console.log('User restored successfully:', {
-      id: typedReq.user.id,
-      role: typedReq.user.role
-    });
+      console.log('User restored successfully:', {
+        id: typedReq.user.id,
+        role: typedReq.user.role,
+        isIncognito
+      });
     }
   } else if (process.env.NODE_ENV !== 'production') {
     console.log('No user found in session');
   }
   
   if (process.env.NODE_ENV !== 'production') {
-  console.log('=== End Session Restore Debug ===');
+    console.log('=== End Session Restore Debug ===');
   }
   
   next();

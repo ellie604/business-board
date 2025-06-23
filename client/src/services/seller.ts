@@ -1,5 +1,6 @@
 // import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { authService } from './auth';
 
 export interface DashboardStats {
   currentStep: number;
@@ -119,197 +120,154 @@ const cache = new Cache();
 // Request deduplication
 const pendingRequests = new Map<string, Promise<any>>();
 
-async function makeRequest<T>(
-  url: string, 
-  options: RequestInit = {},
-  cacheKey?: string,
-  cacheTTL: number = 30000
-): Promise<T> {
-  // Check cache first
-  if (cacheKey) {
-    const cached = cache.get<T>(cacheKey);
-    if (cached) {
-      return cached;
-    }
-  }
-
-  // Check for pending request
-  const requestKey = `${url}_${JSON.stringify(options)}`;
-  if (pendingRequests.has(requestKey)) {
-    return pendingRequests.get(requestKey);
-  }
-
-  // Make new request
-  const request = fetch(`${API_BASE_URL}${url}`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+// 创建一个通用的 API 请求函数
+const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const requestConfig = authService.getAuthenticatedRequestConfig();
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...requestConfig,
     ...options,
-  }).then(async (res) => {
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    headers: {
+      ...requestConfig.headers,
+      ...(options.headers || {})
     }
-    const data = await res.json();
-    
-    // Cache successful responses
-    if (cacheKey && res.ok) {
-      cache.set(cacheKey, data, cacheTTL);
-    }
-    
-    return data;
-  }).finally(() => {
-    // Clean up pending request
-    pendingRequests.delete(requestKey);
   });
 
-  pendingRequests.set(requestKey, request);
-  return request;
-}
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new Error(error.message || `Failed to ${options.method || 'GET'} ${endpoint}`);
+  }
+
+  return response.json();
+};
 
 export const sellerService = {
-  async getDashboardStats() {
-    const res = await fetch(`${API_BASE_URL}/seller/dashboard`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to fetch dashboard stats');
-    return res.json();
-  },
-
-  async getListings(): Promise<any[]> {
-    return makeRequest<any[]>(
-      '/seller/listings',
-      {},
-      'seller_listings',
-      60000 // Cache for 1 minute since listings don't change often
-    );
-  },
-
-  async getProgress(): Promise<{ progress: SellerProgress }> {
-    return makeRequest<{ progress: SellerProgress }>(
-      '/seller/progress',
-      {},
-      'seller_progress',
-      10000 // Cache for 10 seconds since progress changes frequently
-    );
-  },
+  getDashboardStats: () => makeAuthenticatedRequest('/seller/dashboard'),
+  
+  getDocuments: () => makeAuthenticatedRequest('/seller/documents'),
+  
+  uploadDocument: (formData: FormData) => makeAuthenticatedRequest('/seller/documents/upload', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      // 不设置 Content-Type，让浏览器自动设置
+    }
+  }),
+  
+  getListingAgreement: () => makeAuthenticatedRequest('/seller/listing-agreement'),
+  
+  getPurchaseAgreement: () => makeAuthenticatedRequest('/seller/purchase-agreement'),
+  
+  getDueDiligence: () => makeAuthenticatedRequest('/seller/due-diligence'),
+  
+  getPreCloseChecklist: () => makeAuthenticatedRequest('/seller/pre-close-checklist'),
+  
+  updatePreCloseChecklist: (data: any) => makeAuthenticatedRequest('/seller/pre-close-checklist', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  }),
+  
+  getClosingDocuments: () => makeAuthenticatedRequest('/seller/closing-documents'),
+  
+  // 新增的方法
+  downloadDocument: (documentId: string) => makeAuthenticatedRequest(`/seller/download-document/${documentId}`),
+  
+  getProgress: () => makeAuthenticatedRequest('/seller/progress'),
+  
+  updateStep: (step: number, completed: boolean) => makeAuthenticatedRequest('/seller/update-step', {
+    method: 'PUT',
+    body: JSON.stringify({ step, completed })
+  }),
+  
+  // 尽职调查相关
+  getDueDiligenceRequests: (listingId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/due-diligence/requests`),
+  
+  uploadDueDiligenceDocument: (listingId: string, requestId: string, formData: FormData) => makeAuthenticatedRequest(`/seller/listings/${listingId}/due-diligence/${requestId}/upload`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      // 不设置 Content-Type，让浏览器自动设置
+    }
+  }),
+  
+  // 列表相关
+  getListings: () => makeAuthenticatedRequest('/seller/listings'),
+  
+  getListingDetails: (listingId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}`),
+  
+  // 买家相关
+  getInterestedBuyers: (listingId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/interested-buyers`),
+  
+  approveBuyer: (listingId: string, buyerId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/approve-buyer`, {
+    method: 'POST',
+    body: JSON.stringify({ buyerId })
+  }),
+  
+  rejectBuyer: (listingId: string, buyerId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/reject-buyer`, {
+    method: 'POST',
+    body: JSON.stringify({ buyerId })
+  }),
 
   async selectListing(listingId: string): Promise<{ message: string; listing: any; progress: any }> {
     // Clear both progress and listings cache when selecting
     cache.delete('seller_progress');
     cache.delete('current_listing');
-    return makeRequest<{ message: string; listing: any; progress: any }>(
-      '/seller/select-listing',
-      {
-        method: 'POST',
-        body: JSON.stringify({ listingId }),
-      }
-    );
+    return makeAuthenticatedRequest('/seller/select-listing', {
+      method: 'POST',
+      body: JSON.stringify({ listingId }),
+    });
   },
 
   async getCurrentListing(): Promise<{ listing: any; needsSelection: boolean }> {
-    return makeRequest<{ listing: any; needsSelection: boolean }>(
-      '/seller/current-listing',
-      {},
-      'current_listing',
-      30000 // Cache for 30 seconds
-    );
-  },
-
-  async updateStep(stepId: number): Promise<{ message: string; progress: any }> {
-    // Clear progress cache when updating
-    cache.delete('seller_progress');
-    return makeRequest<{ message: string; progress: any }>(
-      '/seller/update-step',
-      {
-        method: 'POST',
-        body: JSON.stringify({ stepId }),
-      }
-    );
+    return makeAuthenticatedRequest('/seller/current-listing');
   },
 
   async markStepCompleted(stepId: number): Promise<{ message: string; progress: any }> {
     // Clear progress cache when marking step as completed
     cache.delete('seller_progress');
-    return makeRequest<{ message: string; progress: any }>(
-      '/seller/mark-step-completed',
-      {
-        method: 'POST',
-        body: JSON.stringify({ stepId }),
-      }
-    );
+    return makeAuthenticatedRequest('/seller/mark-step-completed', {
+      method: 'POST',
+      body: JSON.stringify({ stepId }),
+    });
   },
 
   async markStepIncomplete(stepId: number): Promise<{ message: string; progress: any }> {
     // Clear progress cache when marking step as incomplete
     cache.delete('seller_progress');
-    return makeRequest<{ message: string; progress: any }>(
-      '/seller/mark-step-incomplete',
-      {
-        method: 'POST',
-        body: JSON.stringify({ stepId }),
-      }
-    );
+    return makeAuthenticatedRequest('/seller/mark-step-incomplete', {
+      method: 'POST',
+      body: JSON.stringify({ stepId }),
+    });
   },
 
   async getStepDocuments(stepId: number): Promise<{ documents: any[]; requirement: DocumentRequirement }> {
-    return makeRequest<{ documents: any[]; requirement: DocumentRequirement }>(
-      `/seller/step/${stepId}/documents`,
-      {},
-      `step_${stepId}_documents`,
-      30000
-    );
+    return makeAuthenticatedRequest(`/seller/step/${stepId}/documents`);
   },
 
   async uploadStepDocument(stepId: number, fileName: string, fileUrl: string, fileSize: number): Promise<{ document: any }> {
     // Clear step documents cache when uploading
     cache.delete(`step_${stepId}_documents`);
-    return makeRequest<{ document: any }>(
-      `/seller/step/${stepId}/upload`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ fileName, fileUrl, fileSize }),
-      }
-    );
+    return makeAuthenticatedRequest(`/seller/step/${stepId}/upload`, {
+      method: 'POST',
+      body: JSON.stringify({ fileName, fileUrl, fileSize }),
+    });
   },
 
   async downloadStepDocument(stepId: number): Promise<{ document: any }> {
     // Clear step documents cache when downloading
     cache.delete(`step_${stepId}_documents`);
-    return makeRequest<{ document: any }>(
-      `/seller/step/${stepId}/download`,
-      {
-        method: 'POST',
-      }
-    );
-  },
-
-  async getDocuments(): Promise<DocumentsResponse> {
-    const response = await fetch(`${API_BASE_URL}/seller/documents`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch documents');
-    }
-
-    return response.json();
-  },
-
-  async uploadDocument(file: File, type: string): Promise<Document> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-
-    const response = await fetch(`${API_BASE_URL}/seller/documents/upload`, {
+    return makeAuthenticatedRequest(`/seller/step/${stepId}/download`, {
       method: 'POST',
-      credentials: 'include',
-      body: formData,
     });
+  },
 
-    if (!response.ok) {
-      throw new Error('Failed to upload document');
-    }
-
-    return response.json().then(data => data.document);
+  async submitQuestionnaire(questionnaire: any): Promise<{ message: string; document: any }> {
+    // Clear questionnaire cache when submitting
+    cache.delete('seller_questionnaire');
+    cache.delete('seller_progress'); // Also clear progress since this affects step completion
+    return makeAuthenticatedRequest('/seller/questionnaire/submit', {
+      method: 'POST',
+      body: JSON.stringify({ questionnaire }),
+    });
   },
 
   async submitListingAgreement(data: any): Promise<void> {
@@ -324,34 +282,6 @@ export const sellerService = {
 
     if (!response.ok) {
       throw new Error('Failed to submit listing agreement');
-    }
-  },
-
-  async submitQuestionnaire(questionnaire: any): Promise<{ message: string; document: any }> {
-    // Clear questionnaire cache when submitting
-    cache.delete('seller_questionnaire');
-    cache.delete('seller_progress'); // Also clear progress since this affects step completion
-    return makeRequest<{ message: string; document: any }>(
-      '/seller/questionnaire/submit',
-      {
-        method: 'POST',
-        body: JSON.stringify({ questionnaire }),
-      }
-    );
-  },
-
-  async submitPurchaseAgreement(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/seller/purchase-agreement`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit purchase agreement');
     }
   },
 
@@ -370,73 +300,21 @@ export const sellerService = {
     }
   },
 
-  async getPreCloseChecklist(): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/seller/pre-close-checklist`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get pre-close checklist');
-    }
-
-    return response.json().then(data => data.checklist);
-  },
-
-  async submitPreCloseChecklist(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/seller/pre-close-checklist`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit pre-close checklist');
-    }
-  },
-
-  async getClosingDocuments(): Promise<DocumentsResponse> {
-    const response = await fetch(`${API_BASE_URL}/seller/closing-documents`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch closing documents');
-    }
-
-    return response.json();
-  },
-
   async getListingBuyers(): Promise<any[]> {
-    return makeRequest<any[]>(
-      '/seller/listing-buyers',
-      {},
-      'listing_buyers',
-      60000 // Cache for 1 minute
-    );
+    return makeAuthenticatedRequest('/seller/listing-buyers');
   },
 
   async getQuestionnaire(): Promise<{ questionnaire: any }> {
-    return makeRequest<{ questionnaire: any }>(
-      '/seller/questionnaire',
-      {},
-      'seller_questionnaire',
-      300000 // Cache for 5 minutes since questionnaire doesn't change often
-    );
+    return makeAuthenticatedRequest('/seller/questionnaire');
   },
 
   async saveQuestionnaire(questionnaire: any): Promise<{ message: string }> {
     // Clear questionnaire cache when saving
     cache.delete('seller_questionnaire');
-    return makeRequest<{ message: string }>(
-      '/seller/questionnaire/save',
-      {
-        method: 'POST',
-        body: JSON.stringify({ questionnaire }),
-      }
-    );
+    return makeAuthenticatedRequest('/seller/questionnaire/save', {
+      method: 'POST',
+      body: JSON.stringify({ questionnaire }),
+    });
   },
 
   // Clear all cache (useful when logging out or major state changes)
