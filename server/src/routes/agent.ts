@@ -39,7 +39,7 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
     // 获取该 agent 管理的所有 seller
     const sellers = await getPrisma().user.findMany({
       where: {
-        managedBy: { id: agentId },
+        managerId: agentId,
         role: 'SELLER'
       },
       select: { id: true }
@@ -123,7 +123,7 @@ const getListings: RequestHandler = async (req, res, next) => {
     // 首先获取该 agent 管理的所有 seller
     const sellers = await getPrisma().user.findMany({
       where: {
-        managedBy: { id: agentId },
+        managerId: agentId,
         role: 'SELLER'
       },
       select: { id: true }
@@ -174,7 +174,7 @@ const getSellers: RequestHandler = async (req, res, next) => {
     
     const sellers = await getPrisma().user.findMany({
       where: {
-        managedBy: { id: agentId },
+        managerId: agentId,
         role: 'SELLER'
       },
       select: {
@@ -213,7 +213,7 @@ const getBuyers: RequestHandler = async (req, res, next) => {
     // 首先获取该agent管理的所有seller
     const sellers = await getPrisma().user.findMany({
       where: {
-        managedBy: { id: agentId },
+        managerId: agentId,
         role: 'SELLER'
       },
       select: { id: true }
@@ -285,9 +285,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
       where: { 
         id: listingId,
         seller: {
-          managedBy: {
-            id: agentId
-          }
+          managerId: agentId
         }
       },
       include: {
@@ -1491,9 +1489,7 @@ router.get('/buyers/:buyerId/listings/:listingId/due-diligence', authenticateAge
       where: { 
         id: listingId,
         seller: {
-          managedBy: {
-            id: agentId
-          }
+          managerId: agentId
         }
       },
       include: {
@@ -1604,9 +1600,7 @@ router.post('/listings/:listingId/due-diligence/upload', upload.single('file'), 
       where: { 
         id: listingId,
         seller: {
-          managedBy: {
-            id: typedReq.user.id
-          }
+          managerId: typedReq.user.id
         }
       },
       include: {
