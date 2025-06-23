@@ -626,19 +626,19 @@ const SellerProgressView: React.FC = () => {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          doc.uploader.role === 'BROKER' 
+                          doc.uploader?.role === 'BROKER' 
                             ? 'bg-purple-100 text-purple-800' 
                             : 'bg-green-100 text-green-800'
                         }`}>
-                          {doc.uploader.role === 'BROKER' ? '🏢 Broker' : '👤 Agent'}
+                          {doc.uploader?.role === 'BROKER' ? '🏢 Broker' : '👤 Agent'}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {doc.uploader.name} • {new Date(doc.uploadedAt).toLocaleDateString()} {new Date(doc.uploadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          {doc.uploader?.name || 'Unknown'} • {new Date(doc.uploadedAt).toLocaleDateString()} {new Date(doc.uploadedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </span>
                       </div>
                       {doc.buyer && (
                         <p className="text-xs text-blue-600 mt-1">
-                          📋 For buyer: {doc.buyer.name}
+                          📋 For buyer: {doc.buyer?.name || 'Unknown Buyer'}
                         </p>
                       )}
                     </div>

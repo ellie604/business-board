@@ -86,7 +86,17 @@ app.use(cors({
       console.log('Allowed origins:', allowedOrigins);
     }
     
-    if (allowedOrigins.includes(origin || '')) {
+    // 检查 origin 是否在允许的列表中
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return allowedOrigin === origin;
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin || '');
+      }
+      return false;
+    });
+    
+    if (isAllowed || !origin) { // !origin 用于处理同源请求
       if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
         console.log('Origin allowed:', origin);
       }
