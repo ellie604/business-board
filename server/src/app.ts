@@ -56,29 +56,46 @@ const getAllowedOrigins = () => {
     ]
   };
 
-  // 检测环境：优先使用 VERCEL_ENV，然后是 NODE_ENV
-  let env = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
+  // 检测环境：根据Render和Vercel的部署配置
+  let env = 'development'; // 默认为开发环境
   
-  // Vercel 环境映射
-  if (env === 'production') {
-    env = 'production';
-  } else if (env === 'preview') {
+  // 首先检查 NODE_ENV 环境变量
+  if (process.env.NODE_ENV === 'preview') {
     env = 'preview';
-  } else {
+  } else if (process.env.NODE_ENV === 'production') {
+    env = 'production';
+  } else if (process.env.VERCEL_ENV === 'preview') {
+    env = 'preview';
+  } else if (process.env.VERCEL_ENV === 'production') {
+    env = 'production';
+  } else if (process.env.NODE_ENV === 'development') {
     env = 'development';
   }
   
-  console.log('Current environment:', env);
-  console.log('VERCEL_ENV:', process.env.VERCEL_ENV);
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  console.log('Current hostname:', process.env.HOST);
+  // 在Render上，我们通过检查是否有特定的环境变量来确定是preview还是production
+  // 根据项目配置，preview环境部署在business-board.onrender.com
+  const isRenderDeployment = process.env.RENDER === 'true' || process.env.RENDER_SERVICE_ID;
+  if (isRenderDeployment) {
+    // 如果没有明确的环境设置，默认为preview（因为主要的部署是preview环境）
+    if (env === 'development') {
+      env = 'preview';
+    }
+  }
+  
+  console.log('Environment detection:', {
+    NODE_ENV: process.env.NODE_ENV,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    RENDER: process.env.RENDER,
+    RENDER_SERVICE_ID: process.env.RENDER_SERVICE_ID,
+    finalEnv: env
+  });
   
   if (!(env in origins)) {
-    console.warn('Unknown environment:', env, 'falling back to development');
-    return origins.development;
+    console.warn('Unknown environment:', env, 'falling back to preview for safety');
+    return [...origins.development, ...origins.preview]; // 返回更宽松的配置
   }
 
-  console.log('Available origins for this environment:', origins[env]);
+  console.log('Available origins for environment', env, ':', origins[env]);
   return origins[env];
 };
 
@@ -89,20 +106,30 @@ app.use(cors({
     const hostname = process.env.HOST;
     
     // CORS configuration
+    console.log('=== CORS Request Debug ===');
+    console.log('Incoming request origin:', origin);
     console.log('Current environment:', process.env.NODE_ENV);
     console.log('Current hostname:', hostname);
+    console.log('RENDER environment:', process.env.RENDER);
     console.log('Available origins for this environment:', allowedOrigins);
-    
-    // 减少CORS调试日志 - 只在出错时显示
-    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
-      console.log('=== CORS Debug Info ===');
-      console.log('Incoming request origin:', origin);
-      console.log('Current NODE_ENV:', process.env.NODE_ENV);
-      console.log('Allowed origins:', allowedOrigins);
-    }
     
     // 允许没有 origin 的请求 (比如移动app或者一些工具)
     if (!origin) {
+      console.log('No origin, allowing request');
+      callback(null, true);
+      return;
+    }
+    
+    // 临时：明确允许当前的Vercel preview域名来解决CORS问题
+    const explicitAllowedDomains = [
+      'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app',
+      'https://business-board.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:5174'
+    ];
+    
+    if (explicitAllowedDomains.includes(origin)) {
+      console.log('Origin explicitly allowed:', origin);
       callback(null, true);
       return;
     }
@@ -118,19 +145,16 @@ app.use(cors({
     });
     
     if (isAllowed) {
-      if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
-        console.log('Origin allowed:', origin);
-      }
+      console.log('Origin allowed by configured rules:', origin);
       callback(null, true);
     } else {
       console.error('CORS Error: Origin not allowed:', origin);
       console.error('Allowed origins:', allowedOrigins);
+      console.error('Explicit allowed domains:', explicitAllowedDomains);
       callback(new Error('Not allowed by CORS'), false);
     }
     
-    if (process.env.NODE_ENV === 'development' && process.env.DEBUG_CORS) {
-      console.log('=== End CORS Debug Info ===');
-    }
+    console.log('=== End CORS Request Debug ===');
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
