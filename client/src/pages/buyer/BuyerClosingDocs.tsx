@@ -162,7 +162,7 @@ const BuyerClosingDocs: React.FC = () => {
 
       // Record the download and update step completion for buyer
       // For buyer, we'll use the updateStep method to mark step 9 as completed
-      await buyerService.updateStep(9);
+      await buyerService.updateStep(9, true);
       
       // Download all available closing documents
       for (const doc of availableClosingDocs) {
