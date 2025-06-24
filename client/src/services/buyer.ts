@@ -1,5 +1,4 @@
 import { API_BASE_URL } from '../config';
-import { authService } from './auth';
 
 export interface Listing {
   id: string;
@@ -76,90 +75,158 @@ export interface BuyerProgressResponse {
   progress: BuyerProgress;
 }
 
-// 创建一个通用的 API 请求函数
-const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const requestConfig = authService.getAuthenticatedRequestConfig();
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...requestConfig,
-    ...options,
-    headers: {
-      ...requestConfig.headers,
-      ...(options.headers || {})
+// 统一的认证请求函数
+const makeAuthenticatedRequest = async (
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> => {
+  // 获取用户信息
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  
+  // 检测无痕模式
+  const isIncognito = (() => {
+    try {
+      // 检测私有模式的多种方法
+      const testKey = '__test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return false;
+    } catch {
+      return true;
     }
-  });
+  })();
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `Failed to ${options.method || 'GET'} ${endpoint}`);
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>
+  };
+
+  // 添加浏览器模式标识
+  if (isIncognito) {
+    headers['X-Browser-Mode'] = 'incognito';
   }
 
+  // 添加用户会话令牌（如果有）
+  if (user?.id) {
+    headers['X-Session-Token'] = user.id;
+  }
+
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include' // 确保发送 cookies
+  };
+
+  console.log('Making authenticated request:', {
+    url,
+    isIncognito,
+    hasUser: !!user,
+    headers: Object.keys(headers)
+  });
+
+  try {
+    const response = await fetch(url, config);
+    
+    // 如果是认证错误，尝试清理本地状态并重定向到登录
+    if (response.status === 401) {
+      console.warn('Authentication failed, clearing local storage');
+      localStorage.removeItem('user');
+      // 可以在这里添加重定向到登录页面的逻辑
+      throw new Error('Authentication required');
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('Request failed:', error);
+    throw error;
+  }
+};
+
+// 创建一个包装函数来处理 JSON 响应
+const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const response = await makeAuthenticatedRequest(`${API_BASE_URL}${endpoint}`, options);
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Buyer ${endpoint} request failed:`, response.status, errorText);
+    throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${response.status} ${response.statusText}`);
+  }
+  
   return response.json();
 };
 
 export const buyerService = {
-  getDashboardStats: () => makeAuthenticatedRequest('/buyer/dashboard'),
+  getDashboardStats: () => makeRequest('/buyer/dashboard'),
   
-  getDocuments: () => makeAuthenticatedRequest('/buyer/documents'),
+  getDocuments: () => makeRequest('/buyer/documents'),
   
-  uploadDocument: (formData: FormData) => makeAuthenticatedRequest('/buyer/documents/upload', {
-    method: 'POST',
-    body: formData,
-    headers: {
-      // 不设置 Content-Type，让浏览器自动设置
+  uploadDocument: async (formData: FormData) => {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/buyer/documents/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {} // 不设置 Content-Type，让浏览器自动设置
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to upload document: ${response.status} ${response.statusText}`);
     }
-  }),
+    
+    return response.json();
+  },
   
-  emailAgent: (data: any) => makeAuthenticatedRequest('/buyer/email-agent', {
+  emailAgent: (data: any) => makeRequest('/buyer/email-agent', {
     method: 'POST',
     body: JSON.stringify(data)
   }),
   
-  getNDA: () => makeAuthenticatedRequest('/buyer/nda'),
+  getNDA: () => makeRequest('/buyer/nda'),
   
-  getFinancialStatement: () => makeAuthenticatedRequest('/buyer/financial-statement'),
+  getFinancialStatement: () => makeRequest('/buyer/financial-statement'),
   
-  getCbrCim: () => makeAuthenticatedRequest('/buyer/cbr-cim'),
+  getCbrCim: () => makeRequest('/buyer/cbr-cim'),
   
-  getPurchaseContract: () => makeAuthenticatedRequest('/buyer/purchase-contract'),
+  getPurchaseContract: () => makeRequest('/buyer/purchase-contract'),
   
-  getDueDiligence: () => makeAuthenticatedRequest('/buyer/due-diligence'),
+  getDueDiligence: () => makeRequest('/buyer/due-diligence'),
   
-  getPreCloseChecklist: () => makeAuthenticatedRequest('/buyer/pre-close-checklist'),
+  getPreCloseChecklist: () => makeRequest('/buyer/pre-close-checklist'),
   
-  updatePreCloseChecklist: (data: any) => makeAuthenticatedRequest('/buyer/pre-close-checklist', {
+  updatePreCloseChecklist: (data: any) => makeRequest('/buyer/pre-close-checklist', {
     method: 'PUT',
     body: JSON.stringify(data)
   }),
   
-  getClosingDocuments: () => makeAuthenticatedRequest('/buyer/closing-documents'),
+  getClosingDocuments: () => makeRequest('/buyer/closing-documents'),
   
-  getProgress: () => makeAuthenticatedRequest('/buyer/progress'),
+  getProgress: () => makeRequest('/buyer/progress'),
   
-  updateStep: (step: number, completed: boolean) => makeAuthenticatedRequest('/buyer/update-step', {
+  updateStep: (step: number, completed: boolean) => makeRequest('/buyer/update-step', {
     method: 'PUT',
     body: JSON.stringify({ step, completed })
   }),
   
-  selectListing: (listingId: string) => makeAuthenticatedRequest('/buyer/select-listing', {
+  selectListing: (listingId: string) => makeRequest('/buyer/select-listing', {
     method: 'POST',
     body: JSON.stringify({ listingId })
   }),
   
-  getCurrentListing: () => makeAuthenticatedRequest('/buyer/current-listing'),
+  getCurrentListing: () => makeRequest('/buyer/current-listing'),
   
-  getListings: () => makeAuthenticatedRequest('/buyer/listings'),
+  getListings: () => makeRequest('/buyer/listings'),
 
   // 新增的方法
-  downloadDocument: (documentId: string) => makeAuthenticatedRequest(`/buyer/download-document/${documentId}`),
+  downloadDocument: (documentId: string) => makeRequest(`/buyer/download-document/${documentId}`),
   
-  requestDueDiligence: (listingId: string, documentTypes: string[]) => makeAuthenticatedRequest(`/buyer/listings/${listingId}/due-diligence/request`, {
+  requestDueDiligence: (listingId: string, documentTypes: string[]) => makeRequest(`/buyer/listings/${listingId}/due-diligence/request`, {
     method: 'POST',
     body: JSON.stringify({ documentTypes })
   }),
   
-  downloadDueDiligenceDocument: (listingId: string, documentId: string) => makeAuthenticatedRequest(`/buyer/listings/${listingId}/due-diligence/download/${documentId}`),
+  downloadDueDiligenceDocument: (listingId: string, documentId: string) => makeRequest(`/buyer/listings/${listingId}/due-diligence/download/${documentId}`),
   
-  getAgentDocuments: (listingId: string) => makeAuthenticatedRequest(`/buyer/listings/${listingId}/agent-documents`),
+  getAgentDocuments: (listingId: string) => makeRequest(`/buyer/listings/${listingId}/agent-documents`),
   
-  downloadAgentDocument: (documentId: string) => makeAuthenticatedRequest(`/buyer/download-agent-document/${documentId}`)
+  downloadAgentDocument: (documentId: string) => makeRequest(`/buyer/download-agent-document/${documentId}`)
 }; 

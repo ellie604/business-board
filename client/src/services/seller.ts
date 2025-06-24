@@ -1,6 +1,5 @@
 // import axios from 'axios';
 import { API_BASE_URL } from '../config';
-import { authService } from './auth';
 
 export interface DashboardStats {
   currentStep: number;
@@ -120,89 +119,164 @@ const cache = new Cache();
 // Request deduplication
 const pendingRequests = new Map<string, Promise<any>>();
 
-// 创建一个通用的 API 请求函数
-const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const requestConfig = authService.getAuthenticatedRequestConfig();
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...requestConfig,
-    ...options,
-    headers: {
-      ...requestConfig.headers,
-      ...(options.headers || {})
+// 统一的认证请求函数
+const makeAuthenticatedRequest = async (
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> => {
+  // 获取用户信息
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  
+  // 检测无痕模式
+  const isIncognito = (() => {
+    try {
+      // 检测私有模式的多种方法
+      const testKey = '__test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return false;
+    } catch {
+      return true;
     }
-  });
+  })();
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `Failed to ${options.method || 'GET'} ${endpoint}`);
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>
+  };
+
+  // 添加浏览器模式标识
+  if (isIncognito) {
+    headers['X-Browser-Mode'] = 'incognito';
   }
 
+  // 添加用户会话令牌（如果有）
+  if (user?.id) {
+    headers['X-Session-Token'] = user.id;
+  }
+
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include' // 确保发送 cookies
+  };
+
+  console.log('Making authenticated request:', {
+    url,
+    isIncognito,
+    hasUser: !!user,
+    headers: Object.keys(headers)
+  });
+
+  try {
+    const response = await fetch(url, config);
+    
+    // 如果是认证错误，尝试清理本地状态并重定向到登录
+    if (response.status === 401) {
+      console.warn('Authentication failed, clearing local storage');
+      localStorage.removeItem('user');
+      // 可以在这里添加重定向到登录页面的逻辑
+      throw new Error('Authentication required');
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('Request failed:', error);
+    throw error;
+  }
+};
+
+// 创建一个包装函数来处理 JSON 响应
+const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const response = await makeAuthenticatedRequest(`${API_BASE_URL}${endpoint}`, options);
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Seller ${endpoint} request failed:`, response.status, errorText);
+    throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${response.status} ${response.statusText}`);
+  }
+  
   return response.json();
 };
 
 export const sellerService = {
-  getDashboardStats: () => makeAuthenticatedRequest('/seller/dashboard'),
+  getDashboardStats: () => makeRequest('/seller/dashboard'),
   
-  getDocuments: () => makeAuthenticatedRequest('/seller/documents'),
+  getDocuments: () => makeRequest('/seller/documents'),
   
-  uploadDocument: (formData: FormData) => makeAuthenticatedRequest('/seller/documents/upload', {
-    method: 'POST',
-    body: formData,
-    headers: {
-      // 不设置 Content-Type，让浏览器自动设置
+  uploadDocument: async (formData: FormData) => {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/documents/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {} // 不设置 Content-Type，让浏览器自动设置
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to upload document: ${response.status} ${response.statusText}`);
     }
-  }),
+    
+    return response.json();
+  },
   
-  getListingAgreement: () => makeAuthenticatedRequest('/seller/listing-agreement'),
+  getListingAgreement: () => makeRequest('/seller/listing-agreement'),
   
-  getPurchaseAgreement: () => makeAuthenticatedRequest('/seller/purchase-agreement'),
+  getPurchaseAgreement: () => makeRequest('/seller/purchase-agreement'),
   
-  getDueDiligence: () => makeAuthenticatedRequest('/seller/due-diligence'),
+  getDueDiligence: () => makeRequest('/seller/due-diligence'),
   
-  getPreCloseChecklist: () => makeAuthenticatedRequest('/seller/pre-close-checklist'),
+  getPreCloseChecklist: () => makeRequest('/seller/pre-close-checklist'),
   
-  updatePreCloseChecklist: (data: any) => makeAuthenticatedRequest('/seller/pre-close-checklist', {
+  updatePreCloseChecklist: (data: any) => makeRequest('/seller/pre-close-checklist', {
     method: 'PUT',
     body: JSON.stringify(data)
   }),
   
-  getClosingDocuments: () => makeAuthenticatedRequest('/seller/closing-documents'),
+  getClosingDocuments: () => makeRequest('/seller/closing-documents'),
   
   // 新增的方法
-  downloadDocument: (documentId: string) => makeAuthenticatedRequest(`/seller/download-document/${documentId}`),
+  downloadDocument: (documentId: string) => makeRequest(`/seller/download-document/${documentId}`),
   
-  getProgress: () => makeAuthenticatedRequest('/seller/progress'),
+  getProgress: () => makeRequest('/seller/progress'),
   
-  updateStep: (step: number, completed: boolean) => makeAuthenticatedRequest('/seller/update-step', {
+  updateStep: (step: number, completed: boolean) => makeRequest('/seller/update-step', {
     method: 'PUT',
     body: JSON.stringify({ step, completed })
   }),
   
   // 尽职调查相关
-  getDueDiligenceRequests: (listingId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/due-diligence/requests`),
+  getDueDiligenceRequests: (listingId: string) => makeRequest(`/seller/listings/${listingId}/due-diligence/requests`),
   
-  uploadDueDiligenceDocument: (listingId: string, requestId: string, formData: FormData) => makeAuthenticatedRequest(`/seller/listings/${listingId}/due-diligence/${requestId}/upload`, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      // 不设置 Content-Type，让浏览器自动设置
+  uploadDueDiligenceDocument: async (listingId: string, requestId: string, formData: FormData) => {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/listings/${listingId}/due-diligence/${requestId}/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {} // 不设置 Content-Type，让浏览器自动设置
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to upload due diligence document: ${response.status} ${response.statusText}`);
     }
-  }),
+    
+    return response.json();
+  },
   
   // 列表相关
-  getListings: () => makeAuthenticatedRequest('/seller/listings'),
+  getListings: () => makeRequest('/seller/listings'),
   
-  getListingDetails: (listingId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}`),
+  getListingDetails: (listingId: string) => makeRequest(`/seller/listings/${listingId}`),
   
   // 买家相关
-  getInterestedBuyers: (listingId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/interested-buyers`),
+  getInterestedBuyers: (listingId: string) => makeRequest(`/seller/listings/${listingId}/interested-buyers`),
   
-  approveBuyer: (listingId: string, buyerId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/approve-buyer`, {
+  approveBuyer: (listingId: string, buyerId: string) => makeRequest(`/seller/listings/${listingId}/approve-buyer`, {
     method: 'POST',
     body: JSON.stringify({ buyerId })
   }),
   
-  rejectBuyer: (listingId: string, buyerId: string) => makeAuthenticatedRequest(`/seller/listings/${listingId}/reject-buyer`, {
+  rejectBuyer: (listingId: string, buyerId: string) => makeRequest(`/seller/listings/${listingId}/reject-buyer`, {
     method: 'POST',
     body: JSON.stringify({ buyerId })
   }),
@@ -211,20 +285,20 @@ export const sellerService = {
     // Clear both progress and listings cache when selecting
     cache.delete('seller_progress');
     cache.delete('current_listing');
-    return makeAuthenticatedRequest('/seller/select-listing', {
+    return makeRequest('/seller/select-listing', {
       method: 'POST',
       body: JSON.stringify({ listingId }),
     });
   },
 
   async getCurrentListing(): Promise<{ listing: any; needsSelection: boolean }> {
-    return makeAuthenticatedRequest('/seller/current-listing');
+    return makeRequest('/seller/current-listing');
   },
 
   async markStepCompleted(stepId: number): Promise<{ message: string; progress: any }> {
     // Clear progress cache when marking step as completed
     cache.delete('seller_progress');
-    return makeAuthenticatedRequest('/seller/mark-step-completed', {
+    return makeRequest('/seller/mark-step-completed', {
       method: 'POST',
       body: JSON.stringify({ stepId }),
     });
@@ -233,20 +307,20 @@ export const sellerService = {
   async markStepIncomplete(stepId: number): Promise<{ message: string; progress: any }> {
     // Clear progress cache when marking step as incomplete
     cache.delete('seller_progress');
-    return makeAuthenticatedRequest('/seller/mark-step-incomplete', {
+    return makeRequest('/seller/mark-step-incomplete', {
       method: 'POST',
       body: JSON.stringify({ stepId }),
     });
   },
 
   async getStepDocuments(stepId: number): Promise<{ documents: any[]; requirement: DocumentRequirement }> {
-    return makeAuthenticatedRequest(`/seller/step/${stepId}/documents`);
+    return makeRequest(`/seller/step/${stepId}/documents`);
   },
 
   async uploadStepDocument(stepId: number, fileName: string, fileUrl: string, fileSize: number): Promise<{ document: any }> {
     // Clear step documents cache when uploading
     cache.delete(`step_${stepId}_documents`);
-    return makeAuthenticatedRequest(`/seller/step/${stepId}/upload`, {
+    return makeRequest(`/seller/step/${stepId}/upload`, {
       method: 'POST',
       body: JSON.stringify({ fileName, fileUrl, fileSize }),
     });
@@ -255,7 +329,7 @@ export const sellerService = {
   async downloadStepDocument(stepId: number): Promise<{ document: any }> {
     // Clear step documents cache when downloading
     cache.delete(`step_${stepId}_documents`);
-    return makeAuthenticatedRequest(`/seller/step/${stepId}/download`, {
+    return makeRequest(`/seller/step/${stepId}/download`, {
       method: 'POST',
     });
   },
@@ -264,65 +338,57 @@ export const sellerService = {
     // Clear questionnaire cache when submitting
     cache.delete('seller_questionnaire');
     cache.delete('seller_progress'); // Also clear progress since this affects step completion
-    return makeAuthenticatedRequest('/seller/questionnaire/submit', {
+    return makeRequest('/seller/questionnaire/submit', {
       method: 'POST',
       body: JSON.stringify({ questionnaire }),
     });
   },
 
   async submitListingAgreement(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/seller/listing-agreement`, {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/listing-agreement`, {
       method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to submit listing agreement');
+      const errorText = await response.text();
+      throw new Error(`Failed to submit listing agreement: ${response.status} ${response.statusText}`);
     }
   },
 
   async submitDueDiligence(data: any): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/seller/due-diligence`, {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/due-diligence`, {
       method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to submit due diligence');
+      const errorText = await response.text();
+      throw new Error(`Failed to submit due diligence: ${response.status} ${response.statusText}`);
     }
   },
 
   async getListingBuyers(): Promise<any[]> {
-    return makeAuthenticatedRequest('/seller/listing-buyers');
+    return makeRequest('/seller/listing-buyers');
   },
 
   async getQuestionnaire(): Promise<{ questionnaire: any }> {
-    return makeAuthenticatedRequest('/seller/questionnaire');
+    return makeRequest('/seller/questionnaire');
   },
 
   async saveQuestionnaire(questionnaire: any): Promise<{ message: string }> {
     // Clear questionnaire cache when saving
     cache.delete('seller_questionnaire');
-    return makeAuthenticatedRequest('/seller/questionnaire/save', {
+    return makeRequest('/seller/questionnaire/save', {
       method: 'POST',
       body: JSON.stringify({ questionnaire }),
     });
   },
 
-  // Clear all cache (useful when logging out or major state changes)
   clearCache(): void {
     cache.clear();
   },
 
-  // Clear specific cache entries
   clearCacheFor(keys: string[]): void {
     keys.forEach(key => cache.delete(key));
   }
