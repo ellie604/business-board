@@ -6,7 +6,7 @@ import { RequestHandler } from 'express';
 const prisma = getPrisma();
 
 // 从 session 恢复用户信息的中间件
-export const restoreUser = (req: Request, _res: Response, next: NextFunction) => {
+export const restoreUser = async (req: Request, _res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
   
   // 仅在开发环境记录详细日志
@@ -17,6 +17,8 @@ export const restoreUser = (req: Request, _res: Response, next: NextFunction) =>
       origin: req.headers.origin,
       referer: req.headers.referer,
       authorization: req.headers.authorization,
+      'x-session-token': req.headers['x-session-token'],
+      'x-browser-mode': req.headers['x-browser-mode'],
       'user-agent': req.headers['user-agent']
     });
     console.log('Session details:', {
@@ -44,12 +46,50 @@ export const restoreUser = (req: Request, _res: Response, next: NextFunction) =>
       }
     }
 
-    // 2. 尝试从自定义 header 恢复
-    const sessionToken = req.headers['x-session-token'];
+    // 2. 尝试从自定义 header 恢复 - 实现实际的恢复逻辑
+    const sessionToken = req.headers['x-session-token'] as string;
     if (sessionToken) {
       try {
-        console.log('Attempting to restore session from x-session-token');
-        // TODO: 实现从自定义 header 恢复会话的逻辑
+        console.log('Attempting to restore session from x-session-token:', sessionToken);
+        
+        // 从数据库查找用户信息
+        const user = await getPrisma().user.findUnique({
+          where: { id: sessionToken },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true
+          }
+        });
+        
+        if (user) {
+          console.log('User found from x-session-token:', {
+            id: user.id,
+            role: user.role,
+            email: user.email
+          });
+          
+          // 恢复session
+          if (typedReq.session) {
+            typedReq.session.user = {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role
+            };
+            
+            // 设置用户到请求对象
+            typedReq.user = {
+              ...user,
+              id: user.id.toString()
+            };
+            
+            console.log('Session restored from x-session-token successfully');
+          }
+        } else {
+          console.log('No user found for x-session-token:', sessionToken);
+        }
       } catch (error) {
         console.error('Failed to restore session from x-session-token:', error);
       }
