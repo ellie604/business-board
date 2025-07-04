@@ -47,7 +47,7 @@ const isIncognitoMode = async (): Promise<boolean> => {
 // 重试函数
 const retryRequest = async <T>(
   fn: () => Promise<T>,
-  maxRetries: number = 3,
+  maxRetries: number = 2,
   delay: number = 1000
 ): Promise<T> => {
   for (let i = 0; i < maxRetries; i++) {
@@ -58,7 +58,7 @@ const retryRequest = async <T>(
       
       console.log(`Request failed, retrying in ${delay}ms... (${i + 1}/${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 1.5; // 指数退避
+      delay *= 1.2;
     }
   }
   throw new Error('Max retries exceeded');
@@ -87,7 +87,7 @@ export const authService = {
     
     return retryRequest(async () => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
       try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -132,7 +132,7 @@ export const authService = {
         }
         throw error;
       }
-    }, 3, 2000); // 最多重试3次，从2秒开始的延迟
+    }, 2, 1000);
   },
 
   // 设置认证头

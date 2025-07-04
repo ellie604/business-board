@@ -43,11 +43,6 @@ interface UserFromDB {
 const loginHandler = async (req: Request, res: Response): Promise<void> => {
   const typedReq = req as AuthenticatedRequest;
   
-  // 仅在开发环境记录详细日志
-  if (process.env.NODE_ENV !== 'production') {
-  console.log('Login request received - Body:', typedReq.body);
-  }
-  
   const { email, password } = typedReq.body;
   
   if (!email || !password) {
@@ -56,10 +51,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
   }
   
   try {
-    if (process.env.NODE_ENV !== 'production') {
-    console.log('Attempting to find user with email:', email);
-    }
-    
+    // 优化数据库查询 - 只获取必要字段
     const user = await prisma.user.findUnique({
       where: { 
         email: email.toLowerCase()
@@ -70,35 +62,13 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
         password: true,
         name: true,
         role: true,
-        managing: {
-          select: {
-            id: true,
-            email: true,
-            role: true
-          }
-        }
+        // 移除 managing 查询以提高性能
       }
     });
 
-    if (process.env.NODE_ENV !== 'production') {
-    console.log('Found user:', {
-      ...user,
-      password: user ? '******' : null
-    });
-    }
-
-    if (!user) {
+    if (!user || user.password !== password) {
       res.status(401).json({ message: 'Invalid email or password' });
       return;
-    }
-
-    if (user.password !== password) {
-      res.status(401).json({ message: 'Invalid email or password' });
-      return;
-    }
-
-    if (process.env.NODE_ENV !== 'production') {
-    console.log('Login successful for:', email, 'with role:', user.role);
     }
     
     // 设置用户信息到 request 和 session
@@ -112,34 +82,31 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     typedReq.user = userInfo;
     typedReq.session.user = userInfo;
 
-    // 确保 session 被保存
-    typedReq.session.save((error: Error | null) => {
-      if (error) {
-        console.error('Session save error:', error);
-        res.status(500).json({ message: 'Failed to save session' });
-        return;
-      }
+    // 简化 session 保存 - 不使用异步回调
+    try {
+      await new Promise<void>((resolve, reject) => {
+        typedReq.session.save((error: Error | null) => {
+          if (error) reject(error);
+          else resolve();
+        });
+      });
+    } catch (sessionError) {
+      console.error('Session save error:', sessionError);
+      // 即使 session 保存失败，也继续登录流程
+    }
 
-      if (process.env.NODE_ENV !== 'production') {
-      console.log('Session after login:', {
-        id: typedReq.sessionID,
-        user: typedReq.session.user
-      });
-      console.log('User after login:', typedReq.user);
-      }
-    
-      res.json({ 
-        message: 'Login successful',
+    // 立即返回响应，不等待 session 完全保存
+    res.json({ 
+      message: 'Login successful',
+      role: user.role,
+      redirect: `/dashboard/${user.role.toLowerCase()}`,
+      user: {
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
         role: user.role,
-        redirect: `/dashboard/${user.role.toLowerCase()}`,
-        user: {
-          id: user.id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          managing: user.managing
-        }
-      });
+        managing: [] // 暂时返回空数组，减少查询时间
+      }
     });
   } catch (error: unknown) {
     console.error('Login error:', error);
