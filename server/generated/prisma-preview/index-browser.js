@@ -146,6 +146,7 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   name: 'name',
   role: 'role',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   managerId: 'managerId',
@@ -224,6 +225,26 @@ exports.Prisma.ActivityScalarFieldEnum = {
 exports.Prisma.SellerQuestionnaireScalarFieldEnum = {
   id: 'id',
   sellerId: 'sellerId',
+  data: 'data',
+  submitted: 'submitted',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BuyerNDAScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  data: 'data',
+  submitted: 'submitted',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BuyerFinancialStatementScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
   data: 'data',
   submitted: 'submitted',
   submittedAt: 'submittedAt',
@@ -335,7 +356,8 @@ exports.MessageStatus = exports.$Enums.MessageStatus = {
 exports.ListingStatus = exports.$Enums.ListingStatus = {
   ACTIVE: 'ACTIVE',
   UNDER_CONTRACT: 'UNDER_CONTRACT',
-  CLOSED: 'CLOSED'
+  CLOSED: 'CLOSED',
+  INACTIVE: 'INACTIVE'
 };
 
 exports.DueDiligenceStatus = exports.$Enums.DueDiligenceStatus = {
@@ -354,6 +376,8 @@ exports.Prisma.ModelName = {
   Listing: 'Listing',
   Activity: 'Activity',
   SellerQuestionnaire: 'SellerQuestionnaire',
+  BuyerNDA: 'BuyerNDA',
+  BuyerFinancialStatement: 'BuyerFinancialStatement',
   PreCloseChecklist: 'PreCloseChecklist',
   DueDiligenceRequest: 'DueDiligenceRequest'
 };

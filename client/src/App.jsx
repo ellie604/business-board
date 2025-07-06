@@ -14,6 +14,7 @@ import BrokerListingsPage from './pages/broker/BrokerListingsPage';
 import BrokerSellers from './pages/broker/BrokerSellers';
 import BrokerBuyers from './pages/broker/BrokerBuyers';
 import BrokerAgentsPage from './pages/broker/BrokerAgentsPage';
+import AdminPortal from './pages/broker/AdminPortal';
 
 // Agent pages
 import AgentDashboard from './pages/agent/AgentDashboard';
@@ -62,6 +63,7 @@ function App() {
             <Route path="listings" element={<BrokerListingsPage />} />
             <Route path="sellers" element={<BrokerSellers />} />
             <Route path="buyers" element={<BrokerBuyers />} />
+            <Route path="admin" element={<AdminPortal />} />
             <Route path="sellers/:sellerId/:listingId/*" element={<SellerProgressView />} />
             <Route path="buyers/:buyerId/:listingId/*" element={<BuyerProgressView />} />
           </Route>

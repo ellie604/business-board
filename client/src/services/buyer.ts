@@ -183,7 +183,27 @@ export const buyerService = {
   
   getNDA: () => makeRequest('/buyer/nda'),
   
+  saveNDA: (nda: any) => makeRequest('/buyer/nda/save', {
+    method: 'POST',
+    body: JSON.stringify({ nda })
+  }),
+  
+  submitNDA: (nda: any) => makeRequest('/buyer/nda/submit', {
+    method: 'POST',
+    body: JSON.stringify({ nda })
+  }),
+  
   getFinancialStatement: () => makeRequest('/buyer/financial-statement'),
+  
+  saveFinancialStatement: (financialStatement: any) => makeRequest('/buyer/financial-statement/save', {
+    method: 'POST',
+    body: JSON.stringify({ financialStatement })
+  }),
+  
+  submitFinancialStatement: (financialStatement: any) => makeRequest('/buyer/financial-statement/submit', {
+    method: 'POST',
+    body: JSON.stringify({ financialStatement })
+  }),
   
   getCbrCim: () => makeRequest('/buyer/cbr-cim'),
   
@@ -203,8 +223,8 @@ export const buyerService = {
   getProgress: () => makeRequest('/buyer/progress'),
   
   updateStep: (step: number, completed: boolean) => makeRequest('/buyer/update-step', {
-    method: 'PUT',
-    body: JSON.stringify({ step, completed })
+    method: 'POST',
+    body: JSON.stringify({ stepId: step })
   }),
   
   selectListing: (listingId: string) => makeRequest('/buyer/select-listing', {
@@ -215,6 +235,8 @@ export const buyerService = {
   getCurrentListing: () => makeRequest('/buyer/current-listing'),
   
   getListings: () => makeRequest('/buyer/listings'),
+
+  getAvailableListings: () => makeRequest('/buyer/available-listings'),
 
   // 新增的方法
   downloadDocument: (documentId: string) => makeRequest(`/buyer/download-document/${documentId}`),

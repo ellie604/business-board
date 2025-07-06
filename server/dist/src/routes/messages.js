@@ -140,7 +140,7 @@ const sendMessage = async (req, res, next) => {
             const attachmentPromises = files.map(async (file) => {
                 try {
                     // Upload file to Supabase Storage
-                    const fileName = `${Date.now()}-${file.originalname}`;
+                    const fileName = `communications/attachments/${Date.now()}-${file.originalname}`;
                     console.log('Uploading file:', fileName);
                     const { data, error } = await supabase_1.supabase.storage
                         .from(bucketName)

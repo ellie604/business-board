@@ -115,13 +115,27 @@ export default function BrokerListingsPage() {
     loadData();
   }, []);
 
-  const handleDelete = async (id: string) => {
+  const handleArchive = async (id: string) => {
+    if (!confirm('Are you sure you want to archive this listing?')) return;
+    
     try {
-      await listingService.deleteListing(id);
+      await listingService.archiveListing(id);
       await loadData(); // 重新加载数据
     } catch (err) {
-      console.error('Failed to delete listing:', err);
-      setError('Failed to delete listing. Please try again later.');
+      console.error('Failed to archive listing:', err);
+      setError('Failed to archive listing. Please try again later.');
+    }
+  };
+
+  const handleReactivate = async (id: string) => {
+    if (!confirm('Are you sure you want to reactivate this listing?')) return;
+    
+    try {
+      await listingService.reactivateListing(id);
+      await loadData(); // 重新加载数据
+    } catch (err) {
+      console.error('Failed to reactivate listing:', err);
+      setError('Failed to reactivate listing. Please try again later.');
     }
   };
 
@@ -170,6 +184,21 @@ export default function BrokerListingsPage() {
     }
   };
 
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-800';
+      case 'UNDER_CONTRACT':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'CLOSED':
+        return 'bg-blue-100 text-blue-800';
+      case 'INACTIVE':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
@@ -187,9 +216,6 @@ export default function BrokerListingsPage() {
       </div>
     );
   }
-
-  // 只要数据加载完成就允许操作
-  const canOpenModal = dataLoaded;
 
   return (
     <div className="w-full">
@@ -217,11 +243,18 @@ export default function BrokerListingsPage() {
         </thead>
         <tbody>
           {listings.map(listing => (
-            <tr key={listing.id} className="border-t">
+            <tr 
+              key={listing.id} 
+              className={`border-t ${listing.status === 'INACTIVE' ? 'opacity-60' : ''}`}
+            >
               <td className="p-2">{listing.title}</td>
               <td className="p-2">{listing.description}</td>
               <td className="p-2">${listing.price.toLocaleString()}</td>
-              <td className="p-2">{listing.status}</td>
+              <td className="p-2">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
+                  {listing.status.replace('_', ' ')}
+                </span>
+              </td>
               <td className="p-2">{listing.seller.name}</td>
               <td className="p-2">{listing.buyers.map(b => b.name).join(', ')}</td>
               <td className="p-2">{listing.agent?.name || '-'}</td>
@@ -232,12 +265,21 @@ export default function BrokerListingsPage() {
                 >
                   Edit
                 </button>
-                <button 
-                  className="text-red-500 hover:text-red-600" 
-                  onClick={() => handleDelete(listing.id)}
-                >
-                  Delete
-                </button>
+                {listing.status === 'INACTIVE' ? (
+                  <button 
+                    className="text-green-500 hover:text-green-600" 
+                    onClick={() => handleReactivate(listing.id)}
+                  >
+                    Reactivate
+                  </button>
+                ) : (
+                  <button 
+                    className="text-orange-500 hover:text-orange-600" 
+                    onClick={() => handleArchive(listing.id)}
+                  >
+                    Archive
+                  </button>
+                )}
               </td>
             </tr>
           ))}

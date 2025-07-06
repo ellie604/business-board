@@ -23,6 +23,7 @@ enum ListingStatus {
   ACTIVE
   UNDER_CONTRACT
   CLOSED
+  INACTIVE
 }
 
 enum DocumentType {
@@ -107,31 +108,34 @@ model Document {
 }
 
 model User {
-  id                   String                @id @default(uuid())
-  email                String                @unique
-  password             String
-  name                 String                @default("")
-  role                 UserRole              @default(BUYER)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @default(now()) @updatedAt
-  managedBy            User?                 @relation("UserManagement", fields: [managerId], references: [id])
-  managerId            String?
-  managing             User[]                @relation("UserManagement")
-  listings             Listing[]             @relation("SellerListings")
-  buyerDocs            Document[]            @relation("BuyerDocuments")
-  sellerDocs           Document[]            @relation("SellerDocuments")
-  uploadedDocuments    Document[]            @relation("UploadedDocuments") // 新增：用户上传的文档
-  activities           Activity[]
-  sentMessages         Message[]             @relation("SentMessages")
-  receivedMessages     Message[]             @relation("ReceivedMessages")
-  unreadCount          Int                   @default(0)
-  lastReadAt           DateTime?
-  buyingListings       Listing[]             @relation("BuyerListings")
-  sellerProgress       SellerProgress[]
-  buyerProgress        BuyerProgress[]
-  sellerQuestionnaire  SellerQuestionnaire?  @relation("SellerQuestionnaire")
-  updatedChecklists    PreCloseChecklist[]   @relation("ChecklistUpdater")
-  dueDiligenceRequests DueDiligenceRequest[] @relation("BuyerDueDiligenceRequests")
+  id                      String                   @id @default(uuid())
+  email                   String                   @unique
+  password                String
+  name                    String                   @default("")
+  role                    UserRole                 @default(BUYER)
+  isActive                Boolean                  @default(true) // 新增：标记用户是否处于活跃状态
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @default(now()) @updatedAt
+  managedBy               User?                    @relation("UserManagement", fields: [managerId], references: [id])
+  managerId               String?
+  managing                User[]                   @relation("UserManagement")
+  listings                Listing[]                @relation("SellerListings")
+  buyerDocs               Document[]               @relation("BuyerDocuments")
+  sellerDocs              Document[]               @relation("SellerDocuments")
+  uploadedDocuments       Document[]               @relation("UploadedDocuments") // 新增：用户上传的文档
+  activities              Activity[]
+  sentMessages            Message[]                @relation("SentMessages")
+  receivedMessages        Message[]                @relation("ReceivedMessages")
+  unreadCount             Int                      @default(0)
+  lastReadAt              DateTime?
+  buyingListings          Listing[]                @relation("BuyerListings")
+  sellerProgress          SellerProgress[]
+  buyerProgress           BuyerProgress[]
+  sellerQuestionnaire     SellerQuestionnaire?     @relation("SellerQuestionnaire")
+  buyerNDA                BuyerNDA?                @relation("BuyerNDA")
+  buyerFinancialStatement BuyerFinancialStatement? @relation("BuyerFinancialStatement")
+  updatedChecklists       PreCloseChecklist[]      @relation("ChecklistUpdater")
+  dueDiligenceRequests    DueDiligenceRequest[]    @relation("BuyerDueDiligenceRequests")
 }
 
 model SellerProgress {
@@ -240,6 +244,28 @@ model SellerQuestionnaire {
   submittedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model BuyerNDA {
+  id          String    @id @default(uuid())
+  buyerId     String    @unique
+  buyer       User      @relation("BuyerNDA", fields: [buyerId], references: [id], onDelete: Cascade)
+  data        Json
+  submitted   Boolean   @default(false)
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+}
+
+model BuyerFinancialStatement {
+  id          String    @id @default(uuid())
+  buyerId     String    @unique
+  buyer       User      @relation("BuyerFinancialStatement", fields: [buyerId], references: [id], onDelete: Cascade)
+  data        Json
+  submitted   Boolean   @default(false)
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
 }
 
 model PreCloseChecklist {

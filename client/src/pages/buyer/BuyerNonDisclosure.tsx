@@ -5,20 +5,70 @@ import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
 import { API_BASE_URL } from '../../config';
 
+interface NDAData {
+  // Personal Information
+  firstName: string;
+  lastName: string;
+  organization: string;
+  email: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  
+  // Business Interest
+  listingInterest: string;
+  availableMoney: string;
+  minimumIncome: string;
+  totalPriceWilling: string;
+  californiaRegions: string[];
+  timeFrameToPurchase: string;
+  
+  // Agreement
+  agreementAccepted: boolean;
+  signature: string;
+}
+
+interface Listing {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  status: string;
+}
+
 const BuyerNonDisclosure: React.FC = () => {
-  const [downloading, setDownloading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [downloadMessage, setDownloadMessage] = useState<string>('');
-  const [uploadMessage, setUploadMessage] = useState<string>('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
-  const [uploadMessageType, setUploadMessageType] = useState<'success' | 'error' | ''>('');
   const [progressData, setProgressData] = useState<any>(null);
-  const [ndaDocuments, setNdaDocuments] = useState<any[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const navigate = useNavigate();
   
+  const [formData, setFormData] = useState<NDAData>({
+    firstName: '',
+    lastName: '',
+    organization: '',
+    email: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    listingInterest: '',
+    availableMoney: '',
+    minimumIncome: '',
+    totalPriceWilling: '',
+    californiaRegions: [],
+    timeFrameToPurchase: '',
+    agreementAccepted: false,
+    signature: ''
+  });
+
   const steps = useMemo(() => [
     'Select Listing',
     'Messages',
@@ -33,262 +83,157 @@ const BuyerNonDisclosure: React.FC = () => {
     'After The Sale'
   ], []);
 
-  // 优化：使用useEffect替代React Query，减少重复API调用
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      // 获取进度数据
-      const progressRes = await buyerService.getProgress();
-      setProgressData(progressRes.progress);
+  const californiaRegionOptions = [
+    'All California',
+    'Northern California',
+    'Greater Sacramento Region',
+    'East Bay',
+    'West Bay',
+    'Los Angeles Region',
+    'San Diego Region',
+    'No Preference'
+  ];
 
-      // 如果有选中的listing，获取NDA文档和已上传文件
-      if (progressRes.progress?.selectedListingId) {
-        setDocumentsLoading(true);
+  const timeFrameOptions = [
+    '0-3 months',
+    '3-6 months',
+    '6-12 months',
+    '1-2 years',
+    'More than 2 years',
+    'No specific timeframe'
+  ];
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
         
-        // 获取broker/agent上传的NDA文档
-        const response = await fetch(`${API_BASE_URL}/buyer/listings/${progressRes.progress.selectedListingId}/agent-documents`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const documentsData = await response.json();
-          console.log('=== Debug: Agent Documents Response ===');
-          console.log('Full response:', documentsData);
-          console.log('Documents array:', documentsData.documents);
-          
-          const ndaDocuments = documentsData.documents?.filter(
-            (doc: any) => doc.type === 'NDA'
-          ) || [];
-          
-          console.log('Filtered NDA documents:', ndaDocuments);
-          console.log('NDA documents URLs:', ndaDocuments.map((doc: any) => ({ id: doc.id, url: doc.url, fileName: doc.fileName })));
-          
-          setNdaDocuments(ndaDocuments);
-        } else {
-          console.error('Failed to fetch documents:', response.status, response.statusText);
-          setNdaDocuments([]);
+        // Get progress data
+        const progressRes = await buyerService.getProgress();
+        setProgressData(progressRes.progress);
+
+        // Get available listings
+        const listingsRes = await buyerService.getListings();
+        setListings(Array.isArray(listingsRes) ? listingsRes : []);
+
+        // Try to load existing NDA data
+        const savedData = await loadSavedNDA();
+        if (savedData) {
+          setFormData(savedData);
         }
-
-        // 获取buyer已上传的签完字的NDA文件
-        await refreshUploadedFiles(progressRes.progress.selectedListingId);
-        setDocumentsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setNdaDocuments([]);
-      setDocumentsLoading(false);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    fetchData();
   }, []);
 
-  const refreshUploadedFiles = useCallback(async (selectedListingId: string) => {
+  const loadSavedNDA = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/buyer/listings/${selectedListingId}/documents`, {
-        method: 'GET',
+      const response = await fetch(`${API_BASE_URL}/buyer/nda`, {
         credentials: 'include'
       });
-      
       if (response.ok) {
         const data = await response.json();
-        // Filter for signed NDA agreements (step 2 uploads)
-        const signedNDAs = data.documents?.filter((doc: any) => 
-          doc.stepId === 2 && 
-          doc.operationType === 'UPLOAD' &&
-          (doc.type === 'NDA' || doc.type === 'UPLOADED_DOC')
-        ) || [];
-        setUploadedFiles(signedNDAs);
+        return data.nda;
       }
-    } catch (error) {
-      console.error('Error fetching uploaded files:', error);
+    } catch (err) {
+      console.error('Failed to load saved NDA:', err);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const downloadNDAFile = (ndaDoc: any) => {
-    try {
-      // 检查文件URL是否有效
-      if (!ndaDoc.url) {
-        setDownloadMessage('File URL not available');
-        setMessageType('error');
-        return;
-      }
-
-      // 创建下载链接
-      const link = document.createElement('a');
-      link.href = ndaDoc.url;
-      link.download = ndaDoc.fileName || 'Non_Disclosure_Agreement.pdf';
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      
-      // 尝试下载
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // 记录下载到数据库
-      recordDownload(ndaDoc);
-      
-      setDownloadMessage('Non-Disclosure Agreement downloaded successfully!');
-      setMessageType('success');
-    } catch (error) {
-      console.error('Download error:', error);
-      setDownloadMessage('Download failed. Please try again.');
-      setMessageType('error');
-    }
+    return null;
   };
 
-  const recordDownload = async (ndaDoc: any) => {
-    try {
-      if (progressData?.selectedListingId) {
-        // 使用现有的download API来记录下载
-        const response = await fetch(`${API_BASE_URL}/buyer/download-agent-document/${ndaDoc.id}`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ stepId: 2 }),
-    });
-    
-        if (!response.ok) {
-          console.error('Failed to record download');
-    }
-      }
-    } catch (error) {
-      console.error('Failed to record download:', error);
-      // 不影响下载流程，静默处理错误
-    }
+  const handleInputChange = (field: keyof NDAData, value: string | boolean | string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handleDownload = useCallback(async () => {
+  const handleRegionChange = (region: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      californiaRegions: checked 
+        ? [...prev.californiaRegions, region]
+        : prev.californiaRegions.filter(r => r !== region)
+    }));
+  };
+
+  const handleSave = async () => {
     try {
-      setDownloading(true);
-      setDownloadMessage('');
-      setMessageType('');
+      setSaving(true);
+      setMessage(null);
       
-      if (!ndaDocuments || ndaDocuments.length === 0) {
-        setDownloadMessage('No NDA document available for download');
-        setMessageType('error');
-        return;
-      }
-
-      downloadNDAFile(ndaDocuments[0]);
-      
-    } catch (error: any) {
-      console.error('Download error:', error);
-      setDownloadMessage(error.message || 'Download failed');
-      setMessageType('error');
-    } finally {
-      setDownloading(false);
-    }
-  }, [ndaDocuments]);
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploading(true);
-      setUploadMessage('');
-      setUploadMessageType('');
-      
-      if (!progressData?.selectedListingId) {
-        setUploadMessage('Please select a listing first');
-        setUploadMessageType('error');
-        return;
-      }
-      
-      // Upload file using real API
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('documentType', 'NDA');
-      formData.append('stepId', '2'); // Step 2 for NDA
-
-      const response = await fetch(`${API_BASE_URL}/buyer/listings/${progressData.selectedListingId}/documents`, {
+      const response = await fetch(`${API_BASE_URL}/buyer/nda/save`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         credentials: 'include',
-        body: formData
+        body: JSON.stringify({ nda: formData })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Upload failed: ${errorData.message}`);
-      }
-
-      const data = await response.json();
-      console.log('Uploaded signed NDA:', data.document);
-      
-      // Refresh the file list from backend
-      await refreshUploadedFiles(progressData.selectedListingId);
-      
-      // Mark step as completed after successful upload
-      await buyerService.updateStep(2);
-      
-      // Refresh progress
-      const progressRes = await buyerService.getProgress();
-      setProgressData(progressRes.progress);
-      
-      setUploadMessage('Signed NDA uploaded successfully!');
-      setUploadMessageType('success');
-      
-      // Clear the file input
-      if (e.target) {
-        e.target.value = '';
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'NDA saved successfully!' });
+      } else {
+        throw new Error('Failed to save NDA');
       }
     } catch (err) {
-      console.error('Failed to upload:', err);
-      setUploadMessage(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      setUploadMessageType('error');
+      console.error('Failed to save NDA:', err);
+      setMessage({ type: 'error', text: 'Failed to save NDA. Please try again.' });
     } finally {
-      setUploading(false);
+      setSaving(false);
     }
   };
 
-  const handleDeleteFile = async (fileId: string) => {
-    if (!confirm('Are you sure you want to delete this file?')) {
-      return;
-    }
-
+  const handleSubmit = async () => {
     try {
-      if (!progressData?.selectedListingId) {
-        alert('No listing selected');
+      setSubmitting(true);
+      setMessage(null);
+      
+      // Validate required fields
+      if (!formData.firstName || !formData.lastName || !formData.email || 
+          !formData.phone || !formData.listingInterest || !formData.agreementAccepted) {
+        setMessage({ type: 'error', text: 'Please fill in all required fields and accept the agreement.' });
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/buyer/listings/${progressData.selectedListingId}/documents/${fileId}`, {
-        method: 'DELETE',
+      const response = await fetch(`${API_BASE_URL}/buyer/nda/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         credentials: 'include',
+        body: JSON.stringify({ nda: formData })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Delete failed: ${errorData.message}`);
+      if (response.ok) {
+        const result = await response.json();
+        setMessage({ type: 'success', text: 'NDA submitted successfully! PDF document has been generated.' });
+        
+        // Mark step as completed
+        await buyerService.updateStep(2, true);
+        
+        // Refresh progress
+        const progressRes = await buyerService.getProgress();
+        setProgressData(progressRes.progress);
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error occurred' }));
+        throw new Error(errorData.message || 'Failed to submit NDA');
       }
-
-      // Refresh file list and progress
-      await refreshUploadedFiles(progressData.selectedListingId);
-      const progressRes = await buyerService.getProgress();
-      setProgressData(progressRes.progress);
-      
-      alert('File deleted successfully');
     } catch (err) {
-      console.error('Failed to delete file:', err);
-      alert(`Delete failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.error('Failed to submit NDA:', err);
+      setMessage({ 
+        type: 'error', 
+        text: err instanceof Error ? err.message : 'Failed to submit NDA. Please try again.' 
+      });
+    } finally {
+      setSubmitting(false);
     }
-  };
-
-  const formatFileSize = (bytes: number | null | undefined) => {
-    if (!bytes || bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   // Memoize step calculations
@@ -301,7 +246,6 @@ const BuyerNonDisclosure: React.FC = () => {
     const isCurrentStep = currentStepIndex === 2;
     const isAccessible = currentStepIndex >= 2;
 
-    console.log('Step status:', { stepCompleted, currentStepIndex, isStepFinished, isCurrentStep, isAccessible });
     return { stepCompleted, currentStepIndex, isStepFinished, isCurrentStep, isAccessible };
   }, [progressData]);
 
@@ -313,8 +257,6 @@ const BuyerNonDisclosure: React.FC = () => {
     );
   }
 
-  const hasNdaDocument = ndaDocuments && ndaDocuments.length > 0;
-
   return (
     <StepGuard stepName="Non Disclosure">
       <div className="max-w-6xl mx-auto">
@@ -325,8 +267,8 @@ const BuyerNonDisclosure: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 3: Non Disclosure</h1>
-              <p className="text-gray-600 mt-2">Download, sign, and upload your Non-Disclosure Agreement</p>
+              <h1 className="text-2xl font-bold text-gray-900">Step 3: Non Disclosure Agreement</h1>
+              <p className="text-gray-600 mt-2">Complete the online Non-Disclosure Agreement</p>
             </div>
             <div className="flex items-center space-x-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -337,7 +279,7 @@ const BuyerNonDisclosure: React.FC = () => {
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Finished
+                  Completed
                 </span>
               ) : stepStatus.isCurrentStep ? (
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
@@ -352,277 +294,369 @@ const BuyerNonDisclosure: React.FC = () => {
           </div>
         </div>
 
-        {/* Debug Information - 仅在开发环境显示 */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-gray-100 rounded-lg p-4 mb-6 text-xs">
-            <h3 className="font-bold mb-2">Debug Info:</h3>
-            <p>Current Step: {progressData?.currentStep}</p>
-            <p>Step 2 Completed: {stepStatus.stepCompleted ? 'Yes' : 'No'}</p>
-            <p>Has NDA Document: {hasNdaDocument ? 'Yes' : 'No'}</p>
-            <p>Documents Loading: {documentsLoading ? 'Yes' : 'No'}</p>
-            <p>Selected Listing: {progressData?.selectedListingId}</p>
-            <p>Uploaded Files: {uploadedFiles.length}</p>
-          </div>
-        )}
-
-        {/* NDA Overview */}
+        {/* NDA Introduction */}
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-purple-800 mb-4">Non-Disclosure Agreement Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-medium text-purple-700 mb-2">Purpose</h3>
-              <p className="text-purple-600">Protect confidential business information during the evaluation process</p>
-            </div>
-            <div>
-              <h3 className="font-medium text-purple-700 mb-2">Duration</h3>
-              <p className="text-purple-600">2 years from signing date</p>
-            </div>
-            <div>
-              <h3 className="font-medium text-purple-700 mb-2">Scope</h3>
-              <p className="text-purple-600">All financial, operational, and strategic business information</p>
-            </div>
-            <div>
-              <h3 className="font-medium text-purple-700 mb-2">Penalties</h3>
-              <p className="text-purple-600">Legal remedies for breach of confidentiality</p>
-            </div>
-          </div>
+          <h2 className="text-xl font-semibold text-purple-800 mb-4">Non-Disclosure Agreement Information</h2>
+          <p className="text-purple-700 mb-4">
+            Our agreement with the seller requires that we obtain a nondisclosure and confidentiality agreement and evidence of financial ability before disclosing the name and location of his business. This information will be kept confidential. In compliance with the above, please read and complete the following nondisclosure and confidentiality agreement.
+          </p>
+          <p className="text-purple-700">
+            In consideration of the broker, California Business Sales providing the information on businesses for sale, I/we, the undersigned, understand and agree:
+          </p>
         </div>
 
-        {/* Key Terms */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Key NDA Terms</h2>
-          
-          <div className="space-y-4">
-            <div className="border-l-4 border-purple-500 pl-4">
-              <h3 className="font-medium text-gray-900">Confidential Information</h3>
-              <p className="text-gray-600 text-sm mt-1">
-                All financial statements, customer lists, business processes, trade secrets, and proprietary information.
-              </p>
-            </div>
-            
-            <div className="border-l-4 border-purple-500 pl-4">
-              <h3 className="font-medium text-gray-900">Use Restrictions</h3>
-              <p className="text-gray-600 text-sm mt-1">
-                Information may only be used for evaluating the business acquisition opportunity.
-              </p>
-            </div>
-            
-            <div className="border-l-4 border-purple-500 pl-4">
-              <h3 className="font-medium text-gray-900">Return of Information</h3>
-              <p className="text-gray-600 text-sm mt-1">
-                All materials must be returned or destroyed if the transaction does not proceed.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Download and Upload Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Download Section */}
+        {/* Main NDA Form */}
         <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">1. Download NDA</h2>
-          
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5-8a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2h10z" />
-            </svg>
-            
-            <h3 className="mt-4 text-lg font-medium text-gray-900">Non-Disclosure Agreement</h3>
-            <p className="mt-2 text-sm text-gray-500">
-              {hasNdaDocument 
-                ? 'Standard NDA for business acquisition due diligence'
-                : 'Waiting for broker/agent to provide NDA document'
-              }
-            </p>
-            
-            {documentsLoading ? (
-              <div className="mt-6 flex justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+          <div className="space-y-8">
+            {/* Personal Information Section */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-blue-600">Personal Information</h2>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Last Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Organization
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.organization}
+                    onChange={(e) => handleInputChange('organization', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Address Line 1
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.addressLine1}
+                    onChange={(e) => handleInputChange('addressLine1', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Address Line 2
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.addressLine2}
+                    onChange={(e) => handleInputChange('addressLine2', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      State
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.state}
+                      onChange={(e) => handleInputChange('state', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Zip Code
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.zipCode}
+                      onChange={(e) => handleInputChange('zipCode', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
               </div>
-            ) : hasNdaDocument ? (
-              <div className="mt-6 flex justify-center space-x-4">
+            </section>
+
+            {/* Business Interest Section */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-blue-600">Business Interest</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Listing Interest <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-sm text-gray-600 mb-2">Please select business of interest from the drop down menu</p>
+                  <select
+                    value={formData.listingInterest}
+                    onChange={(e) => handleInputChange('listingInterest', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="">Select a business...</option>
+                    {listings.map((listing) => (
+                      <option key={listing.id} value={listing.id}>
+                        {listing.title} - ${listing.price.toLocaleString()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    How much money do you have available for the purchase of a business?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.availableMoney}
+                    onChange={(e) => handleInputChange('availableMoney', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., $500,000"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Is there a minimum amount of money you need to receive from a business?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.minimumIncome}
+                    onChange={(e) => handleInputChange('minimumIncome', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., $100,000 annually"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What is the total price you are willing to pay for a business?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.totalPriceWilling}
+                    onChange={(e) => handleInputChange('totalPriceWilling', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., $1,000,000"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What regions of California would you consider owning a business in?
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                    {californiaRegionOptions.map((region) => (
+                      <label key={region} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.californiaRegions.includes(region)}
+                          onChange={(e) => handleRegionChange(region, e.target.checked)}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{region}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What is your time frame to purchase?
+                  </label>
+                  <select
+                    value={formData.timeFrameToPurchase}
+                    onChange={(e) => handleInputChange('timeFrameToPurchase', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select timeframe...</option>
+                    {timeFrameOptions.map((timeFrame) => (
+                      <option key={timeFrame} value={timeFrame}>
+                        {timeFrame}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            {/* Agreement Terms */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-blue-600">Agreement Terms</h2>
+              <div className="bg-gray-50 p-6 rounded-lg mb-4">
+                <div className="space-y-4 text-sm text-gray-700">
+                  <div>
+                    <strong>1.</strong> That information provided on businesses by California Business Sales is sensitive and confidential and that its disclosure to others would be damaging to the businesses and to the broker's fiduciary relationship with the seller.
+                  </div>
+                  <div>
+                    <strong>2.</strong> That I will not disclose any information regarding these businesses to any other person who has not also signed and dated this agreement, except to secure their advice and counsel, in which case I agree to obtain their consent to maintain such confidentiality. "Information" shall include the fact that the business is for sale, plus other data. The term "information" does not include any information, which is, or becomes, generally available to the public or is already in your possession. All information provided to review the business will be returned to California Business Sales without retaining copies, summaries, analyses, or extracts thereof in the event the review is terminated.
+                  </div>
+                  <div>
+                    <strong>3.</strong> That I will not contact the seller, his/her employees, suppliers, or customers except through California Business Sales.
+                  </div>
+                  <div>
+                    <strong>4.</strong> That all information is provided by the seller and is not verified in any way by California Business Sales. California Business Sales is relying on the seller for the accuracy and completeness of said information, has no knowledge of the accuracy of said information, and makes no warranty, express or implied, as to such information.
+                  </div>
+                  <div>
+                    <strong>5.</strong> California Business Sales does not give tax, accounting, or legal advice. That, prior to finalizing an agreement to purchase a business, it is my responsibility to make an independent verification of all information. I agree that California Business Sales is not responsible for the accuracy of any information I receive, and I agree to indemnify and hold California Business Sales harmless from any claims or damages resulting from its use. I will look only to the seller and to my own investigation for all information regarding any business offered by California Business Sales.
+                  </div>
+                  <div>
+                    <strong>6.</strong> That, should I enter into an agreement to purchase a business which California Business Sales offers for sale, I grant to the seller the right to obtain, through standard reporting agencies, financial and credit information concerning myself or the companies or other parties I represent; and I understand that this information will be held confidential by the seller and California Business Sales and will be used only for the purpose of the seller extending credit to me.
+                  </div>
+                  <div>
+                    <strong>7.</strong> That all correspondence, inquiries, offers to purchase, and negotiations relating to the purchase or lease of any business presented to me, or companies I represent, by California Business Sales, will be conducted exclusively through California Business Sales.
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.agreementAccepted}
+                      onChange={(e) => handleInputChange('agreementAccepted', e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      required
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      By checking this box you agree to the terms of this agreement. <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Signature <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.signature}
+                    onChange={(e) => handleInputChange('signature', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Type your full name as signature"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Please type your full name as your electronic signature</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Save and Submit Buttons */}
+            <div className="flex justify-between items-center pt-6 border-t">
+              <div className="flex space-x-4">
                 <button
-                  onClick={handleDownload}
-                  disabled={downloading}
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  {downloading ? (
+                  {saving ? (
                     <>
                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Downloading...
+                      Saving...
                     </>
                   ) : (
+                    'Save for Later'
+                  )}
+                </button>
+                
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                >
+                  {submitting ? (
                     <>
-                      <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                        Download NDA
+                      Submitting...
                     </>
+                  ) : (
+                    'Submit NDA'
                   )}
                 </button>
               </div>
-            ) : (
-              <div className="mt-6">
-                <div className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-500 bg-gray-50 cursor-not-allowed">
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Waiting for NDA Document
-                </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  Your broker or agent will provide the NDA document for this listing.
-                </p>
+              
+              <div className="text-sm text-gray-500">
+                {stepStatus.stepCompleted ? 'NDA completed' : 'Complete and submit to proceed'}
               </div>
-            )}
+            </div>
             
-            {/* Download Message */}
-            {downloadMessage && (
-              <div className={`mt-4 p-3 rounded-lg ${
-                messageType === 'success' 
-                  ? 'bg-green-50 border border-green-200' 
-                  : 'bg-red-50 border border-red-200'
+            {/* Message Display */}
+            {message && (
+              <div className={`rounded-lg p-4 mt-4 ${
+                message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
               }`}>
-                <p className={`text-sm ${
-                  messageType === 'success' ? 'text-green-700' : 'text-red-700'
-                }`}>
-                  {messageType === 'success' && '✓ '}
-                  {messageType === 'error' && '⚠ '}
-                  {downloadMessage}
-                </p>
+                {message.text}
               </div>
             )}
-            </div>
-          </div>
-
-          {/* Upload Section */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">2. Upload Signed NDA</h2>
-            
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Upload Signed NDA</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                After signing the NDA, upload the completed document here
-              </p>
-              
-              <div className="mt-6">
-                <label htmlFor="signed-nda-upload" className="cursor-pointer">
-                  <span className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                    {uploading ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        Upload Signed NDA
-                      </>
-                    )}
-                  </span>
-                </label>
-                <input
-                  id="signed-nda-upload"
-                  type="file"
-                  className="sr-only"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleFileUpload}
-                  disabled={uploading}
-                />
-                <p className="text-xs text-gray-500 mt-2">PDF, DOC, DOCX up to 10MB</p>
-              </div>
-              
-              {/* Upload Message */}
-              {uploadMessage && (
-                <div className={`mt-4 p-3 rounded-lg ${
-                  uploadMessageType === 'success' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-red-50 border border-red-200'
-                }`}>
-                  <p className={`text-sm ${
-                    uploadMessageType === 'success' ? 'text-green-700' : 'text-red-700'
-                  }`}>
-                    {uploadMessageType === 'success' && '✓ '}
-                    {uploadMessageType === 'error' && '⚠ '}
-                    {uploadMessage}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-        </div>
-
-        {/* Uploaded Files List */}
-        {uploadedFiles.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Uploaded Signed NDAs</h2>
-            <div className="space-y-3">
-              {uploadedFiles.map((file) => (
-                <div key={file.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-green-500">
-                      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{file.fileName}</p>
-                      <p className="text-xs text-gray-500">
-                        Uploaded: {new Date(file.uploadedAt).toLocaleDateString()} • {formatFileSize(file.fileSize)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => window.open(file.url, '_blank')}
-                      className="p-2 text-green-600 hover:text-green-800 transition-colors"
-                      title="View file"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFile(file.id)}
-                      className="p-2 text-red-600 hover:text-red-800 transition-colors"
-                      title="Delete file"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Important Notice */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-6">
-          <div className="flex items-start">
-            <svg className="h-6 w-6 text-yellow-600 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <div>
-              <h4 className="font-medium text-yellow-900">Important</h4>
-              <p className="text-sm text-yellow-700 mt-1">
-                Please download, review, sign, and upload the NDA to complete this step. 
-                By signing this NDA, you agree to maintain strict confidentiality of all business information. 
-              </p>
-            </div>
           </div>
         </div>
 

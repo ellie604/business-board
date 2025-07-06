@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.7.0
- * Query Engine version: 3cff47a7f5d65c3ea74883f1d736e41d68ce91ed
+ * Prisma Client JS version: 6.9.0
+ * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
  */
 Prisma.prismaVersion = {
-  client: "6.7.0",
-  engine: "3cff47a7f5d65c3ea74883f1d736e41d68ce91ed"
+  client: "6.9.0",
+  engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -124,9 +124,18 @@ exports.Prisma.DocumentScalarFieldEnum = {
   id: 'id',
   type: 'type',
   status: 'status',
+  category: 'category',
   url: 'url',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  operationType: 'operationType',
+  stepId: 'stepId',
   sellerId: 'sellerId',
   buyerId: 'buyerId',
+  listingId: 'listingId',
+  uploadedAt: 'uploadedAt',
+  downloadedAt: 'downloadedAt',
+  uploadedBy: 'uploadedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -137,11 +146,32 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   name: 'name',
   role: 'role',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   managerId: 'managerId',
   unreadCount: 'unreadCount',
   lastReadAt: 'lastReadAt'
+};
+
+exports.Prisma.SellerProgressScalarFieldEnum = {
+  id: 'id',
+  sellerId: 'sellerId',
+  currentStep: 'currentStep',
+  completedSteps: 'completedSteps',
+  selectedListingId: 'selectedListingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BuyerProgressScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  currentStep: 'currentStep',
+  completedSteps: 'completedSteps',
+  selectedListingId: 'selectedListingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -192,9 +222,66 @@ exports.Prisma.ActivityScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SellerQuestionnaireScalarFieldEnum = {
+  id: 'id',
+  sellerId: 'sellerId',
+  data: 'data',
+  submitted: 'submitted',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BuyerNDAScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  data: 'data',
+  submitted: 'submitted',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BuyerFinancialStatementScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  data: 'data',
+  submitted: 'submitted',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PreCloseChecklistScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  buyerItems: 'buyerItems',
+  sellerItems: 'sellerItems',
+  brokerItems: 'brokerItems',
+  lastUpdatedBy: 'lastUpdatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DueDiligenceRequestScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  buyerId: 'buyerId',
+  documentName: 'documentName',
+  status: 'status',
+  requestedAt: 'requestedAt',
+  fulfilledAt: 'fulfilledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.NullableJsonNullValueInput = {
@@ -230,12 +317,27 @@ exports.DocumentType = exports.$Enums.DocumentType = {
   PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
   LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   QUESTIONNAIRE: 'QUESTIONNAIRE',
-  AFTER_SALE: 'AFTER_SALE'
+  AFTER_SALE: 'AFTER_SALE',
+  FINANCIAL_DOCUMENTS: 'FINANCIAL_DOCUMENTS'
 };
 
 exports.DocumentStatus = exports.$Enums.DocumentStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED'
+};
+
+exports.DocumentCategory = exports.$Enums.DocumentCategory = {
+  SELLER_UPLOAD: 'SELLER_UPLOAD',
+  AGENT_PROVIDED: 'AGENT_PROVIDED',
+  BUYER_UPLOAD: 'BUYER_UPLOAD',
+  SYSTEM_GENERATED: 'SYSTEM_GENERATED'
+};
+
+exports.DocumentOperationType = exports.$Enums.DocumentOperationType = {
+  UPLOAD: 'UPLOAD',
+  DOWNLOAD: 'DOWNLOAD',
+  BOTH: 'BOTH',
+  NONE: 'NONE'
 };
 
 exports.UserRole = exports.$Enums.UserRole = {
@@ -254,16 +356,30 @@ exports.MessageStatus = exports.$Enums.MessageStatus = {
 exports.ListingStatus = exports.$Enums.ListingStatus = {
   ACTIVE: 'ACTIVE',
   UNDER_CONTRACT: 'UNDER_CONTRACT',
-  CLOSED: 'CLOSED'
+  CLOSED: 'CLOSED',
+  INACTIVE: 'INACTIVE'
+};
+
+exports.DueDiligenceStatus = exports.$Enums.DueDiligenceStatus = {
+  REQUESTED: 'REQUESTED',
+  FULFILLED: 'FULFILLED',
+  CANCELLED: 'CANCELLED'
 };
 
 exports.Prisma.ModelName = {
   Document: 'Document',
   User: 'User',
+  SellerProgress: 'SellerProgress',
+  BuyerProgress: 'BuyerProgress',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
   Listing: 'Listing',
-  Activity: 'Activity'
+  Activity: 'Activity',
+  SellerQuestionnaire: 'SellerQuestionnaire',
+  BuyerNDA: 'BuyerNDA',
+  BuyerFinancialStatement: 'BuyerFinancialStatement',
+  PreCloseChecklist: 'PreCloseChecklist',
+  DueDiligenceRequest: 'DueDiligenceRequest'
 };
 
 /**

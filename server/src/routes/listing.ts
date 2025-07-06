@@ -4,8 +4,9 @@ import { authenticateBroker } from '../middleware/auth';
 import { AuthenticatedRequest, User } from '../types/custom.d';
 
 const router = Router();
-const prisma = getPrisma();
-type PrismaType = typeof prisma;
+// 移除模块级别的 prisma 初始化
+// const prisma = getPrisma();
+// type PrismaType = typeof prisma;
 
 interface ListingFromDB {
   id: string;
@@ -45,6 +46,9 @@ router.get('/', authenticateBroker, async (req: Request, res: Response, next: Ne
       res.status(401).json({ message: 'Authentication required' });
       return;
     }
+
+    // 在函数内部获取 prisma 实例
+    const prisma = getPrisma();
 
     // 获取经纪人管理的所有代理
     const managedAgents = await prisma.user.findMany({
@@ -114,6 +118,9 @@ router.post('/', authenticateBroker, async (req: Request, res: Response, next: N
       res.status(401).json({ message: 'Authentication required' });
       return;
     }
+
+    // 在函数内部获取 prisma 实例
+    const prisma = getPrisma();
 
     const { title, description, price, status, sellerId, buyerIds, agentId } = req.body;
     console.log('Creating listing with data:', { title, description, price, status, sellerId, buyerIds, agentId });
@@ -194,7 +201,7 @@ router.post('/', authenticateBroker, async (req: Request, res: Response, next: N
     }
 
     // 开始事务
-    const listing = await prisma.$transaction(async (tx: PrismaType) => {
+    const listing = await prisma.$transaction(async (tx: typeof prisma) => {
       // 如果提供了 agentId，先更新卖家的 managedBy
       if (agentId) {
         await tx.user.update({
@@ -273,6 +280,9 @@ router.post('/', authenticateBroker, async (req: Request, res: Response, next: N
 // 编辑 listing
 router.put('/:id', authenticateBroker, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    // 在函数内部获取 prisma 实例
+    const prisma = getPrisma();
+
     const { title, description, price, status, sellerId, buyerIds, agentId } = req.body;
     console.log('Updating listing with data:', { id: req.params.id, title, description, price, status, sellerId, buyerIds, agentId });
 
@@ -299,7 +309,7 @@ router.put('/:id', authenticateBroker, async (req: Request, res: Response, next:
     }
 
     // 开始事务
-    const listing = await prisma.$transaction(async (tx: PrismaType) => {
+    const listing = await prisma.$transaction(async (tx: typeof prisma) => {
       // 更新 listing
       const updatedListing = await tx.listing.update({
         where: { id: req.params.id },
@@ -363,11 +373,122 @@ router.put('/:id', authenticateBroker, async (req: Request, res: Response, next:
   }
 });
 
-// 删除 listing
+// 归档 listing (软删除 - 设置为INACTIVE状态)
+router.patch('/:id/archive', authenticateBroker, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const listingId = req.params.id;
+    
+    // 在函数内部获取 prisma 实例
+    const prisma = getPrisma();
+    
+    // 先检查listing是否存在
+    const existingListing = await prisma.listing.findUnique({
+      where: { id: listingId }
+    });
+
+    if (!existingListing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    if (existingListing.status === 'INACTIVE') {
+      res.status(400).json({ message: 'Listing is already archived' });
+      return;
+    }
+
+    const updatedListing = await prisma.listing.update({
+      where: { id: listingId },
+      data: { status: 'INACTIVE' },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        buyers: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    res.json({ 
+      message: 'Listing archived successfully',
+      listing: updatedListing
+    });
+  } catch (err) {
+    console.error('Error archiving listing:', err);
+    next(err);
+  }
+});
+
+// 重新激活 listing
+router.patch('/:id/reactivate', authenticateBroker, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const listingId = req.params.id;
+    
+    // 在函数内部获取 prisma 实例
+    const prisma = getPrisma();
+    
+    // 先检查listing是否存在
+    const existingListing = await prisma.listing.findUnique({
+      where: { id: listingId }
+    });
+
+    if (!existingListing) {
+      res.status(404).json({ message: 'Listing not found' });
+      return;
+    }
+
+    if (existingListing.status !== 'INACTIVE') {
+      res.status(400).json({ message: 'Listing is not archived' });
+      return;
+    }
+
+    const updatedListing = await prisma.listing.update({
+      where: { id: listingId },
+      data: { status: 'ACTIVE' },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        buyers: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    res.json({ 
+      message: 'Listing reactivated successfully',
+      listing: updatedListing
+    });
+  } catch (err) {
+    console.error('Error reactivating listing:', err);
+    next(err);
+  }
+});
+
+// 删除 listing (保留原有功能，但改为真正的删除)
 router.delete('/:id', authenticateBroker, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    // 在函数内部获取 prisma 实例
+    const prisma = getPrisma();
+    
     await prisma.listing.delete({ where: { id: req.params.id } });
-    res.json({ message: 'Listing deleted' });
+    res.json({ message: 'Listing deleted permanently' });
   } catch (err) {
     console.error('Error deleting listing:', err);
     next(err);

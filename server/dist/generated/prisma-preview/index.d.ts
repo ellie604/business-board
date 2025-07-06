@@ -24,6 +24,16 @@ export type Document = $Result.DefaultSelection<Prisma.$DocumentPayload>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model SellerProgress
+ * 
+ */
+export type SellerProgress = $Result.DefaultSelection<Prisma.$SellerProgressPayload>
+/**
+ * Model BuyerProgress
+ * 
+ */
+export type BuyerProgress = $Result.DefaultSelection<Prisma.$BuyerProgressPayload>
+/**
  * Model Message
  * 
  */
@@ -43,6 +53,31 @@ export type Listing = $Result.DefaultSelection<Prisma.$ListingPayload>
  * 
  */
 export type Activity = $Result.DefaultSelection<Prisma.$ActivityPayload>
+/**
+ * Model SellerQuestionnaire
+ * 
+ */
+export type SellerQuestionnaire = $Result.DefaultSelection<Prisma.$SellerQuestionnairePayload>
+/**
+ * Model BuyerNDA
+ * 
+ */
+export type BuyerNDA = $Result.DefaultSelection<Prisma.$BuyerNDAPayload>
+/**
+ * Model BuyerFinancialStatement
+ * 
+ */
+export type BuyerFinancialStatement = $Result.DefaultSelection<Prisma.$BuyerFinancialStatementPayload>
+/**
+ * Model PreCloseChecklist
+ * 
+ */
+export type PreCloseChecklist = $Result.DefaultSelection<Prisma.$PreCloseChecklistPayload>
+/**
+ * Model DueDiligenceRequest
+ * 
+ */
+export type DueDiligenceRequest = $Result.DefaultSelection<Prisma.$DueDiligenceRequestPayload>
 
 /**
  * Enums
@@ -61,7 +96,8 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 export const ListingStatus: {
   ACTIVE: 'ACTIVE',
   UNDER_CONTRACT: 'UNDER_CONTRACT',
-  CLOSED: 'CLOSED'
+  CLOSED: 'CLOSED',
+  INACTIVE: 'INACTIVE'
 };
 
 export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
@@ -80,7 +116,8 @@ export const DocumentType: {
   PURCHASE_CONTRACT: 'PURCHASE_CONTRACT',
   LISTING_AGREEMENT: 'LISTING_AGREEMENT',
   QUESTIONNAIRE: 'QUESTIONNAIRE',
-  AFTER_SALE: 'AFTER_SALE'
+  AFTER_SALE: 'AFTER_SALE',
+  FINANCIAL_DOCUMENTS: 'FINANCIAL_DOCUMENTS'
 };
 
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
@@ -94,6 +131,16 @@ export const DocumentStatus: {
 export type DocumentStatus = (typeof DocumentStatus)[keyof typeof DocumentStatus]
 
 
+export const DocumentOperationType: {
+  UPLOAD: 'UPLOAD',
+  DOWNLOAD: 'DOWNLOAD',
+  BOTH: 'BOTH',
+  NONE: 'NONE'
+};
+
+export type DocumentOperationType = (typeof DocumentOperationType)[keyof typeof DocumentOperationType]
+
+
 export const MessageStatus: {
   SENT: 'SENT',
   DELIVERED: 'DELIVERED',
@@ -101,6 +148,25 @@ export const MessageStatus: {
 };
 
 export type MessageStatus = (typeof MessageStatus)[keyof typeof MessageStatus]
+
+
+export const DocumentCategory: {
+  SELLER_UPLOAD: 'SELLER_UPLOAD',
+  AGENT_PROVIDED: 'AGENT_PROVIDED',
+  BUYER_UPLOAD: 'BUYER_UPLOAD',
+  SYSTEM_GENERATED: 'SYSTEM_GENERATED'
+};
+
+export type DocumentCategory = (typeof DocumentCategory)[keyof typeof DocumentCategory]
+
+
+export const DueDiligenceStatus: {
+  REQUESTED: 'REQUESTED',
+  FULFILLED: 'FULFILLED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type DueDiligenceStatus = (typeof DueDiligenceStatus)[keyof typeof DueDiligenceStatus]
 
 }
 
@@ -120,9 +186,21 @@ export type DocumentStatus = $Enums.DocumentStatus
 
 export const DocumentStatus: typeof $Enums.DocumentStatus
 
+export type DocumentOperationType = $Enums.DocumentOperationType
+
+export const DocumentOperationType: typeof $Enums.DocumentOperationType
+
 export type MessageStatus = $Enums.MessageStatus
 
 export const MessageStatus: typeof $Enums.MessageStatus
+
+export type DocumentCategory = $Enums.DocumentCategory
+
+export const DocumentCategory: typeof $Enums.DocumentCategory
+
+export type DueDiligenceStatus = $Enums.DueDiligenceStatus
+
+export const DueDiligenceStatus: typeof $Enums.DueDiligenceStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -270,6 +348,26 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.sellerProgress`: Exposes CRUD operations for the **SellerProgress** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SellerProgresses
+    * const sellerProgresses = await prisma.sellerProgress.findMany()
+    * ```
+    */
+  get sellerProgress(): Prisma.SellerProgressDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.buyerProgress`: Exposes CRUD operations for the **BuyerProgress** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BuyerProgresses
+    * const buyerProgresses = await prisma.buyerProgress.findMany()
+    * ```
+    */
+  get buyerProgress(): Prisma.BuyerProgressDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.message`: Exposes CRUD operations for the **Message** model.
     * Example usage:
     * ```ts
@@ -308,6 +406,56 @@ export class PrismaClient<
     * ```
     */
   get activity(): Prisma.ActivityDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.sellerQuestionnaire`: Exposes CRUD operations for the **SellerQuestionnaire** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SellerQuestionnaires
+    * const sellerQuestionnaires = await prisma.sellerQuestionnaire.findMany()
+    * ```
+    */
+  get sellerQuestionnaire(): Prisma.SellerQuestionnaireDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.buyerNDA`: Exposes CRUD operations for the **BuyerNDA** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BuyerNDAS
+    * const buyerNDAS = await prisma.buyerNDA.findMany()
+    * ```
+    */
+  get buyerNDA(): Prisma.BuyerNDADelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.buyerFinancialStatement`: Exposes CRUD operations for the **BuyerFinancialStatement** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BuyerFinancialStatements
+    * const buyerFinancialStatements = await prisma.buyerFinancialStatement.findMany()
+    * ```
+    */
+  get buyerFinancialStatement(): Prisma.BuyerFinancialStatementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.preCloseChecklist`: Exposes CRUD operations for the **PreCloseChecklist** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PreCloseChecklists
+    * const preCloseChecklists = await prisma.preCloseChecklist.findMany()
+    * ```
+    */
+  get preCloseChecklist(): Prisma.PreCloseChecklistDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dueDiligenceRequest`: Exposes CRUD operations for the **DueDiligenceRequest** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DueDiligenceRequests
+    * const dueDiligenceRequests = await prisma.dueDiligenceRequest.findMany()
+    * ```
+    */
+  get dueDiligenceRequest(): Prisma.DueDiligenceRequestDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -366,8 +514,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.7.0
-   * Query Engine version: 3cff47a7f5d65c3ea74883f1d736e41d68ce91ed
+   * Prisma Client JS version: 6.9.0
+   * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
    */
   export type PrismaVersion = {
     client: string
@@ -750,10 +898,17 @@ export namespace Prisma {
   export const ModelName: {
     Document: 'Document',
     User: 'User',
+    SellerProgress: 'SellerProgress',
+    BuyerProgress: 'BuyerProgress',
     Message: 'Message',
     MessageAttachment: 'MessageAttachment',
     Listing: 'Listing',
-    Activity: 'Activity'
+    Activity: 'Activity',
+    SellerQuestionnaire: 'SellerQuestionnaire',
+    BuyerNDA: 'BuyerNDA',
+    BuyerFinancialStatement: 'BuyerFinancialStatement',
+    PreCloseChecklist: 'PreCloseChecklist',
+    DueDiligenceRequest: 'DueDiligenceRequest'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -772,7 +927,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "document" | "user" | "message" | "messageAttachment" | "listing" | "activity"
+      modelProps: "document" | "user" | "sellerProgress" | "buyerProgress" | "message" | "messageAttachment" | "listing" | "activity" | "sellerQuestionnaire" | "buyerNDA" | "buyerFinancialStatement" | "preCloseChecklist" | "dueDiligenceRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -921,6 +1076,154 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      SellerProgress: {
+        payload: Prisma.$SellerProgressPayload<ExtArgs>
+        fields: Prisma.SellerProgressFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SellerProgressFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SellerProgressFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          findFirst: {
+            args: Prisma.SellerProgressFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SellerProgressFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          findMany: {
+            args: Prisma.SellerProgressFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>[]
+          }
+          create: {
+            args: Prisma.SellerProgressCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          createMany: {
+            args: Prisma.SellerProgressCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SellerProgressCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>[]
+          }
+          delete: {
+            args: Prisma.SellerProgressDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          update: {
+            args: Prisma.SellerProgressUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          deleteMany: {
+            args: Prisma.SellerProgressDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SellerProgressUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SellerProgressUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>[]
+          }
+          upsert: {
+            args: Prisma.SellerProgressUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerProgressPayload>
+          }
+          aggregate: {
+            args: Prisma.SellerProgressAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSellerProgress>
+          }
+          groupBy: {
+            args: Prisma.SellerProgressGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SellerProgressGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SellerProgressCountArgs<ExtArgs>
+            result: $Utils.Optional<SellerProgressCountAggregateOutputType> | number
+          }
+        }
+      }
+      BuyerProgress: {
+        payload: Prisma.$BuyerProgressPayload<ExtArgs>
+        fields: Prisma.BuyerProgressFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BuyerProgressFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BuyerProgressFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>
+          }
+          findFirst: {
+            args: Prisma.BuyerProgressFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BuyerProgressFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>
+          }
+          findMany: {
+            args: Prisma.BuyerProgressFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>[]
+          }
+          create: {
+            args: Prisma.BuyerProgressCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>
+          }
+          createMany: {
+            args: Prisma.BuyerProgressCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BuyerProgressCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>[]
+          }
+          delete: {
+            args: Prisma.BuyerProgressDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>
+          }
+          update: {
+            args: Prisma.BuyerProgressUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>
+          }
+          deleteMany: {
+            args: Prisma.BuyerProgressDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BuyerProgressUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BuyerProgressUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>[]
+          }
+          upsert: {
+            args: Prisma.BuyerProgressUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerProgressPayload>
+          }
+          aggregate: {
+            args: Prisma.BuyerProgressAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBuyerProgress>
+          }
+          groupBy: {
+            args: Prisma.BuyerProgressGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BuyerProgressGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BuyerProgressCountArgs<ExtArgs>
+            result: $Utils.Optional<BuyerProgressCountAggregateOutputType> | number
           }
         }
       }
@@ -1220,6 +1523,376 @@ export namespace Prisma {
           }
         }
       }
+      SellerQuestionnaire: {
+        payload: Prisma.$SellerQuestionnairePayload<ExtArgs>
+        fields: Prisma.SellerQuestionnaireFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SellerQuestionnaireFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SellerQuestionnaireFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          findFirst: {
+            args: Prisma.SellerQuestionnaireFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SellerQuestionnaireFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          findMany: {
+            args: Prisma.SellerQuestionnaireFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>[]
+          }
+          create: {
+            args: Prisma.SellerQuestionnaireCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          createMany: {
+            args: Prisma.SellerQuestionnaireCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SellerQuestionnaireCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>[]
+          }
+          delete: {
+            args: Prisma.SellerQuestionnaireDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          update: {
+            args: Prisma.SellerQuestionnaireUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          deleteMany: {
+            args: Prisma.SellerQuestionnaireDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SellerQuestionnaireUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SellerQuestionnaireUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>[]
+          }
+          upsert: {
+            args: Prisma.SellerQuestionnaireUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SellerQuestionnairePayload>
+          }
+          aggregate: {
+            args: Prisma.SellerQuestionnaireAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSellerQuestionnaire>
+          }
+          groupBy: {
+            args: Prisma.SellerQuestionnaireGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SellerQuestionnaireGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SellerQuestionnaireCountArgs<ExtArgs>
+            result: $Utils.Optional<SellerQuestionnaireCountAggregateOutputType> | number
+          }
+        }
+      }
+      BuyerNDA: {
+        payload: Prisma.$BuyerNDAPayload<ExtArgs>
+        fields: Prisma.BuyerNDAFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BuyerNDAFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BuyerNDAFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>
+          }
+          findFirst: {
+            args: Prisma.BuyerNDAFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BuyerNDAFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>
+          }
+          findMany: {
+            args: Prisma.BuyerNDAFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>[]
+          }
+          create: {
+            args: Prisma.BuyerNDACreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>
+          }
+          createMany: {
+            args: Prisma.BuyerNDACreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BuyerNDACreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>[]
+          }
+          delete: {
+            args: Prisma.BuyerNDADeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>
+          }
+          update: {
+            args: Prisma.BuyerNDAUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>
+          }
+          deleteMany: {
+            args: Prisma.BuyerNDADeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BuyerNDAUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BuyerNDAUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>[]
+          }
+          upsert: {
+            args: Prisma.BuyerNDAUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerNDAPayload>
+          }
+          aggregate: {
+            args: Prisma.BuyerNDAAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBuyerNDA>
+          }
+          groupBy: {
+            args: Prisma.BuyerNDAGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BuyerNDAGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BuyerNDACountArgs<ExtArgs>
+            result: $Utils.Optional<BuyerNDACountAggregateOutputType> | number
+          }
+        }
+      }
+      BuyerFinancialStatement: {
+        payload: Prisma.$BuyerFinancialStatementPayload<ExtArgs>
+        fields: Prisma.BuyerFinancialStatementFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BuyerFinancialStatementFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BuyerFinancialStatementFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>
+          }
+          findFirst: {
+            args: Prisma.BuyerFinancialStatementFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BuyerFinancialStatementFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>
+          }
+          findMany: {
+            args: Prisma.BuyerFinancialStatementFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>[]
+          }
+          create: {
+            args: Prisma.BuyerFinancialStatementCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>
+          }
+          createMany: {
+            args: Prisma.BuyerFinancialStatementCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BuyerFinancialStatementCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>[]
+          }
+          delete: {
+            args: Prisma.BuyerFinancialStatementDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>
+          }
+          update: {
+            args: Prisma.BuyerFinancialStatementUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>
+          }
+          deleteMany: {
+            args: Prisma.BuyerFinancialStatementDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BuyerFinancialStatementUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BuyerFinancialStatementUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>[]
+          }
+          upsert: {
+            args: Prisma.BuyerFinancialStatementUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuyerFinancialStatementPayload>
+          }
+          aggregate: {
+            args: Prisma.BuyerFinancialStatementAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBuyerFinancialStatement>
+          }
+          groupBy: {
+            args: Prisma.BuyerFinancialStatementGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BuyerFinancialStatementGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BuyerFinancialStatementCountArgs<ExtArgs>
+            result: $Utils.Optional<BuyerFinancialStatementCountAggregateOutputType> | number
+          }
+        }
+      }
+      PreCloseChecklist: {
+        payload: Prisma.$PreCloseChecklistPayload<ExtArgs>
+        fields: Prisma.PreCloseChecklistFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PreCloseChecklistFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PreCloseChecklistFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          findFirst: {
+            args: Prisma.PreCloseChecklistFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PreCloseChecklistFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          findMany: {
+            args: Prisma.PreCloseChecklistFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>[]
+          }
+          create: {
+            args: Prisma.PreCloseChecklistCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          createMany: {
+            args: Prisma.PreCloseChecklistCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PreCloseChecklistCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>[]
+          }
+          delete: {
+            args: Prisma.PreCloseChecklistDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          update: {
+            args: Prisma.PreCloseChecklistUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          deleteMany: {
+            args: Prisma.PreCloseChecklistDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PreCloseChecklistUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PreCloseChecklistUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>[]
+          }
+          upsert: {
+            args: Prisma.PreCloseChecklistUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PreCloseChecklistPayload>
+          }
+          aggregate: {
+            args: Prisma.PreCloseChecklistAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePreCloseChecklist>
+          }
+          groupBy: {
+            args: Prisma.PreCloseChecklistGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PreCloseChecklistGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PreCloseChecklistCountArgs<ExtArgs>
+            result: $Utils.Optional<PreCloseChecklistCountAggregateOutputType> | number
+          }
+        }
+      }
+      DueDiligenceRequest: {
+        payload: Prisma.$DueDiligenceRequestPayload<ExtArgs>
+        fields: Prisma.DueDiligenceRequestFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DueDiligenceRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DueDiligenceRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>
+          }
+          findFirst: {
+            args: Prisma.DueDiligenceRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DueDiligenceRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>
+          }
+          findMany: {
+            args: Prisma.DueDiligenceRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>[]
+          }
+          create: {
+            args: Prisma.DueDiligenceRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>
+          }
+          createMany: {
+            args: Prisma.DueDiligenceRequestCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DueDiligenceRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>[]
+          }
+          delete: {
+            args: Prisma.DueDiligenceRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>
+          }
+          update: {
+            args: Prisma.DueDiligenceRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>
+          }
+          deleteMany: {
+            args: Prisma.DueDiligenceRequestDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DueDiligenceRequestUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DueDiligenceRequestUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>[]
+          }
+          upsert: {
+            args: Prisma.DueDiligenceRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DueDiligenceRequestPayload>
+          }
+          aggregate: {
+            args: Prisma.DueDiligenceRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDueDiligenceRequest>
+          }
+          groupBy: {
+            args: Prisma.DueDiligenceRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DueDiligenceRequestGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DueDiligenceRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<DueDiligenceRequestCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1306,10 +1979,17 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     document?: DocumentOmit
     user?: UserOmit
+    sellerProgress?: SellerProgressOmit
+    buyerProgress?: BuyerProgressOmit
     message?: MessageOmit
     messageAttachment?: MessageAttachmentOmit
     listing?: ListingOmit
     activity?: ActivityOmit
+    sellerQuestionnaire?: SellerQuestionnaireOmit
+    buyerNDA?: BuyerNDAOmit
+    buyerFinancialStatement?: BuyerFinancialStatementOmit
+    preCloseChecklist?: PreCloseChecklistOmit
+    dueDiligenceRequest?: DueDiligenceRequestOmit
   }
 
   /* Types for Logging */
@@ -1408,9 +2088,15 @@ export namespace Prisma {
     listings: number
     buyerDocs: number
     sellerDocs: number
+    uploadedDocuments: number
     activities: number
     sentMessages: number
     receivedMessages: number
+    buyingListings: number
+    sellerProgress: number
+    buyerProgress: number
+    updatedChecklists: number
+    dueDiligenceRequests: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1418,9 +2104,15 @@ export namespace Prisma {
     listings?: boolean | UserCountOutputTypeCountListingsArgs
     buyerDocs?: boolean | UserCountOutputTypeCountBuyerDocsArgs
     sellerDocs?: boolean | UserCountOutputTypeCountSellerDocsArgs
+    uploadedDocuments?: boolean | UserCountOutputTypeCountUploadedDocumentsArgs
     activities?: boolean | UserCountOutputTypeCountActivitiesArgs
     sentMessages?: boolean | UserCountOutputTypeCountSentMessagesArgs
     receivedMessages?: boolean | UserCountOutputTypeCountReceivedMessagesArgs
+    buyingListings?: boolean | UserCountOutputTypeCountBuyingListingsArgs
+    sellerProgress?: boolean | UserCountOutputTypeCountSellerProgressArgs
+    buyerProgress?: boolean | UserCountOutputTypeCountBuyerProgressArgs
+    updatedChecklists?: boolean | UserCountOutputTypeCountUpdatedChecklistsArgs
+    dueDiligenceRequests?: boolean | UserCountOutputTypeCountDueDiligenceRequestsArgs
   }
 
   // Custom InputTypes
@@ -1465,6 +2157,13 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountUploadedDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountActivitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ActivityWhereInput
   }
@@ -1481,6 +2180,41 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountReceivedMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MessageWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBuyingListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ListingWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProgressWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBuyerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BuyerProgressWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUpdatedChecklistsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PreCloseChecklistWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDueDiligenceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DueDiligenceRequestWhereInput
   }
 
 
@@ -1525,6 +2259,73 @@ export namespace Prisma {
 
 
   /**
+   * Count Type ListingCountOutputType
+   */
+
+  export type ListingCountOutputType = {
+    buyers: number
+    documents: number
+    sellerProgress: number
+    buyerSelectedProgress: number
+    dueDiligenceRequests: number
+  }
+
+  export type ListingCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyers?: boolean | ListingCountOutputTypeCountBuyersArgs
+    documents?: boolean | ListingCountOutputTypeCountDocumentsArgs
+    sellerProgress?: boolean | ListingCountOutputTypeCountSellerProgressArgs
+    buyerSelectedProgress?: boolean | ListingCountOutputTypeCountBuyerSelectedProgressArgs
+    dueDiligenceRequests?: boolean | ListingCountOutputTypeCountDueDiligenceRequestsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ListingCountOutputType
+     */
+    select?: ListingCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountBuyersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountSellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProgressWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountBuyerSelectedProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BuyerProgressWhereInput
+  }
+
+  /**
+   * ListingCountOutputType without action
+   */
+  export type ListingCountOutputTypeCountDueDiligenceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DueDiligenceRequestWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -1534,17 +2335,38 @@ export namespace Prisma {
 
   export type AggregateDocument = {
     _count: DocumentCountAggregateOutputType | null
+    _avg: DocumentAvgAggregateOutputType | null
+    _sum: DocumentSumAggregateOutputType | null
     _min: DocumentMinAggregateOutputType | null
     _max: DocumentMaxAggregateOutputType | null
+  }
+
+  export type DocumentAvgAggregateOutputType = {
+    fileSize: number | null
+    stepId: number | null
+  }
+
+  export type DocumentSumAggregateOutputType = {
+    fileSize: number | null
+    stepId: number | null
   }
 
   export type DocumentMinAggregateOutputType = {
     id: string | null
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
+    category: $Enums.DocumentCategory | null
     url: string | null
+    fileName: string | null
+    fileSize: number | null
+    operationType: $Enums.DocumentOperationType | null
+    stepId: number | null
     sellerId: string | null
     buyerId: string | null
+    listingId: string | null
+    uploadedAt: Date | null
+    downloadedAt: Date | null
+    uploadedBy: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1553,9 +2375,18 @@ export namespace Prisma {
     id: string | null
     type: $Enums.DocumentType | null
     status: $Enums.DocumentStatus | null
+    category: $Enums.DocumentCategory | null
     url: string | null
+    fileName: string | null
+    fileSize: number | null
+    operationType: $Enums.DocumentOperationType | null
+    stepId: number | null
     sellerId: string | null
     buyerId: string | null
+    listingId: string | null
+    uploadedAt: Date | null
+    downloadedAt: Date | null
+    uploadedBy: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1564,22 +2395,50 @@ export namespace Prisma {
     id: number
     type: number
     status: number
+    category: number
     url: number
+    fileName: number
+    fileSize: number
+    operationType: number
+    stepId: number
     sellerId: number
     buyerId: number
+    listingId: number
+    uploadedAt: number
+    downloadedAt: number
+    uploadedBy: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
 
+  export type DocumentAvgAggregateInputType = {
+    fileSize?: true
+    stepId?: true
+  }
+
+  export type DocumentSumAggregateInputType = {
+    fileSize?: true
+    stepId?: true
+  }
+
   export type DocumentMinAggregateInputType = {
     id?: true
     type?: true
     status?: true
+    category?: true
     url?: true
+    fileName?: true
+    fileSize?: true
+    operationType?: true
+    stepId?: true
     sellerId?: true
     buyerId?: true
+    listingId?: true
+    uploadedAt?: true
+    downloadedAt?: true
+    uploadedBy?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1588,9 +2447,18 @@ export namespace Prisma {
     id?: true
     type?: true
     status?: true
+    category?: true
     url?: true
+    fileName?: true
+    fileSize?: true
+    operationType?: true
+    stepId?: true
     sellerId?: true
     buyerId?: true
+    listingId?: true
+    uploadedAt?: true
+    downloadedAt?: true
+    uploadedBy?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1599,9 +2467,18 @@ export namespace Prisma {
     id?: true
     type?: true
     status?: true
+    category?: true
     url?: true
+    fileName?: true
+    fileSize?: true
+    operationType?: true
+    stepId?: true
     sellerId?: true
     buyerId?: true
+    listingId?: true
+    uploadedAt?: true
+    downloadedAt?: true
+    uploadedBy?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1645,6 +2522,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: DocumentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DocumentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: DocumentMinAggregateInputType
@@ -1675,6 +2564,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: DocumentCountAggregateInputType | true
+    _avg?: DocumentAvgAggregateInputType
+    _sum?: DocumentSumAggregateInputType
     _min?: DocumentMinAggregateInputType
     _max?: DocumentMaxAggregateInputType
   }
@@ -1683,12 +2574,23 @@ export namespace Prisma {
     id: string
     type: $Enums.DocumentType
     status: $Enums.DocumentStatus
+    category: $Enums.DocumentCategory
     url: string | null
+    fileName: string | null
+    fileSize: number | null
+    operationType: $Enums.DocumentOperationType
+    stepId: number | null
     sellerId: string
     buyerId: string | null
+    listingId: string | null
+    uploadedAt: Date | null
+    downloadedAt: Date | null
+    uploadedBy: string | null
     createdAt: Date
     updatedAt: Date
     _count: DocumentCountAggregateOutputType | null
+    _avg: DocumentAvgAggregateOutputType | null
+    _sum: DocumentSumAggregateOutputType | null
     _min: DocumentMinAggregateOutputType | null
     _max: DocumentMaxAggregateOutputType | null
   }
@@ -1711,64 +2613,112 @@ export namespace Prisma {
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }, ExtArgs["result"]["document"]>
 
   export type DocumentSelectScalar = {
     id?: boolean
     type?: boolean
     status?: boolean
+    category?: boolean
     url?: boolean
+    fileName?: boolean
+    fileSize?: boolean
+    operationType?: boolean
+    stepId?: boolean
     sellerId?: boolean
     buyerId?: boolean
+    listingId?: boolean
+    uploadedAt?: boolean
+    downloadedAt?: boolean
+    uploadedBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "url" | "sellerId" | "buyerId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "category" | "url" | "fileName" | "fileSize" | "operationType" | "stepId" | "sellerId" | "buyerId" | "listingId" | "uploadedAt" | "downloadedAt" | "uploadedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
   export type DocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }
   export type DocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }
   export type DocumentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
     buyer?: boolean | Document$buyerArgs<ExtArgs>
+    listing?: boolean | Document$listingArgs<ExtArgs>
+    uploader?: boolean | Document$uploaderArgs<ExtArgs>
   }
 
   export type $DocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1776,14 +2726,25 @@ export namespace Prisma {
     objects: {
       seller: Prisma.$UserPayload<ExtArgs>
       buyer: Prisma.$UserPayload<ExtArgs> | null
+      listing: Prisma.$ListingPayload<ExtArgs> | null
+      uploader: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       type: $Enums.DocumentType
       status: $Enums.DocumentStatus
+      category: $Enums.DocumentCategory
       url: string | null
+      fileName: string | null
+      fileSize: number | null
+      operationType: $Enums.DocumentOperationType
+      stepId: number | null
       sellerId: string
       buyerId: string | null
+      listingId: string | null
+      uploadedAt: Date | null
+      downloadedAt: Date | null
+      uploadedBy: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["document"]>
@@ -2182,6 +3143,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     buyer<T extends Document$buyerArgs<ExtArgs> = {}>(args?: Subset<T, Document$buyerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    listing<T extends Document$listingArgs<ExtArgs> = {}>(args?: Subset<T, Document$listingArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    uploader<T extends Document$uploaderArgs<ExtArgs> = {}>(args?: Subset<T, Document$uploaderArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2214,9 +3177,18 @@ export namespace Prisma {
     readonly id: FieldRef<"Document", 'String'>
     readonly type: FieldRef<"Document", 'DocumentType'>
     readonly status: FieldRef<"Document", 'DocumentStatus'>
+    readonly category: FieldRef<"Document", 'DocumentCategory'>
     readonly url: FieldRef<"Document", 'String'>
+    readonly fileName: FieldRef<"Document", 'String'>
+    readonly fileSize: FieldRef<"Document", 'Int'>
+    readonly operationType: FieldRef<"Document", 'DocumentOperationType'>
+    readonly stepId: FieldRef<"Document", 'Int'>
     readonly sellerId: FieldRef<"Document", 'String'>
     readonly buyerId: FieldRef<"Document", 'String'>
+    readonly listingId: FieldRef<"Document", 'String'>
+    readonly uploadedAt: FieldRef<"Document", 'DateTime'>
+    readonly downloadedAt: FieldRef<"Document", 'DateTime'>
+    readonly uploadedBy: FieldRef<"Document", 'String'>
     readonly createdAt: FieldRef<"Document", 'DateTime'>
     readonly updatedAt: FieldRef<"Document", 'DateTime'>
   }
@@ -2634,6 +3606,44 @@ export namespace Prisma {
   }
 
   /**
+   * Document.listing
+   */
+  export type Document$listingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+  }
+
+  /**
+   * Document.uploader
+   */
+  export type Document$uploaderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * Document without action
    */
   export type DocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2678,6 +3688,7 @@ export namespace Prisma {
     password: string | null
     name: string | null
     role: $Enums.UserRole | null
+    isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
     managerId: string | null
@@ -2691,6 +3702,7 @@ export namespace Prisma {
     password: string | null
     name: string | null
     role: $Enums.UserRole | null
+    isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
     managerId: string | null
@@ -2704,6 +3716,7 @@ export namespace Prisma {
     password: number
     name: number
     role: number
+    isActive: number
     createdAt: number
     updatedAt: number
     managerId: number
@@ -2727,6 +3740,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    isActive?: true
     createdAt?: true
     updatedAt?: true
     managerId?: true
@@ -2740,6 +3754,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    isActive?: true
     createdAt?: true
     updatedAt?: true
     managerId?: true
@@ -2753,6 +3768,7 @@ export namespace Prisma {
     password?: true
     name?: true
     role?: true
+    isActive?: true
     createdAt?: true
     updatedAt?: true
     managerId?: true
@@ -2853,6 +3869,7 @@ export namespace Prisma {
     password: string
     name: string
     role: $Enums.UserRole
+    isActive: boolean
     createdAt: Date
     updatedAt: Date
     managerId: string | null
@@ -2885,6 +3902,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     managerId?: boolean
@@ -2895,9 +3913,18 @@ export namespace Prisma {
     listings?: boolean | User$listingsArgs<ExtArgs>
     buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
     sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
+    uploadedDocuments?: boolean | User$uploadedDocumentsArgs<ExtArgs>
     activities?: boolean | User$activitiesArgs<ExtArgs>
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
+    buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
+    sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
+    buyerProgress?: boolean | User$buyerProgressArgs<ExtArgs>
+    sellerQuestionnaire?: boolean | User$sellerQuestionnaireArgs<ExtArgs>
+    buyerNDA?: boolean | User$buyerNDAArgs<ExtArgs>
+    buyerFinancialStatement?: boolean | User$buyerFinancialStatementArgs<ExtArgs>
+    updatedChecklists?: boolean | User$updatedChecklistsArgs<ExtArgs>
+    dueDiligenceRequests?: boolean | User$dueDiligenceRequestsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2907,6 +3934,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     managerId?: boolean
@@ -2921,6 +3949,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     managerId?: boolean
@@ -2935,6 +3964,7 @@ export namespace Prisma {
     password?: boolean
     name?: boolean
     role?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     managerId?: boolean
@@ -2942,16 +3972,25 @@ export namespace Prisma {
     lastReadAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "createdAt" | "updatedAt" | "managerId" | "unreadCount" | "lastReadAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "isActive" | "createdAt" | "updatedAt" | "managerId" | "unreadCount" | "lastReadAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     managedBy?: boolean | User$managedByArgs<ExtArgs>
     managing?: boolean | User$managingArgs<ExtArgs>
     listings?: boolean | User$listingsArgs<ExtArgs>
     buyerDocs?: boolean | User$buyerDocsArgs<ExtArgs>
     sellerDocs?: boolean | User$sellerDocsArgs<ExtArgs>
+    uploadedDocuments?: boolean | User$uploadedDocumentsArgs<ExtArgs>
     activities?: boolean | User$activitiesArgs<ExtArgs>
     sentMessages?: boolean | User$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
+    buyingListings?: boolean | User$buyingListingsArgs<ExtArgs>
+    sellerProgress?: boolean | User$sellerProgressArgs<ExtArgs>
+    buyerProgress?: boolean | User$buyerProgressArgs<ExtArgs>
+    sellerQuestionnaire?: boolean | User$sellerQuestionnaireArgs<ExtArgs>
+    buyerNDA?: boolean | User$buyerNDAArgs<ExtArgs>
+    buyerFinancialStatement?: boolean | User$buyerFinancialStatementArgs<ExtArgs>
+    updatedChecklists?: boolean | User$updatedChecklistsArgs<ExtArgs>
+    dueDiligenceRequests?: boolean | User$dueDiligenceRequestsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2969,9 +4008,18 @@ export namespace Prisma {
       listings: Prisma.$ListingPayload<ExtArgs>[]
       buyerDocs: Prisma.$DocumentPayload<ExtArgs>[]
       sellerDocs: Prisma.$DocumentPayload<ExtArgs>[]
+      uploadedDocuments: Prisma.$DocumentPayload<ExtArgs>[]
       activities: Prisma.$ActivityPayload<ExtArgs>[]
       sentMessages: Prisma.$MessagePayload<ExtArgs>[]
       receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
+      buyingListings: Prisma.$ListingPayload<ExtArgs>[]
+      sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
+      buyerProgress: Prisma.$BuyerProgressPayload<ExtArgs>[]
+      sellerQuestionnaire: Prisma.$SellerQuestionnairePayload<ExtArgs> | null
+      buyerNDA: Prisma.$BuyerNDAPayload<ExtArgs> | null
+      buyerFinancialStatement: Prisma.$BuyerFinancialStatementPayload<ExtArgs> | null
+      updatedChecklists: Prisma.$PreCloseChecklistPayload<ExtArgs>[]
+      dueDiligenceRequests: Prisma.$DueDiligenceRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2979,6 +4027,7 @@ export namespace Prisma {
       password: string
       name: string
       role: $Enums.UserRole
+      isActive: boolean
       createdAt: Date
       updatedAt: Date
       managerId: string | null
@@ -3383,9 +4432,18 @@ export namespace Prisma {
     listings<T extends User$listingsArgs<ExtArgs> = {}>(args?: Subset<T, User$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     buyerDocs<T extends User$buyerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sellerDocs<T extends User$sellerDocsArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerDocsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    uploadedDocuments<T extends User$uploadedDocumentsArgs<ExtArgs> = {}>(args?: Subset<T, User$uploadedDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     activities<T extends User$activitiesArgs<ExtArgs> = {}>(args?: Subset<T, User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentMessages<T extends User$sentMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receivedMessages<T extends User$receivedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    buyingListings<T extends User$buyingListingsArgs<ExtArgs> = {}>(args?: Subset<T, User$buyingListingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerProgress<T extends User$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    buyerProgress<T extends User$buyerProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerQuestionnaire<T extends User$sellerQuestionnaireArgs<ExtArgs> = {}>(args?: Subset<T, User$sellerQuestionnaireArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    buyerNDA<T extends User$buyerNDAArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerNDAArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    buyerFinancialStatement<T extends User$buyerFinancialStatementArgs<ExtArgs> = {}>(args?: Subset<T, User$buyerFinancialStatementArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    updatedChecklists<T extends User$updatedChecklistsArgs<ExtArgs> = {}>(args?: Subset<T, User$updatedChecklistsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dueDiligenceRequests<T extends User$dueDiligenceRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$dueDiligenceRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3420,6 +4478,7 @@ export namespace Prisma {
     readonly password: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'UserRole'>
+    readonly isActive: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly managerId: FieldRef<"User", 'String'>
@@ -3936,6 +4995,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.uploadedDocuments
+   */
+  export type User$uploadedDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
    * User.activities
    */
   export type User$activitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4008,6 +5091,183 @@ export namespace Prisma {
   }
 
   /**
+   * User.buyingListings
+   */
+  export type User$buyingListingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+    orderBy?: ListingOrderByWithRelationInput | ListingOrderByWithRelationInput[]
+    cursor?: ListingWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ListingScalarFieldEnum | ListingScalarFieldEnum[]
+  }
+
+  /**
+   * User.sellerProgress
+   */
+  export type User$sellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    where?: SellerProgressWhereInput
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    cursor?: SellerProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * User.buyerProgress
+   */
+  export type User$buyerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    where?: BuyerProgressWhereInput
+    orderBy?: BuyerProgressOrderByWithRelationInput | BuyerProgressOrderByWithRelationInput[]
+    cursor?: BuyerProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * User.sellerQuestionnaire
+   */
+  export type User$sellerQuestionnaireArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    where?: SellerQuestionnaireWhereInput
+  }
+
+  /**
+   * User.buyerNDA
+   */
+  export type User$buyerNDAArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    where?: BuyerNDAWhereInput
+  }
+
+  /**
+   * User.buyerFinancialStatement
+   */
+  export type User$buyerFinancialStatementArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    where?: BuyerFinancialStatementWhereInput
+  }
+
+  /**
+   * User.updatedChecklists
+   */
+  export type User$updatedChecklistsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    where?: PreCloseChecklistWhereInput
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    cursor?: PreCloseChecklistWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * User.dueDiligenceRequests
+   */
+  export type User$dueDiligenceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    where?: DueDiligenceRequestWhereInput
+    orderBy?: DueDiligenceRequestOrderByWithRelationInput | DueDiligenceRequestOrderByWithRelationInput[]
+    cursor?: DueDiligenceRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DueDiligenceRequestScalarFieldEnum | DueDiligenceRequestScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4023,6 +5283,2288 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SellerProgress
+   */
+
+  export type AggregateSellerProgress = {
+    _count: SellerProgressCountAggregateOutputType | null
+    _avg: SellerProgressAvgAggregateOutputType | null
+    _sum: SellerProgressSumAggregateOutputType | null
+    _min: SellerProgressMinAggregateOutputType | null
+    _max: SellerProgressMaxAggregateOutputType | null
+  }
+
+  export type SellerProgressAvgAggregateOutputType = {
+    currentStep: number | null
+  }
+
+  export type SellerProgressSumAggregateOutputType = {
+    currentStep: number | null
+  }
+
+  export type SellerProgressMinAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    currentStep: number | null
+    selectedListingId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerProgressMaxAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    currentStep: number | null
+    selectedListingId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerProgressCountAggregateOutputType = {
+    id: number
+    sellerId: number
+    currentStep: number
+    completedSteps: number
+    selectedListingId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SellerProgressAvgAggregateInputType = {
+    currentStep?: true
+  }
+
+  export type SellerProgressSumAggregateInputType = {
+    currentStep?: true
+  }
+
+  export type SellerProgressMinAggregateInputType = {
+    id?: true
+    sellerId?: true
+    currentStep?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerProgressMaxAggregateInputType = {
+    id?: true
+    sellerId?: true
+    currentStep?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerProgressCountAggregateInputType = {
+    id?: true
+    sellerId?: true
+    currentStep?: true
+    completedSteps?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SellerProgressAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerProgress to aggregate.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SellerProgresses
+    **/
+    _count?: true | SellerProgressCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SellerProgressAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SellerProgressSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SellerProgressMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SellerProgressMaxAggregateInputType
+  }
+
+  export type GetSellerProgressAggregateType<T extends SellerProgressAggregateArgs> = {
+        [P in keyof T & keyof AggregateSellerProgress]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSellerProgress[P]>
+      : GetScalarType<T[P], AggregateSellerProgress[P]>
+  }
+
+
+
+
+  export type SellerProgressGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProgressWhereInput
+    orderBy?: SellerProgressOrderByWithAggregationInput | SellerProgressOrderByWithAggregationInput[]
+    by: SellerProgressScalarFieldEnum[] | SellerProgressScalarFieldEnum
+    having?: SellerProgressScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SellerProgressCountAggregateInputType | true
+    _avg?: SellerProgressAvgAggregateInputType
+    _sum?: SellerProgressSumAggregateInputType
+    _min?: SellerProgressMinAggregateInputType
+    _max?: SellerProgressMaxAggregateInputType
+  }
+
+  export type SellerProgressGroupByOutputType = {
+    id: string
+    sellerId: string
+    currentStep: number
+    completedSteps: JsonValue
+    selectedListingId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SellerProgressCountAggregateOutputType | null
+    _avg: SellerProgressAvgAggregateOutputType | null
+    _sum: SellerProgressSumAggregateOutputType | null
+    _min: SellerProgressMinAggregateOutputType | null
+    _max: SellerProgressMaxAggregateOutputType | null
+  }
+
+  type GetSellerProgressGroupByPayload<T extends SellerProgressGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SellerProgressGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SellerProgressGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SellerProgressGroupByOutputType[P]>
+            : GetScalarType<T[P], SellerProgressGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SellerProgressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerProgress"]>
+
+  export type SellerProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerProgress"]>
+
+  export type SellerProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerProgress"]>
+
+  export type SellerProgressSelectScalar = {
+    id?: boolean
+    sellerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SellerProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sellerId" | "currentStep" | "completedSteps" | "selectedListingId" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerProgress"]>
+  export type SellerProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
+  }
+  export type SellerProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
+  }
+  export type SellerProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | SellerProgress$selectedListingArgs<ExtArgs>
+  }
+
+  export type $SellerProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SellerProgress"
+    objects: {
+      seller: Prisma.$UserPayload<ExtArgs>
+      selectedListing: Prisma.$ListingPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sellerId: string
+      currentStep: number
+      completedSteps: Prisma.JsonValue
+      selectedListingId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["sellerProgress"]>
+    composites: {}
+  }
+
+  type SellerProgressGetPayload<S extends boolean | null | undefined | SellerProgressDefaultArgs> = $Result.GetResult<Prisma.$SellerProgressPayload, S>
+
+  type SellerProgressCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SellerProgressFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SellerProgressCountAggregateInputType | true
+    }
+
+  export interface SellerProgressDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SellerProgress'], meta: { name: 'SellerProgress' } }
+    /**
+     * Find zero or one SellerProgress that matches the filter.
+     * @param {SellerProgressFindUniqueArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SellerProgressFindUniqueArgs>(args: SelectSubset<T, SellerProgressFindUniqueArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SellerProgress that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SellerProgressFindUniqueOrThrowArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SellerProgressFindUniqueOrThrowArgs>(args: SelectSubset<T, SellerProgressFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerProgress that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressFindFirstArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SellerProgressFindFirstArgs>(args?: SelectSubset<T, SellerProgressFindFirstArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerProgress that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressFindFirstOrThrowArgs} args - Arguments to find a SellerProgress
+     * @example
+     * // Get one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SellerProgressFindFirstOrThrowArgs>(args?: SelectSubset<T, SellerProgressFindFirstOrThrowArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SellerProgresses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SellerProgresses
+     * const sellerProgresses = await prisma.sellerProgress.findMany()
+     * 
+     * // Get first 10 SellerProgresses
+     * const sellerProgresses = await prisma.sellerProgress.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sellerProgressWithIdOnly = await prisma.sellerProgress.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SellerProgressFindManyArgs>(args?: SelectSubset<T, SellerProgressFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SellerProgress.
+     * @param {SellerProgressCreateArgs} args - Arguments to create a SellerProgress.
+     * @example
+     * // Create one SellerProgress
+     * const SellerProgress = await prisma.sellerProgress.create({
+     *   data: {
+     *     // ... data to create a SellerProgress
+     *   }
+     * })
+     * 
+     */
+    create<T extends SellerProgressCreateArgs>(args: SelectSubset<T, SellerProgressCreateArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SellerProgresses.
+     * @param {SellerProgressCreateManyArgs} args - Arguments to create many SellerProgresses.
+     * @example
+     * // Create many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SellerProgressCreateManyArgs>(args?: SelectSubset<T, SellerProgressCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SellerProgresses and returns the data saved in the database.
+     * @param {SellerProgressCreateManyAndReturnArgs} args - Arguments to create many SellerProgresses.
+     * @example
+     * // Create many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SellerProgresses and only return the `id`
+     * const sellerProgressWithIdOnly = await prisma.sellerProgress.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SellerProgressCreateManyAndReturnArgs>(args?: SelectSubset<T, SellerProgressCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SellerProgress.
+     * @param {SellerProgressDeleteArgs} args - Arguments to delete one SellerProgress.
+     * @example
+     * // Delete one SellerProgress
+     * const SellerProgress = await prisma.sellerProgress.delete({
+     *   where: {
+     *     // ... filter to delete one SellerProgress
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SellerProgressDeleteArgs>(args: SelectSubset<T, SellerProgressDeleteArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SellerProgress.
+     * @param {SellerProgressUpdateArgs} args - Arguments to update one SellerProgress.
+     * @example
+     * // Update one SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SellerProgressUpdateArgs>(args: SelectSubset<T, SellerProgressUpdateArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SellerProgresses.
+     * @param {SellerProgressDeleteManyArgs} args - Arguments to filter SellerProgresses to delete.
+     * @example
+     * // Delete a few SellerProgresses
+     * const { count } = await prisma.sellerProgress.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SellerProgressDeleteManyArgs>(args?: SelectSubset<T, SellerProgressDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SellerProgressUpdateManyArgs>(args: SelectSubset<T, SellerProgressUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerProgresses and returns the data updated in the database.
+     * @param {SellerProgressUpdateManyAndReturnArgs} args - Arguments to update many SellerProgresses.
+     * @example
+     * // Update many SellerProgresses
+     * const sellerProgress = await prisma.sellerProgress.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SellerProgresses and only return the `id`
+     * const sellerProgressWithIdOnly = await prisma.sellerProgress.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SellerProgressUpdateManyAndReturnArgs>(args: SelectSubset<T, SellerProgressUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SellerProgress.
+     * @param {SellerProgressUpsertArgs} args - Arguments to update or create a SellerProgress.
+     * @example
+     * // Update or create a SellerProgress
+     * const sellerProgress = await prisma.sellerProgress.upsert({
+     *   create: {
+     *     // ... data to create a SellerProgress
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SellerProgress we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SellerProgressUpsertArgs>(args: SelectSubset<T, SellerProgressUpsertArgs<ExtArgs>>): Prisma__SellerProgressClient<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SellerProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressCountArgs} args - Arguments to filter SellerProgresses to count.
+     * @example
+     * // Count the number of SellerProgresses
+     * const count = await prisma.sellerProgress.count({
+     *   where: {
+     *     // ... the filter for the SellerProgresses we want to count
+     *   }
+     * })
+    **/
+    count<T extends SellerProgressCountArgs>(
+      args?: Subset<T, SellerProgressCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SellerProgressCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SellerProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SellerProgressAggregateArgs>(args: Subset<T, SellerProgressAggregateArgs>): Prisma.PrismaPromise<GetSellerProgressAggregateType<T>>
+
+    /**
+     * Group by SellerProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerProgressGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SellerProgressGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SellerProgressGroupByArgs['orderBy'] }
+        : { orderBy?: SellerProgressGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SellerProgressGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSellerProgressGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SellerProgress model
+   */
+  readonly fields: SellerProgressFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SellerProgress.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SellerProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    selectedListing<T extends SellerProgress$selectedListingArgs<ExtArgs> = {}>(args?: Subset<T, SellerProgress$selectedListingArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SellerProgress model
+   */
+  interface SellerProgressFieldRefs {
+    readonly id: FieldRef<"SellerProgress", 'String'>
+    readonly sellerId: FieldRef<"SellerProgress", 'String'>
+    readonly currentStep: FieldRef<"SellerProgress", 'Int'>
+    readonly completedSteps: FieldRef<"SellerProgress", 'Json'>
+    readonly selectedListingId: FieldRef<"SellerProgress", 'String'>
+    readonly createdAt: FieldRef<"SellerProgress", 'DateTime'>
+    readonly updatedAt: FieldRef<"SellerProgress", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SellerProgress findUnique
+   */
+  export type SellerProgressFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress findUniqueOrThrow
+   */
+  export type SellerProgressFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress findFirst
+   */
+  export type SellerProgressFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerProgresses.
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerProgresses.
+     */
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * SellerProgress findFirstOrThrow
+   */
+  export type SellerProgressFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgress to fetch.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerProgresses.
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerProgresses.
+     */
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * SellerProgress findMany
+   */
+  export type SellerProgressFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerProgresses to fetch.
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerProgresses to fetch.
+     */
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SellerProgresses.
+     */
+    cursor?: SellerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerProgresses.
+     */
+    skip?: number
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * SellerProgress create
+   */
+  export type SellerProgressCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SellerProgress.
+     */
+    data: XOR<SellerProgressCreateInput, SellerProgressUncheckedCreateInput>
+  }
+
+  /**
+   * SellerProgress createMany
+   */
+  export type SellerProgressCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SellerProgresses.
+     */
+    data: SellerProgressCreateManyInput | SellerProgressCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SellerProgress createManyAndReturn
+   */
+  export type SellerProgressCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * The data used to create many SellerProgresses.
+     */
+    data: SellerProgressCreateManyInput | SellerProgressCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerProgress update
+   */
+  export type SellerProgressUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SellerProgress.
+     */
+    data: XOR<SellerProgressUpdateInput, SellerProgressUncheckedUpdateInput>
+    /**
+     * Choose, which SellerProgress to update.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress updateMany
+   */
+  export type SellerProgressUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SellerProgresses.
+     */
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerProgresses to update
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * Limit how many SellerProgresses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerProgress updateManyAndReturn
+   */
+  export type SellerProgressUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * The data used to update SellerProgresses.
+     */
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerProgresses to update
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * Limit how many SellerProgresses to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerProgress upsert
+   */
+  export type SellerProgressUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SellerProgress to update in case it exists.
+     */
+    where: SellerProgressWhereUniqueInput
+    /**
+     * In case the SellerProgress found by the `where` argument doesn't exist, create a new SellerProgress with this data.
+     */
+    create: XOR<SellerProgressCreateInput, SellerProgressUncheckedCreateInput>
+    /**
+     * In case the SellerProgress was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SellerProgressUpdateInput, SellerProgressUncheckedUpdateInput>
+  }
+
+  /**
+   * SellerProgress delete
+   */
+  export type SellerProgressDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    /**
+     * Filter which SellerProgress to delete.
+     */
+    where: SellerProgressWhereUniqueInput
+  }
+
+  /**
+   * SellerProgress deleteMany
+   */
+  export type SellerProgressDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerProgresses to delete
+     */
+    where?: SellerProgressWhereInput
+    /**
+     * Limit how many SellerProgresses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerProgress.selectedListing
+   */
+  export type SellerProgress$selectedListingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+  }
+
+  /**
+   * SellerProgress without action
+   */
+  export type SellerProgressDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BuyerProgress
+   */
+
+  export type AggregateBuyerProgress = {
+    _count: BuyerProgressCountAggregateOutputType | null
+    _avg: BuyerProgressAvgAggregateOutputType | null
+    _sum: BuyerProgressSumAggregateOutputType | null
+    _min: BuyerProgressMinAggregateOutputType | null
+    _max: BuyerProgressMaxAggregateOutputType | null
+  }
+
+  export type BuyerProgressAvgAggregateOutputType = {
+    currentStep: number | null
+  }
+
+  export type BuyerProgressSumAggregateOutputType = {
+    currentStep: number | null
+  }
+
+  export type BuyerProgressMinAggregateOutputType = {
+    id: string | null
+    buyerId: string | null
+    currentStep: number | null
+    selectedListingId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuyerProgressMaxAggregateOutputType = {
+    id: string | null
+    buyerId: string | null
+    currentStep: number | null
+    selectedListingId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuyerProgressCountAggregateOutputType = {
+    id: number
+    buyerId: number
+    currentStep: number
+    completedSteps: number
+    selectedListingId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BuyerProgressAvgAggregateInputType = {
+    currentStep?: true
+  }
+
+  export type BuyerProgressSumAggregateInputType = {
+    currentStep?: true
+  }
+
+  export type BuyerProgressMinAggregateInputType = {
+    id?: true
+    buyerId?: true
+    currentStep?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuyerProgressMaxAggregateInputType = {
+    id?: true
+    buyerId?: true
+    currentStep?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuyerProgressCountAggregateInputType = {
+    id?: true
+    buyerId?: true
+    currentStep?: true
+    completedSteps?: true
+    selectedListingId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BuyerProgressAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuyerProgress to aggregate.
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerProgresses to fetch.
+     */
+    orderBy?: BuyerProgressOrderByWithRelationInput | BuyerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BuyerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BuyerProgresses
+    **/
+    _count?: true | BuyerProgressCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BuyerProgressAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BuyerProgressSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BuyerProgressMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BuyerProgressMaxAggregateInputType
+  }
+
+  export type GetBuyerProgressAggregateType<T extends BuyerProgressAggregateArgs> = {
+        [P in keyof T & keyof AggregateBuyerProgress]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBuyerProgress[P]>
+      : GetScalarType<T[P], AggregateBuyerProgress[P]>
+  }
+
+
+
+
+  export type BuyerProgressGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BuyerProgressWhereInput
+    orderBy?: BuyerProgressOrderByWithAggregationInput | BuyerProgressOrderByWithAggregationInput[]
+    by: BuyerProgressScalarFieldEnum[] | BuyerProgressScalarFieldEnum
+    having?: BuyerProgressScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BuyerProgressCountAggregateInputType | true
+    _avg?: BuyerProgressAvgAggregateInputType
+    _sum?: BuyerProgressSumAggregateInputType
+    _min?: BuyerProgressMinAggregateInputType
+    _max?: BuyerProgressMaxAggregateInputType
+  }
+
+  export type BuyerProgressGroupByOutputType = {
+    id: string
+    buyerId: string
+    currentStep: number
+    completedSteps: JsonValue
+    selectedListingId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BuyerProgressCountAggregateOutputType | null
+    _avg: BuyerProgressAvgAggregateOutputType | null
+    _sum: BuyerProgressSumAggregateOutputType | null
+    _min: BuyerProgressMinAggregateOutputType | null
+    _max: BuyerProgressMaxAggregateOutputType | null
+  }
+
+  type GetBuyerProgressGroupByPayload<T extends BuyerProgressGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BuyerProgressGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BuyerProgressGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BuyerProgressGroupByOutputType[P]>
+            : GetScalarType<T[P], BuyerProgressGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BuyerProgressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | BuyerProgress$selectedListingArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerProgress"]>
+
+  export type BuyerProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | BuyerProgress$selectedListingArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerProgress"]>
+
+  export type BuyerProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | BuyerProgress$selectedListingArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerProgress"]>
+
+  export type BuyerProgressSelectScalar = {
+    id?: boolean
+    buyerId?: boolean
+    currentStep?: boolean
+    completedSteps?: boolean
+    selectedListingId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BuyerProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "buyerId" | "currentStep" | "completedSteps" | "selectedListingId" | "createdAt" | "updatedAt", ExtArgs["result"]["buyerProgress"]>
+  export type BuyerProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | BuyerProgress$selectedListingArgs<ExtArgs>
+  }
+  export type BuyerProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | BuyerProgress$selectedListingArgs<ExtArgs>
+  }
+  export type BuyerProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+    selectedListing?: boolean | BuyerProgress$selectedListingArgs<ExtArgs>
+  }
+
+  export type $BuyerProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BuyerProgress"
+    objects: {
+      buyer: Prisma.$UserPayload<ExtArgs>
+      selectedListing: Prisma.$ListingPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      buyerId: string
+      currentStep: number
+      completedSteps: Prisma.JsonValue
+      selectedListingId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["buyerProgress"]>
+    composites: {}
+  }
+
+  type BuyerProgressGetPayload<S extends boolean | null | undefined | BuyerProgressDefaultArgs> = $Result.GetResult<Prisma.$BuyerProgressPayload, S>
+
+  type BuyerProgressCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BuyerProgressFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BuyerProgressCountAggregateInputType | true
+    }
+
+  export interface BuyerProgressDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BuyerProgress'], meta: { name: 'BuyerProgress' } }
+    /**
+     * Find zero or one BuyerProgress that matches the filter.
+     * @param {BuyerProgressFindUniqueArgs} args - Arguments to find a BuyerProgress
+     * @example
+     * // Get one BuyerProgress
+     * const buyerProgress = await prisma.buyerProgress.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BuyerProgressFindUniqueArgs>(args: SelectSubset<T, BuyerProgressFindUniqueArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BuyerProgress that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BuyerProgressFindUniqueOrThrowArgs} args - Arguments to find a BuyerProgress
+     * @example
+     * // Get one BuyerProgress
+     * const buyerProgress = await prisma.buyerProgress.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BuyerProgressFindUniqueOrThrowArgs>(args: SelectSubset<T, BuyerProgressFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuyerProgress that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressFindFirstArgs} args - Arguments to find a BuyerProgress
+     * @example
+     * // Get one BuyerProgress
+     * const buyerProgress = await prisma.buyerProgress.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BuyerProgressFindFirstArgs>(args?: SelectSubset<T, BuyerProgressFindFirstArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuyerProgress that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressFindFirstOrThrowArgs} args - Arguments to find a BuyerProgress
+     * @example
+     * // Get one BuyerProgress
+     * const buyerProgress = await prisma.buyerProgress.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BuyerProgressFindFirstOrThrowArgs>(args?: SelectSubset<T, BuyerProgressFindFirstOrThrowArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BuyerProgresses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BuyerProgresses
+     * const buyerProgresses = await prisma.buyerProgress.findMany()
+     * 
+     * // Get first 10 BuyerProgresses
+     * const buyerProgresses = await prisma.buyerProgress.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const buyerProgressWithIdOnly = await prisma.buyerProgress.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BuyerProgressFindManyArgs>(args?: SelectSubset<T, BuyerProgressFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BuyerProgress.
+     * @param {BuyerProgressCreateArgs} args - Arguments to create a BuyerProgress.
+     * @example
+     * // Create one BuyerProgress
+     * const BuyerProgress = await prisma.buyerProgress.create({
+     *   data: {
+     *     // ... data to create a BuyerProgress
+     *   }
+     * })
+     * 
+     */
+    create<T extends BuyerProgressCreateArgs>(args: SelectSubset<T, BuyerProgressCreateArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BuyerProgresses.
+     * @param {BuyerProgressCreateManyArgs} args - Arguments to create many BuyerProgresses.
+     * @example
+     * // Create many BuyerProgresses
+     * const buyerProgress = await prisma.buyerProgress.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BuyerProgressCreateManyArgs>(args?: SelectSubset<T, BuyerProgressCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BuyerProgresses and returns the data saved in the database.
+     * @param {BuyerProgressCreateManyAndReturnArgs} args - Arguments to create many BuyerProgresses.
+     * @example
+     * // Create many BuyerProgresses
+     * const buyerProgress = await prisma.buyerProgress.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BuyerProgresses and only return the `id`
+     * const buyerProgressWithIdOnly = await prisma.buyerProgress.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BuyerProgressCreateManyAndReturnArgs>(args?: SelectSubset<T, BuyerProgressCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BuyerProgress.
+     * @param {BuyerProgressDeleteArgs} args - Arguments to delete one BuyerProgress.
+     * @example
+     * // Delete one BuyerProgress
+     * const BuyerProgress = await prisma.buyerProgress.delete({
+     *   where: {
+     *     // ... filter to delete one BuyerProgress
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BuyerProgressDeleteArgs>(args: SelectSubset<T, BuyerProgressDeleteArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BuyerProgress.
+     * @param {BuyerProgressUpdateArgs} args - Arguments to update one BuyerProgress.
+     * @example
+     * // Update one BuyerProgress
+     * const buyerProgress = await prisma.buyerProgress.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BuyerProgressUpdateArgs>(args: SelectSubset<T, BuyerProgressUpdateArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BuyerProgresses.
+     * @param {BuyerProgressDeleteManyArgs} args - Arguments to filter BuyerProgresses to delete.
+     * @example
+     * // Delete a few BuyerProgresses
+     * const { count } = await prisma.buyerProgress.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BuyerProgressDeleteManyArgs>(args?: SelectSubset<T, BuyerProgressDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuyerProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BuyerProgresses
+     * const buyerProgress = await prisma.buyerProgress.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BuyerProgressUpdateManyArgs>(args: SelectSubset<T, BuyerProgressUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuyerProgresses and returns the data updated in the database.
+     * @param {BuyerProgressUpdateManyAndReturnArgs} args - Arguments to update many BuyerProgresses.
+     * @example
+     * // Update many BuyerProgresses
+     * const buyerProgress = await prisma.buyerProgress.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BuyerProgresses and only return the `id`
+     * const buyerProgressWithIdOnly = await prisma.buyerProgress.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BuyerProgressUpdateManyAndReturnArgs>(args: SelectSubset<T, BuyerProgressUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BuyerProgress.
+     * @param {BuyerProgressUpsertArgs} args - Arguments to update or create a BuyerProgress.
+     * @example
+     * // Update or create a BuyerProgress
+     * const buyerProgress = await prisma.buyerProgress.upsert({
+     *   create: {
+     *     // ... data to create a BuyerProgress
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BuyerProgress we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BuyerProgressUpsertArgs>(args: SelectSubset<T, BuyerProgressUpsertArgs<ExtArgs>>): Prisma__BuyerProgressClient<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BuyerProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressCountArgs} args - Arguments to filter BuyerProgresses to count.
+     * @example
+     * // Count the number of BuyerProgresses
+     * const count = await prisma.buyerProgress.count({
+     *   where: {
+     *     // ... the filter for the BuyerProgresses we want to count
+     *   }
+     * })
+    **/
+    count<T extends BuyerProgressCountArgs>(
+      args?: Subset<T, BuyerProgressCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BuyerProgressCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BuyerProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BuyerProgressAggregateArgs>(args: Subset<T, BuyerProgressAggregateArgs>): Prisma.PrismaPromise<GetBuyerProgressAggregateType<T>>
+
+    /**
+     * Group by BuyerProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerProgressGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BuyerProgressGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BuyerProgressGroupByArgs['orderBy'] }
+        : { orderBy?: BuyerProgressGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BuyerProgressGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBuyerProgressGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BuyerProgress model
+   */
+  readonly fields: BuyerProgressFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BuyerProgress.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BuyerProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    buyer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    selectedListing<T extends BuyerProgress$selectedListingArgs<ExtArgs> = {}>(args?: Subset<T, BuyerProgress$selectedListingArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BuyerProgress model
+   */
+  interface BuyerProgressFieldRefs {
+    readonly id: FieldRef<"BuyerProgress", 'String'>
+    readonly buyerId: FieldRef<"BuyerProgress", 'String'>
+    readonly currentStep: FieldRef<"BuyerProgress", 'Int'>
+    readonly completedSteps: FieldRef<"BuyerProgress", 'Json'>
+    readonly selectedListingId: FieldRef<"BuyerProgress", 'String'>
+    readonly createdAt: FieldRef<"BuyerProgress", 'DateTime'>
+    readonly updatedAt: FieldRef<"BuyerProgress", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BuyerProgress findUnique
+   */
+  export type BuyerProgressFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerProgress to fetch.
+     */
+    where: BuyerProgressWhereUniqueInput
+  }
+
+  /**
+   * BuyerProgress findUniqueOrThrow
+   */
+  export type BuyerProgressFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerProgress to fetch.
+     */
+    where: BuyerProgressWhereUniqueInput
+  }
+
+  /**
+   * BuyerProgress findFirst
+   */
+  export type BuyerProgressFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerProgress to fetch.
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerProgresses to fetch.
+     */
+    orderBy?: BuyerProgressOrderByWithRelationInput | BuyerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuyerProgresses.
+     */
+    cursor?: BuyerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuyerProgresses.
+     */
+    distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerProgress findFirstOrThrow
+   */
+  export type BuyerProgressFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerProgress to fetch.
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerProgresses to fetch.
+     */
+    orderBy?: BuyerProgressOrderByWithRelationInput | BuyerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuyerProgresses.
+     */
+    cursor?: BuyerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuyerProgresses.
+     */
+    distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerProgress findMany
+   */
+  export type BuyerProgressFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerProgresses to fetch.
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerProgresses to fetch.
+     */
+    orderBy?: BuyerProgressOrderByWithRelationInput | BuyerProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BuyerProgresses.
+     */
+    cursor?: BuyerProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerProgresses.
+     */
+    skip?: number
+    distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerProgress create
+   */
+  export type BuyerProgressCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BuyerProgress.
+     */
+    data: XOR<BuyerProgressCreateInput, BuyerProgressUncheckedCreateInput>
+  }
+
+  /**
+   * BuyerProgress createMany
+   */
+  export type BuyerProgressCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BuyerProgresses.
+     */
+    data: BuyerProgressCreateManyInput | BuyerProgressCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BuyerProgress createManyAndReturn
+   */
+  export type BuyerProgressCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * The data used to create many BuyerProgresses.
+     */
+    data: BuyerProgressCreateManyInput | BuyerProgressCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BuyerProgress update
+   */
+  export type BuyerProgressUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BuyerProgress.
+     */
+    data: XOR<BuyerProgressUpdateInput, BuyerProgressUncheckedUpdateInput>
+    /**
+     * Choose, which BuyerProgress to update.
+     */
+    where: BuyerProgressWhereUniqueInput
+  }
+
+  /**
+   * BuyerProgress updateMany
+   */
+  export type BuyerProgressUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BuyerProgresses.
+     */
+    data: XOR<BuyerProgressUpdateManyMutationInput, BuyerProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which BuyerProgresses to update
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * Limit how many BuyerProgresses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuyerProgress updateManyAndReturn
+   */
+  export type BuyerProgressUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * The data used to update BuyerProgresses.
+     */
+    data: XOR<BuyerProgressUpdateManyMutationInput, BuyerProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which BuyerProgresses to update
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * Limit how many BuyerProgresses to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BuyerProgress upsert
+   */
+  export type BuyerProgressUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BuyerProgress to update in case it exists.
+     */
+    where: BuyerProgressWhereUniqueInput
+    /**
+     * In case the BuyerProgress found by the `where` argument doesn't exist, create a new BuyerProgress with this data.
+     */
+    create: XOR<BuyerProgressCreateInput, BuyerProgressUncheckedCreateInput>
+    /**
+     * In case the BuyerProgress was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BuyerProgressUpdateInput, BuyerProgressUncheckedUpdateInput>
+  }
+
+  /**
+   * BuyerProgress delete
+   */
+  export type BuyerProgressDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    /**
+     * Filter which BuyerProgress to delete.
+     */
+    where: BuyerProgressWhereUniqueInput
+  }
+
+  /**
+   * BuyerProgress deleteMany
+   */
+  export type BuyerProgressDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuyerProgresses to delete
+     */
+    where?: BuyerProgressWhereInput
+    /**
+     * Limit how many BuyerProgresses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuyerProgress.selectedListing
+   */
+  export type BuyerProgress$selectedListingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Listing
+     */
+    select?: ListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Listing
+     */
+    omit?: ListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ListingInclude<ExtArgs> | null
+    where?: ListingWhereInput
+  }
+
+  /**
+   * BuyerProgress without action
+   */
+  export type BuyerProgressDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
   }
 
 
@@ -6666,6 +10208,13 @@ export namespace Prisma {
     createdAt?: boolean
     sellerId?: boolean
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    buyers?: boolean | Listing$buyersArgs<ExtArgs>
+    documents?: boolean | Listing$documentsArgs<ExtArgs>
+    sellerProgress?: boolean | Listing$sellerProgressArgs<ExtArgs>
+    buyerSelectedProgress?: boolean | Listing$buyerSelectedProgressArgs<ExtArgs>
+    preCloseChecklist?: boolean | Listing$preCloseChecklistArgs<ExtArgs>
+    dueDiligenceRequests?: boolean | Listing$dueDiligenceRequestsArgs<ExtArgs>
+    _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["listing"]>
 
   export type ListingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6703,6 +10252,13 @@ export namespace Prisma {
   export type ListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "price" | "status" | "createdAt" | "sellerId", ExtArgs["result"]["listing"]>
   export type ListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
+    buyers?: boolean | Listing$buyersArgs<ExtArgs>
+    documents?: boolean | Listing$documentsArgs<ExtArgs>
+    sellerProgress?: boolean | Listing$sellerProgressArgs<ExtArgs>
+    buyerSelectedProgress?: boolean | Listing$buyerSelectedProgressArgs<ExtArgs>
+    preCloseChecklist?: boolean | Listing$preCloseChecklistArgs<ExtArgs>
+    dueDiligenceRequests?: boolean | Listing$dueDiligenceRequestsArgs<ExtArgs>
+    _count?: boolean | ListingCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ListingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     seller?: boolean | UserDefaultArgs<ExtArgs>
@@ -6715,6 +10271,12 @@ export namespace Prisma {
     name: "Listing"
     objects: {
       seller: Prisma.$UserPayload<ExtArgs>
+      buyers: Prisma.$UserPayload<ExtArgs>[]
+      documents: Prisma.$DocumentPayload<ExtArgs>[]
+      sellerProgress: Prisma.$SellerProgressPayload<ExtArgs>[]
+      buyerSelectedProgress: Prisma.$BuyerProgressPayload<ExtArgs>[]
+      preCloseChecklist: Prisma.$PreCloseChecklistPayload<ExtArgs> | null
+      dueDiligenceRequests: Prisma.$DueDiligenceRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7119,6 +10681,12 @@ export namespace Prisma {
   export interface Prisma__ListingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    buyers<T extends Listing$buyersArgs<ExtArgs> = {}>(args?: Subset<T, Listing$buyersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    documents<T extends Listing$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Listing$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sellerProgress<T extends Listing$sellerProgressArgs<ExtArgs> = {}>(args?: Subset<T, Listing$sellerProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    buyerSelectedProgress<T extends Listing$buyerSelectedProgressArgs<ExtArgs> = {}>(args?: Subset<T, Listing$buyerSelectedProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    preCloseChecklist<T extends Listing$preCloseChecklistArgs<ExtArgs> = {}>(args?: Subset<T, Listing$preCloseChecklistArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    dueDiligenceRequests<T extends Listing$dueDiligenceRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Listing$dueDiligenceRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7548,6 +11116,145 @@ export namespace Prisma {
      * Limit how many Listings to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Listing.buyers
+   */
+  export type Listing$buyersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.documents
+   */
+  export type Listing$documentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.sellerProgress
+   */
+  export type Listing$sellerProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProgress
+     */
+    select?: SellerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProgress
+     */
+    omit?: SellerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProgressInclude<ExtArgs> | null
+    where?: SellerProgressWhereInput
+    orderBy?: SellerProgressOrderByWithRelationInput | SellerProgressOrderByWithRelationInput[]
+    cursor?: SellerProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SellerProgressScalarFieldEnum | SellerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.buyerSelectedProgress
+   */
+  export type Listing$buyerSelectedProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerProgress
+     */
+    select?: BuyerProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerProgress
+     */
+    omit?: BuyerProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerProgressInclude<ExtArgs> | null
+    where?: BuyerProgressWhereInput
+    orderBy?: BuyerProgressOrderByWithRelationInput | BuyerProgressOrderByWithRelationInput[]
+    cursor?: BuyerProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BuyerProgressScalarFieldEnum | BuyerProgressScalarFieldEnum[]
+  }
+
+  /**
+   * Listing.preCloseChecklist
+   */
+  export type Listing$preCloseChecklistArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    where?: PreCloseChecklistWhereInput
+  }
+
+  /**
+   * Listing.dueDiligenceRequests
+   */
+  export type Listing$dueDiligenceRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    where?: DueDiligenceRequestWhereInput
+    orderBy?: DueDiligenceRequestOrderByWithRelationInput | DueDiligenceRequestOrderByWithRelationInput[]
+    cursor?: DueDiligenceRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DueDiligenceRequestScalarFieldEnum | DueDiligenceRequestScalarFieldEnum[]
   }
 
   /**
@@ -8624,6 +12331,5476 @@ export namespace Prisma {
 
 
   /**
+   * Model SellerQuestionnaire
+   */
+
+  export type AggregateSellerQuestionnaire = {
+    _count: SellerQuestionnaireCountAggregateOutputType | null
+    _min: SellerQuestionnaireMinAggregateOutputType | null
+    _max: SellerQuestionnaireMaxAggregateOutputType | null
+  }
+
+  export type SellerQuestionnaireMinAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerQuestionnaireMaxAggregateOutputType = {
+    id: string | null
+    sellerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SellerQuestionnaireCountAggregateOutputType = {
+    id: number
+    sellerId: number
+    data: number
+    submitted: number
+    submittedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SellerQuestionnaireMinAggregateInputType = {
+    id?: true
+    sellerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerQuestionnaireMaxAggregateInputType = {
+    id?: true
+    sellerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SellerQuestionnaireCountAggregateInputType = {
+    id?: true
+    sellerId?: true
+    data?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SellerQuestionnaireAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerQuestionnaire to aggregate.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SellerQuestionnaires
+    **/
+    _count?: true | SellerQuestionnaireCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SellerQuestionnaireMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SellerQuestionnaireMaxAggregateInputType
+  }
+
+  export type GetSellerQuestionnaireAggregateType<T extends SellerQuestionnaireAggregateArgs> = {
+        [P in keyof T & keyof AggregateSellerQuestionnaire]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSellerQuestionnaire[P]>
+      : GetScalarType<T[P], AggregateSellerQuestionnaire[P]>
+  }
+
+
+
+
+  export type SellerQuestionnaireGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerQuestionnaireWhereInput
+    orderBy?: SellerQuestionnaireOrderByWithAggregationInput | SellerQuestionnaireOrderByWithAggregationInput[]
+    by: SellerQuestionnaireScalarFieldEnum[] | SellerQuestionnaireScalarFieldEnum
+    having?: SellerQuestionnaireScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SellerQuestionnaireCountAggregateInputType | true
+    _min?: SellerQuestionnaireMinAggregateInputType
+    _max?: SellerQuestionnaireMaxAggregateInputType
+  }
+
+  export type SellerQuestionnaireGroupByOutputType = {
+    id: string
+    sellerId: string
+    data: JsonValue
+    submitted: boolean
+    submittedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SellerQuestionnaireCountAggregateOutputType | null
+    _min: SellerQuestionnaireMinAggregateOutputType | null
+    _max: SellerQuestionnaireMaxAggregateOutputType | null
+  }
+
+  type GetSellerQuestionnaireGroupByPayload<T extends SellerQuestionnaireGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SellerQuestionnaireGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SellerQuestionnaireGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SellerQuestionnaireGroupByOutputType[P]>
+            : GetScalarType<T[P], SellerQuestionnaireGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SellerQuestionnaireSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerQuestionnaire"]>
+
+  export type SellerQuestionnaireSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerQuestionnaire"]>
+
+  export type SellerQuestionnaireSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sellerQuestionnaire"]>
+
+  export type SellerQuestionnaireSelectScalar = {
+    id?: boolean
+    sellerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SellerQuestionnaireOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sellerId" | "data" | "submitted" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerQuestionnaire"]>
+  export type SellerQuestionnaireInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SellerQuestionnaireIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SellerQuestionnaireIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SellerQuestionnairePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SellerQuestionnaire"
+    objects: {
+      seller: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sellerId: string
+      data: Prisma.JsonValue
+      submitted: boolean
+      submittedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["sellerQuestionnaire"]>
+    composites: {}
+  }
+
+  type SellerQuestionnaireGetPayload<S extends boolean | null | undefined | SellerQuestionnaireDefaultArgs> = $Result.GetResult<Prisma.$SellerQuestionnairePayload, S>
+
+  type SellerQuestionnaireCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SellerQuestionnaireFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SellerQuestionnaireCountAggregateInputType | true
+    }
+
+  export interface SellerQuestionnaireDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SellerQuestionnaire'], meta: { name: 'SellerQuestionnaire' } }
+    /**
+     * Find zero or one SellerQuestionnaire that matches the filter.
+     * @param {SellerQuestionnaireFindUniqueArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SellerQuestionnaireFindUniqueArgs>(args: SelectSubset<T, SellerQuestionnaireFindUniqueArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SellerQuestionnaire that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SellerQuestionnaireFindUniqueOrThrowArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SellerQuestionnaireFindUniqueOrThrowArgs>(args: SelectSubset<T, SellerQuestionnaireFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerQuestionnaire that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireFindFirstArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SellerQuestionnaireFindFirstArgs>(args?: SelectSubset<T, SellerQuestionnaireFindFirstArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SellerQuestionnaire that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireFindFirstOrThrowArgs} args - Arguments to find a SellerQuestionnaire
+     * @example
+     * // Get one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SellerQuestionnaireFindFirstOrThrowArgs>(args?: SelectSubset<T, SellerQuestionnaireFindFirstOrThrowArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SellerQuestionnaires that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SellerQuestionnaires
+     * const sellerQuestionnaires = await prisma.sellerQuestionnaire.findMany()
+     * 
+     * // Get first 10 SellerQuestionnaires
+     * const sellerQuestionnaires = await prisma.sellerQuestionnaire.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sellerQuestionnaireWithIdOnly = await prisma.sellerQuestionnaire.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SellerQuestionnaireFindManyArgs>(args?: SelectSubset<T, SellerQuestionnaireFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SellerQuestionnaire.
+     * @param {SellerQuestionnaireCreateArgs} args - Arguments to create a SellerQuestionnaire.
+     * @example
+     * // Create one SellerQuestionnaire
+     * const SellerQuestionnaire = await prisma.sellerQuestionnaire.create({
+     *   data: {
+     *     // ... data to create a SellerQuestionnaire
+     *   }
+     * })
+     * 
+     */
+    create<T extends SellerQuestionnaireCreateArgs>(args: SelectSubset<T, SellerQuestionnaireCreateArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SellerQuestionnaires.
+     * @param {SellerQuestionnaireCreateManyArgs} args - Arguments to create many SellerQuestionnaires.
+     * @example
+     * // Create many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SellerQuestionnaireCreateManyArgs>(args?: SelectSubset<T, SellerQuestionnaireCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SellerQuestionnaires and returns the data saved in the database.
+     * @param {SellerQuestionnaireCreateManyAndReturnArgs} args - Arguments to create many SellerQuestionnaires.
+     * @example
+     * // Create many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SellerQuestionnaires and only return the `id`
+     * const sellerQuestionnaireWithIdOnly = await prisma.sellerQuestionnaire.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SellerQuestionnaireCreateManyAndReturnArgs>(args?: SelectSubset<T, SellerQuestionnaireCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SellerQuestionnaire.
+     * @param {SellerQuestionnaireDeleteArgs} args - Arguments to delete one SellerQuestionnaire.
+     * @example
+     * // Delete one SellerQuestionnaire
+     * const SellerQuestionnaire = await prisma.sellerQuestionnaire.delete({
+     *   where: {
+     *     // ... filter to delete one SellerQuestionnaire
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SellerQuestionnaireDeleteArgs>(args: SelectSubset<T, SellerQuestionnaireDeleteArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SellerQuestionnaire.
+     * @param {SellerQuestionnaireUpdateArgs} args - Arguments to update one SellerQuestionnaire.
+     * @example
+     * // Update one SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SellerQuestionnaireUpdateArgs>(args: SelectSubset<T, SellerQuestionnaireUpdateArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SellerQuestionnaires.
+     * @param {SellerQuestionnaireDeleteManyArgs} args - Arguments to filter SellerQuestionnaires to delete.
+     * @example
+     * // Delete a few SellerQuestionnaires
+     * const { count } = await prisma.sellerQuestionnaire.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SellerQuestionnaireDeleteManyArgs>(args?: SelectSubset<T, SellerQuestionnaireDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerQuestionnaires.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SellerQuestionnaireUpdateManyArgs>(args: SelectSubset<T, SellerQuestionnaireUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SellerQuestionnaires and returns the data updated in the database.
+     * @param {SellerQuestionnaireUpdateManyAndReturnArgs} args - Arguments to update many SellerQuestionnaires.
+     * @example
+     * // Update many SellerQuestionnaires
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SellerQuestionnaires and only return the `id`
+     * const sellerQuestionnaireWithIdOnly = await prisma.sellerQuestionnaire.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SellerQuestionnaireUpdateManyAndReturnArgs>(args: SelectSubset<T, SellerQuestionnaireUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SellerQuestionnaire.
+     * @param {SellerQuestionnaireUpsertArgs} args - Arguments to update or create a SellerQuestionnaire.
+     * @example
+     * // Update or create a SellerQuestionnaire
+     * const sellerQuestionnaire = await prisma.sellerQuestionnaire.upsert({
+     *   create: {
+     *     // ... data to create a SellerQuestionnaire
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SellerQuestionnaire we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SellerQuestionnaireUpsertArgs>(args: SelectSubset<T, SellerQuestionnaireUpsertArgs<ExtArgs>>): Prisma__SellerQuestionnaireClient<$Result.GetResult<Prisma.$SellerQuestionnairePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SellerQuestionnaires.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireCountArgs} args - Arguments to filter SellerQuestionnaires to count.
+     * @example
+     * // Count the number of SellerQuestionnaires
+     * const count = await prisma.sellerQuestionnaire.count({
+     *   where: {
+     *     // ... the filter for the SellerQuestionnaires we want to count
+     *   }
+     * })
+    **/
+    count<T extends SellerQuestionnaireCountArgs>(
+      args?: Subset<T, SellerQuestionnaireCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SellerQuestionnaireCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SellerQuestionnaire.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SellerQuestionnaireAggregateArgs>(args: Subset<T, SellerQuestionnaireAggregateArgs>): Prisma.PrismaPromise<GetSellerQuestionnaireAggregateType<T>>
+
+    /**
+     * Group by SellerQuestionnaire.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SellerQuestionnaireGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SellerQuestionnaireGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SellerQuestionnaireGroupByArgs['orderBy'] }
+        : { orderBy?: SellerQuestionnaireGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SellerQuestionnaireGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSellerQuestionnaireGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SellerQuestionnaire model
+   */
+  readonly fields: SellerQuestionnaireFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SellerQuestionnaire.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SellerQuestionnaireClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SellerQuestionnaire model
+   */
+  interface SellerQuestionnaireFieldRefs {
+    readonly id: FieldRef<"SellerQuestionnaire", 'String'>
+    readonly sellerId: FieldRef<"SellerQuestionnaire", 'String'>
+    readonly data: FieldRef<"SellerQuestionnaire", 'Json'>
+    readonly submitted: FieldRef<"SellerQuestionnaire", 'Boolean'>
+    readonly submittedAt: FieldRef<"SellerQuestionnaire", 'DateTime'>
+    readonly createdAt: FieldRef<"SellerQuestionnaire", 'DateTime'>
+    readonly updatedAt: FieldRef<"SellerQuestionnaire", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SellerQuestionnaire findUnique
+   */
+  export type SellerQuestionnaireFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire findUniqueOrThrow
+   */
+  export type SellerQuestionnaireFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire findFirst
+   */
+  export type SellerQuestionnaireFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerQuestionnaires.
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerQuestionnaires.
+     */
+    distinct?: SellerQuestionnaireScalarFieldEnum | SellerQuestionnaireScalarFieldEnum[]
+  }
+
+  /**
+   * SellerQuestionnaire findFirstOrThrow
+   */
+  export type SellerQuestionnaireFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaire to fetch.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SellerQuestionnaires.
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SellerQuestionnaires.
+     */
+    distinct?: SellerQuestionnaireScalarFieldEnum | SellerQuestionnaireScalarFieldEnum[]
+  }
+
+  /**
+   * SellerQuestionnaire findMany
+   */
+  export type SellerQuestionnaireFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter, which SellerQuestionnaires to fetch.
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SellerQuestionnaires to fetch.
+     */
+    orderBy?: SellerQuestionnaireOrderByWithRelationInput | SellerQuestionnaireOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SellerQuestionnaires.
+     */
+    cursor?: SellerQuestionnaireWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SellerQuestionnaires from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SellerQuestionnaires.
+     */
+    skip?: number
+    distinct?: SellerQuestionnaireScalarFieldEnum | SellerQuestionnaireScalarFieldEnum[]
+  }
+
+  /**
+   * SellerQuestionnaire create
+   */
+  export type SellerQuestionnaireCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SellerQuestionnaire.
+     */
+    data: XOR<SellerQuestionnaireCreateInput, SellerQuestionnaireUncheckedCreateInput>
+  }
+
+  /**
+   * SellerQuestionnaire createMany
+   */
+  export type SellerQuestionnaireCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SellerQuestionnaires.
+     */
+    data: SellerQuestionnaireCreateManyInput | SellerQuestionnaireCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SellerQuestionnaire createManyAndReturn
+   */
+  export type SellerQuestionnaireCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * The data used to create many SellerQuestionnaires.
+     */
+    data: SellerQuestionnaireCreateManyInput | SellerQuestionnaireCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerQuestionnaire update
+   */
+  export type SellerQuestionnaireUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SellerQuestionnaire.
+     */
+    data: XOR<SellerQuestionnaireUpdateInput, SellerQuestionnaireUncheckedUpdateInput>
+    /**
+     * Choose, which SellerQuestionnaire to update.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire updateMany
+   */
+  export type SellerQuestionnaireUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SellerQuestionnaires.
+     */
+    data: XOR<SellerQuestionnaireUpdateManyMutationInput, SellerQuestionnaireUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerQuestionnaires to update
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * Limit how many SellerQuestionnaires to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerQuestionnaire updateManyAndReturn
+   */
+  export type SellerQuestionnaireUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * The data used to update SellerQuestionnaires.
+     */
+    data: XOR<SellerQuestionnaireUpdateManyMutationInput, SellerQuestionnaireUncheckedUpdateManyInput>
+    /**
+     * Filter which SellerQuestionnaires to update
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * Limit how many SellerQuestionnaires to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SellerQuestionnaire upsert
+   */
+  export type SellerQuestionnaireUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SellerQuestionnaire to update in case it exists.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+    /**
+     * In case the SellerQuestionnaire found by the `where` argument doesn't exist, create a new SellerQuestionnaire with this data.
+     */
+    create: XOR<SellerQuestionnaireCreateInput, SellerQuestionnaireUncheckedCreateInput>
+    /**
+     * In case the SellerQuestionnaire was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SellerQuestionnaireUpdateInput, SellerQuestionnaireUncheckedUpdateInput>
+  }
+
+  /**
+   * SellerQuestionnaire delete
+   */
+  export type SellerQuestionnaireDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+    /**
+     * Filter which SellerQuestionnaire to delete.
+     */
+    where: SellerQuestionnaireWhereUniqueInput
+  }
+
+  /**
+   * SellerQuestionnaire deleteMany
+   */
+  export type SellerQuestionnaireDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SellerQuestionnaires to delete
+     */
+    where?: SellerQuestionnaireWhereInput
+    /**
+     * Limit how many SellerQuestionnaires to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SellerQuestionnaire without action
+   */
+  export type SellerQuestionnaireDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerQuestionnaire
+     */
+    select?: SellerQuestionnaireSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerQuestionnaire
+     */
+    omit?: SellerQuestionnaireOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerQuestionnaireInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BuyerNDA
+   */
+
+  export type AggregateBuyerNDA = {
+    _count: BuyerNDACountAggregateOutputType | null
+    _min: BuyerNDAMinAggregateOutputType | null
+    _max: BuyerNDAMaxAggregateOutputType | null
+  }
+
+  export type BuyerNDAMinAggregateOutputType = {
+    id: string | null
+    buyerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuyerNDAMaxAggregateOutputType = {
+    id: string | null
+    buyerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuyerNDACountAggregateOutputType = {
+    id: number
+    buyerId: number
+    data: number
+    submitted: number
+    submittedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BuyerNDAMinAggregateInputType = {
+    id?: true
+    buyerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuyerNDAMaxAggregateInputType = {
+    id?: true
+    buyerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuyerNDACountAggregateInputType = {
+    id?: true
+    buyerId?: true
+    data?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BuyerNDAAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuyerNDA to aggregate.
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerNDAS to fetch.
+     */
+    orderBy?: BuyerNDAOrderByWithRelationInput | BuyerNDAOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BuyerNDAWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerNDAS from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerNDAS.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BuyerNDAS
+    **/
+    _count?: true | BuyerNDACountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BuyerNDAMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BuyerNDAMaxAggregateInputType
+  }
+
+  export type GetBuyerNDAAggregateType<T extends BuyerNDAAggregateArgs> = {
+        [P in keyof T & keyof AggregateBuyerNDA]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBuyerNDA[P]>
+      : GetScalarType<T[P], AggregateBuyerNDA[P]>
+  }
+
+
+
+
+  export type BuyerNDAGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BuyerNDAWhereInput
+    orderBy?: BuyerNDAOrderByWithAggregationInput | BuyerNDAOrderByWithAggregationInput[]
+    by: BuyerNDAScalarFieldEnum[] | BuyerNDAScalarFieldEnum
+    having?: BuyerNDAScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BuyerNDACountAggregateInputType | true
+    _min?: BuyerNDAMinAggregateInputType
+    _max?: BuyerNDAMaxAggregateInputType
+  }
+
+  export type BuyerNDAGroupByOutputType = {
+    id: string
+    buyerId: string
+    data: JsonValue
+    submitted: boolean
+    submittedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BuyerNDACountAggregateOutputType | null
+    _min: BuyerNDAMinAggregateOutputType | null
+    _max: BuyerNDAMaxAggregateOutputType | null
+  }
+
+  type GetBuyerNDAGroupByPayload<T extends BuyerNDAGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BuyerNDAGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BuyerNDAGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BuyerNDAGroupByOutputType[P]>
+            : GetScalarType<T[P], BuyerNDAGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BuyerNDASelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerNDA"]>
+
+  export type BuyerNDASelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerNDA"]>
+
+  export type BuyerNDASelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerNDA"]>
+
+  export type BuyerNDASelectScalar = {
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BuyerNDAOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "buyerId" | "data" | "submitted" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["buyerNDA"]>
+  export type BuyerNDAInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type BuyerNDAIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type BuyerNDAIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $BuyerNDAPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BuyerNDA"
+    objects: {
+      buyer: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      buyerId: string
+      data: Prisma.JsonValue
+      submitted: boolean
+      submittedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["buyerNDA"]>
+    composites: {}
+  }
+
+  type BuyerNDAGetPayload<S extends boolean | null | undefined | BuyerNDADefaultArgs> = $Result.GetResult<Prisma.$BuyerNDAPayload, S>
+
+  type BuyerNDACountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BuyerNDAFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BuyerNDACountAggregateInputType | true
+    }
+
+  export interface BuyerNDADelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BuyerNDA'], meta: { name: 'BuyerNDA' } }
+    /**
+     * Find zero or one BuyerNDA that matches the filter.
+     * @param {BuyerNDAFindUniqueArgs} args - Arguments to find a BuyerNDA
+     * @example
+     * // Get one BuyerNDA
+     * const buyerNDA = await prisma.buyerNDA.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BuyerNDAFindUniqueArgs>(args: SelectSubset<T, BuyerNDAFindUniqueArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BuyerNDA that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BuyerNDAFindUniqueOrThrowArgs} args - Arguments to find a BuyerNDA
+     * @example
+     * // Get one BuyerNDA
+     * const buyerNDA = await prisma.buyerNDA.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BuyerNDAFindUniqueOrThrowArgs>(args: SelectSubset<T, BuyerNDAFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuyerNDA that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDAFindFirstArgs} args - Arguments to find a BuyerNDA
+     * @example
+     * // Get one BuyerNDA
+     * const buyerNDA = await prisma.buyerNDA.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BuyerNDAFindFirstArgs>(args?: SelectSubset<T, BuyerNDAFindFirstArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuyerNDA that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDAFindFirstOrThrowArgs} args - Arguments to find a BuyerNDA
+     * @example
+     * // Get one BuyerNDA
+     * const buyerNDA = await prisma.buyerNDA.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BuyerNDAFindFirstOrThrowArgs>(args?: SelectSubset<T, BuyerNDAFindFirstOrThrowArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BuyerNDAS that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDAFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BuyerNDAS
+     * const buyerNDAS = await prisma.buyerNDA.findMany()
+     * 
+     * // Get first 10 BuyerNDAS
+     * const buyerNDAS = await prisma.buyerNDA.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const buyerNDAWithIdOnly = await prisma.buyerNDA.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BuyerNDAFindManyArgs>(args?: SelectSubset<T, BuyerNDAFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BuyerNDA.
+     * @param {BuyerNDACreateArgs} args - Arguments to create a BuyerNDA.
+     * @example
+     * // Create one BuyerNDA
+     * const BuyerNDA = await prisma.buyerNDA.create({
+     *   data: {
+     *     // ... data to create a BuyerNDA
+     *   }
+     * })
+     * 
+     */
+    create<T extends BuyerNDACreateArgs>(args: SelectSubset<T, BuyerNDACreateArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BuyerNDAS.
+     * @param {BuyerNDACreateManyArgs} args - Arguments to create many BuyerNDAS.
+     * @example
+     * // Create many BuyerNDAS
+     * const buyerNDA = await prisma.buyerNDA.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BuyerNDACreateManyArgs>(args?: SelectSubset<T, BuyerNDACreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BuyerNDAS and returns the data saved in the database.
+     * @param {BuyerNDACreateManyAndReturnArgs} args - Arguments to create many BuyerNDAS.
+     * @example
+     * // Create many BuyerNDAS
+     * const buyerNDA = await prisma.buyerNDA.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BuyerNDAS and only return the `id`
+     * const buyerNDAWithIdOnly = await prisma.buyerNDA.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BuyerNDACreateManyAndReturnArgs>(args?: SelectSubset<T, BuyerNDACreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BuyerNDA.
+     * @param {BuyerNDADeleteArgs} args - Arguments to delete one BuyerNDA.
+     * @example
+     * // Delete one BuyerNDA
+     * const BuyerNDA = await prisma.buyerNDA.delete({
+     *   where: {
+     *     // ... filter to delete one BuyerNDA
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BuyerNDADeleteArgs>(args: SelectSubset<T, BuyerNDADeleteArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BuyerNDA.
+     * @param {BuyerNDAUpdateArgs} args - Arguments to update one BuyerNDA.
+     * @example
+     * // Update one BuyerNDA
+     * const buyerNDA = await prisma.buyerNDA.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BuyerNDAUpdateArgs>(args: SelectSubset<T, BuyerNDAUpdateArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BuyerNDAS.
+     * @param {BuyerNDADeleteManyArgs} args - Arguments to filter BuyerNDAS to delete.
+     * @example
+     * // Delete a few BuyerNDAS
+     * const { count } = await prisma.buyerNDA.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BuyerNDADeleteManyArgs>(args?: SelectSubset<T, BuyerNDADeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuyerNDAS.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDAUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BuyerNDAS
+     * const buyerNDA = await prisma.buyerNDA.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BuyerNDAUpdateManyArgs>(args: SelectSubset<T, BuyerNDAUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuyerNDAS and returns the data updated in the database.
+     * @param {BuyerNDAUpdateManyAndReturnArgs} args - Arguments to update many BuyerNDAS.
+     * @example
+     * // Update many BuyerNDAS
+     * const buyerNDA = await prisma.buyerNDA.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BuyerNDAS and only return the `id`
+     * const buyerNDAWithIdOnly = await prisma.buyerNDA.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BuyerNDAUpdateManyAndReturnArgs>(args: SelectSubset<T, BuyerNDAUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BuyerNDA.
+     * @param {BuyerNDAUpsertArgs} args - Arguments to update or create a BuyerNDA.
+     * @example
+     * // Update or create a BuyerNDA
+     * const buyerNDA = await prisma.buyerNDA.upsert({
+     *   create: {
+     *     // ... data to create a BuyerNDA
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BuyerNDA we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BuyerNDAUpsertArgs>(args: SelectSubset<T, BuyerNDAUpsertArgs<ExtArgs>>): Prisma__BuyerNDAClient<$Result.GetResult<Prisma.$BuyerNDAPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BuyerNDAS.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDACountArgs} args - Arguments to filter BuyerNDAS to count.
+     * @example
+     * // Count the number of BuyerNDAS
+     * const count = await prisma.buyerNDA.count({
+     *   where: {
+     *     // ... the filter for the BuyerNDAS we want to count
+     *   }
+     * })
+    **/
+    count<T extends BuyerNDACountArgs>(
+      args?: Subset<T, BuyerNDACountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BuyerNDACountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BuyerNDA.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDAAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BuyerNDAAggregateArgs>(args: Subset<T, BuyerNDAAggregateArgs>): Prisma.PrismaPromise<GetBuyerNDAAggregateType<T>>
+
+    /**
+     * Group by BuyerNDA.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerNDAGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BuyerNDAGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BuyerNDAGroupByArgs['orderBy'] }
+        : { orderBy?: BuyerNDAGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BuyerNDAGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBuyerNDAGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BuyerNDA model
+   */
+  readonly fields: BuyerNDAFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BuyerNDA.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BuyerNDAClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    buyer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BuyerNDA model
+   */
+  interface BuyerNDAFieldRefs {
+    readonly id: FieldRef<"BuyerNDA", 'String'>
+    readonly buyerId: FieldRef<"BuyerNDA", 'String'>
+    readonly data: FieldRef<"BuyerNDA", 'Json'>
+    readonly submitted: FieldRef<"BuyerNDA", 'Boolean'>
+    readonly submittedAt: FieldRef<"BuyerNDA", 'DateTime'>
+    readonly createdAt: FieldRef<"BuyerNDA", 'DateTime'>
+    readonly updatedAt: FieldRef<"BuyerNDA", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BuyerNDA findUnique
+   */
+  export type BuyerNDAFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerNDA to fetch.
+     */
+    where: BuyerNDAWhereUniqueInput
+  }
+
+  /**
+   * BuyerNDA findUniqueOrThrow
+   */
+  export type BuyerNDAFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerNDA to fetch.
+     */
+    where: BuyerNDAWhereUniqueInput
+  }
+
+  /**
+   * BuyerNDA findFirst
+   */
+  export type BuyerNDAFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerNDA to fetch.
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerNDAS to fetch.
+     */
+    orderBy?: BuyerNDAOrderByWithRelationInput | BuyerNDAOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuyerNDAS.
+     */
+    cursor?: BuyerNDAWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerNDAS from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerNDAS.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuyerNDAS.
+     */
+    distinct?: BuyerNDAScalarFieldEnum | BuyerNDAScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerNDA findFirstOrThrow
+   */
+  export type BuyerNDAFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerNDA to fetch.
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerNDAS to fetch.
+     */
+    orderBy?: BuyerNDAOrderByWithRelationInput | BuyerNDAOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuyerNDAS.
+     */
+    cursor?: BuyerNDAWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerNDAS from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerNDAS.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuyerNDAS.
+     */
+    distinct?: BuyerNDAScalarFieldEnum | BuyerNDAScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerNDA findMany
+   */
+  export type BuyerNDAFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerNDAS to fetch.
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerNDAS to fetch.
+     */
+    orderBy?: BuyerNDAOrderByWithRelationInput | BuyerNDAOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BuyerNDAS.
+     */
+    cursor?: BuyerNDAWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerNDAS from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerNDAS.
+     */
+    skip?: number
+    distinct?: BuyerNDAScalarFieldEnum | BuyerNDAScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerNDA create
+   */
+  export type BuyerNDACreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BuyerNDA.
+     */
+    data: XOR<BuyerNDACreateInput, BuyerNDAUncheckedCreateInput>
+  }
+
+  /**
+   * BuyerNDA createMany
+   */
+  export type BuyerNDACreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BuyerNDAS.
+     */
+    data: BuyerNDACreateManyInput | BuyerNDACreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BuyerNDA createManyAndReturn
+   */
+  export type BuyerNDACreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * The data used to create many BuyerNDAS.
+     */
+    data: BuyerNDACreateManyInput | BuyerNDACreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BuyerNDA update
+   */
+  export type BuyerNDAUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BuyerNDA.
+     */
+    data: XOR<BuyerNDAUpdateInput, BuyerNDAUncheckedUpdateInput>
+    /**
+     * Choose, which BuyerNDA to update.
+     */
+    where: BuyerNDAWhereUniqueInput
+  }
+
+  /**
+   * BuyerNDA updateMany
+   */
+  export type BuyerNDAUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BuyerNDAS.
+     */
+    data: XOR<BuyerNDAUpdateManyMutationInput, BuyerNDAUncheckedUpdateManyInput>
+    /**
+     * Filter which BuyerNDAS to update
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * Limit how many BuyerNDAS to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuyerNDA updateManyAndReturn
+   */
+  export type BuyerNDAUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * The data used to update BuyerNDAS.
+     */
+    data: XOR<BuyerNDAUpdateManyMutationInput, BuyerNDAUncheckedUpdateManyInput>
+    /**
+     * Filter which BuyerNDAS to update
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * Limit how many BuyerNDAS to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BuyerNDA upsert
+   */
+  export type BuyerNDAUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BuyerNDA to update in case it exists.
+     */
+    where: BuyerNDAWhereUniqueInput
+    /**
+     * In case the BuyerNDA found by the `where` argument doesn't exist, create a new BuyerNDA with this data.
+     */
+    create: XOR<BuyerNDACreateInput, BuyerNDAUncheckedCreateInput>
+    /**
+     * In case the BuyerNDA was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BuyerNDAUpdateInput, BuyerNDAUncheckedUpdateInput>
+  }
+
+  /**
+   * BuyerNDA delete
+   */
+  export type BuyerNDADeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+    /**
+     * Filter which BuyerNDA to delete.
+     */
+    where: BuyerNDAWhereUniqueInput
+  }
+
+  /**
+   * BuyerNDA deleteMany
+   */
+  export type BuyerNDADeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuyerNDAS to delete
+     */
+    where?: BuyerNDAWhereInput
+    /**
+     * Limit how many BuyerNDAS to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuyerNDA without action
+   */
+  export type BuyerNDADefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerNDA
+     */
+    select?: BuyerNDASelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerNDA
+     */
+    omit?: BuyerNDAOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerNDAInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BuyerFinancialStatement
+   */
+
+  export type AggregateBuyerFinancialStatement = {
+    _count: BuyerFinancialStatementCountAggregateOutputType | null
+    _min: BuyerFinancialStatementMinAggregateOutputType | null
+    _max: BuyerFinancialStatementMaxAggregateOutputType | null
+  }
+
+  export type BuyerFinancialStatementMinAggregateOutputType = {
+    id: string | null
+    buyerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuyerFinancialStatementMaxAggregateOutputType = {
+    id: string | null
+    buyerId: string | null
+    submitted: boolean | null
+    submittedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuyerFinancialStatementCountAggregateOutputType = {
+    id: number
+    buyerId: number
+    data: number
+    submitted: number
+    submittedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BuyerFinancialStatementMinAggregateInputType = {
+    id?: true
+    buyerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuyerFinancialStatementMaxAggregateInputType = {
+    id?: true
+    buyerId?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuyerFinancialStatementCountAggregateInputType = {
+    id?: true
+    buyerId?: true
+    data?: true
+    submitted?: true
+    submittedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BuyerFinancialStatementAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuyerFinancialStatement to aggregate.
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerFinancialStatements to fetch.
+     */
+    orderBy?: BuyerFinancialStatementOrderByWithRelationInput | BuyerFinancialStatementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BuyerFinancialStatementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerFinancialStatements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerFinancialStatements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BuyerFinancialStatements
+    **/
+    _count?: true | BuyerFinancialStatementCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BuyerFinancialStatementMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BuyerFinancialStatementMaxAggregateInputType
+  }
+
+  export type GetBuyerFinancialStatementAggregateType<T extends BuyerFinancialStatementAggregateArgs> = {
+        [P in keyof T & keyof AggregateBuyerFinancialStatement]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBuyerFinancialStatement[P]>
+      : GetScalarType<T[P], AggregateBuyerFinancialStatement[P]>
+  }
+
+
+
+
+  export type BuyerFinancialStatementGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BuyerFinancialStatementWhereInput
+    orderBy?: BuyerFinancialStatementOrderByWithAggregationInput | BuyerFinancialStatementOrderByWithAggregationInput[]
+    by: BuyerFinancialStatementScalarFieldEnum[] | BuyerFinancialStatementScalarFieldEnum
+    having?: BuyerFinancialStatementScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BuyerFinancialStatementCountAggregateInputType | true
+    _min?: BuyerFinancialStatementMinAggregateInputType
+    _max?: BuyerFinancialStatementMaxAggregateInputType
+  }
+
+  export type BuyerFinancialStatementGroupByOutputType = {
+    id: string
+    buyerId: string
+    data: JsonValue
+    submitted: boolean
+    submittedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BuyerFinancialStatementCountAggregateOutputType | null
+    _min: BuyerFinancialStatementMinAggregateOutputType | null
+    _max: BuyerFinancialStatementMaxAggregateOutputType | null
+  }
+
+  type GetBuyerFinancialStatementGroupByPayload<T extends BuyerFinancialStatementGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BuyerFinancialStatementGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BuyerFinancialStatementGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BuyerFinancialStatementGroupByOutputType[P]>
+            : GetScalarType<T[P], BuyerFinancialStatementGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BuyerFinancialStatementSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerFinancialStatement"]>
+
+  export type BuyerFinancialStatementSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerFinancialStatement"]>
+
+  export type BuyerFinancialStatementSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["buyerFinancialStatement"]>
+
+  export type BuyerFinancialStatementSelectScalar = {
+    id?: boolean
+    buyerId?: boolean
+    data?: boolean
+    submitted?: boolean
+    submittedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BuyerFinancialStatementOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "buyerId" | "data" | "submitted" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["buyerFinancialStatement"]>
+  export type BuyerFinancialStatementInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type BuyerFinancialStatementIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type BuyerFinancialStatementIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $BuyerFinancialStatementPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BuyerFinancialStatement"
+    objects: {
+      buyer: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      buyerId: string
+      data: Prisma.JsonValue
+      submitted: boolean
+      submittedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["buyerFinancialStatement"]>
+    composites: {}
+  }
+
+  type BuyerFinancialStatementGetPayload<S extends boolean | null | undefined | BuyerFinancialStatementDefaultArgs> = $Result.GetResult<Prisma.$BuyerFinancialStatementPayload, S>
+
+  type BuyerFinancialStatementCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BuyerFinancialStatementFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BuyerFinancialStatementCountAggregateInputType | true
+    }
+
+  export interface BuyerFinancialStatementDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BuyerFinancialStatement'], meta: { name: 'BuyerFinancialStatement' } }
+    /**
+     * Find zero or one BuyerFinancialStatement that matches the filter.
+     * @param {BuyerFinancialStatementFindUniqueArgs} args - Arguments to find a BuyerFinancialStatement
+     * @example
+     * // Get one BuyerFinancialStatement
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BuyerFinancialStatementFindUniqueArgs>(args: SelectSubset<T, BuyerFinancialStatementFindUniqueArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BuyerFinancialStatement that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BuyerFinancialStatementFindUniqueOrThrowArgs} args - Arguments to find a BuyerFinancialStatement
+     * @example
+     * // Get one BuyerFinancialStatement
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BuyerFinancialStatementFindUniqueOrThrowArgs>(args: SelectSubset<T, BuyerFinancialStatementFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuyerFinancialStatement that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementFindFirstArgs} args - Arguments to find a BuyerFinancialStatement
+     * @example
+     * // Get one BuyerFinancialStatement
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BuyerFinancialStatementFindFirstArgs>(args?: SelectSubset<T, BuyerFinancialStatementFindFirstArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuyerFinancialStatement that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementFindFirstOrThrowArgs} args - Arguments to find a BuyerFinancialStatement
+     * @example
+     * // Get one BuyerFinancialStatement
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BuyerFinancialStatementFindFirstOrThrowArgs>(args?: SelectSubset<T, BuyerFinancialStatementFindFirstOrThrowArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BuyerFinancialStatements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BuyerFinancialStatements
+     * const buyerFinancialStatements = await prisma.buyerFinancialStatement.findMany()
+     * 
+     * // Get first 10 BuyerFinancialStatements
+     * const buyerFinancialStatements = await prisma.buyerFinancialStatement.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const buyerFinancialStatementWithIdOnly = await prisma.buyerFinancialStatement.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BuyerFinancialStatementFindManyArgs>(args?: SelectSubset<T, BuyerFinancialStatementFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BuyerFinancialStatement.
+     * @param {BuyerFinancialStatementCreateArgs} args - Arguments to create a BuyerFinancialStatement.
+     * @example
+     * // Create one BuyerFinancialStatement
+     * const BuyerFinancialStatement = await prisma.buyerFinancialStatement.create({
+     *   data: {
+     *     // ... data to create a BuyerFinancialStatement
+     *   }
+     * })
+     * 
+     */
+    create<T extends BuyerFinancialStatementCreateArgs>(args: SelectSubset<T, BuyerFinancialStatementCreateArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BuyerFinancialStatements.
+     * @param {BuyerFinancialStatementCreateManyArgs} args - Arguments to create many BuyerFinancialStatements.
+     * @example
+     * // Create many BuyerFinancialStatements
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BuyerFinancialStatementCreateManyArgs>(args?: SelectSubset<T, BuyerFinancialStatementCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BuyerFinancialStatements and returns the data saved in the database.
+     * @param {BuyerFinancialStatementCreateManyAndReturnArgs} args - Arguments to create many BuyerFinancialStatements.
+     * @example
+     * // Create many BuyerFinancialStatements
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BuyerFinancialStatements and only return the `id`
+     * const buyerFinancialStatementWithIdOnly = await prisma.buyerFinancialStatement.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BuyerFinancialStatementCreateManyAndReturnArgs>(args?: SelectSubset<T, BuyerFinancialStatementCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BuyerFinancialStatement.
+     * @param {BuyerFinancialStatementDeleteArgs} args - Arguments to delete one BuyerFinancialStatement.
+     * @example
+     * // Delete one BuyerFinancialStatement
+     * const BuyerFinancialStatement = await prisma.buyerFinancialStatement.delete({
+     *   where: {
+     *     // ... filter to delete one BuyerFinancialStatement
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BuyerFinancialStatementDeleteArgs>(args: SelectSubset<T, BuyerFinancialStatementDeleteArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BuyerFinancialStatement.
+     * @param {BuyerFinancialStatementUpdateArgs} args - Arguments to update one BuyerFinancialStatement.
+     * @example
+     * // Update one BuyerFinancialStatement
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BuyerFinancialStatementUpdateArgs>(args: SelectSubset<T, BuyerFinancialStatementUpdateArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BuyerFinancialStatements.
+     * @param {BuyerFinancialStatementDeleteManyArgs} args - Arguments to filter BuyerFinancialStatements to delete.
+     * @example
+     * // Delete a few BuyerFinancialStatements
+     * const { count } = await prisma.buyerFinancialStatement.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BuyerFinancialStatementDeleteManyArgs>(args?: SelectSubset<T, BuyerFinancialStatementDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuyerFinancialStatements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BuyerFinancialStatements
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BuyerFinancialStatementUpdateManyArgs>(args: SelectSubset<T, BuyerFinancialStatementUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuyerFinancialStatements and returns the data updated in the database.
+     * @param {BuyerFinancialStatementUpdateManyAndReturnArgs} args - Arguments to update many BuyerFinancialStatements.
+     * @example
+     * // Update many BuyerFinancialStatements
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BuyerFinancialStatements and only return the `id`
+     * const buyerFinancialStatementWithIdOnly = await prisma.buyerFinancialStatement.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BuyerFinancialStatementUpdateManyAndReturnArgs>(args: SelectSubset<T, BuyerFinancialStatementUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BuyerFinancialStatement.
+     * @param {BuyerFinancialStatementUpsertArgs} args - Arguments to update or create a BuyerFinancialStatement.
+     * @example
+     * // Update or create a BuyerFinancialStatement
+     * const buyerFinancialStatement = await prisma.buyerFinancialStatement.upsert({
+     *   create: {
+     *     // ... data to create a BuyerFinancialStatement
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BuyerFinancialStatement we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BuyerFinancialStatementUpsertArgs>(args: SelectSubset<T, BuyerFinancialStatementUpsertArgs<ExtArgs>>): Prisma__BuyerFinancialStatementClient<$Result.GetResult<Prisma.$BuyerFinancialStatementPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BuyerFinancialStatements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementCountArgs} args - Arguments to filter BuyerFinancialStatements to count.
+     * @example
+     * // Count the number of BuyerFinancialStatements
+     * const count = await prisma.buyerFinancialStatement.count({
+     *   where: {
+     *     // ... the filter for the BuyerFinancialStatements we want to count
+     *   }
+     * })
+    **/
+    count<T extends BuyerFinancialStatementCountArgs>(
+      args?: Subset<T, BuyerFinancialStatementCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BuyerFinancialStatementCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BuyerFinancialStatement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BuyerFinancialStatementAggregateArgs>(args: Subset<T, BuyerFinancialStatementAggregateArgs>): Prisma.PrismaPromise<GetBuyerFinancialStatementAggregateType<T>>
+
+    /**
+     * Group by BuyerFinancialStatement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuyerFinancialStatementGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BuyerFinancialStatementGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BuyerFinancialStatementGroupByArgs['orderBy'] }
+        : { orderBy?: BuyerFinancialStatementGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BuyerFinancialStatementGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBuyerFinancialStatementGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BuyerFinancialStatement model
+   */
+  readonly fields: BuyerFinancialStatementFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BuyerFinancialStatement.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BuyerFinancialStatementClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    buyer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BuyerFinancialStatement model
+   */
+  interface BuyerFinancialStatementFieldRefs {
+    readonly id: FieldRef<"BuyerFinancialStatement", 'String'>
+    readonly buyerId: FieldRef<"BuyerFinancialStatement", 'String'>
+    readonly data: FieldRef<"BuyerFinancialStatement", 'Json'>
+    readonly submitted: FieldRef<"BuyerFinancialStatement", 'Boolean'>
+    readonly submittedAt: FieldRef<"BuyerFinancialStatement", 'DateTime'>
+    readonly createdAt: FieldRef<"BuyerFinancialStatement", 'DateTime'>
+    readonly updatedAt: FieldRef<"BuyerFinancialStatement", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BuyerFinancialStatement findUnique
+   */
+  export type BuyerFinancialStatementFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerFinancialStatement to fetch.
+     */
+    where: BuyerFinancialStatementWhereUniqueInput
+  }
+
+  /**
+   * BuyerFinancialStatement findUniqueOrThrow
+   */
+  export type BuyerFinancialStatementFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerFinancialStatement to fetch.
+     */
+    where: BuyerFinancialStatementWhereUniqueInput
+  }
+
+  /**
+   * BuyerFinancialStatement findFirst
+   */
+  export type BuyerFinancialStatementFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerFinancialStatement to fetch.
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerFinancialStatements to fetch.
+     */
+    orderBy?: BuyerFinancialStatementOrderByWithRelationInput | BuyerFinancialStatementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuyerFinancialStatements.
+     */
+    cursor?: BuyerFinancialStatementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerFinancialStatements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerFinancialStatements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuyerFinancialStatements.
+     */
+    distinct?: BuyerFinancialStatementScalarFieldEnum | BuyerFinancialStatementScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerFinancialStatement findFirstOrThrow
+   */
+  export type BuyerFinancialStatementFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerFinancialStatement to fetch.
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerFinancialStatements to fetch.
+     */
+    orderBy?: BuyerFinancialStatementOrderByWithRelationInput | BuyerFinancialStatementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuyerFinancialStatements.
+     */
+    cursor?: BuyerFinancialStatementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerFinancialStatements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerFinancialStatements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuyerFinancialStatements.
+     */
+    distinct?: BuyerFinancialStatementScalarFieldEnum | BuyerFinancialStatementScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerFinancialStatement findMany
+   */
+  export type BuyerFinancialStatementFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * Filter, which BuyerFinancialStatements to fetch.
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuyerFinancialStatements to fetch.
+     */
+    orderBy?: BuyerFinancialStatementOrderByWithRelationInput | BuyerFinancialStatementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BuyerFinancialStatements.
+     */
+    cursor?: BuyerFinancialStatementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuyerFinancialStatements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuyerFinancialStatements.
+     */
+    skip?: number
+    distinct?: BuyerFinancialStatementScalarFieldEnum | BuyerFinancialStatementScalarFieldEnum[]
+  }
+
+  /**
+   * BuyerFinancialStatement create
+   */
+  export type BuyerFinancialStatementCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BuyerFinancialStatement.
+     */
+    data: XOR<BuyerFinancialStatementCreateInput, BuyerFinancialStatementUncheckedCreateInput>
+  }
+
+  /**
+   * BuyerFinancialStatement createMany
+   */
+  export type BuyerFinancialStatementCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BuyerFinancialStatements.
+     */
+    data: BuyerFinancialStatementCreateManyInput | BuyerFinancialStatementCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BuyerFinancialStatement createManyAndReturn
+   */
+  export type BuyerFinancialStatementCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * The data used to create many BuyerFinancialStatements.
+     */
+    data: BuyerFinancialStatementCreateManyInput | BuyerFinancialStatementCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BuyerFinancialStatement update
+   */
+  export type BuyerFinancialStatementUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BuyerFinancialStatement.
+     */
+    data: XOR<BuyerFinancialStatementUpdateInput, BuyerFinancialStatementUncheckedUpdateInput>
+    /**
+     * Choose, which BuyerFinancialStatement to update.
+     */
+    where: BuyerFinancialStatementWhereUniqueInput
+  }
+
+  /**
+   * BuyerFinancialStatement updateMany
+   */
+  export type BuyerFinancialStatementUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BuyerFinancialStatements.
+     */
+    data: XOR<BuyerFinancialStatementUpdateManyMutationInput, BuyerFinancialStatementUncheckedUpdateManyInput>
+    /**
+     * Filter which BuyerFinancialStatements to update
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * Limit how many BuyerFinancialStatements to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuyerFinancialStatement updateManyAndReturn
+   */
+  export type BuyerFinancialStatementUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * The data used to update BuyerFinancialStatements.
+     */
+    data: XOR<BuyerFinancialStatementUpdateManyMutationInput, BuyerFinancialStatementUncheckedUpdateManyInput>
+    /**
+     * Filter which BuyerFinancialStatements to update
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * Limit how many BuyerFinancialStatements to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BuyerFinancialStatement upsert
+   */
+  export type BuyerFinancialStatementUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BuyerFinancialStatement to update in case it exists.
+     */
+    where: BuyerFinancialStatementWhereUniqueInput
+    /**
+     * In case the BuyerFinancialStatement found by the `where` argument doesn't exist, create a new BuyerFinancialStatement with this data.
+     */
+    create: XOR<BuyerFinancialStatementCreateInput, BuyerFinancialStatementUncheckedCreateInput>
+    /**
+     * In case the BuyerFinancialStatement was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BuyerFinancialStatementUpdateInput, BuyerFinancialStatementUncheckedUpdateInput>
+  }
+
+  /**
+   * BuyerFinancialStatement delete
+   */
+  export type BuyerFinancialStatementDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+    /**
+     * Filter which BuyerFinancialStatement to delete.
+     */
+    where: BuyerFinancialStatementWhereUniqueInput
+  }
+
+  /**
+   * BuyerFinancialStatement deleteMany
+   */
+  export type BuyerFinancialStatementDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuyerFinancialStatements to delete
+     */
+    where?: BuyerFinancialStatementWhereInput
+    /**
+     * Limit how many BuyerFinancialStatements to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuyerFinancialStatement without action
+   */
+  export type BuyerFinancialStatementDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuyerFinancialStatement
+     */
+    select?: BuyerFinancialStatementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuyerFinancialStatement
+     */
+    omit?: BuyerFinancialStatementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BuyerFinancialStatementInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PreCloseChecklist
+   */
+
+  export type AggregatePreCloseChecklist = {
+    _count: PreCloseChecklistCountAggregateOutputType | null
+    _min: PreCloseChecklistMinAggregateOutputType | null
+    _max: PreCloseChecklistMaxAggregateOutputType | null
+  }
+
+  export type PreCloseChecklistMinAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    lastUpdatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PreCloseChecklistMaxAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    lastUpdatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PreCloseChecklistCountAggregateOutputType = {
+    id: number
+    listingId: number
+    buyerItems: number
+    sellerItems: number
+    brokerItems: number
+    lastUpdatedBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PreCloseChecklistMinAggregateInputType = {
+    id?: true
+    listingId?: true
+    lastUpdatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PreCloseChecklistMaxAggregateInputType = {
+    id?: true
+    listingId?: true
+    lastUpdatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PreCloseChecklistCountAggregateInputType = {
+    id?: true
+    listingId?: true
+    buyerItems?: true
+    sellerItems?: true
+    brokerItems?: true
+    lastUpdatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PreCloseChecklistAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PreCloseChecklist to aggregate.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PreCloseChecklists
+    **/
+    _count?: true | PreCloseChecklistCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PreCloseChecklistMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PreCloseChecklistMaxAggregateInputType
+  }
+
+  export type GetPreCloseChecklistAggregateType<T extends PreCloseChecklistAggregateArgs> = {
+        [P in keyof T & keyof AggregatePreCloseChecklist]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePreCloseChecklist[P]>
+      : GetScalarType<T[P], AggregatePreCloseChecklist[P]>
+  }
+
+
+
+
+  export type PreCloseChecklistGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PreCloseChecklistWhereInput
+    orderBy?: PreCloseChecklistOrderByWithAggregationInput | PreCloseChecklistOrderByWithAggregationInput[]
+    by: PreCloseChecklistScalarFieldEnum[] | PreCloseChecklistScalarFieldEnum
+    having?: PreCloseChecklistScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PreCloseChecklistCountAggregateInputType | true
+    _min?: PreCloseChecklistMinAggregateInputType
+    _max?: PreCloseChecklistMaxAggregateInputType
+  }
+
+  export type PreCloseChecklistGroupByOutputType = {
+    id: string
+    listingId: string
+    buyerItems: JsonValue
+    sellerItems: JsonValue
+    brokerItems: JsonValue
+    lastUpdatedBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PreCloseChecklistCountAggregateOutputType | null
+    _min: PreCloseChecklistMinAggregateOutputType | null
+    _max: PreCloseChecklistMaxAggregateOutputType | null
+  }
+
+  type GetPreCloseChecklistGroupByPayload<T extends PreCloseChecklistGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PreCloseChecklistGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PreCloseChecklistGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PreCloseChecklistGroupByOutputType[P]>
+            : GetScalarType<T[P], PreCloseChecklistGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PreCloseChecklistSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["preCloseChecklist"]>
+
+  export type PreCloseChecklistSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["preCloseChecklist"]>
+
+  export type PreCloseChecklistSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["preCloseChecklist"]>
+
+  export type PreCloseChecklistSelectScalar = {
+    id?: boolean
+    listingId?: boolean
+    buyerItems?: boolean
+    sellerItems?: boolean
+    brokerItems?: boolean
+    lastUpdatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PreCloseChecklistOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "buyerItems" | "sellerItems" | "brokerItems" | "lastUpdatedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["preCloseChecklist"]>
+  export type PreCloseChecklistInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }
+  export type PreCloseChecklistIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }
+  export type PreCloseChecklistIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    lastUpdatedByUser?: boolean | PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>
+  }
+
+  export type $PreCloseChecklistPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PreCloseChecklist"
+    objects: {
+      listing: Prisma.$ListingPayload<ExtArgs>
+      lastUpdatedByUser: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      listingId: string
+      buyerItems: Prisma.JsonValue
+      sellerItems: Prisma.JsonValue
+      brokerItems: Prisma.JsonValue
+      lastUpdatedBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["preCloseChecklist"]>
+    composites: {}
+  }
+
+  type PreCloseChecklistGetPayload<S extends boolean | null | undefined | PreCloseChecklistDefaultArgs> = $Result.GetResult<Prisma.$PreCloseChecklistPayload, S>
+
+  type PreCloseChecklistCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PreCloseChecklistFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PreCloseChecklistCountAggregateInputType | true
+    }
+
+  export interface PreCloseChecklistDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PreCloseChecklist'], meta: { name: 'PreCloseChecklist' } }
+    /**
+     * Find zero or one PreCloseChecklist that matches the filter.
+     * @param {PreCloseChecklistFindUniqueArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PreCloseChecklistFindUniqueArgs>(args: SelectSubset<T, PreCloseChecklistFindUniqueArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PreCloseChecklist that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PreCloseChecklistFindUniqueOrThrowArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PreCloseChecklistFindUniqueOrThrowArgs>(args: SelectSubset<T, PreCloseChecklistFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PreCloseChecklist that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistFindFirstArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PreCloseChecklistFindFirstArgs>(args?: SelectSubset<T, PreCloseChecklistFindFirstArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PreCloseChecklist that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistFindFirstOrThrowArgs} args - Arguments to find a PreCloseChecklist
+     * @example
+     * // Get one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PreCloseChecklistFindFirstOrThrowArgs>(args?: SelectSubset<T, PreCloseChecklistFindFirstOrThrowArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PreCloseChecklists that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PreCloseChecklists
+     * const preCloseChecklists = await prisma.preCloseChecklist.findMany()
+     * 
+     * // Get first 10 PreCloseChecklists
+     * const preCloseChecklists = await prisma.preCloseChecklist.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const preCloseChecklistWithIdOnly = await prisma.preCloseChecklist.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PreCloseChecklistFindManyArgs>(args?: SelectSubset<T, PreCloseChecklistFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PreCloseChecklist.
+     * @param {PreCloseChecklistCreateArgs} args - Arguments to create a PreCloseChecklist.
+     * @example
+     * // Create one PreCloseChecklist
+     * const PreCloseChecklist = await prisma.preCloseChecklist.create({
+     *   data: {
+     *     // ... data to create a PreCloseChecklist
+     *   }
+     * })
+     * 
+     */
+    create<T extends PreCloseChecklistCreateArgs>(args: SelectSubset<T, PreCloseChecklistCreateArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PreCloseChecklists.
+     * @param {PreCloseChecklistCreateManyArgs} args - Arguments to create many PreCloseChecklists.
+     * @example
+     * // Create many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PreCloseChecklistCreateManyArgs>(args?: SelectSubset<T, PreCloseChecklistCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PreCloseChecklists and returns the data saved in the database.
+     * @param {PreCloseChecklistCreateManyAndReturnArgs} args - Arguments to create many PreCloseChecklists.
+     * @example
+     * // Create many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PreCloseChecklists and only return the `id`
+     * const preCloseChecklistWithIdOnly = await prisma.preCloseChecklist.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PreCloseChecklistCreateManyAndReturnArgs>(args?: SelectSubset<T, PreCloseChecklistCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PreCloseChecklist.
+     * @param {PreCloseChecklistDeleteArgs} args - Arguments to delete one PreCloseChecklist.
+     * @example
+     * // Delete one PreCloseChecklist
+     * const PreCloseChecklist = await prisma.preCloseChecklist.delete({
+     *   where: {
+     *     // ... filter to delete one PreCloseChecklist
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PreCloseChecklistDeleteArgs>(args: SelectSubset<T, PreCloseChecklistDeleteArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PreCloseChecklist.
+     * @param {PreCloseChecklistUpdateArgs} args - Arguments to update one PreCloseChecklist.
+     * @example
+     * // Update one PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PreCloseChecklistUpdateArgs>(args: SelectSubset<T, PreCloseChecklistUpdateArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PreCloseChecklists.
+     * @param {PreCloseChecklistDeleteManyArgs} args - Arguments to filter PreCloseChecklists to delete.
+     * @example
+     * // Delete a few PreCloseChecklists
+     * const { count } = await prisma.preCloseChecklist.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PreCloseChecklistDeleteManyArgs>(args?: SelectSubset<T, PreCloseChecklistDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PreCloseChecklists.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PreCloseChecklistUpdateManyArgs>(args: SelectSubset<T, PreCloseChecklistUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PreCloseChecklists and returns the data updated in the database.
+     * @param {PreCloseChecklistUpdateManyAndReturnArgs} args - Arguments to update many PreCloseChecklists.
+     * @example
+     * // Update many PreCloseChecklists
+     * const preCloseChecklist = await prisma.preCloseChecklist.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PreCloseChecklists and only return the `id`
+     * const preCloseChecklistWithIdOnly = await prisma.preCloseChecklist.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PreCloseChecklistUpdateManyAndReturnArgs>(args: SelectSubset<T, PreCloseChecklistUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PreCloseChecklist.
+     * @param {PreCloseChecklistUpsertArgs} args - Arguments to update or create a PreCloseChecklist.
+     * @example
+     * // Update or create a PreCloseChecklist
+     * const preCloseChecklist = await prisma.preCloseChecklist.upsert({
+     *   create: {
+     *     // ... data to create a PreCloseChecklist
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PreCloseChecklist we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PreCloseChecklistUpsertArgs>(args: SelectSubset<T, PreCloseChecklistUpsertArgs<ExtArgs>>): Prisma__PreCloseChecklistClient<$Result.GetResult<Prisma.$PreCloseChecklistPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PreCloseChecklists.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistCountArgs} args - Arguments to filter PreCloseChecklists to count.
+     * @example
+     * // Count the number of PreCloseChecklists
+     * const count = await prisma.preCloseChecklist.count({
+     *   where: {
+     *     // ... the filter for the PreCloseChecklists we want to count
+     *   }
+     * })
+    **/
+    count<T extends PreCloseChecklistCountArgs>(
+      args?: Subset<T, PreCloseChecklistCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PreCloseChecklistCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PreCloseChecklist.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PreCloseChecklistAggregateArgs>(args: Subset<T, PreCloseChecklistAggregateArgs>): Prisma.PrismaPromise<GetPreCloseChecklistAggregateType<T>>
+
+    /**
+     * Group by PreCloseChecklist.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PreCloseChecklistGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PreCloseChecklistGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PreCloseChecklistGroupByArgs['orderBy'] }
+        : { orderBy?: PreCloseChecklistGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PreCloseChecklistGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPreCloseChecklistGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PreCloseChecklist model
+   */
+  readonly fields: PreCloseChecklistFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PreCloseChecklist.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PreCloseChecklistClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    listing<T extends ListingDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ListingDefaultArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    lastUpdatedByUser<T extends PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs> = {}>(args?: Subset<T, PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PreCloseChecklist model
+   */
+  interface PreCloseChecklistFieldRefs {
+    readonly id: FieldRef<"PreCloseChecklist", 'String'>
+    readonly listingId: FieldRef<"PreCloseChecklist", 'String'>
+    readonly buyerItems: FieldRef<"PreCloseChecklist", 'Json'>
+    readonly sellerItems: FieldRef<"PreCloseChecklist", 'Json'>
+    readonly brokerItems: FieldRef<"PreCloseChecklist", 'Json'>
+    readonly lastUpdatedBy: FieldRef<"PreCloseChecklist", 'String'>
+    readonly createdAt: FieldRef<"PreCloseChecklist", 'DateTime'>
+    readonly updatedAt: FieldRef<"PreCloseChecklist", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PreCloseChecklist findUnique
+   */
+  export type PreCloseChecklistFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist findUniqueOrThrow
+   */
+  export type PreCloseChecklistFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist findFirst
+   */
+  export type PreCloseChecklistFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PreCloseChecklists.
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PreCloseChecklists.
+     */
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * PreCloseChecklist findFirstOrThrow
+   */
+  export type PreCloseChecklistFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklist to fetch.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PreCloseChecklists.
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PreCloseChecklists.
+     */
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * PreCloseChecklist findMany
+   */
+  export type PreCloseChecklistFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter, which PreCloseChecklists to fetch.
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PreCloseChecklists to fetch.
+     */
+    orderBy?: PreCloseChecklistOrderByWithRelationInput | PreCloseChecklistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PreCloseChecklists.
+     */
+    cursor?: PreCloseChecklistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PreCloseChecklists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PreCloseChecklists.
+     */
+    skip?: number
+    distinct?: PreCloseChecklistScalarFieldEnum | PreCloseChecklistScalarFieldEnum[]
+  }
+
+  /**
+   * PreCloseChecklist create
+   */
+  export type PreCloseChecklistCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PreCloseChecklist.
+     */
+    data: XOR<PreCloseChecklistCreateInput, PreCloseChecklistUncheckedCreateInput>
+  }
+
+  /**
+   * PreCloseChecklist createMany
+   */
+  export type PreCloseChecklistCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PreCloseChecklists.
+     */
+    data: PreCloseChecklistCreateManyInput | PreCloseChecklistCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PreCloseChecklist createManyAndReturn
+   */
+  export type PreCloseChecklistCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * The data used to create many PreCloseChecklists.
+     */
+    data: PreCloseChecklistCreateManyInput | PreCloseChecklistCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PreCloseChecklist update
+   */
+  export type PreCloseChecklistUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PreCloseChecklist.
+     */
+    data: XOR<PreCloseChecklistUpdateInput, PreCloseChecklistUncheckedUpdateInput>
+    /**
+     * Choose, which PreCloseChecklist to update.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist updateMany
+   */
+  export type PreCloseChecklistUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PreCloseChecklists.
+     */
+    data: XOR<PreCloseChecklistUpdateManyMutationInput, PreCloseChecklistUncheckedUpdateManyInput>
+    /**
+     * Filter which PreCloseChecklists to update
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * Limit how many PreCloseChecklists to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PreCloseChecklist updateManyAndReturn
+   */
+  export type PreCloseChecklistUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * The data used to update PreCloseChecklists.
+     */
+    data: XOR<PreCloseChecklistUpdateManyMutationInput, PreCloseChecklistUncheckedUpdateManyInput>
+    /**
+     * Filter which PreCloseChecklists to update
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * Limit how many PreCloseChecklists to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PreCloseChecklist upsert
+   */
+  export type PreCloseChecklistUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PreCloseChecklist to update in case it exists.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+    /**
+     * In case the PreCloseChecklist found by the `where` argument doesn't exist, create a new PreCloseChecklist with this data.
+     */
+    create: XOR<PreCloseChecklistCreateInput, PreCloseChecklistUncheckedCreateInput>
+    /**
+     * In case the PreCloseChecklist was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PreCloseChecklistUpdateInput, PreCloseChecklistUncheckedUpdateInput>
+  }
+
+  /**
+   * PreCloseChecklist delete
+   */
+  export type PreCloseChecklistDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+    /**
+     * Filter which PreCloseChecklist to delete.
+     */
+    where: PreCloseChecklistWhereUniqueInput
+  }
+
+  /**
+   * PreCloseChecklist deleteMany
+   */
+  export type PreCloseChecklistDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PreCloseChecklists to delete
+     */
+    where?: PreCloseChecklistWhereInput
+    /**
+     * Limit how many PreCloseChecklists to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PreCloseChecklist.lastUpdatedByUser
+   */
+  export type PreCloseChecklist$lastUpdatedByUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * PreCloseChecklist without action
+   */
+  export type PreCloseChecklistDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PreCloseChecklist
+     */
+    select?: PreCloseChecklistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PreCloseChecklist
+     */
+    omit?: PreCloseChecklistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PreCloseChecklistInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DueDiligenceRequest
+   */
+
+  export type AggregateDueDiligenceRequest = {
+    _count: DueDiligenceRequestCountAggregateOutputType | null
+    _min: DueDiligenceRequestMinAggregateOutputType | null
+    _max: DueDiligenceRequestMaxAggregateOutputType | null
+  }
+
+  export type DueDiligenceRequestMinAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    buyerId: string | null
+    documentName: string | null
+    status: $Enums.DueDiligenceStatus | null
+    requestedAt: Date | null
+    fulfilledAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DueDiligenceRequestMaxAggregateOutputType = {
+    id: string | null
+    listingId: string | null
+    buyerId: string | null
+    documentName: string | null
+    status: $Enums.DueDiligenceStatus | null
+    requestedAt: Date | null
+    fulfilledAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DueDiligenceRequestCountAggregateOutputType = {
+    id: number
+    listingId: number
+    buyerId: number
+    documentName: number
+    status: number
+    requestedAt: number
+    fulfilledAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DueDiligenceRequestMinAggregateInputType = {
+    id?: true
+    listingId?: true
+    buyerId?: true
+    documentName?: true
+    status?: true
+    requestedAt?: true
+    fulfilledAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DueDiligenceRequestMaxAggregateInputType = {
+    id?: true
+    listingId?: true
+    buyerId?: true
+    documentName?: true
+    status?: true
+    requestedAt?: true
+    fulfilledAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DueDiligenceRequestCountAggregateInputType = {
+    id?: true
+    listingId?: true
+    buyerId?: true
+    documentName?: true
+    status?: true
+    requestedAt?: true
+    fulfilledAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DueDiligenceRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DueDiligenceRequest to aggregate.
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DueDiligenceRequests to fetch.
+     */
+    orderBy?: DueDiligenceRequestOrderByWithRelationInput | DueDiligenceRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DueDiligenceRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DueDiligenceRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DueDiligenceRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DueDiligenceRequests
+    **/
+    _count?: true | DueDiligenceRequestCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DueDiligenceRequestMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DueDiligenceRequestMaxAggregateInputType
+  }
+
+  export type GetDueDiligenceRequestAggregateType<T extends DueDiligenceRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregateDueDiligenceRequest]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDueDiligenceRequest[P]>
+      : GetScalarType<T[P], AggregateDueDiligenceRequest[P]>
+  }
+
+
+
+
+  export type DueDiligenceRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DueDiligenceRequestWhereInput
+    orderBy?: DueDiligenceRequestOrderByWithAggregationInput | DueDiligenceRequestOrderByWithAggregationInput[]
+    by: DueDiligenceRequestScalarFieldEnum[] | DueDiligenceRequestScalarFieldEnum
+    having?: DueDiligenceRequestScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DueDiligenceRequestCountAggregateInputType | true
+    _min?: DueDiligenceRequestMinAggregateInputType
+    _max?: DueDiligenceRequestMaxAggregateInputType
+  }
+
+  export type DueDiligenceRequestGroupByOutputType = {
+    id: string
+    listingId: string
+    buyerId: string
+    documentName: string
+    status: $Enums.DueDiligenceStatus
+    requestedAt: Date
+    fulfilledAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DueDiligenceRequestCountAggregateOutputType | null
+    _min: DueDiligenceRequestMinAggregateOutputType | null
+    _max: DueDiligenceRequestMaxAggregateOutputType | null
+  }
+
+  type GetDueDiligenceRequestGroupByPayload<T extends DueDiligenceRequestGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DueDiligenceRequestGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DueDiligenceRequestGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DueDiligenceRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], DueDiligenceRequestGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DueDiligenceRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerId?: boolean
+    documentName?: boolean
+    status?: boolean
+    requestedAt?: boolean
+    fulfilledAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dueDiligenceRequest"]>
+
+  export type DueDiligenceRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerId?: boolean
+    documentName?: boolean
+    status?: boolean
+    requestedAt?: boolean
+    fulfilledAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dueDiligenceRequest"]>
+
+  export type DueDiligenceRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    listingId?: boolean
+    buyerId?: boolean
+    documentName?: boolean
+    status?: boolean
+    requestedAt?: boolean
+    fulfilledAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dueDiligenceRequest"]>
+
+  export type DueDiligenceRequestSelectScalar = {
+    id?: boolean
+    listingId?: boolean
+    buyerId?: boolean
+    documentName?: boolean
+    status?: boolean
+    requestedAt?: boolean
+    fulfilledAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DueDiligenceRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "listingId" | "buyerId" | "documentName" | "status" | "requestedAt" | "fulfilledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["dueDiligenceRequest"]>
+  export type DueDiligenceRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DueDiligenceRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DueDiligenceRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | ListingDefaultArgs<ExtArgs>
+    buyer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $DueDiligenceRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DueDiligenceRequest"
+    objects: {
+      listing: Prisma.$ListingPayload<ExtArgs>
+      buyer: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      listingId: string
+      buyerId: string
+      documentName: string
+      status: $Enums.DueDiligenceStatus
+      requestedAt: Date
+      fulfilledAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["dueDiligenceRequest"]>
+    composites: {}
+  }
+
+  type DueDiligenceRequestGetPayload<S extends boolean | null | undefined | DueDiligenceRequestDefaultArgs> = $Result.GetResult<Prisma.$DueDiligenceRequestPayload, S>
+
+  type DueDiligenceRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DueDiligenceRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DueDiligenceRequestCountAggregateInputType | true
+    }
+
+  export interface DueDiligenceRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DueDiligenceRequest'], meta: { name: 'DueDiligenceRequest' } }
+    /**
+     * Find zero or one DueDiligenceRequest that matches the filter.
+     * @param {DueDiligenceRequestFindUniqueArgs} args - Arguments to find a DueDiligenceRequest
+     * @example
+     * // Get one DueDiligenceRequest
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DueDiligenceRequestFindUniqueArgs>(args: SelectSubset<T, DueDiligenceRequestFindUniqueArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DueDiligenceRequest that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DueDiligenceRequestFindUniqueOrThrowArgs} args - Arguments to find a DueDiligenceRequest
+     * @example
+     * // Get one DueDiligenceRequest
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DueDiligenceRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, DueDiligenceRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DueDiligenceRequest that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestFindFirstArgs} args - Arguments to find a DueDiligenceRequest
+     * @example
+     * // Get one DueDiligenceRequest
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DueDiligenceRequestFindFirstArgs>(args?: SelectSubset<T, DueDiligenceRequestFindFirstArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DueDiligenceRequest that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestFindFirstOrThrowArgs} args - Arguments to find a DueDiligenceRequest
+     * @example
+     * // Get one DueDiligenceRequest
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DueDiligenceRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, DueDiligenceRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DueDiligenceRequests that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DueDiligenceRequests
+     * const dueDiligenceRequests = await prisma.dueDiligenceRequest.findMany()
+     * 
+     * // Get first 10 DueDiligenceRequests
+     * const dueDiligenceRequests = await prisma.dueDiligenceRequest.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dueDiligenceRequestWithIdOnly = await prisma.dueDiligenceRequest.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DueDiligenceRequestFindManyArgs>(args?: SelectSubset<T, DueDiligenceRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DueDiligenceRequest.
+     * @param {DueDiligenceRequestCreateArgs} args - Arguments to create a DueDiligenceRequest.
+     * @example
+     * // Create one DueDiligenceRequest
+     * const DueDiligenceRequest = await prisma.dueDiligenceRequest.create({
+     *   data: {
+     *     // ... data to create a DueDiligenceRequest
+     *   }
+     * })
+     * 
+     */
+    create<T extends DueDiligenceRequestCreateArgs>(args: SelectSubset<T, DueDiligenceRequestCreateArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DueDiligenceRequests.
+     * @param {DueDiligenceRequestCreateManyArgs} args - Arguments to create many DueDiligenceRequests.
+     * @example
+     * // Create many DueDiligenceRequests
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DueDiligenceRequestCreateManyArgs>(args?: SelectSubset<T, DueDiligenceRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DueDiligenceRequests and returns the data saved in the database.
+     * @param {DueDiligenceRequestCreateManyAndReturnArgs} args - Arguments to create many DueDiligenceRequests.
+     * @example
+     * // Create many DueDiligenceRequests
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DueDiligenceRequests and only return the `id`
+     * const dueDiligenceRequestWithIdOnly = await prisma.dueDiligenceRequest.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DueDiligenceRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, DueDiligenceRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DueDiligenceRequest.
+     * @param {DueDiligenceRequestDeleteArgs} args - Arguments to delete one DueDiligenceRequest.
+     * @example
+     * // Delete one DueDiligenceRequest
+     * const DueDiligenceRequest = await prisma.dueDiligenceRequest.delete({
+     *   where: {
+     *     // ... filter to delete one DueDiligenceRequest
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DueDiligenceRequestDeleteArgs>(args: SelectSubset<T, DueDiligenceRequestDeleteArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DueDiligenceRequest.
+     * @param {DueDiligenceRequestUpdateArgs} args - Arguments to update one DueDiligenceRequest.
+     * @example
+     * // Update one DueDiligenceRequest
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DueDiligenceRequestUpdateArgs>(args: SelectSubset<T, DueDiligenceRequestUpdateArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DueDiligenceRequests.
+     * @param {DueDiligenceRequestDeleteManyArgs} args - Arguments to filter DueDiligenceRequests to delete.
+     * @example
+     * // Delete a few DueDiligenceRequests
+     * const { count } = await prisma.dueDiligenceRequest.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DueDiligenceRequestDeleteManyArgs>(args?: SelectSubset<T, DueDiligenceRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DueDiligenceRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DueDiligenceRequests
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DueDiligenceRequestUpdateManyArgs>(args: SelectSubset<T, DueDiligenceRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DueDiligenceRequests and returns the data updated in the database.
+     * @param {DueDiligenceRequestUpdateManyAndReturnArgs} args - Arguments to update many DueDiligenceRequests.
+     * @example
+     * // Update many DueDiligenceRequests
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DueDiligenceRequests and only return the `id`
+     * const dueDiligenceRequestWithIdOnly = await prisma.dueDiligenceRequest.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DueDiligenceRequestUpdateManyAndReturnArgs>(args: SelectSubset<T, DueDiligenceRequestUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DueDiligenceRequest.
+     * @param {DueDiligenceRequestUpsertArgs} args - Arguments to update or create a DueDiligenceRequest.
+     * @example
+     * // Update or create a DueDiligenceRequest
+     * const dueDiligenceRequest = await prisma.dueDiligenceRequest.upsert({
+     *   create: {
+     *     // ... data to create a DueDiligenceRequest
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DueDiligenceRequest we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DueDiligenceRequestUpsertArgs>(args: SelectSubset<T, DueDiligenceRequestUpsertArgs<ExtArgs>>): Prisma__DueDiligenceRequestClient<$Result.GetResult<Prisma.$DueDiligenceRequestPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DueDiligenceRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestCountArgs} args - Arguments to filter DueDiligenceRequests to count.
+     * @example
+     * // Count the number of DueDiligenceRequests
+     * const count = await prisma.dueDiligenceRequest.count({
+     *   where: {
+     *     // ... the filter for the DueDiligenceRequests we want to count
+     *   }
+     * })
+    **/
+    count<T extends DueDiligenceRequestCountArgs>(
+      args?: Subset<T, DueDiligenceRequestCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DueDiligenceRequestCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DueDiligenceRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DueDiligenceRequestAggregateArgs>(args: Subset<T, DueDiligenceRequestAggregateArgs>): Prisma.PrismaPromise<GetDueDiligenceRequestAggregateType<T>>
+
+    /**
+     * Group by DueDiligenceRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DueDiligenceRequestGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DueDiligenceRequestGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DueDiligenceRequestGroupByArgs['orderBy'] }
+        : { orderBy?: DueDiligenceRequestGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DueDiligenceRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDueDiligenceRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DueDiligenceRequest model
+   */
+  readonly fields: DueDiligenceRequestFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DueDiligenceRequest.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DueDiligenceRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    listing<T extends ListingDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ListingDefaultArgs<ExtArgs>>): Prisma__ListingClient<$Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    buyer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DueDiligenceRequest model
+   */
+  interface DueDiligenceRequestFieldRefs {
+    readonly id: FieldRef<"DueDiligenceRequest", 'String'>
+    readonly listingId: FieldRef<"DueDiligenceRequest", 'String'>
+    readonly buyerId: FieldRef<"DueDiligenceRequest", 'String'>
+    readonly documentName: FieldRef<"DueDiligenceRequest", 'String'>
+    readonly status: FieldRef<"DueDiligenceRequest", 'DueDiligenceStatus'>
+    readonly requestedAt: FieldRef<"DueDiligenceRequest", 'DateTime'>
+    readonly fulfilledAt: FieldRef<"DueDiligenceRequest", 'DateTime'>
+    readonly createdAt: FieldRef<"DueDiligenceRequest", 'DateTime'>
+    readonly updatedAt: FieldRef<"DueDiligenceRequest", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DueDiligenceRequest findUnique
+   */
+  export type DueDiligenceRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which DueDiligenceRequest to fetch.
+     */
+    where: DueDiligenceRequestWhereUniqueInput
+  }
+
+  /**
+   * DueDiligenceRequest findUniqueOrThrow
+   */
+  export type DueDiligenceRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which DueDiligenceRequest to fetch.
+     */
+    where: DueDiligenceRequestWhereUniqueInput
+  }
+
+  /**
+   * DueDiligenceRequest findFirst
+   */
+  export type DueDiligenceRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which DueDiligenceRequest to fetch.
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DueDiligenceRequests to fetch.
+     */
+    orderBy?: DueDiligenceRequestOrderByWithRelationInput | DueDiligenceRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DueDiligenceRequests.
+     */
+    cursor?: DueDiligenceRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DueDiligenceRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DueDiligenceRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DueDiligenceRequests.
+     */
+    distinct?: DueDiligenceRequestScalarFieldEnum | DueDiligenceRequestScalarFieldEnum[]
+  }
+
+  /**
+   * DueDiligenceRequest findFirstOrThrow
+   */
+  export type DueDiligenceRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which DueDiligenceRequest to fetch.
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DueDiligenceRequests to fetch.
+     */
+    orderBy?: DueDiligenceRequestOrderByWithRelationInput | DueDiligenceRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DueDiligenceRequests.
+     */
+    cursor?: DueDiligenceRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DueDiligenceRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DueDiligenceRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DueDiligenceRequests.
+     */
+    distinct?: DueDiligenceRequestScalarFieldEnum | DueDiligenceRequestScalarFieldEnum[]
+  }
+
+  /**
+   * DueDiligenceRequest findMany
+   */
+  export type DueDiligenceRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which DueDiligenceRequests to fetch.
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DueDiligenceRequests to fetch.
+     */
+    orderBy?: DueDiligenceRequestOrderByWithRelationInput | DueDiligenceRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DueDiligenceRequests.
+     */
+    cursor?: DueDiligenceRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DueDiligenceRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DueDiligenceRequests.
+     */
+    skip?: number
+    distinct?: DueDiligenceRequestScalarFieldEnum | DueDiligenceRequestScalarFieldEnum[]
+  }
+
+  /**
+   * DueDiligenceRequest create
+   */
+  export type DueDiligenceRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DueDiligenceRequest.
+     */
+    data: XOR<DueDiligenceRequestCreateInput, DueDiligenceRequestUncheckedCreateInput>
+  }
+
+  /**
+   * DueDiligenceRequest createMany
+   */
+  export type DueDiligenceRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DueDiligenceRequests.
+     */
+    data: DueDiligenceRequestCreateManyInput | DueDiligenceRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DueDiligenceRequest createManyAndReturn
+   */
+  export type DueDiligenceRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * The data used to create many DueDiligenceRequests.
+     */
+    data: DueDiligenceRequestCreateManyInput | DueDiligenceRequestCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DueDiligenceRequest update
+   */
+  export type DueDiligenceRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DueDiligenceRequest.
+     */
+    data: XOR<DueDiligenceRequestUpdateInput, DueDiligenceRequestUncheckedUpdateInput>
+    /**
+     * Choose, which DueDiligenceRequest to update.
+     */
+    where: DueDiligenceRequestWhereUniqueInput
+  }
+
+  /**
+   * DueDiligenceRequest updateMany
+   */
+  export type DueDiligenceRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DueDiligenceRequests.
+     */
+    data: XOR<DueDiligenceRequestUpdateManyMutationInput, DueDiligenceRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which DueDiligenceRequests to update
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * Limit how many DueDiligenceRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DueDiligenceRequest updateManyAndReturn
+   */
+  export type DueDiligenceRequestUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * The data used to update DueDiligenceRequests.
+     */
+    data: XOR<DueDiligenceRequestUpdateManyMutationInput, DueDiligenceRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which DueDiligenceRequests to update
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * Limit how many DueDiligenceRequests to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DueDiligenceRequest upsert
+   */
+  export type DueDiligenceRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DueDiligenceRequest to update in case it exists.
+     */
+    where: DueDiligenceRequestWhereUniqueInput
+    /**
+     * In case the DueDiligenceRequest found by the `where` argument doesn't exist, create a new DueDiligenceRequest with this data.
+     */
+    create: XOR<DueDiligenceRequestCreateInput, DueDiligenceRequestUncheckedCreateInput>
+    /**
+     * In case the DueDiligenceRequest was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DueDiligenceRequestUpdateInput, DueDiligenceRequestUncheckedUpdateInput>
+  }
+
+  /**
+   * DueDiligenceRequest delete
+   */
+  export type DueDiligenceRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+    /**
+     * Filter which DueDiligenceRequest to delete.
+     */
+    where: DueDiligenceRequestWhereUniqueInput
+  }
+
+  /**
+   * DueDiligenceRequest deleteMany
+   */
+  export type DueDiligenceRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DueDiligenceRequests to delete
+     */
+    where?: DueDiligenceRequestWhereInput
+    /**
+     * Limit how many DueDiligenceRequests to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DueDiligenceRequest without action
+   */
+  export type DueDiligenceRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DueDiligenceRequest
+     */
+    select?: DueDiligenceRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DueDiligenceRequest
+     */
+    omit?: DueDiligenceRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DueDiligenceRequestInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -8641,9 +17818,18 @@ export namespace Prisma {
     id: 'id',
     type: 'type',
     status: 'status',
+    category: 'category',
     url: 'url',
+    fileName: 'fileName',
+    fileSize: 'fileSize',
+    operationType: 'operationType',
+    stepId: 'stepId',
     sellerId: 'sellerId',
     buyerId: 'buyerId',
+    listingId: 'listingId',
+    uploadedAt: 'uploadedAt',
+    downloadedAt: 'downloadedAt',
+    uploadedBy: 'uploadedBy',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8657,6 +17843,7 @@ export namespace Prisma {
     password: 'password',
     name: 'name',
     role: 'role',
+    isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     managerId: 'managerId',
@@ -8665,6 +17852,32 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const SellerProgressScalarFieldEnum: {
+    id: 'id',
+    sellerId: 'sellerId',
+    currentStep: 'currentStep',
+    completedSteps: 'completedSteps',
+    selectedListingId: 'selectedListingId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SellerProgressScalarFieldEnum = (typeof SellerProgressScalarFieldEnum)[keyof typeof SellerProgressScalarFieldEnum]
+
+
+  export const BuyerProgressScalarFieldEnum: {
+    id: 'id',
+    buyerId: 'buyerId',
+    currentStep: 'currentStep',
+    completedSteps: 'completedSteps',
+    selectedListingId: 'selectedListingId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BuyerProgressScalarFieldEnum = (typeof BuyerProgressScalarFieldEnum)[keyof typeof BuyerProgressScalarFieldEnum]
 
 
   export const MessageScalarFieldEnum: {
@@ -8727,12 +17940,87 @@ export namespace Prisma {
   export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
 
 
+  export const SellerQuestionnaireScalarFieldEnum: {
+    id: 'id',
+    sellerId: 'sellerId',
+    data: 'data',
+    submitted: 'submitted',
+    submittedAt: 'submittedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SellerQuestionnaireScalarFieldEnum = (typeof SellerQuestionnaireScalarFieldEnum)[keyof typeof SellerQuestionnaireScalarFieldEnum]
+
+
+  export const BuyerNDAScalarFieldEnum: {
+    id: 'id',
+    buyerId: 'buyerId',
+    data: 'data',
+    submitted: 'submitted',
+    submittedAt: 'submittedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BuyerNDAScalarFieldEnum = (typeof BuyerNDAScalarFieldEnum)[keyof typeof BuyerNDAScalarFieldEnum]
+
+
+  export const BuyerFinancialStatementScalarFieldEnum: {
+    id: 'id',
+    buyerId: 'buyerId',
+    data: 'data',
+    submitted: 'submitted',
+    submittedAt: 'submittedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BuyerFinancialStatementScalarFieldEnum = (typeof BuyerFinancialStatementScalarFieldEnum)[keyof typeof BuyerFinancialStatementScalarFieldEnum]
+
+
+  export const PreCloseChecklistScalarFieldEnum: {
+    id: 'id',
+    listingId: 'listingId',
+    buyerItems: 'buyerItems',
+    sellerItems: 'sellerItems',
+    brokerItems: 'brokerItems',
+    lastUpdatedBy: 'lastUpdatedBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PreCloseChecklistScalarFieldEnum = (typeof PreCloseChecklistScalarFieldEnum)[keyof typeof PreCloseChecklistScalarFieldEnum]
+
+
+  export const DueDiligenceRequestScalarFieldEnum: {
+    id: 'id',
+    listingId: 'listingId',
+    buyerId: 'buyerId',
+    documentName: 'documentName',
+    status: 'status',
+    requestedAt: 'requestedAt',
+    fulfilledAt: 'fulfilledAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DueDiligenceRequestScalarFieldEnum = (typeof DueDiligenceRequestScalarFieldEnum)[keyof typeof DueDiligenceRequestScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const NullableJsonNullValueInput: {
@@ -8816,6 +18104,48 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DocumentCategory'
+   */
+  export type EnumDocumentCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentCategory[]'
+   */
+  export type ListEnumDocumentCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentOperationType'
+   */
+  export type EnumDocumentOperationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentOperationType'>
+    
+
+
+  /**
+   * Reference to a field of type 'DocumentOperationType[]'
+   */
+  export type ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentOperationType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -8844,16 +18174,23 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'Boolean'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
   /**
-   * Reference to a field of type 'Int[]'
+   * Reference to a field of type 'Json'
    */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -8868,13 +18205,6 @@ export namespace Prisma {
    * Reference to a field of type 'MessageStatus[]'
    */
   export type ListEnumMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageStatus[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -8907,16 +18237,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
+   * Reference to a field of type 'DueDiligenceStatus'
    */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+  export type EnumDueDiligenceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DueDiligenceStatus'>
     
 
 
   /**
-   * Reference to a field of type 'QueryMode'
+   * Reference to a field of type 'DueDiligenceStatus[]'
    */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+  export type ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DueDiligenceStatus[]'>
     
   /**
    * Deep Input Types
@@ -8930,26 +18260,48 @@ export namespace Prisma {
     id?: StringFilter<"Document"> | string
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableFilter<"Document"> | string | null
+    fileName?: StringNullableFilter<"Document"> | string | null
+    fileSize?: IntNullableFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableFilter<"Document"> | number | null
     sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
+    listingId?: StringNullableFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    listing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+    uploader?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type DocumentOrderByWithRelationInput = {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    fileSize?: SortOrderInput | SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrderInput | SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrderInput | SortOrder
+    listingId?: SortOrderInput | SortOrder
+    uploadedAt?: SortOrderInput | SortOrder
+    downloadedAt?: SortOrderInput | SortOrder
+    uploadedBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seller?: UserOrderByWithRelationInput
     buyer?: UserOrderByWithRelationInput
+    listing?: ListingOrderByWithRelationInput
+    uploader?: UserOrderByWithRelationInput
   }
 
   export type DocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -8959,27 +18311,49 @@ export namespace Prisma {
     NOT?: DocumentWhereInput | DocumentWhereInput[]
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableFilter<"Document"> | string | null
+    fileName?: StringNullableFilter<"Document"> | string | null
+    fileSize?: IntNullableFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableFilter<"Document"> | number | null
     sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
+    listingId?: StringNullableFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
     buyer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    listing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+    uploader?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type DocumentOrderByWithAggregationInput = {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    fileSize?: SortOrderInput | SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrderInput | SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrderInput | SortOrder
+    listingId?: SortOrderInput | SortOrder
+    uploadedAt?: SortOrderInput | SortOrder
+    downloadedAt?: SortOrderInput | SortOrder
+    uploadedBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DocumentCountOrderByAggregateInput
+    _avg?: DocumentAvgOrderByAggregateInput
     _max?: DocumentMaxOrderByAggregateInput
     _min?: DocumentMinOrderByAggregateInput
+    _sum?: DocumentSumOrderByAggregateInput
   }
 
   export type DocumentScalarWhereWithAggregatesInput = {
@@ -8989,9 +18363,18 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Document"> | string
     type?: EnumDocumentTypeWithAggregatesFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusWithAggregatesFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryWithAggregatesFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    fileName?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    fileSize?: IntNullableWithAggregatesFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeWithAggregatesFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableWithAggregatesFilter<"Document"> | number | null
     sellerId?: StringWithAggregatesFilter<"Document"> | string
     buyerId?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    listingId?: StringNullableWithAggregatesFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableWithAggregatesFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableWithAggregatesFilter<"Document"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
   }
@@ -9005,6 +18388,7 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
+    isActive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     managerId?: StringNullableFilter<"User"> | string | null
@@ -9015,9 +18399,18 @@ export namespace Prisma {
     listings?: ListingListRelationFilter
     buyerDocs?: DocumentListRelationFilter
     sellerDocs?: DocumentListRelationFilter
+    uploadedDocuments?: DocumentListRelationFilter
     activities?: ActivityListRelationFilter
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
+    buyingListings?: ListingListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
+    buyerProgress?: BuyerProgressListRelationFilter
+    sellerQuestionnaire?: XOR<SellerQuestionnaireNullableScalarRelationFilter, SellerQuestionnaireWhereInput> | null
+    buyerNDA?: XOR<BuyerNDANullableScalarRelationFilter, BuyerNDAWhereInput> | null
+    buyerFinancialStatement?: XOR<BuyerFinancialStatementNullableScalarRelationFilter, BuyerFinancialStatementWhereInput> | null
+    updatedChecklists?: PreCloseChecklistListRelationFilter
+    dueDiligenceRequests?: DueDiligenceRequestListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -9026,6 +18419,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     managerId?: SortOrderInput | SortOrder
@@ -9036,9 +18430,18 @@ export namespace Prisma {
     listings?: ListingOrderByRelationAggregateInput
     buyerDocs?: DocumentOrderByRelationAggregateInput
     sellerDocs?: DocumentOrderByRelationAggregateInput
+    uploadedDocuments?: DocumentOrderByRelationAggregateInput
     activities?: ActivityOrderByRelationAggregateInput
     sentMessages?: MessageOrderByRelationAggregateInput
     receivedMessages?: MessageOrderByRelationAggregateInput
+    buyingListings?: ListingOrderByRelationAggregateInput
+    sellerProgress?: SellerProgressOrderByRelationAggregateInput
+    buyerProgress?: BuyerProgressOrderByRelationAggregateInput
+    sellerQuestionnaire?: SellerQuestionnaireOrderByWithRelationInput
+    buyerNDA?: BuyerNDAOrderByWithRelationInput
+    buyerFinancialStatement?: BuyerFinancialStatementOrderByWithRelationInput
+    updatedChecklists?: PreCloseChecklistOrderByRelationAggregateInput
+    dueDiligenceRequests?: DueDiligenceRequestOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -9050,6 +18453,7 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
+    isActive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     managerId?: StringNullableFilter<"User"> | string | null
@@ -9060,9 +18464,18 @@ export namespace Prisma {
     listings?: ListingListRelationFilter
     buyerDocs?: DocumentListRelationFilter
     sellerDocs?: DocumentListRelationFilter
+    uploadedDocuments?: DocumentListRelationFilter
     activities?: ActivityListRelationFilter
     sentMessages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
+    buyingListings?: ListingListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
+    buyerProgress?: BuyerProgressListRelationFilter
+    sellerQuestionnaire?: XOR<SellerQuestionnaireNullableScalarRelationFilter, SellerQuestionnaireWhereInput> | null
+    buyerNDA?: XOR<BuyerNDANullableScalarRelationFilter, BuyerNDAWhereInput> | null
+    buyerFinancialStatement?: XOR<BuyerFinancialStatementNullableScalarRelationFilter, BuyerFinancialStatementWhereInput> | null
+    updatedChecklists?: PreCloseChecklistListRelationFilter
+    dueDiligenceRequests?: DueDiligenceRequestListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -9071,6 +18484,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     managerId?: SortOrderInput | SortOrder
@@ -9092,11 +18506,152 @@ export namespace Prisma {
     password?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+    isActive?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     managerId?: StringNullableWithAggregatesFilter<"User"> | string | null
     unreadCount?: IntWithAggregatesFilter<"User"> | number
     lastReadAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  }
+
+  export type SellerProgressWhereInput = {
+    AND?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    OR?: SellerProgressWhereInput[]
+    NOT?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    id?: StringFilter<"SellerProgress"> | string
+    sellerId?: StringFilter<"SellerProgress"> | string
+    currentStep?: IntFilter<"SellerProgress"> | number
+    completedSteps?: JsonFilter<"SellerProgress">
+    selectedListingId?: StringNullableFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    selectedListing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+  }
+
+  export type SellerProgressOrderByWithRelationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    seller?: UserOrderByWithRelationInput
+    selectedListing?: ListingOrderByWithRelationInput
+  }
+
+  export type SellerProgressWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sellerId?: string
+    AND?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    OR?: SellerProgressWhereInput[]
+    NOT?: SellerProgressWhereInput | SellerProgressWhereInput[]
+    currentStep?: IntFilter<"SellerProgress"> | number
+    completedSteps?: JsonFilter<"SellerProgress">
+    selectedListingId?: StringNullableFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    selectedListing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+  }, "id" | "sellerId">
+
+  export type SellerProgressOrderByWithAggregationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SellerProgressCountOrderByAggregateInput
+    _avg?: SellerProgressAvgOrderByAggregateInput
+    _max?: SellerProgressMaxOrderByAggregateInput
+    _min?: SellerProgressMinOrderByAggregateInput
+    _sum?: SellerProgressSumOrderByAggregateInput
+  }
+
+  export type SellerProgressScalarWhereWithAggregatesInput = {
+    AND?: SellerProgressScalarWhereWithAggregatesInput | SellerProgressScalarWhereWithAggregatesInput[]
+    OR?: SellerProgressScalarWhereWithAggregatesInput[]
+    NOT?: SellerProgressScalarWhereWithAggregatesInput | SellerProgressScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SellerProgress"> | string
+    sellerId?: StringWithAggregatesFilter<"SellerProgress"> | string
+    currentStep?: IntWithAggregatesFilter<"SellerProgress"> | number
+    completedSteps?: JsonWithAggregatesFilter<"SellerProgress">
+    selectedListingId?: StringNullableWithAggregatesFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SellerProgress"> | Date | string
+  }
+
+  export type BuyerProgressWhereInput = {
+    AND?: BuyerProgressWhereInput | BuyerProgressWhereInput[]
+    OR?: BuyerProgressWhereInput[]
+    NOT?: BuyerProgressWhereInput | BuyerProgressWhereInput[]
+    id?: StringFilter<"BuyerProgress"> | string
+    buyerId?: StringFilter<"BuyerProgress"> | string
+    currentStep?: IntFilter<"BuyerProgress"> | number
+    completedSteps?: JsonFilter<"BuyerProgress">
+    selectedListingId?: StringNullableFilter<"BuyerProgress"> | string | null
+    createdAt?: DateTimeFilter<"BuyerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerProgress"> | Date | string
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+    selectedListing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+  }
+
+  export type BuyerProgressOrderByWithRelationInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    buyer?: UserOrderByWithRelationInput
+    selectedListing?: ListingOrderByWithRelationInput
+  }
+
+  export type BuyerProgressWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    buyerId?: string
+    AND?: BuyerProgressWhereInput | BuyerProgressWhereInput[]
+    OR?: BuyerProgressWhereInput[]
+    NOT?: BuyerProgressWhereInput | BuyerProgressWhereInput[]
+    currentStep?: IntFilter<"BuyerProgress"> | number
+    completedSteps?: JsonFilter<"BuyerProgress">
+    selectedListingId?: StringNullableFilter<"BuyerProgress"> | string | null
+    createdAt?: DateTimeFilter<"BuyerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerProgress"> | Date | string
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+    selectedListing?: XOR<ListingNullableScalarRelationFilter, ListingWhereInput> | null
+  }, "id" | "buyerId">
+
+  export type BuyerProgressOrderByWithAggregationInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BuyerProgressCountOrderByAggregateInput
+    _avg?: BuyerProgressAvgOrderByAggregateInput
+    _max?: BuyerProgressMaxOrderByAggregateInput
+    _min?: BuyerProgressMinOrderByAggregateInput
+    _sum?: BuyerProgressSumOrderByAggregateInput
+  }
+
+  export type BuyerProgressScalarWhereWithAggregatesInput = {
+    AND?: BuyerProgressScalarWhereWithAggregatesInput | BuyerProgressScalarWhereWithAggregatesInput[]
+    OR?: BuyerProgressScalarWhereWithAggregatesInput[]
+    NOT?: BuyerProgressScalarWhereWithAggregatesInput | BuyerProgressScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BuyerProgress"> | string
+    buyerId?: StringWithAggregatesFilter<"BuyerProgress"> | string
+    currentStep?: IntWithAggregatesFilter<"BuyerProgress"> | number
+    completedSteps?: JsonWithAggregatesFilter<"BuyerProgress">
+    selectedListingId?: StringNullableWithAggregatesFilter<"BuyerProgress"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BuyerProgress"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BuyerProgress"> | Date | string
   }
 
   export type MessageWhereInput = {
@@ -9305,6 +18860,12 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    buyers?: UserListRelationFilter
+    documents?: DocumentListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
+    buyerSelectedProgress?: BuyerProgressListRelationFilter
+    preCloseChecklist?: XOR<PreCloseChecklistNullableScalarRelationFilter, PreCloseChecklistWhereInput> | null
+    dueDiligenceRequests?: DueDiligenceRequestListRelationFilter
   }
 
   export type ListingOrderByWithRelationInput = {
@@ -9316,6 +18877,12 @@ export namespace Prisma {
     createdAt?: SortOrder
     sellerId?: SortOrder
     seller?: UserOrderByWithRelationInput
+    buyers?: UserOrderByRelationAggregateInput
+    documents?: DocumentOrderByRelationAggregateInput
+    sellerProgress?: SellerProgressOrderByRelationAggregateInput
+    buyerSelectedProgress?: BuyerProgressOrderByRelationAggregateInput
+    preCloseChecklist?: PreCloseChecklistOrderByWithRelationInput
+    dueDiligenceRequests?: DueDiligenceRequestOrderByRelationAggregateInput
   }
 
   export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -9330,6 +18897,12 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Listing"> | Date | string
     sellerId?: StringFilter<"Listing"> | string
     seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+    buyers?: UserListRelationFilter
+    documents?: DocumentListRelationFilter
+    sellerProgress?: SellerProgressListRelationFilter
+    buyerSelectedProgress?: BuyerProgressListRelationFilter
+    preCloseChecklist?: XOR<PreCloseChecklistNullableScalarRelationFilter, PreCloseChecklistWhereInput> | null
+    dueDiligenceRequests?: DueDiligenceRequestListRelationFilter
   }, "id">
 
   export type ListingOrderByWithAggregationInput = {
@@ -9415,24 +18988,389 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Activity"> | Date | string
   }
 
+  export type SellerQuestionnaireWhereInput = {
+    AND?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    OR?: SellerQuestionnaireWhereInput[]
+    NOT?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    id?: StringFilter<"SellerQuestionnaire"> | string
+    sellerId?: StringFilter<"SellerQuestionnaire"> | string
+    data?: JsonFilter<"SellerQuestionnaire">
+    submitted?: BoolFilter<"SellerQuestionnaire"> | boolean
+    submittedAt?: DateTimeNullableFilter<"SellerQuestionnaire"> | Date | string | null
+    createdAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SellerQuestionnaireOrderByWithRelationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    seller?: UserOrderByWithRelationInput
+  }
+
+  export type SellerQuestionnaireWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sellerId?: string
+    AND?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    OR?: SellerQuestionnaireWhereInput[]
+    NOT?: SellerQuestionnaireWhereInput | SellerQuestionnaireWhereInput[]
+    data?: JsonFilter<"SellerQuestionnaire">
+    submitted?: BoolFilter<"SellerQuestionnaire"> | boolean
+    submittedAt?: DateTimeNullableFilter<"SellerQuestionnaire"> | Date | string | null
+    createdAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerQuestionnaire"> | Date | string
+    seller?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "sellerId">
+
+  export type SellerQuestionnaireOrderByWithAggregationInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SellerQuestionnaireCountOrderByAggregateInput
+    _max?: SellerQuestionnaireMaxOrderByAggregateInput
+    _min?: SellerQuestionnaireMinOrderByAggregateInput
+  }
+
+  export type SellerQuestionnaireScalarWhereWithAggregatesInput = {
+    AND?: SellerQuestionnaireScalarWhereWithAggregatesInput | SellerQuestionnaireScalarWhereWithAggregatesInput[]
+    OR?: SellerQuestionnaireScalarWhereWithAggregatesInput[]
+    NOT?: SellerQuestionnaireScalarWhereWithAggregatesInput | SellerQuestionnaireScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SellerQuestionnaire"> | string
+    sellerId?: StringWithAggregatesFilter<"SellerQuestionnaire"> | string
+    data?: JsonWithAggregatesFilter<"SellerQuestionnaire">
+    submitted?: BoolWithAggregatesFilter<"SellerQuestionnaire"> | boolean
+    submittedAt?: DateTimeNullableWithAggregatesFilter<"SellerQuestionnaire"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SellerQuestionnaire"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SellerQuestionnaire"> | Date | string
+  }
+
+  export type BuyerNDAWhereInput = {
+    AND?: BuyerNDAWhereInput | BuyerNDAWhereInput[]
+    OR?: BuyerNDAWhereInput[]
+    NOT?: BuyerNDAWhereInput | BuyerNDAWhereInput[]
+    id?: StringFilter<"BuyerNDA"> | string
+    buyerId?: StringFilter<"BuyerNDA"> | string
+    data?: JsonFilter<"BuyerNDA">
+    submitted?: BoolFilter<"BuyerNDA"> | boolean
+    submittedAt?: DateTimeNullableFilter<"BuyerNDA"> | Date | string | null
+    createdAt?: DateTimeFilter<"BuyerNDA"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerNDA"> | Date | string
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type BuyerNDAOrderByWithRelationInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    buyer?: UserOrderByWithRelationInput
+  }
+
+  export type BuyerNDAWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    buyerId?: string
+    AND?: BuyerNDAWhereInput | BuyerNDAWhereInput[]
+    OR?: BuyerNDAWhereInput[]
+    NOT?: BuyerNDAWhereInput | BuyerNDAWhereInput[]
+    data?: JsonFilter<"BuyerNDA">
+    submitted?: BoolFilter<"BuyerNDA"> | boolean
+    submittedAt?: DateTimeNullableFilter<"BuyerNDA"> | Date | string | null
+    createdAt?: DateTimeFilter<"BuyerNDA"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerNDA"> | Date | string
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "buyerId">
+
+  export type BuyerNDAOrderByWithAggregationInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BuyerNDACountOrderByAggregateInput
+    _max?: BuyerNDAMaxOrderByAggregateInput
+    _min?: BuyerNDAMinOrderByAggregateInput
+  }
+
+  export type BuyerNDAScalarWhereWithAggregatesInput = {
+    AND?: BuyerNDAScalarWhereWithAggregatesInput | BuyerNDAScalarWhereWithAggregatesInput[]
+    OR?: BuyerNDAScalarWhereWithAggregatesInput[]
+    NOT?: BuyerNDAScalarWhereWithAggregatesInput | BuyerNDAScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BuyerNDA"> | string
+    buyerId?: StringWithAggregatesFilter<"BuyerNDA"> | string
+    data?: JsonWithAggregatesFilter<"BuyerNDA">
+    submitted?: BoolWithAggregatesFilter<"BuyerNDA"> | boolean
+    submittedAt?: DateTimeNullableWithAggregatesFilter<"BuyerNDA"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BuyerNDA"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BuyerNDA"> | Date | string
+  }
+
+  export type BuyerFinancialStatementWhereInput = {
+    AND?: BuyerFinancialStatementWhereInput | BuyerFinancialStatementWhereInput[]
+    OR?: BuyerFinancialStatementWhereInput[]
+    NOT?: BuyerFinancialStatementWhereInput | BuyerFinancialStatementWhereInput[]
+    id?: StringFilter<"BuyerFinancialStatement"> | string
+    buyerId?: StringFilter<"BuyerFinancialStatement"> | string
+    data?: JsonFilter<"BuyerFinancialStatement">
+    submitted?: BoolFilter<"BuyerFinancialStatement"> | boolean
+    submittedAt?: DateTimeNullableFilter<"BuyerFinancialStatement"> | Date | string | null
+    createdAt?: DateTimeFilter<"BuyerFinancialStatement"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerFinancialStatement"> | Date | string
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type BuyerFinancialStatementOrderByWithRelationInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    buyer?: UserOrderByWithRelationInput
+  }
+
+  export type BuyerFinancialStatementWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    buyerId?: string
+    AND?: BuyerFinancialStatementWhereInput | BuyerFinancialStatementWhereInput[]
+    OR?: BuyerFinancialStatementWhereInput[]
+    NOT?: BuyerFinancialStatementWhereInput | BuyerFinancialStatementWhereInput[]
+    data?: JsonFilter<"BuyerFinancialStatement">
+    submitted?: BoolFilter<"BuyerFinancialStatement"> | boolean
+    submittedAt?: DateTimeNullableFilter<"BuyerFinancialStatement"> | Date | string | null
+    createdAt?: DateTimeFilter<"BuyerFinancialStatement"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerFinancialStatement"> | Date | string
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "buyerId">
+
+  export type BuyerFinancialStatementOrderByWithAggregationInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BuyerFinancialStatementCountOrderByAggregateInput
+    _max?: BuyerFinancialStatementMaxOrderByAggregateInput
+    _min?: BuyerFinancialStatementMinOrderByAggregateInput
+  }
+
+  export type BuyerFinancialStatementScalarWhereWithAggregatesInput = {
+    AND?: BuyerFinancialStatementScalarWhereWithAggregatesInput | BuyerFinancialStatementScalarWhereWithAggregatesInput[]
+    OR?: BuyerFinancialStatementScalarWhereWithAggregatesInput[]
+    NOT?: BuyerFinancialStatementScalarWhereWithAggregatesInput | BuyerFinancialStatementScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BuyerFinancialStatement"> | string
+    buyerId?: StringWithAggregatesFilter<"BuyerFinancialStatement"> | string
+    data?: JsonWithAggregatesFilter<"BuyerFinancialStatement">
+    submitted?: BoolWithAggregatesFilter<"BuyerFinancialStatement"> | boolean
+    submittedAt?: DateTimeNullableWithAggregatesFilter<"BuyerFinancialStatement"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BuyerFinancialStatement"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BuyerFinancialStatement"> | Date | string
+  }
+
+  export type PreCloseChecklistWhereInput = {
+    AND?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    OR?: PreCloseChecklistWhereInput[]
+    NOT?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    id?: StringFilter<"PreCloseChecklist"> | string
+    listingId?: StringFilter<"PreCloseChecklist"> | string
+    buyerItems?: JsonFilter<"PreCloseChecklist">
+    sellerItems?: JsonFilter<"PreCloseChecklist">
+    brokerItems?: JsonFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+    lastUpdatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type PreCloseChecklistOrderByWithRelationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerItems?: SortOrder
+    sellerItems?: SortOrder
+    brokerItems?: SortOrder
+    lastUpdatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    listing?: ListingOrderByWithRelationInput
+    lastUpdatedByUser?: UserOrderByWithRelationInput
+  }
+
+  export type PreCloseChecklistWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    listingId?: string
+    AND?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    OR?: PreCloseChecklistWhereInput[]
+    NOT?: PreCloseChecklistWhereInput | PreCloseChecklistWhereInput[]
+    buyerItems?: JsonFilter<"PreCloseChecklist">
+    sellerItems?: JsonFilter<"PreCloseChecklist">
+    brokerItems?: JsonFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+    lastUpdatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "listingId">
+
+  export type PreCloseChecklistOrderByWithAggregationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerItems?: SortOrder
+    sellerItems?: SortOrder
+    brokerItems?: SortOrder
+    lastUpdatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PreCloseChecklistCountOrderByAggregateInput
+    _max?: PreCloseChecklistMaxOrderByAggregateInput
+    _min?: PreCloseChecklistMinOrderByAggregateInput
+  }
+
+  export type PreCloseChecklistScalarWhereWithAggregatesInput = {
+    AND?: PreCloseChecklistScalarWhereWithAggregatesInput | PreCloseChecklistScalarWhereWithAggregatesInput[]
+    OR?: PreCloseChecklistScalarWhereWithAggregatesInput[]
+    NOT?: PreCloseChecklistScalarWhereWithAggregatesInput | PreCloseChecklistScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PreCloseChecklist"> | string
+    listingId?: StringWithAggregatesFilter<"PreCloseChecklist"> | string
+    buyerItems?: JsonWithAggregatesFilter<"PreCloseChecklist">
+    sellerItems?: JsonWithAggregatesFilter<"PreCloseChecklist">
+    brokerItems?: JsonWithAggregatesFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableWithAggregatesFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PreCloseChecklist"> | Date | string
+  }
+
+  export type DueDiligenceRequestWhereInput = {
+    AND?: DueDiligenceRequestWhereInput | DueDiligenceRequestWhereInput[]
+    OR?: DueDiligenceRequestWhereInput[]
+    NOT?: DueDiligenceRequestWhereInput | DueDiligenceRequestWhereInput[]
+    id?: StringFilter<"DueDiligenceRequest"> | string
+    listingId?: StringFilter<"DueDiligenceRequest"> | string
+    buyerId?: StringFilter<"DueDiligenceRequest"> | string
+    documentName?: StringFilter<"DueDiligenceRequest"> | string
+    status?: EnumDueDiligenceStatusFilter<"DueDiligenceRequest"> | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    fulfilledAt?: DateTimeNullableFilter<"DueDiligenceRequest"> | Date | string | null
+    createdAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type DueDiligenceRequestOrderByWithRelationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerId?: SortOrder
+    documentName?: SortOrder
+    status?: SortOrder
+    requestedAt?: SortOrder
+    fulfilledAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    listing?: ListingOrderByWithRelationInput
+    buyer?: UserOrderByWithRelationInput
+  }
+
+  export type DueDiligenceRequestWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    listingId_buyerId_documentName?: DueDiligenceRequestListingIdBuyerIdDocumentNameCompoundUniqueInput
+    AND?: DueDiligenceRequestWhereInput | DueDiligenceRequestWhereInput[]
+    OR?: DueDiligenceRequestWhereInput[]
+    NOT?: DueDiligenceRequestWhereInput | DueDiligenceRequestWhereInput[]
+    listingId?: StringFilter<"DueDiligenceRequest"> | string
+    buyerId?: StringFilter<"DueDiligenceRequest"> | string
+    documentName?: StringFilter<"DueDiligenceRequest"> | string
+    status?: EnumDueDiligenceStatusFilter<"DueDiligenceRequest"> | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    fulfilledAt?: DateTimeNullableFilter<"DueDiligenceRequest"> | Date | string | null
+    createdAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    listing?: XOR<ListingScalarRelationFilter, ListingWhereInput>
+    buyer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "listingId_buyerId_documentName">
+
+  export type DueDiligenceRequestOrderByWithAggregationInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerId?: SortOrder
+    documentName?: SortOrder
+    status?: SortOrder
+    requestedAt?: SortOrder
+    fulfilledAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DueDiligenceRequestCountOrderByAggregateInput
+    _max?: DueDiligenceRequestMaxOrderByAggregateInput
+    _min?: DueDiligenceRequestMinOrderByAggregateInput
+  }
+
+  export type DueDiligenceRequestScalarWhereWithAggregatesInput = {
+    AND?: DueDiligenceRequestScalarWhereWithAggregatesInput | DueDiligenceRequestScalarWhereWithAggregatesInput[]
+    OR?: DueDiligenceRequestScalarWhereWithAggregatesInput[]
+    NOT?: DueDiligenceRequestScalarWhereWithAggregatesInput | DueDiligenceRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DueDiligenceRequest"> | string
+    listingId?: StringWithAggregatesFilter<"DueDiligenceRequest"> | string
+    buyerId?: StringWithAggregatesFilter<"DueDiligenceRequest"> | string
+    documentName?: StringWithAggregatesFilter<"DueDiligenceRequest"> | string
+    status?: EnumDueDiligenceStatusWithAggregatesFilter<"DueDiligenceRequest"> | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeWithAggregatesFilter<"DueDiligenceRequest"> | Date | string
+    fulfilledAt?: DateTimeNullableWithAggregatesFilter<"DueDiligenceRequest"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DueDiligenceRequest"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DueDiligenceRequest"> | Date | string
+  }
+
   export type DocumentCreateInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerDocsInput
     buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
   }
 
   export type DocumentUncheckedCreateInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9441,20 +19379,38 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
     buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
   }
 
   export type DocumentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9463,9 +19419,18 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9474,7 +19439,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9483,9 +19455,18 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9496,6 +19477,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -9505,9 +19487,18 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -9516,6 +19507,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -9525,9 +19517,18 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUpdateInput = {
@@ -9536,6 +19537,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -9545,9 +19547,18 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -9556,6 +19567,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9565,9 +19577,18 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -9576,6 +19597,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -9589,6 +19611,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -9601,11 +19624,148 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
     unreadCount?: IntFieldUpdateOperationsInput | number
     lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type SellerProgressCreateInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerProgressInput
+    selectedListing?: ListingCreateNestedOneWithoutSellerProgressInput
+  }
+
+  export type SellerProgressUncheckedCreateInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerProgressNestedInput
+    selectedListing?: ListingUpdateOneWithoutSellerProgressNestedInput
+  }
+
+  export type SellerProgressUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressCreateManyInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressCreateInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer: UserCreateNestedOneWithoutBuyerProgressInput
+    selectedListing?: ListingCreateNestedOneWithoutBuyerSelectedProgressInput
+  }
+
+  export type BuyerProgressUncheckedCreateInput = {
+    id?: string
+    buyerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerProgressUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneRequiredWithoutBuyerProgressNestedInput
+    selectedListing?: ListingUpdateOneWithoutBuyerSelectedProgressNestedInput
+  }
+
+  export type BuyerProgressUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressCreateManyInput = {
+    id?: string
+    buyerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerProgressUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageCreateInput = {
@@ -9830,6 +19990,12 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
   }
 
   export type ListingUncheckedCreateInput = {
@@ -9840,6 +20006,12 @@ export namespace Prisma {
     status?: $Enums.ListingStatus
     createdAt?: Date | string
     sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
   }
 
   export type ListingUpdateInput = {
@@ -9850,6 +20022,12 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateInput = {
@@ -9860,6 +20038,12 @@ export namespace Prisma {
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
   }
 
   export type ListingCreateManyInput = {
@@ -9946,6 +20130,370 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SellerQuestionnaireCreateInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerQuestionnaireInput
+  }
+
+  export type SellerQuestionnaireUncheckedCreateInput = {
+    id?: string
+    sellerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerQuestionnaireNestedInput
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerQuestionnaireCreateManyInput = {
+    id?: string
+    sellerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerNDACreateInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer: UserCreateNestedOneWithoutBuyerNDAInput
+  }
+
+  export type BuyerNDAUncheckedCreateInput = {
+    id?: string
+    buyerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerNDAUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneRequiredWithoutBuyerNDANestedInput
+  }
+
+  export type BuyerNDAUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerNDACreateManyInput = {
+    id?: string
+    buyerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerNDAUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerNDAUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerFinancialStatementCreateInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer: UserCreateNestedOneWithoutBuyerFinancialStatementInput
+  }
+
+  export type BuyerFinancialStatementUncheckedCreateInput = {
+    id?: string
+    buyerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerFinancialStatementUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneRequiredWithoutBuyerFinancialStatementNestedInput
+  }
+
+  export type BuyerFinancialStatementUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerFinancialStatementCreateManyInput = {
+    id?: string
+    buyerId: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerFinancialStatementUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerFinancialStatementUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistCreateInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutPreCloseChecklistInput
+    lastUpdatedByUser?: UserCreateNestedOneWithoutUpdatedChecklistsInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutPreCloseChecklistNestedInput
+    lastUpdatedByUser?: UserUpdateOneWithoutUpdatedChecklistsNestedInput
+  }
+
+  export type PreCloseChecklistUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistCreateManyInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestCreateInput = {
+    id?: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutDueDiligenceRequestsInput
+    buyer: UserCreateNestedOneWithoutDueDiligenceRequestsInput
+  }
+
+  export type DueDiligenceRequestUncheckedCreateInput = {
+    id?: string
+    listingId: string
+    buyerId: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DueDiligenceRequestUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutDueDiligenceRequestsNestedInput
+    buyer?: UserUpdateOneRequiredWithoutDueDiligenceRequestsNestedInput
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestCreateManyInput = {
+    id?: string
+    listingId: string
+    buyerId: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DueDiligenceRequestUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9975,6 +20523,13 @@ export namespace Prisma {
     not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
   }
 
+  export type EnumDocumentCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryFilter<$PrismaModel> | $Enums.DocumentCategory
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -9988,6 +20543,35 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type EnumDocumentOperationTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeFilter<$PrismaModel> | $Enums.DocumentOperationType
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -10011,6 +20595,11 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
+  export type ListingNullableScalarRelationFilter = {
+    is?: ListingWhereInput | null
+    isNot?: ListingWhereInput | null
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -10020,20 +20609,43 @@ export namespace Prisma {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrder
+    fileName?: SortOrder
+    fileSize?: SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrder
+    listingId?: SortOrder
+    uploadedAt?: SortOrder
+    downloadedAt?: SortOrder
+    uploadedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type DocumentAvgOrderByAggregateInput = {
+    fileSize?: SortOrder
+    stepId?: SortOrder
   }
 
   export type DocumentMaxOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrder
+    fileName?: SortOrder
+    fileSize?: SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrder
+    listingId?: SortOrder
+    uploadedAt?: SortOrder
+    downloadedAt?: SortOrder
+    uploadedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10042,11 +20654,25 @@ export namespace Prisma {
     id?: SortOrder
     type?: SortOrder
     status?: SortOrder
+    category?: SortOrder
     url?: SortOrder
+    fileName?: SortOrder
+    fileSize?: SortOrder
+    operationType?: SortOrder
+    stepId?: SortOrder
     sellerId?: SortOrder
     buyerId?: SortOrder
+    listingId?: SortOrder
+    uploadedAt?: SortOrder
+    downloadedAt?: SortOrder
+    uploadedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type DocumentSumOrderByAggregateInput = {
+    fileSize?: SortOrder
+    stepId?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -10087,6 +20713,16 @@ export namespace Prisma {
     _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
   }
 
+  export type EnumDocumentCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryWithAggregatesFilter<$PrismaModel> | $Enums.DocumentCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentCategoryFilter<$PrismaModel>
+    _max?: NestedEnumDocumentCategoryFilter<$PrismaModel>
+  }
+
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -10103,6 +20739,46 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type EnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel> | $Enums.DocumentOperationType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+    _max?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10126,6 +20802,11 @@ export namespace Prisma {
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -10135,17 +20816,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type UserListRelationFilter = {
@@ -10178,6 +20848,45 @@ export namespace Prisma {
     none?: MessageWhereInput
   }
 
+  export type SellerProgressListRelationFilter = {
+    every?: SellerProgressWhereInput
+    some?: SellerProgressWhereInput
+    none?: SellerProgressWhereInput
+  }
+
+  export type BuyerProgressListRelationFilter = {
+    every?: BuyerProgressWhereInput
+    some?: BuyerProgressWhereInput
+    none?: BuyerProgressWhereInput
+  }
+
+  export type SellerQuestionnaireNullableScalarRelationFilter = {
+    is?: SellerQuestionnaireWhereInput | null
+    isNot?: SellerQuestionnaireWhereInput | null
+  }
+
+  export type BuyerNDANullableScalarRelationFilter = {
+    is?: BuyerNDAWhereInput | null
+    isNot?: BuyerNDAWhereInput | null
+  }
+
+  export type BuyerFinancialStatementNullableScalarRelationFilter = {
+    is?: BuyerFinancialStatementWhereInput | null
+    isNot?: BuyerFinancialStatementWhereInput | null
+  }
+
+  export type PreCloseChecklistListRelationFilter = {
+    every?: PreCloseChecklistWhereInput
+    some?: PreCloseChecklistWhereInput
+    none?: PreCloseChecklistWhereInput
+  }
+
+  export type DueDiligenceRequestListRelationFilter = {
+    every?: DueDiligenceRequestWhereInput
+    some?: DueDiligenceRequestWhereInput
+    none?: DueDiligenceRequestWhereInput
+  }
+
   export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -10198,12 +20907,29 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type SellerProgressOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BuyerProgressOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PreCloseChecklistOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DueDiligenceRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     managerId?: SortOrder
@@ -10221,6 +20947,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     managerId?: SortOrder
@@ -10234,6 +20961,7 @@ export namespace Prisma {
     password?: SortOrder
     name?: SortOrder
     role?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     managerId?: SortOrder
@@ -10255,6 +20983,14 @@ export namespace Prisma {
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -10270,19 +21006,126 @@ export namespace Prisma {
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type SellerProgressCountOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerProgressAvgOrderByAggregateInput = {
+    currentStep?: SortOrder
+  }
+
+  export type SellerProgressMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerProgressMinOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    currentStep?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerProgressSumOrderByAggregateInput = {
+    currentStep?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type BuyerProgressCountOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    currentStep?: SortOrder
+    completedSteps?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerProgressAvgOrderByAggregateInput = {
+    currentStep?: SortOrder
+  }
+
+  export type BuyerProgressMaxOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    currentStep?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerProgressMinOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    currentStep?: SortOrder
+    selectedListingId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerProgressSumOrderByAggregateInput = {
+    currentStep?: SortOrder
   }
 
   export type EnumMessageStatusFilter<$PrismaModel = never> = {
@@ -10290,11 +21133,6 @@ export namespace Prisma {
     in?: $Enums.MessageStatus[] | ListEnumMessageStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.MessageStatus[] | ListEnumMessageStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumMessageStatusFilter<$PrismaModel> | $Enums.MessageStatus
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type MessageNullableScalarRelationFilter = {
@@ -10382,14 +21220,6 @@ export namespace Prisma {
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
   }
 
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type MessageScalarRelationFilter = {
     is?: MessageWhereInput
     isNot?: MessageWhereInput
@@ -10449,6 +21279,11 @@ export namespace Prisma {
     in?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.ListingStatus[] | ListEnumListingStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
+  }
+
+  export type PreCloseChecklistNullableScalarRelationFilter = {
+    is?: PreCloseChecklistWhereInput | null
+    isNot?: PreCloseChecklistWhereInput | null
   }
 
   export type ListingCountOrderByAggregateInput = {
@@ -10586,6 +21421,181 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
+  export type SellerQuestionnaireCountOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerQuestionnaireMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SellerQuestionnaireMinOrderByAggregateInput = {
+    id?: SortOrder
+    sellerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerNDACountOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerNDAMaxOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerNDAMinOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerFinancialStatementCountOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    data?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerFinancialStatementMaxOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuyerFinancialStatementMinOrderByAggregateInput = {
+    id?: SortOrder
+    buyerId?: SortOrder
+    submitted?: SortOrder
+    submittedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ListingScalarRelationFilter = {
+    is?: ListingWhereInput
+    isNot?: ListingWhereInput
+  }
+
+  export type PreCloseChecklistCountOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerItems?: SortOrder
+    sellerItems?: SortOrder
+    brokerItems?: SortOrder
+    lastUpdatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PreCloseChecklistMaxOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    lastUpdatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PreCloseChecklistMinOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    lastUpdatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumDueDiligenceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DueDiligenceStatus | EnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDueDiligenceStatusFilter<$PrismaModel> | $Enums.DueDiligenceStatus
+  }
+
+  export type DueDiligenceRequestListingIdBuyerIdDocumentNameCompoundUniqueInput = {
+    listingId: string
+    buyerId: string
+    documentName: string
+  }
+
+  export type DueDiligenceRequestCountOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerId?: SortOrder
+    documentName?: SortOrder
+    status?: SortOrder
+    requestedAt?: SortOrder
+    fulfilledAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DueDiligenceRequestMaxOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerId?: SortOrder
+    documentName?: SortOrder
+    status?: SortOrder
+    requestedAt?: SortOrder
+    fulfilledAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DueDiligenceRequestMinOrderByAggregateInput = {
+    id?: SortOrder
+    listingId?: SortOrder
+    buyerId?: SortOrder
+    documentName?: SortOrder
+    status?: SortOrder
+    requestedAt?: SortOrder
+    fulfilledAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumDueDiligenceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DueDiligenceStatus | EnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDueDiligenceStatusWithAggregatesFilter<$PrismaModel> | $Enums.DueDiligenceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDueDiligenceStatusFilter<$PrismaModel>
+    _max?: NestedEnumDueDiligenceStatusFilter<$PrismaModel>
+  }
+
   export type UserCreateNestedOneWithoutSellerDocsInput = {
     create?: XOR<UserCreateWithoutSellerDocsInput, UserUncheckedCreateWithoutSellerDocsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSellerDocsInput
@@ -10595,6 +21605,18 @@ export namespace Prisma {
   export type UserCreateNestedOneWithoutBuyerDocsInput = {
     create?: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
     connectOrCreate?: UserCreateOrConnectWithoutBuyerDocsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ListingCreateNestedOneWithoutDocumentsInput = {
+    create?: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutDocumentsInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutUploadedDocumentsInput = {
+    create?: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUploadedDocumentsInput
     connect?: UserWhereUniqueInput
   }
 
@@ -10610,8 +21632,28 @@ export namespace Prisma {
     set?: $Enums.DocumentStatus
   }
 
+  export type EnumDocumentCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentCategory
+  }
+
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type EnumDocumentOperationTypeFieldUpdateOperationsInput = {
+    set?: $Enums.DocumentOperationType
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -10634,6 +21676,26 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerDocsInput, UserUpdateWithoutBuyerDocsInput>, UserUncheckedUpdateWithoutBuyerDocsInput>
+  }
+
+  export type ListingUpdateOneWithoutDocumentsNestedInput = {
+    create?: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutDocumentsInput
+    upsert?: ListingUpsertWithoutDocumentsInput
+    disconnect?: ListingWhereInput | boolean
+    delete?: ListingWhereInput | boolean
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutDocumentsInput, ListingUpdateWithoutDocumentsInput>, ListingUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type UserUpdateOneWithoutUploadedDocumentsNestedInput = {
+    create?: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUploadedDocumentsInput
+    upsert?: UserUpsertWithoutUploadedDocumentsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUploadedDocumentsInput, UserUpdateWithoutUploadedDocumentsInput>, UserUncheckedUpdateWithoutUploadedDocumentsInput>
   }
 
   export type UserCreateNestedOneWithoutManagingInput = {
@@ -10670,6 +21732,13 @@ export namespace Prisma {
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
+  export type DocumentCreateNestedManyWithoutUploaderInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
   export type ActivityCreateNestedManyWithoutUserInput = {
     create?: XOR<ActivityCreateWithoutUserInput, ActivityUncheckedCreateWithoutUserInput> | ActivityCreateWithoutUserInput[] | ActivityUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActivityCreateOrConnectWithoutUserInput | ActivityCreateOrConnectWithoutUserInput[]
@@ -10689,6 +21758,58 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutReceiverInput | MessageCreateOrConnectWithoutReceiverInput[]
     createMany?: MessageCreateManyReceiverInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type ListingCreateNestedManyWithoutBuyersInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+  }
+
+  export type SellerProgressCreateNestedManyWithoutSellerInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
+  export type BuyerProgressCreateNestedManyWithoutBuyerInput = {
+    create?: XOR<BuyerProgressCreateWithoutBuyerInput, BuyerProgressUncheckedCreateWithoutBuyerInput> | BuyerProgressCreateWithoutBuyerInput[] | BuyerProgressUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutBuyerInput | BuyerProgressCreateOrConnectWithoutBuyerInput[]
+    createMany?: BuyerProgressCreateManyBuyerInputEnvelope
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+  }
+
+  export type SellerQuestionnaireCreateNestedOneWithoutSellerInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    connect?: SellerQuestionnaireWhereUniqueInput
+  }
+
+  export type BuyerNDACreateNestedOneWithoutBuyerInput = {
+    create?: XOR<BuyerNDACreateWithoutBuyerInput, BuyerNDAUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerNDACreateOrConnectWithoutBuyerInput
+    connect?: BuyerNDAWhereUniqueInput
+  }
+
+  export type BuyerFinancialStatementCreateNestedOneWithoutBuyerInput = {
+    create?: XOR<BuyerFinancialStatementCreateWithoutBuyerInput, BuyerFinancialStatementUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerFinancialStatementCreateOrConnectWithoutBuyerInput
+    connect?: BuyerFinancialStatementWhereUniqueInput
+  }
+
+  export type PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+  }
+
+  export type DueDiligenceRequestCreateNestedManyWithoutBuyerInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutBuyerInput, DueDiligenceRequestUncheckedCreateWithoutBuyerInput> | DueDiligenceRequestCreateWithoutBuyerInput[] | DueDiligenceRequestUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutBuyerInput | DueDiligenceRequestCreateOrConnectWithoutBuyerInput[]
+    createMany?: DueDiligenceRequestCreateManyBuyerInputEnvelope
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
   }
 
   export type UserUncheckedCreateNestedManyWithoutManagedByInput = {
@@ -10719,6 +21840,13 @@ export namespace Prisma {
     connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
+  export type DocumentUncheckedCreateNestedManyWithoutUploaderInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
   export type ActivityUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<ActivityCreateWithoutUserInput, ActivityUncheckedCreateWithoutUserInput> | ActivityCreateWithoutUserInput[] | ActivityUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActivityCreateOrConnectWithoutUserInput | ActivityCreateOrConnectWithoutUserInput[]
@@ -10740,8 +21868,64 @@ export namespace Prisma {
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
   }
 
+  export type ListingUncheckedCreateNestedManyWithoutBuyersInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+  }
+
+  export type SellerProgressUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
+  export type BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput = {
+    create?: XOR<BuyerProgressCreateWithoutBuyerInput, BuyerProgressUncheckedCreateWithoutBuyerInput> | BuyerProgressCreateWithoutBuyerInput[] | BuyerProgressUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutBuyerInput | BuyerProgressCreateOrConnectWithoutBuyerInput[]
+    createMany?: BuyerProgressCreateManyBuyerInputEnvelope
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+  }
+
+  export type SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    connect?: SellerQuestionnaireWhereUniqueInput
+  }
+
+  export type BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput = {
+    create?: XOR<BuyerNDACreateWithoutBuyerInput, BuyerNDAUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerNDACreateOrConnectWithoutBuyerInput
+    connect?: BuyerNDAWhereUniqueInput
+  }
+
+  export type BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput = {
+    create?: XOR<BuyerFinancialStatementCreateWithoutBuyerInput, BuyerFinancialStatementUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerFinancialStatementCreateOrConnectWithoutBuyerInput
+    connect?: BuyerFinancialStatementWhereUniqueInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+  }
+
+  export type DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutBuyerInput, DueDiligenceRequestUncheckedCreateWithoutBuyerInput> | DueDiligenceRequestCreateWithoutBuyerInput[] | DueDiligenceRequestUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutBuyerInput | DueDiligenceRequestCreateOrConnectWithoutBuyerInput[]
+    createMany?: DueDiligenceRequestCreateManyBuyerInputEnvelope
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+  }
+
   export type EnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -10750,10 +21934,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type UserUpdateOneWithoutManagingNestedInput = {
@@ -10822,6 +22002,20 @@ export namespace Prisma {
     deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
+  export type DocumentUpdateManyWithoutUploaderNestedInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutUploaderInput | DocumentUpsertWithWhereUniqueWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutUploaderInput | DocumentUpdateWithWhereUniqueWithoutUploaderInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutUploaderInput | DocumentUpdateManyWithWhereWithoutUploaderInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
   export type ActivityUpdateManyWithoutUserNestedInput = {
     create?: XOR<ActivityCreateWithoutUserInput, ActivityUncheckedCreateWithoutUserInput> | ActivityCreateWithoutUserInput[] | ActivityUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActivityCreateOrConnectWithoutUserInput | ActivityCreateOrConnectWithoutUserInput[]
@@ -10862,6 +22056,105 @@ export namespace Prisma {
     update?: MessageUpdateWithWhereUniqueWithoutReceiverInput | MessageUpdateWithWhereUniqueWithoutReceiverInput[]
     updateMany?: MessageUpdateManyWithWhereWithoutReceiverInput | MessageUpdateManyWithWhereWithoutReceiverInput[]
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type ListingUpdateManyWithoutBuyersNestedInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    upsert?: ListingUpsertWithWhereUniqueWithoutBuyersInput | ListingUpsertWithWhereUniqueWithoutBuyersInput[]
+    set?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    disconnect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    delete?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    update?: ListingUpdateWithWhereUniqueWithoutBuyersInput | ListingUpdateWithWhereUniqueWithoutBuyersInput[]
+    updateMany?: ListingUpdateManyWithWhereWithoutBuyersInput | ListingUpdateManyWithWhereWithoutBuyersInput[]
+    deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
+  }
+
+  export type SellerProgressUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSellerInput | SellerProgressUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSellerInput | SellerProgressUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSellerInput | SellerProgressUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
+  export type BuyerProgressUpdateManyWithoutBuyerNestedInput = {
+    create?: XOR<BuyerProgressCreateWithoutBuyerInput, BuyerProgressUncheckedCreateWithoutBuyerInput> | BuyerProgressCreateWithoutBuyerInput[] | BuyerProgressUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutBuyerInput | BuyerProgressCreateOrConnectWithoutBuyerInput[]
+    upsert?: BuyerProgressUpsertWithWhereUniqueWithoutBuyerInput | BuyerProgressUpsertWithWhereUniqueWithoutBuyerInput[]
+    createMany?: BuyerProgressCreateManyBuyerInputEnvelope
+    set?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    disconnect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    delete?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    update?: BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput | BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput[]
+    updateMany?: BuyerProgressUpdateManyWithWhereWithoutBuyerInput | BuyerProgressUpdateManyWithWhereWithoutBuyerInput[]
+    deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+  }
+
+  export type SellerQuestionnaireUpdateOneWithoutSellerNestedInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    upsert?: SellerQuestionnaireUpsertWithoutSellerInput
+    disconnect?: SellerQuestionnaireWhereInput | boolean
+    delete?: SellerQuestionnaireWhereInput | boolean
+    connect?: SellerQuestionnaireWhereUniqueInput
+    update?: XOR<XOR<SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput, SellerQuestionnaireUpdateWithoutSellerInput>, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type BuyerNDAUpdateOneWithoutBuyerNestedInput = {
+    create?: XOR<BuyerNDACreateWithoutBuyerInput, BuyerNDAUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerNDACreateOrConnectWithoutBuyerInput
+    upsert?: BuyerNDAUpsertWithoutBuyerInput
+    disconnect?: BuyerNDAWhereInput | boolean
+    delete?: BuyerNDAWhereInput | boolean
+    connect?: BuyerNDAWhereUniqueInput
+    update?: XOR<XOR<BuyerNDAUpdateToOneWithWhereWithoutBuyerInput, BuyerNDAUpdateWithoutBuyerInput>, BuyerNDAUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput = {
+    create?: XOR<BuyerFinancialStatementCreateWithoutBuyerInput, BuyerFinancialStatementUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerFinancialStatementCreateOrConnectWithoutBuyerInput
+    upsert?: BuyerFinancialStatementUpsertWithoutBuyerInput
+    disconnect?: BuyerFinancialStatementWhereInput | boolean
+    delete?: BuyerFinancialStatementWhereInput | boolean
+    connect?: BuyerFinancialStatementWhereUniqueInput
+    update?: XOR<XOR<BuyerFinancialStatementUpdateToOneWithWhereWithoutBuyerInput, BuyerFinancialStatementUpdateWithoutBuyerInput>, BuyerFinancialStatementUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    upsert?: PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    set?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    disconnect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    delete?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    update?: PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    updateMany?: PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput[]
+    deleteMany?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+  }
+
+  export type DueDiligenceRequestUpdateManyWithoutBuyerNestedInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutBuyerInput, DueDiligenceRequestUncheckedCreateWithoutBuyerInput> | DueDiligenceRequestCreateWithoutBuyerInput[] | DueDiligenceRequestUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutBuyerInput | DueDiligenceRequestCreateOrConnectWithoutBuyerInput[]
+    upsert?: DueDiligenceRequestUpsertWithWhereUniqueWithoutBuyerInput | DueDiligenceRequestUpsertWithWhereUniqueWithoutBuyerInput[]
+    createMany?: DueDiligenceRequestCreateManyBuyerInputEnvelope
+    set?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    disconnect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    delete?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    update?: DueDiligenceRequestUpdateWithWhereUniqueWithoutBuyerInput | DueDiligenceRequestUpdateWithWhereUniqueWithoutBuyerInput[]
+    updateMany?: DueDiligenceRequestUpdateManyWithWhereWithoutBuyerInput | DueDiligenceRequestUpdateManyWithWhereWithoutBuyerInput[]
+    deleteMany?: DueDiligenceRequestScalarWhereInput | DueDiligenceRequestScalarWhereInput[]
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByNestedInput = {
@@ -10920,6 +22213,20 @@ export namespace Prisma {
     deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
+  export type DocumentUncheckedUpdateManyWithoutUploaderNestedInput = {
+    create?: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput> | DocumentCreateWithoutUploaderInput[] | DocumentUncheckedCreateWithoutUploaderInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutUploaderInput | DocumentCreateOrConnectWithoutUploaderInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutUploaderInput | DocumentUpsertWithWhereUniqueWithoutUploaderInput[]
+    createMany?: DocumentCreateManyUploaderInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutUploaderInput | DocumentUpdateWithWhereUniqueWithoutUploaderInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutUploaderInput | DocumentUpdateManyWithWhereWithoutUploaderInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
   export type ActivityUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<ActivityCreateWithoutUserInput, ActivityUncheckedCreateWithoutUserInput> | ActivityCreateWithoutUserInput[] | ActivityUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActivityCreateOrConnectWithoutUserInput | ActivityCreateOrConnectWithoutUserInput[]
@@ -10960,6 +22267,165 @@ export namespace Prisma {
     update?: MessageUpdateWithWhereUniqueWithoutReceiverInput | MessageUpdateWithWhereUniqueWithoutReceiverInput[]
     updateMany?: MessageUpdateManyWithWhereWithoutReceiverInput | MessageUpdateManyWithWhereWithoutReceiverInput[]
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type ListingUncheckedUpdateManyWithoutBuyersNestedInput = {
+    create?: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput> | ListingCreateWithoutBuyersInput[] | ListingUncheckedCreateWithoutBuyersInput[]
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyersInput | ListingCreateOrConnectWithoutBuyersInput[]
+    upsert?: ListingUpsertWithWhereUniqueWithoutBuyersInput | ListingUpsertWithWhereUniqueWithoutBuyersInput[]
+    set?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    disconnect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    delete?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    connect?: ListingWhereUniqueInput | ListingWhereUniqueInput[]
+    update?: ListingUpdateWithWhereUniqueWithoutBuyersInput | ListingUpdateWithWhereUniqueWithoutBuyersInput[]
+    updateMany?: ListingUpdateManyWithWhereWithoutBuyersInput | ListingUpdateManyWithWhereWithoutBuyersInput[]
+    deleteMany?: ListingScalarWhereInput | ListingScalarWhereInput[]
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput> | SellerProgressCreateWithoutSellerInput[] | SellerProgressUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSellerInput | SellerProgressCreateOrConnectWithoutSellerInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSellerInput | SellerProgressUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: SellerProgressCreateManySellerInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSellerInput | SellerProgressUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSellerInput | SellerProgressUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
+  export type BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput = {
+    create?: XOR<BuyerProgressCreateWithoutBuyerInput, BuyerProgressUncheckedCreateWithoutBuyerInput> | BuyerProgressCreateWithoutBuyerInput[] | BuyerProgressUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutBuyerInput | BuyerProgressCreateOrConnectWithoutBuyerInput[]
+    upsert?: BuyerProgressUpsertWithWhereUniqueWithoutBuyerInput | BuyerProgressUpsertWithWhereUniqueWithoutBuyerInput[]
+    createMany?: BuyerProgressCreateManyBuyerInputEnvelope
+    set?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    disconnect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    delete?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    update?: BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput | BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput[]
+    updateMany?: BuyerProgressUpdateManyWithWhereWithoutBuyerInput | BuyerProgressUpdateManyWithWhereWithoutBuyerInput[]
+    deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput = {
+    create?: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: SellerQuestionnaireCreateOrConnectWithoutSellerInput
+    upsert?: SellerQuestionnaireUpsertWithoutSellerInput
+    disconnect?: SellerQuestionnaireWhereInput | boolean
+    delete?: SellerQuestionnaireWhereInput | boolean
+    connect?: SellerQuestionnaireWhereUniqueInput
+    update?: XOR<XOR<SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput, SellerQuestionnaireUpdateWithoutSellerInput>, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput = {
+    create?: XOR<BuyerNDACreateWithoutBuyerInput, BuyerNDAUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerNDACreateOrConnectWithoutBuyerInput
+    upsert?: BuyerNDAUpsertWithoutBuyerInput
+    disconnect?: BuyerNDAWhereInput | boolean
+    delete?: BuyerNDAWhereInput | boolean
+    connect?: BuyerNDAWhereUniqueInput
+    update?: XOR<XOR<BuyerNDAUpdateToOneWithWhereWithoutBuyerInput, BuyerNDAUpdateWithoutBuyerInput>, BuyerNDAUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput = {
+    create?: XOR<BuyerFinancialStatementCreateWithoutBuyerInput, BuyerFinancialStatementUncheckedCreateWithoutBuyerInput>
+    connectOrCreate?: BuyerFinancialStatementCreateOrConnectWithoutBuyerInput
+    upsert?: BuyerFinancialStatementUpsertWithoutBuyerInput
+    disconnect?: BuyerFinancialStatementWhereInput | boolean
+    delete?: BuyerFinancialStatementWhereInput | boolean
+    connect?: BuyerFinancialStatementWhereUniqueInput
+    update?: XOR<XOR<BuyerFinancialStatementUpdateToOneWithWhereWithoutBuyerInput, BuyerFinancialStatementUpdateWithoutBuyerInput>, BuyerFinancialStatementUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput> | PreCloseChecklistCreateWithoutLastUpdatedByUserInput[] | PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput[]
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput | PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput[]
+    upsert?: PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    createMany?: PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope
+    set?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    disconnect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    delete?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    connect?: PreCloseChecklistWhereUniqueInput | PreCloseChecklistWhereUniqueInput[]
+    update?: PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput[]
+    updateMany?: PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput | PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput[]
+    deleteMany?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutBuyerInput, DueDiligenceRequestUncheckedCreateWithoutBuyerInput> | DueDiligenceRequestCreateWithoutBuyerInput[] | DueDiligenceRequestUncheckedCreateWithoutBuyerInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutBuyerInput | DueDiligenceRequestCreateOrConnectWithoutBuyerInput[]
+    upsert?: DueDiligenceRequestUpsertWithWhereUniqueWithoutBuyerInput | DueDiligenceRequestUpsertWithWhereUniqueWithoutBuyerInput[]
+    createMany?: DueDiligenceRequestCreateManyBuyerInputEnvelope
+    set?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    disconnect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    delete?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    update?: DueDiligenceRequestUpdateWithWhereUniqueWithoutBuyerInput | DueDiligenceRequestUpdateWithWhereUniqueWithoutBuyerInput[]
+    updateMany?: DueDiligenceRequestUpdateManyWithWhereWithoutBuyerInput | DueDiligenceRequestUpdateManyWithWhereWithoutBuyerInput[]
+    deleteMany?: DueDiligenceRequestScalarWhereInput | DueDiligenceRequestScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutSellerProgressInput = {
+    create?: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerProgressInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ListingCreateNestedOneWithoutSellerProgressInput = {
+    create?: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutSellerProgressInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSellerProgressNestedInput = {
+    create?: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerProgressInput
+    upsert?: UserUpsertWithoutSellerProgressInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerProgressInput, UserUpdateWithoutSellerProgressInput>, UserUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type ListingUpdateOneWithoutSellerProgressNestedInput = {
+    create?: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutSellerProgressInput
+    upsert?: ListingUpsertWithoutSellerProgressInput
+    disconnect?: ListingWhereInput | boolean
+    delete?: ListingWhereInput | boolean
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutSellerProgressInput, ListingUpdateWithoutSellerProgressInput>, ListingUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type UserCreateNestedOneWithoutBuyerProgressInput = {
+    create?: XOR<UserCreateWithoutBuyerProgressInput, UserUncheckedCreateWithoutBuyerProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerProgressInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ListingCreateNestedOneWithoutBuyerSelectedProgressInput = {
+    create?: XOR<ListingCreateWithoutBuyerSelectedProgressInput, ListingUncheckedCreateWithoutBuyerSelectedProgressInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyerSelectedProgressInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutBuyerProgressNestedInput = {
+    create?: XOR<UserCreateWithoutBuyerProgressInput, UserUncheckedCreateWithoutBuyerProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerProgressInput
+    upsert?: UserUpsertWithoutBuyerProgressInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerProgressInput, UserUpdateWithoutBuyerProgressInput>, UserUncheckedUpdateWithoutBuyerProgressInput>
+  }
+
+  export type ListingUpdateOneWithoutBuyerSelectedProgressNestedInput = {
+    create?: XOR<ListingCreateWithoutBuyerSelectedProgressInput, ListingUncheckedCreateWithoutBuyerSelectedProgressInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutBuyerSelectedProgressInput
+    upsert?: ListingUpsertWithoutBuyerSelectedProgressInput
+    disconnect?: ListingWhereInput | boolean
+    delete?: ListingWhereInput | boolean
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutBuyerSelectedProgressInput, ListingUpdateWithoutBuyerSelectedProgressInput>, ListingUncheckedUpdateWithoutBuyerSelectedProgressInput>
   }
 
   export type UserCreateNestedOneWithoutSentMessagesInput = {
@@ -11010,10 +22476,6 @@ export namespace Prisma {
 
   export type EnumMessageStatusFieldUpdateOperationsInput = {
     set?: $Enums.MessageStatus
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type UserUpdateOneRequiredWithoutSentMessagesNestedInput = {
@@ -11118,6 +22580,86 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type UserCreateNestedManyWithoutBuyingListingsInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type DocumentCreateNestedManyWithoutListingInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type SellerProgressCreateNestedManyWithoutSelectedListingInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
+  export type BuyerProgressCreateNestedManyWithoutSelectedListingInput = {
+    create?: XOR<BuyerProgressCreateWithoutSelectedListingInput, BuyerProgressUncheckedCreateWithoutSelectedListingInput> | BuyerProgressCreateWithoutSelectedListingInput[] | BuyerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutSelectedListingInput | BuyerProgressCreateOrConnectWithoutSelectedListingInput[]
+    createMany?: BuyerProgressCreateManySelectedListingInputEnvelope
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+  }
+
+  export type PreCloseChecklistCreateNestedOneWithoutListingInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    connect?: PreCloseChecklistWhereUniqueInput
+  }
+
+  export type DueDiligenceRequestCreateNestedManyWithoutListingInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutListingInput, DueDiligenceRequestUncheckedCreateWithoutListingInput> | DueDiligenceRequestCreateWithoutListingInput[] | DueDiligenceRequestUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutListingInput | DueDiligenceRequestCreateOrConnectWithoutListingInput[]
+    createMany?: DueDiligenceRequestCreateManyListingInputEnvelope
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutBuyingListingsInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutListingInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
+  export type SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+  }
+
+  export type BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput = {
+    create?: XOR<BuyerProgressCreateWithoutSelectedListingInput, BuyerProgressUncheckedCreateWithoutSelectedListingInput> | BuyerProgressCreateWithoutSelectedListingInput[] | BuyerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutSelectedListingInput | BuyerProgressCreateOrConnectWithoutSelectedListingInput[]
+    createMany?: BuyerProgressCreateManySelectedListingInputEnvelope
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+  }
+
+  export type PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    connect?: PreCloseChecklistWhereUniqueInput
+  }
+
+  export type DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutListingInput, DueDiligenceRequestUncheckedCreateWithoutListingInput> | DueDiligenceRequestCreateWithoutListingInput[] | DueDiligenceRequestUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutListingInput | DueDiligenceRequestCreateOrConnectWithoutListingInput[]
+    createMany?: DueDiligenceRequestCreateManyListingInputEnvelope
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+  }
+
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -11138,6 +22680,164 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutListingsInput, UserUpdateWithoutListingsInput>, UserUncheckedUpdateWithoutListingsInput>
   }
 
+  export type UserUpdateManyWithoutBuyingListingsNestedInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutBuyingListingsInput | UserUpsertWithWhereUniqueWithoutBuyingListingsInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutBuyingListingsInput | UserUpdateWithWhereUniqueWithoutBuyingListingsInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutBuyingListingsInput | UserUpdateManyWithWhereWithoutBuyingListingsInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type DocumentUpdateManyWithoutListingNestedInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutListingInput | DocumentUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutListingInput | DocumentUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutListingInput | DocumentUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type SellerProgressUpdateManyWithoutSelectedListingNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSelectedListingInput | SellerProgressUpdateManyWithWhereWithoutSelectedListingInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
+  export type BuyerProgressUpdateManyWithoutSelectedListingNestedInput = {
+    create?: XOR<BuyerProgressCreateWithoutSelectedListingInput, BuyerProgressUncheckedCreateWithoutSelectedListingInput> | BuyerProgressCreateWithoutSelectedListingInput[] | BuyerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutSelectedListingInput | BuyerProgressCreateOrConnectWithoutSelectedListingInput[]
+    upsert?: BuyerProgressUpsertWithWhereUniqueWithoutSelectedListingInput | BuyerProgressUpsertWithWhereUniqueWithoutSelectedListingInput[]
+    createMany?: BuyerProgressCreateManySelectedListingInputEnvelope
+    set?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    disconnect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    delete?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    update?: BuyerProgressUpdateWithWhereUniqueWithoutSelectedListingInput | BuyerProgressUpdateWithWhereUniqueWithoutSelectedListingInput[]
+    updateMany?: BuyerProgressUpdateManyWithWhereWithoutSelectedListingInput | BuyerProgressUpdateManyWithWhereWithoutSelectedListingInput[]
+    deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+  }
+
+  export type PreCloseChecklistUpdateOneWithoutListingNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    upsert?: PreCloseChecklistUpsertWithoutListingInput
+    disconnect?: PreCloseChecklistWhereInput | boolean
+    delete?: PreCloseChecklistWhereInput | boolean
+    connect?: PreCloseChecklistWhereUniqueInput
+    update?: XOR<XOR<PreCloseChecklistUpdateToOneWithWhereWithoutListingInput, PreCloseChecklistUpdateWithoutListingInput>, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DueDiligenceRequestUpdateManyWithoutListingNestedInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutListingInput, DueDiligenceRequestUncheckedCreateWithoutListingInput> | DueDiligenceRequestCreateWithoutListingInput[] | DueDiligenceRequestUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutListingInput | DueDiligenceRequestCreateOrConnectWithoutListingInput[]
+    upsert?: DueDiligenceRequestUpsertWithWhereUniqueWithoutListingInput | DueDiligenceRequestUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: DueDiligenceRequestCreateManyListingInputEnvelope
+    set?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    disconnect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    delete?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    update?: DueDiligenceRequestUpdateWithWhereUniqueWithoutListingInput | DueDiligenceRequestUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: DueDiligenceRequestUpdateManyWithWhereWithoutListingInput | DueDiligenceRequestUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: DueDiligenceRequestScalarWhereInput | DueDiligenceRequestScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutBuyingListingsNestedInput = {
+    create?: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput> | UserCreateWithoutBuyingListingsInput[] | UserUncheckedCreateWithoutBuyingListingsInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutBuyingListingsInput | UserCreateOrConnectWithoutBuyingListingsInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutBuyingListingsInput | UserUpsertWithWhereUniqueWithoutBuyingListingsInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutBuyingListingsInput | UserUpdateWithWhereUniqueWithoutBuyingListingsInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutBuyingListingsInput | UserUpdateManyWithWhereWithoutBuyingListingsInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutListingNestedInput = {
+    create?: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput> | DocumentCreateWithoutListingInput[] | DocumentUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutListingInput | DocumentCreateOrConnectWithoutListingInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutListingInput | DocumentUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: DocumentCreateManyListingInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutListingInput | DocumentUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutListingInput | DocumentUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput = {
+    create?: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput> | SellerProgressCreateWithoutSelectedListingInput[] | SellerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: SellerProgressCreateOrConnectWithoutSelectedListingInput | SellerProgressCreateOrConnectWithoutSelectedListingInput[]
+    upsert?: SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput[]
+    createMany?: SellerProgressCreateManySelectedListingInputEnvelope
+    set?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    disconnect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    delete?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    connect?: SellerProgressWhereUniqueInput | SellerProgressWhereUniqueInput[]
+    update?: SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput | SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput[]
+    updateMany?: SellerProgressUpdateManyWithWhereWithoutSelectedListingInput | SellerProgressUpdateManyWithWhereWithoutSelectedListingInput[]
+    deleteMany?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+  }
+
+  export type BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput = {
+    create?: XOR<BuyerProgressCreateWithoutSelectedListingInput, BuyerProgressUncheckedCreateWithoutSelectedListingInput> | BuyerProgressCreateWithoutSelectedListingInput[] | BuyerProgressUncheckedCreateWithoutSelectedListingInput[]
+    connectOrCreate?: BuyerProgressCreateOrConnectWithoutSelectedListingInput | BuyerProgressCreateOrConnectWithoutSelectedListingInput[]
+    upsert?: BuyerProgressUpsertWithWhereUniqueWithoutSelectedListingInput | BuyerProgressUpsertWithWhereUniqueWithoutSelectedListingInput[]
+    createMany?: BuyerProgressCreateManySelectedListingInputEnvelope
+    set?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    disconnect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    delete?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    connect?: BuyerProgressWhereUniqueInput | BuyerProgressWhereUniqueInput[]
+    update?: BuyerProgressUpdateWithWhereUniqueWithoutSelectedListingInput | BuyerProgressUpdateWithWhereUniqueWithoutSelectedListingInput[]
+    updateMany?: BuyerProgressUpdateManyWithWhereWithoutSelectedListingInput | BuyerProgressUpdateManyWithWhereWithoutSelectedListingInput[]
+    deleteMany?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+  }
+
+  export type PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput = {
+    create?: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    connectOrCreate?: PreCloseChecklistCreateOrConnectWithoutListingInput
+    upsert?: PreCloseChecklistUpsertWithoutListingInput
+    disconnect?: PreCloseChecklistWhereInput | boolean
+    delete?: PreCloseChecklistWhereInput | boolean
+    connect?: PreCloseChecklistWhereUniqueInput
+    update?: XOR<XOR<PreCloseChecklistUpdateToOneWithWhereWithoutListingInput, PreCloseChecklistUpdateWithoutListingInput>, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput = {
+    create?: XOR<DueDiligenceRequestCreateWithoutListingInput, DueDiligenceRequestUncheckedCreateWithoutListingInput> | DueDiligenceRequestCreateWithoutListingInput[] | DueDiligenceRequestUncheckedCreateWithoutListingInput[]
+    connectOrCreate?: DueDiligenceRequestCreateOrConnectWithoutListingInput | DueDiligenceRequestCreateOrConnectWithoutListingInput[]
+    upsert?: DueDiligenceRequestUpsertWithWhereUniqueWithoutListingInput | DueDiligenceRequestUpsertWithWhereUniqueWithoutListingInput[]
+    createMany?: DueDiligenceRequestCreateManyListingInputEnvelope
+    set?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    disconnect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    delete?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    connect?: DueDiligenceRequestWhereUniqueInput | DueDiligenceRequestWhereUniqueInput[]
+    update?: DueDiligenceRequestUpdateWithWhereUniqueWithoutListingInput | DueDiligenceRequestUpdateWithWhereUniqueWithoutListingInput[]
+    updateMany?: DueDiligenceRequestUpdateManyWithWhereWithoutListingInput | DueDiligenceRequestUpdateManyWithWhereWithoutListingInput[]
+    deleteMany?: DueDiligenceRequestScalarWhereInput | DueDiligenceRequestScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutActivitiesInput = {
     create?: XOR<UserCreateWithoutActivitiesInput, UserUncheckedCreateWithoutActivitiesInput>
     connectOrCreate?: UserCreateOrConnectWithoutActivitiesInput
@@ -11150,6 +22850,110 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutActivitiesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActivitiesInput, UserUpdateWithoutActivitiesInput>, UserUncheckedUpdateWithoutActivitiesInput>
+  }
+
+  export type UserCreateNestedOneWithoutSellerQuestionnaireInput = {
+    create?: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerQuestionnaireInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSellerQuestionnaireNestedInput = {
+    create?: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSellerQuestionnaireInput
+    upsert?: UserUpsertWithoutSellerQuestionnaireInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSellerQuestionnaireInput, UserUpdateWithoutSellerQuestionnaireInput>, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+  }
+
+  export type UserCreateNestedOneWithoutBuyerNDAInput = {
+    create?: XOR<UserCreateWithoutBuyerNDAInput, UserUncheckedCreateWithoutBuyerNDAInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerNDAInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutBuyerNDANestedInput = {
+    create?: XOR<UserCreateWithoutBuyerNDAInput, UserUncheckedCreateWithoutBuyerNDAInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerNDAInput
+    upsert?: UserUpsertWithoutBuyerNDAInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerNDAInput, UserUpdateWithoutBuyerNDAInput>, UserUncheckedUpdateWithoutBuyerNDAInput>
+  }
+
+  export type UserCreateNestedOneWithoutBuyerFinancialStatementInput = {
+    create?: XOR<UserCreateWithoutBuyerFinancialStatementInput, UserUncheckedCreateWithoutBuyerFinancialStatementInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerFinancialStatementInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutBuyerFinancialStatementNestedInput = {
+    create?: XOR<UserCreateWithoutBuyerFinancialStatementInput, UserUncheckedCreateWithoutBuyerFinancialStatementInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBuyerFinancialStatementInput
+    upsert?: UserUpsertWithoutBuyerFinancialStatementInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBuyerFinancialStatementInput, UserUpdateWithoutBuyerFinancialStatementInput>, UserUncheckedUpdateWithoutBuyerFinancialStatementInput>
+  }
+
+  export type ListingCreateNestedOneWithoutPreCloseChecklistInput = {
+    create?: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutPreCloseChecklistInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutUpdatedChecklistsInput = {
+    create?: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUpdatedChecklistsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ListingUpdateOneRequiredWithoutPreCloseChecklistNestedInput = {
+    create?: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutPreCloseChecklistInput
+    upsert?: ListingUpsertWithoutPreCloseChecklistInput
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutPreCloseChecklistInput, ListingUpdateWithoutPreCloseChecklistInput>, ListingUncheckedUpdateWithoutPreCloseChecklistInput>
+  }
+
+  export type UserUpdateOneWithoutUpdatedChecklistsNestedInput = {
+    create?: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUpdatedChecklistsInput
+    upsert?: UserUpsertWithoutUpdatedChecklistsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUpdatedChecklistsInput, UserUpdateWithoutUpdatedChecklistsInput>, UserUncheckedUpdateWithoutUpdatedChecklistsInput>
+  }
+
+  export type ListingCreateNestedOneWithoutDueDiligenceRequestsInput = {
+    create?: XOR<ListingCreateWithoutDueDiligenceRequestsInput, ListingUncheckedCreateWithoutDueDiligenceRequestsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutDueDiligenceRequestsInput
+    connect?: ListingWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutDueDiligenceRequestsInput = {
+    create?: XOR<UserCreateWithoutDueDiligenceRequestsInput, UserUncheckedCreateWithoutDueDiligenceRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDueDiligenceRequestsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumDueDiligenceStatusFieldUpdateOperationsInput = {
+    set?: $Enums.DueDiligenceStatus
+  }
+
+  export type ListingUpdateOneRequiredWithoutDueDiligenceRequestsNestedInput = {
+    create?: XOR<ListingCreateWithoutDueDiligenceRequestsInput, ListingUncheckedCreateWithoutDueDiligenceRequestsInput>
+    connectOrCreate?: ListingCreateOrConnectWithoutDueDiligenceRequestsInput
+    upsert?: ListingUpsertWithoutDueDiligenceRequestsInput
+    connect?: ListingWhereUniqueInput
+    update?: XOR<XOR<ListingUpdateToOneWithWhereWithoutDueDiligenceRequestsInput, ListingUpdateWithoutDueDiligenceRequestsInput>, ListingUncheckedUpdateWithoutDueDiligenceRequestsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutDueDiligenceRequestsNestedInput = {
+    create?: XOR<UserCreateWithoutDueDiligenceRequestsInput, UserUncheckedCreateWithoutDueDiligenceRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDueDiligenceRequestsInput
+    upsert?: UserUpsertWithoutDueDiligenceRequestsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDueDiligenceRequestsInput, UserUpdateWithoutDueDiligenceRequestsInput>, UserUncheckedUpdateWithoutDueDiligenceRequestsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -11180,6 +22984,13 @@ export namespace Prisma {
     not?: NestedEnumDocumentStatusFilter<$PrismaModel> | $Enums.DocumentStatus
   }
 
+  export type NestedEnumDocumentCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryFilter<$PrismaModel> | $Enums.DocumentCategory
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11192,6 +23003,35 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumDocumentOperationTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeFilter<$PrismaModel> | $Enums.DocumentOperationType
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -11253,6 +23093,16 @@ export namespace Prisma {
     _max?: NestedEnumDocumentStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumDocumentCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentCategory | EnumDocumentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentCategory[] | ListEnumDocumentCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentCategoryWithAggregatesFilter<$PrismaModel> | $Enums.DocumentCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentCategoryFilter<$PrismaModel>
+    _max?: NestedEnumDocumentCategoryFilter<$PrismaModel>
+  }
+
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11270,7 +23120,7 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -11278,7 +23128,47 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DocumentOperationType | EnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DocumentOperationType[] | ListEnumDocumentOperationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDocumentOperationTypeWithAggregatesFilter<$PrismaModel> | $Enums.DocumentOperationType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+    _max?: NestedEnumDocumentOperationTypeFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11302,15 +23192,9 @@ export namespace Prisma {
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
@@ -11321,6 +23205,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -11349,19 +23241,28 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumMessageStatusFilter<$PrismaModel = never> = {
@@ -11369,11 +23270,6 @@ export namespace Prisma {
     in?: $Enums.MessageStatus[] | ListEnumMessageStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.MessageStatus[] | ListEnumMessageStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumMessageStatusFilter<$PrismaModel> | $Enums.MessageStatus
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedEnumMessageStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11384,14 +23280,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMessageStatusFilter<$PrismaModel>
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumListingStatusFilter<$PrismaModel = never> = {
@@ -11450,12 +23338,30 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedEnumDueDiligenceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DueDiligenceStatus | EnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDueDiligenceStatusFilter<$PrismaModel> | $Enums.DueDiligenceStatus
+  }
+
+  export type NestedEnumDueDiligenceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DueDiligenceStatus | EnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DueDiligenceStatus[] | ListEnumDueDiligenceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDueDiligenceStatusWithAggregatesFilter<$PrismaModel> | $Enums.DueDiligenceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDueDiligenceStatusFilter<$PrismaModel>
+    _max?: NestedEnumDueDiligenceStatusFilter<$PrismaModel>
+  }
+
   export type UserCreateWithoutSellerDocsInput = {
     id?: string
     email: string
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -11464,9 +23370,18 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutSellerDocsInput = {
@@ -11475,6 +23390,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -11483,9 +23399,18 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutSellerDocsInput = {
@@ -11499,6 +23424,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -11507,9 +23433,18 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     listings?: ListingCreateNestedManyWithoutSellerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutBuyerDocsInput = {
@@ -11518,6 +23453,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -11526,14 +23462,121 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutBuyerDocsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutBuyerDocsInput, UserUncheckedCreateWithoutBuyerDocsInput>
+  }
+
+  export type ListingCreateWithoutDocumentsInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutDocumentsInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutDocumentsInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+  }
+
+  export type UserCreateWithoutUploadedDocumentsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutUploadedDocumentsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutUploadedDocumentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
   }
 
   export type UserUpsertWithoutSellerDocsInput = {
@@ -11553,6 +23596,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -11561,9 +23605,18 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSellerDocsInput = {
@@ -11572,6 +23625,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11580,9 +23634,18 @@ export namespace Prisma {
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUpsertWithoutBuyerDocsInput = {
@@ -11602,6 +23665,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -11610,9 +23674,18 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     listings?: ListingUpdateManyWithoutSellerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBuyerDocsInput = {
@@ -11621,6 +23694,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11629,9 +23703,128 @@ export namespace Prisma {
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type ListingUpsertWithoutDocumentsInput = {
+    update: XOR<ListingUpdateWithoutDocumentsInput, ListingUncheckedUpdateWithoutDocumentsInput>
+    create: XOR<ListingCreateWithoutDocumentsInput, ListingUncheckedCreateWithoutDocumentsInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutDocumentsInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutDocumentsInput, ListingUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type ListingUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type UserUpsertWithoutUploadedDocumentsInput = {
+    update: XOR<UserUpdateWithoutUploadedDocumentsInput, UserUncheckedUpdateWithoutUploadedDocumentsInput>
+    create: XOR<UserCreateWithoutUploadedDocumentsInput, UserUncheckedCreateWithoutUploadedDocumentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUploadedDocumentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUploadedDocumentsInput, UserUncheckedUpdateWithoutUploadedDocumentsInput>
+  }
+
+  export type UserUpdateWithoutUploadedDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUploadedDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserCreateWithoutManagingInput = {
@@ -11640,6 +23833,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -11648,9 +23842,18 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutManagingInput = {
@@ -11659,6 +23862,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -11667,9 +23871,18 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutManagingInput = {
@@ -11683,6 +23896,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -11691,9 +23905,18 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutManagedByInput = {
@@ -11702,6 +23925,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -11710,9 +23934,18 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutManagedByInput = {
@@ -11732,6 +23965,12 @@ export namespace Prisma {
     price: number
     status?: $Enums.ListingStatus
     createdAt?: Date | string
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
   }
 
   export type ListingUncheckedCreateWithoutSellerInput = {
@@ -11741,6 +23980,12 @@ export namespace Prisma {
     price: number
     status?: $Enums.ListingStatus
     createdAt?: Date | string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
   }
 
   export type ListingCreateOrConnectWithoutSellerInput = {
@@ -11757,18 +24002,36 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seller: UserCreateNestedOneWithoutSellerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
   }
 
   export type DocumentUncheckedCreateWithoutBuyerInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11787,18 +24050,36 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
   }
 
   export type DocumentUncheckedCreateWithoutSellerInput = {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11810,6 +24091,54 @@ export namespace Prisma {
 
   export type DocumentCreateManySellerInputEnvelope = {
     data: DocumentCreateManySellerInput | DocumentCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DocumentCreateWithoutUploaderInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerDocsInput
+    buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    listing?: ListingCreateNestedOneWithoutDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutUploaderInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutUploaderInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput>
+  }
+
+  export type DocumentCreateManyUploaderInputEnvelope = {
+    data: DocumentCreateManyUploaderInput | DocumentCreateManyUploaderInput[]
     skipDuplicates?: boolean
   }
 
@@ -11941,6 +24270,228 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ListingCreateWithoutBuyersInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutBuyersInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutBuyersInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput>
+  }
+
+  export type SellerProgressCreateWithoutSellerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    selectedListing?: ListingCreateNestedOneWithoutSellerProgressInput
+  }
+
+  export type SellerProgressUncheckedCreateWithoutSellerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressCreateOrConnectWithoutSellerInput = {
+    where: SellerProgressWhereUniqueInput
+    create: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProgressCreateManySellerInputEnvelope = {
+    data: SellerProgressCreateManySellerInput | SellerProgressCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BuyerProgressCreateWithoutBuyerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    selectedListing?: ListingCreateNestedOneWithoutBuyerSelectedProgressInput
+  }
+
+  export type BuyerProgressUncheckedCreateWithoutBuyerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerProgressCreateOrConnectWithoutBuyerInput = {
+    where: BuyerProgressWhereUniqueInput
+    create: XOR<BuyerProgressCreateWithoutBuyerInput, BuyerProgressUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type BuyerProgressCreateManyBuyerInputEnvelope = {
+    data: BuyerProgressCreateManyBuyerInput | BuyerProgressCreateManyBuyerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SellerQuestionnaireCreateWithoutSellerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireUncheckedCreateWithoutSellerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerQuestionnaireCreateOrConnectWithoutSellerInput = {
+    where: SellerQuestionnaireWhereUniqueInput
+    create: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+  }
+
+  export type BuyerNDACreateWithoutBuyerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerNDAUncheckedCreateWithoutBuyerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerNDACreateOrConnectWithoutBuyerInput = {
+    where: BuyerNDAWhereUniqueInput
+    create: XOR<BuyerNDACreateWithoutBuyerInput, BuyerNDAUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type BuyerFinancialStatementCreateWithoutBuyerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerFinancialStatementUncheckedCreateWithoutBuyerInput = {
+    id?: string
+    data: JsonNullValueInput | InputJsonValue
+    submitted?: boolean
+    submittedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerFinancialStatementCreateOrConnectWithoutBuyerInput = {
+    where: BuyerFinancialStatementWhereUniqueInput
+    create: XOR<BuyerFinancialStatementCreateWithoutBuyerInput, BuyerFinancialStatementUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type PreCloseChecklistCreateWithoutLastUpdatedByUserInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutPreCloseChecklistInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistCreateOrConnectWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    create: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistCreateManyLastUpdatedByUserInputEnvelope = {
+    data: PreCloseChecklistCreateManyLastUpdatedByUserInput | PreCloseChecklistCreateManyLastUpdatedByUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DueDiligenceRequestCreateWithoutBuyerInput = {
+    id?: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    listing: ListingCreateNestedOneWithoutDueDiligenceRequestsInput
+  }
+
+  export type DueDiligenceRequestUncheckedCreateWithoutBuyerInput = {
+    id?: string
+    listingId: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DueDiligenceRequestCreateOrConnectWithoutBuyerInput = {
+    where: DueDiligenceRequestWhereUniqueInput
+    create: XOR<DueDiligenceRequestCreateWithoutBuyerInput, DueDiligenceRequestUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type DueDiligenceRequestCreateManyBuyerInputEnvelope = {
+    data: DueDiligenceRequestCreateManyBuyerInput | DueDiligenceRequestCreateManyBuyerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutManagingInput = {
     update: XOR<UserUpdateWithoutManagingInput, UserUncheckedUpdateWithoutManagingInput>
     create: XOR<UserCreateWithoutManagingInput, UserUncheckedCreateWithoutManagingInput>
@@ -11958,6 +24509,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -11966,9 +24518,18 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagingInput = {
@@ -11977,6 +24538,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11985,9 +24547,18 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutManagedByInput = {
@@ -12015,6 +24586,7 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
+    isActive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     managerId?: StringNullableFilter<"User"> | string | null
@@ -12074,9 +24646,18 @@ export namespace Prisma {
     id?: StringFilter<"Document"> | string
     type?: EnumDocumentTypeFilter<"Document"> | $Enums.DocumentType
     status?: EnumDocumentStatusFilter<"Document"> | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFilter<"Document"> | $Enums.DocumentCategory
     url?: StringNullableFilter<"Document"> | string | null
+    fileName?: StringNullableFilter<"Document"> | string | null
+    fileSize?: IntNullableFilter<"Document"> | number | null
+    operationType?: EnumDocumentOperationTypeFilter<"Document"> | $Enums.DocumentOperationType
+    stepId?: IntNullableFilter<"Document"> | number | null
     sellerId?: StringFilter<"Document"> | string
     buyerId?: StringNullableFilter<"Document"> | string | null
+    listingId?: StringNullableFilter<"Document"> | string | null
+    uploadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    downloadedAt?: DateTimeNullableFilter<"Document"> | Date | string | null
+    uploadedBy?: StringNullableFilter<"Document"> | string | null
     createdAt?: DateTimeFilter<"Document"> | Date | string
     updatedAt?: DateTimeFilter<"Document"> | Date | string
   }
@@ -12095,6 +24676,22 @@ export namespace Prisma {
   export type DocumentUpdateManyWithWhereWithoutSellerInput = {
     where: DocumentScalarWhereInput
     data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type DocumentUpsertWithWhereUniqueWithoutUploaderInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutUploaderInput, DocumentUncheckedUpdateWithoutUploaderInput>
+    create: XOR<DocumentCreateWithoutUploaderInput, DocumentUncheckedCreateWithoutUploaderInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutUploaderInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutUploaderInput, DocumentUncheckedUpdateWithoutUploaderInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutUploaderInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutUploaderInput>
   }
 
   export type ActivityUpsertWithWhereUniqueWithoutUserInput = {
@@ -12179,12 +24776,235 @@ export namespace Prisma {
     data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutReceiverInput>
   }
 
-  export type UserCreateWithoutSentMessagesInput = {
+  export type ListingUpsertWithWhereUniqueWithoutBuyersInput = {
+    where: ListingWhereUniqueInput
+    update: XOR<ListingUpdateWithoutBuyersInput, ListingUncheckedUpdateWithoutBuyersInput>
+    create: XOR<ListingCreateWithoutBuyersInput, ListingUncheckedCreateWithoutBuyersInput>
+  }
+
+  export type ListingUpdateWithWhereUniqueWithoutBuyersInput = {
+    where: ListingWhereUniqueInput
+    data: XOR<ListingUpdateWithoutBuyersInput, ListingUncheckedUpdateWithoutBuyersInput>
+  }
+
+  export type ListingUpdateManyWithWhereWithoutBuyersInput = {
+    where: ListingScalarWhereInput
+    data: XOR<ListingUpdateManyMutationInput, ListingUncheckedUpdateManyWithoutBuyersInput>
+  }
+
+  export type SellerProgressUpsertWithWhereUniqueWithoutSellerInput = {
+    where: SellerProgressWhereUniqueInput
+    update: XOR<SellerProgressUpdateWithoutSellerInput, SellerProgressUncheckedUpdateWithoutSellerInput>
+    create: XOR<SellerProgressCreateWithoutSellerInput, SellerProgressUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProgressUpdateWithWhereUniqueWithoutSellerInput = {
+    where: SellerProgressWhereUniqueInput
+    data: XOR<SellerProgressUpdateWithoutSellerInput, SellerProgressUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type SellerProgressUpdateManyWithWhereWithoutSellerInput = {
+    where: SellerProgressScalarWhereInput
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type SellerProgressScalarWhereInput = {
+    AND?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+    OR?: SellerProgressScalarWhereInput[]
+    NOT?: SellerProgressScalarWhereInput | SellerProgressScalarWhereInput[]
+    id?: StringFilter<"SellerProgress"> | string
+    sellerId?: StringFilter<"SellerProgress"> | string
+    currentStep?: IntFilter<"SellerProgress"> | number
+    completedSteps?: JsonFilter<"SellerProgress">
+    selectedListingId?: StringNullableFilter<"SellerProgress"> | string | null
+    createdAt?: DateTimeFilter<"SellerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"SellerProgress"> | Date | string
+  }
+
+  export type BuyerProgressUpsertWithWhereUniqueWithoutBuyerInput = {
+    where: BuyerProgressWhereUniqueInput
+    update: XOR<BuyerProgressUpdateWithoutBuyerInput, BuyerProgressUncheckedUpdateWithoutBuyerInput>
+    create: XOR<BuyerProgressCreateWithoutBuyerInput, BuyerProgressUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type BuyerProgressUpdateWithWhereUniqueWithoutBuyerInput = {
+    where: BuyerProgressWhereUniqueInput
+    data: XOR<BuyerProgressUpdateWithoutBuyerInput, BuyerProgressUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type BuyerProgressUpdateManyWithWhereWithoutBuyerInput = {
+    where: BuyerProgressScalarWhereInput
+    data: XOR<BuyerProgressUpdateManyMutationInput, BuyerProgressUncheckedUpdateManyWithoutBuyerInput>
+  }
+
+  export type BuyerProgressScalarWhereInput = {
+    AND?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+    OR?: BuyerProgressScalarWhereInput[]
+    NOT?: BuyerProgressScalarWhereInput | BuyerProgressScalarWhereInput[]
+    id?: StringFilter<"BuyerProgress"> | string
+    buyerId?: StringFilter<"BuyerProgress"> | string
+    currentStep?: IntFilter<"BuyerProgress"> | number
+    completedSteps?: JsonFilter<"BuyerProgress">
+    selectedListingId?: StringNullableFilter<"BuyerProgress"> | string | null
+    createdAt?: DateTimeFilter<"BuyerProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"BuyerProgress"> | Date | string
+  }
+
+  export type SellerQuestionnaireUpsertWithoutSellerInput = {
+    update: XOR<SellerQuestionnaireUpdateWithoutSellerInput, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+    create: XOR<SellerQuestionnaireCreateWithoutSellerInput, SellerQuestionnaireUncheckedCreateWithoutSellerInput>
+    where?: SellerQuestionnaireWhereInput
+  }
+
+  export type SellerQuestionnaireUpdateToOneWithWhereWithoutSellerInput = {
+    where?: SellerQuestionnaireWhereInput
+    data: XOR<SellerQuestionnaireUpdateWithoutSellerInput, SellerQuestionnaireUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type SellerQuestionnaireUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerQuestionnaireUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerNDAUpsertWithoutBuyerInput = {
+    update: XOR<BuyerNDAUpdateWithoutBuyerInput, BuyerNDAUncheckedUpdateWithoutBuyerInput>
+    create: XOR<BuyerNDACreateWithoutBuyerInput, BuyerNDAUncheckedCreateWithoutBuyerInput>
+    where?: BuyerNDAWhereInput
+  }
+
+  export type BuyerNDAUpdateToOneWithWhereWithoutBuyerInput = {
+    where?: BuyerNDAWhereInput
+    data: XOR<BuyerNDAUpdateWithoutBuyerInput, BuyerNDAUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type BuyerNDAUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerNDAUncheckedUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerFinancialStatementUpsertWithoutBuyerInput = {
+    update: XOR<BuyerFinancialStatementUpdateWithoutBuyerInput, BuyerFinancialStatementUncheckedUpdateWithoutBuyerInput>
+    create: XOR<BuyerFinancialStatementCreateWithoutBuyerInput, BuyerFinancialStatementUncheckedCreateWithoutBuyerInput>
+    where?: BuyerFinancialStatementWhereInput
+  }
+
+  export type BuyerFinancialStatementUpdateToOneWithWhereWithoutBuyerInput = {
+    where?: BuyerFinancialStatementWhereInput
+    data: XOR<BuyerFinancialStatementUpdateWithoutBuyerInput, BuyerFinancialStatementUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type BuyerFinancialStatementUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerFinancialStatementUncheckedUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: JsonNullValueInput | InputJsonValue
+    submitted?: BoolFieldUpdateOperationsInput | boolean
+    submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUpsertWithWhereUniqueWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    update: XOR<PreCloseChecklistUpdateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedUpdateWithoutLastUpdatedByUserInput>
+    create: XOR<PreCloseChecklistCreateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedCreateWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistUpdateWithWhereUniqueWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    data: XOR<PreCloseChecklistUpdateWithoutLastUpdatedByUserInput, PreCloseChecklistUncheckedUpdateWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistUpdateManyWithWhereWithoutLastUpdatedByUserInput = {
+    where: PreCloseChecklistScalarWhereInput
+    data: XOR<PreCloseChecklistUpdateManyMutationInput, PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserInput>
+  }
+
+  export type PreCloseChecklistScalarWhereInput = {
+    AND?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+    OR?: PreCloseChecklistScalarWhereInput[]
+    NOT?: PreCloseChecklistScalarWhereInput | PreCloseChecklistScalarWhereInput[]
+    id?: StringFilter<"PreCloseChecklist"> | string
+    listingId?: StringFilter<"PreCloseChecklist"> | string
+    buyerItems?: JsonFilter<"PreCloseChecklist">
+    sellerItems?: JsonFilter<"PreCloseChecklist">
+    brokerItems?: JsonFilter<"PreCloseChecklist">
+    lastUpdatedBy?: StringNullableFilter<"PreCloseChecklist"> | string | null
+    createdAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+    updatedAt?: DateTimeFilter<"PreCloseChecklist"> | Date | string
+  }
+
+  export type DueDiligenceRequestUpsertWithWhereUniqueWithoutBuyerInput = {
+    where: DueDiligenceRequestWhereUniqueInput
+    update: XOR<DueDiligenceRequestUpdateWithoutBuyerInput, DueDiligenceRequestUncheckedUpdateWithoutBuyerInput>
+    create: XOR<DueDiligenceRequestCreateWithoutBuyerInput, DueDiligenceRequestUncheckedCreateWithoutBuyerInput>
+  }
+
+  export type DueDiligenceRequestUpdateWithWhereUniqueWithoutBuyerInput = {
+    where: DueDiligenceRequestWhereUniqueInput
+    data: XOR<DueDiligenceRequestUpdateWithoutBuyerInput, DueDiligenceRequestUncheckedUpdateWithoutBuyerInput>
+  }
+
+  export type DueDiligenceRequestUpdateManyWithWhereWithoutBuyerInput = {
+    where: DueDiligenceRequestScalarWhereInput
+    data: XOR<DueDiligenceRequestUpdateManyMutationInput, DueDiligenceRequestUncheckedUpdateManyWithoutBuyerInput>
+  }
+
+  export type DueDiligenceRequestScalarWhereInput = {
+    AND?: DueDiligenceRequestScalarWhereInput | DueDiligenceRequestScalarWhereInput[]
+    OR?: DueDiligenceRequestScalarWhereInput[]
+    NOT?: DueDiligenceRequestScalarWhereInput | DueDiligenceRequestScalarWhereInput[]
+    id?: StringFilter<"DueDiligenceRequest"> | string
+    listingId?: StringFilter<"DueDiligenceRequest"> | string
+    buyerId?: StringFilter<"DueDiligenceRequest"> | string
+    documentName?: StringFilter<"DueDiligenceRequest"> | string
+    status?: EnumDueDiligenceStatusFilter<"DueDiligenceRequest"> | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    fulfilledAt?: DateTimeNullableFilter<"DueDiligenceRequest"> | Date | string | null
+    createdAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"DueDiligenceRequest"> | Date | string
+  }
+
+  export type UserCreateWithoutSellerProgressInput = {
     id?: string
     email: string
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -12194,16 +25014,26 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
-  export type UserUncheckedCreateWithoutSentMessagesInput = {
+  export type UserUncheckedCreateWithoutSellerProgressInput = {
     id?: string
     email: string
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -12213,8 +25043,433 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutSellerProgressInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+  }
+
+  export type ListingCreateWithoutSellerProgressInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutSellerProgressInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutSellerProgressInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+  }
+
+  export type UserUpsertWithoutSellerProgressInput = {
+    update: XOR<UserUpdateWithoutSellerProgressInput, UserUncheckedUpdateWithoutSellerProgressInput>
+    create: XOR<UserCreateWithoutSellerProgressInput, UserUncheckedCreateWithoutSellerProgressInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSellerProgressInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSellerProgressInput, UserUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type UserUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type ListingUpsertWithoutSellerProgressInput = {
+    update: XOR<ListingUpdateWithoutSellerProgressInput, ListingUncheckedUpdateWithoutSellerProgressInput>
+    create: XOR<ListingCreateWithoutSellerProgressInput, ListingUncheckedCreateWithoutSellerProgressInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutSellerProgressInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutSellerProgressInput, ListingUncheckedUpdateWithoutSellerProgressInput>
+  }
+
+  export type ListingUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutSellerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type UserCreateWithoutBuyerProgressInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyerProgressInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyerProgressInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBuyerProgressInput, UserUncheckedCreateWithoutBuyerProgressInput>
+  }
+
+  export type ListingCreateWithoutBuyerSelectedProgressInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutBuyerSelectedProgressInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutBuyerSelectedProgressInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutBuyerSelectedProgressInput, ListingUncheckedCreateWithoutBuyerSelectedProgressInput>
+  }
+
+  export type UserUpsertWithoutBuyerProgressInput = {
+    update: XOR<UserUpdateWithoutBuyerProgressInput, UserUncheckedUpdateWithoutBuyerProgressInput>
+    create: XOR<UserCreateWithoutBuyerProgressInput, UserUncheckedCreateWithoutBuyerProgressInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBuyerProgressInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBuyerProgressInput, UserUncheckedUpdateWithoutBuyerProgressInput>
+  }
+
+  export type UserUpdateWithoutBuyerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyerProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type ListingUpsertWithoutBuyerSelectedProgressInput = {
+    update: XOR<ListingUpdateWithoutBuyerSelectedProgressInput, ListingUncheckedUpdateWithoutBuyerSelectedProgressInput>
+    create: XOR<ListingCreateWithoutBuyerSelectedProgressInput, ListingUncheckedCreateWithoutBuyerSelectedProgressInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutBuyerSelectedProgressInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutBuyerSelectedProgressInput, ListingUncheckedUpdateWithoutBuyerSelectedProgressInput>
+  }
+
+  export type ListingUpdateWithoutBuyerSelectedProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutBuyerSelectedProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type UserCreateWithoutSentMessagesInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutSentMessagesInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -12228,6 +25483,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -12237,8 +25493,17 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -12247,6 +25512,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -12256,8 +25522,17 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -12409,6 +25684,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -12418,8 +25694,17 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -12428,6 +25713,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12437,8 +25723,17 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -12458,6 +25753,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -12467,8 +25763,17 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -12477,6 +25782,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12486,8 +25792,17 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type MessageUpsertWithoutRepliesInput = {
@@ -12694,6 +26009,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -12702,9 +26018,18 @@ export namespace Prisma {
     managing?: UserCreateNestedManyWithoutManagedByInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     activities?: ActivityCreateNestedManyWithoutUserInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutListingsInput = {
@@ -12713,6 +26038,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -12721,14 +26047,247 @@ export namespace Prisma {
     managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutListingsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutListingsInput, UserUncheckedCreateWithoutListingsInput>
+  }
+
+  export type UserCreateWithoutBuyingListingsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyingListingsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyingListingsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput>
+  }
+
+  export type DocumentCreateWithoutListingInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerDocsInput
+    buyer?: UserCreateNestedOneWithoutBuyerDocsInput
+    uploader?: UserCreateNestedOneWithoutUploadedDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutListingInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutListingInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput>
+  }
+
+  export type DocumentCreateManyListingInputEnvelope = {
+    data: DocumentCreateManyListingInput | DocumentCreateManyListingInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SellerProgressCreateWithoutSelectedListingInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    seller: UserCreateNestedOneWithoutSellerProgressInput
+  }
+
+  export type SellerProgressUncheckedCreateWithoutSelectedListingInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressCreateOrConnectWithoutSelectedListingInput = {
+    where: SellerProgressWhereUniqueInput
+    create: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput>
+  }
+
+  export type SellerProgressCreateManySelectedListingInputEnvelope = {
+    data: SellerProgressCreateManySelectedListingInput | SellerProgressCreateManySelectedListingInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BuyerProgressCreateWithoutSelectedListingInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer: UserCreateNestedOneWithoutBuyerProgressInput
+  }
+
+  export type BuyerProgressUncheckedCreateWithoutSelectedListingInput = {
+    id?: string
+    buyerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerProgressCreateOrConnectWithoutSelectedListingInput = {
+    where: BuyerProgressWhereUniqueInput
+    create: XOR<BuyerProgressCreateWithoutSelectedListingInput, BuyerProgressUncheckedCreateWithoutSelectedListingInput>
+  }
+
+  export type BuyerProgressCreateManySelectedListingInputEnvelope = {
+    data: BuyerProgressCreateManySelectedListingInput | BuyerProgressCreateManySelectedListingInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PreCloseChecklistCreateWithoutListingInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lastUpdatedByUser?: UserCreateNestedOneWithoutUpdatedChecklistsInput
+  }
+
+  export type PreCloseChecklistUncheckedCreateWithoutListingInput = {
+    id?: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistCreateOrConnectWithoutListingInput = {
+    where: PreCloseChecklistWhereUniqueInput
+    create: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+  }
+
+  export type DueDiligenceRequestCreateWithoutListingInput = {
+    id?: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    buyer: UserCreateNestedOneWithoutDueDiligenceRequestsInput
+  }
+
+  export type DueDiligenceRequestUncheckedCreateWithoutListingInput = {
+    id?: string
+    buyerId: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DueDiligenceRequestCreateOrConnectWithoutListingInput = {
+    where: DueDiligenceRequestWhereUniqueInput
+    create: XOR<DueDiligenceRequestCreateWithoutListingInput, DueDiligenceRequestUncheckedCreateWithoutListingInput>
+  }
+
+  export type DueDiligenceRequestCreateManyListingInputEnvelope = {
+    data: DueDiligenceRequestCreateManyListingInput | DueDiligenceRequestCreateManyListingInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutListingsInput = {
@@ -12748,6 +26307,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -12756,9 +26316,18 @@ export namespace Prisma {
     managing?: UserUpdateManyWithoutManagedByNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutListingsInput = {
@@ -12767,6 +26336,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12775,9 +26345,129 @@ export namespace Prisma {
     managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutBuyingListingsInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutBuyingListingsInput, UserUncheckedUpdateWithoutBuyingListingsInput>
+    create: XOR<UserCreateWithoutBuyingListingsInput, UserUncheckedCreateWithoutBuyingListingsInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutBuyingListingsInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutBuyingListingsInput, UserUncheckedUpdateWithoutBuyingListingsInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutBuyingListingsInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutBuyingListingsInput>
+  }
+
+  export type DocumentUpsertWithWhereUniqueWithoutListingInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutListingInput, DocumentUncheckedUpdateWithoutListingInput>
+    create: XOR<DocumentCreateWithoutListingInput, DocumentUncheckedCreateWithoutListingInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutListingInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutListingInput, DocumentUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutListingInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutListingInput>
+  }
+
+  export type SellerProgressUpsertWithWhereUniqueWithoutSelectedListingInput = {
+    where: SellerProgressWhereUniqueInput
+    update: XOR<SellerProgressUpdateWithoutSelectedListingInput, SellerProgressUncheckedUpdateWithoutSelectedListingInput>
+    create: XOR<SellerProgressCreateWithoutSelectedListingInput, SellerProgressUncheckedCreateWithoutSelectedListingInput>
+  }
+
+  export type SellerProgressUpdateWithWhereUniqueWithoutSelectedListingInput = {
+    where: SellerProgressWhereUniqueInput
+    data: XOR<SellerProgressUpdateWithoutSelectedListingInput, SellerProgressUncheckedUpdateWithoutSelectedListingInput>
+  }
+
+  export type SellerProgressUpdateManyWithWhereWithoutSelectedListingInput = {
+    where: SellerProgressScalarWhereInput
+    data: XOR<SellerProgressUpdateManyMutationInput, SellerProgressUncheckedUpdateManyWithoutSelectedListingInput>
+  }
+
+  export type BuyerProgressUpsertWithWhereUniqueWithoutSelectedListingInput = {
+    where: BuyerProgressWhereUniqueInput
+    update: XOR<BuyerProgressUpdateWithoutSelectedListingInput, BuyerProgressUncheckedUpdateWithoutSelectedListingInput>
+    create: XOR<BuyerProgressCreateWithoutSelectedListingInput, BuyerProgressUncheckedCreateWithoutSelectedListingInput>
+  }
+
+  export type BuyerProgressUpdateWithWhereUniqueWithoutSelectedListingInput = {
+    where: BuyerProgressWhereUniqueInput
+    data: XOR<BuyerProgressUpdateWithoutSelectedListingInput, BuyerProgressUncheckedUpdateWithoutSelectedListingInput>
+  }
+
+  export type BuyerProgressUpdateManyWithWhereWithoutSelectedListingInput = {
+    where: BuyerProgressScalarWhereInput
+    data: XOR<BuyerProgressUpdateManyMutationInput, BuyerProgressUncheckedUpdateManyWithoutSelectedListingInput>
+  }
+
+  export type PreCloseChecklistUpsertWithoutListingInput = {
+    update: XOR<PreCloseChecklistUpdateWithoutListingInput, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+    create: XOR<PreCloseChecklistCreateWithoutListingInput, PreCloseChecklistUncheckedCreateWithoutListingInput>
+    where?: PreCloseChecklistWhereInput
+  }
+
+  export type PreCloseChecklistUpdateToOneWithWhereWithoutListingInput = {
+    where?: PreCloseChecklistWhereInput
+    data: XOR<PreCloseChecklistUpdateWithoutListingInput, PreCloseChecklistUncheckedUpdateWithoutListingInput>
+  }
+
+  export type PreCloseChecklistUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdatedByUser?: UserUpdateOneWithoutUpdatedChecklistsNestedInput
+  }
+
+  export type PreCloseChecklistUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    lastUpdatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestUpsertWithWhereUniqueWithoutListingInput = {
+    where: DueDiligenceRequestWhereUniqueInput
+    update: XOR<DueDiligenceRequestUpdateWithoutListingInput, DueDiligenceRequestUncheckedUpdateWithoutListingInput>
+    create: XOR<DueDiligenceRequestCreateWithoutListingInput, DueDiligenceRequestUncheckedCreateWithoutListingInput>
+  }
+
+  export type DueDiligenceRequestUpdateWithWhereUniqueWithoutListingInput = {
+    where: DueDiligenceRequestWhereUniqueInput
+    data: XOR<DueDiligenceRequestUpdateWithoutListingInput, DueDiligenceRequestUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DueDiligenceRequestUpdateManyWithWhereWithoutListingInput = {
+    where: DueDiligenceRequestScalarWhereInput
+    data: XOR<DueDiligenceRequestUpdateManyMutationInput, DueDiligenceRequestUncheckedUpdateManyWithoutListingInput>
   }
 
   export type UserCreateWithoutActivitiesInput = {
@@ -12786,6 +26476,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -12795,8 +26486,17 @@ export namespace Prisma {
     listings?: ListingCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
     sentMessages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -12805,6 +26505,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     managerId?: string | null
@@ -12814,8 +26515,17 @@ export namespace Prisma {
     listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
     buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
     sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
     sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -12840,6 +26550,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -12849,8 +26560,17 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -12859,6 +26579,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12868,8 +26589,829 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserCreateWithoutSellerQuestionnaireInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutSellerQuestionnaireInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutSellerQuestionnaireInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+  }
+
+  export type UserUpsertWithoutSellerQuestionnaireInput = {
+    update: XOR<UserUpdateWithoutSellerQuestionnaireInput, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+    create: XOR<UserCreateWithoutSellerQuestionnaireInput, UserUncheckedCreateWithoutSellerQuestionnaireInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSellerQuestionnaireInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSellerQuestionnaireInput, UserUncheckedUpdateWithoutSellerQuestionnaireInput>
+  }
+
+  export type UserUpdateWithoutSellerQuestionnaireInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSellerQuestionnaireInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserCreateWithoutBuyerNDAInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyerNDAInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyerNDAInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBuyerNDAInput, UserUncheckedCreateWithoutBuyerNDAInput>
+  }
+
+  export type UserUpsertWithoutBuyerNDAInput = {
+    update: XOR<UserUpdateWithoutBuyerNDAInput, UserUncheckedUpdateWithoutBuyerNDAInput>
+    create: XOR<UserCreateWithoutBuyerNDAInput, UserUncheckedCreateWithoutBuyerNDAInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBuyerNDAInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBuyerNDAInput, UserUncheckedUpdateWithoutBuyerNDAInput>
+  }
+
+  export type UserUpdateWithoutBuyerNDAInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyerNDAInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserCreateWithoutBuyerFinancialStatementInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutBuyerFinancialStatementInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutBuyerFinancialStatementInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBuyerFinancialStatementInput, UserUncheckedCreateWithoutBuyerFinancialStatementInput>
+  }
+
+  export type UserUpsertWithoutBuyerFinancialStatementInput = {
+    update: XOR<UserUpdateWithoutBuyerFinancialStatementInput, UserUncheckedUpdateWithoutBuyerFinancialStatementInput>
+    create: XOR<UserCreateWithoutBuyerFinancialStatementInput, UserUncheckedCreateWithoutBuyerFinancialStatementInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBuyerFinancialStatementInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBuyerFinancialStatementInput, UserUncheckedUpdateWithoutBuyerFinancialStatementInput>
+  }
+
+  export type UserUpdateWithoutBuyerFinancialStatementInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyerFinancialStatementInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type ListingCreateWithoutPreCloseChecklistInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutPreCloseChecklistInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutPreCloseChecklistInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+  }
+
+  export type UserCreateWithoutUpdatedChecklistsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    dueDiligenceRequests?: DueDiligenceRequestCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserUncheckedCreateWithoutUpdatedChecklistsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedCreateNestedManyWithoutBuyerInput
+  }
+
+  export type UserCreateOrConnectWithoutUpdatedChecklistsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+  }
+
+  export type ListingUpsertWithoutPreCloseChecklistInput = {
+    update: XOR<ListingUpdateWithoutPreCloseChecklistInput, ListingUncheckedUpdateWithoutPreCloseChecklistInput>
+    create: XOR<ListingCreateWithoutPreCloseChecklistInput, ListingUncheckedCreateWithoutPreCloseChecklistInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutPreCloseChecklistInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutPreCloseChecklistInput, ListingUncheckedUpdateWithoutPreCloseChecklistInput>
+  }
+
+  export type ListingUpdateWithoutPreCloseChecklistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutPreCloseChecklistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type UserUpsertWithoutUpdatedChecklistsInput = {
+    update: XOR<UserUpdateWithoutUpdatedChecklistsInput, UserUncheckedUpdateWithoutUpdatedChecklistsInput>
+    create: XOR<UserCreateWithoutUpdatedChecklistsInput, UserUncheckedCreateWithoutUpdatedChecklistsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUpdatedChecklistsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUpdatedChecklistsInput, UserUncheckedUpdateWithoutUpdatedChecklistsInput>
+  }
+
+  export type UserUpdateWithoutUpdatedChecklistsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUpdatedChecklistsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type ListingCreateWithoutDueDiligenceRequestsInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    seller: UserCreateNestedOneWithoutListingsInput
+    buyers?: UserCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistCreateNestedOneWithoutListingInput
+  }
+
+  export type ListingUncheckedCreateWithoutDueDiligenceRequestsInput = {
+    id?: string
+    title: string
+    description: string
+    price: number
+    status?: $Enums.ListingStatus
+    createdAt?: Date | string
+    sellerId: string
+    buyers?: UserUncheckedCreateNestedManyWithoutBuyingListingsInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutListingInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    buyerSelectedProgress?: BuyerProgressUncheckedCreateNestedManyWithoutSelectedListingInput
+    preCloseChecklist?: PreCloseChecklistUncheckedCreateNestedOneWithoutListingInput
+  }
+
+  export type ListingCreateOrConnectWithoutDueDiligenceRequestsInput = {
+    where: ListingWhereUniqueInput
+    create: XOR<ListingCreateWithoutDueDiligenceRequestsInput, ListingUncheckedCreateWithoutDueDiligenceRequestsInput>
+  }
+
+  export type UserCreateWithoutDueDiligenceRequestsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managedBy?: UserCreateNestedOneWithoutManagingInput
+    managing?: UserCreateNestedManyWithoutManagedByInput
+    listings?: ListingCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentCreateNestedManyWithoutUploaderInput
+    activities?: ActivityCreateNestedManyWithoutUserInput
+    sentMessages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDACreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistCreateNestedManyWithoutLastUpdatedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutDueDiligenceRequestsInput = {
+    id?: string
+    email: string
+    password: string
+    name?: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    managerId?: string | null
+    unreadCount?: number
+    lastReadAt?: Date | string | null
+    managing?: UserUncheckedCreateNestedManyWithoutManagedByInput
+    listings?: ListingUncheckedCreateNestedManyWithoutSellerInput
+    buyerDocs?: DocumentUncheckedCreateNestedManyWithoutBuyerInput
+    sellerDocs?: DocumentUncheckedCreateNestedManyWithoutSellerInput
+    uploadedDocuments?: DocumentUncheckedCreateNestedManyWithoutUploaderInput
+    activities?: ActivityUncheckedCreateNestedManyWithoutUserInput
+    sentMessages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    buyingListings?: ListingUncheckedCreateNestedManyWithoutBuyersInput
+    sellerProgress?: SellerProgressUncheckedCreateNestedManyWithoutSellerInput
+    buyerProgress?: BuyerProgressUncheckedCreateNestedManyWithoutBuyerInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedCreateNestedOneWithoutSellerInput
+    buyerNDA?: BuyerNDAUncheckedCreateNestedOneWithoutBuyerInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedCreateNestedOneWithoutBuyerInput
+    updatedChecklists?: PreCloseChecklistUncheckedCreateNestedManyWithoutLastUpdatedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutDueDiligenceRequestsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDueDiligenceRequestsInput, UserUncheckedCreateWithoutDueDiligenceRequestsInput>
+  }
+
+  export type ListingUpsertWithoutDueDiligenceRequestsInput = {
+    update: XOR<ListingUpdateWithoutDueDiligenceRequestsInput, ListingUncheckedUpdateWithoutDueDiligenceRequestsInput>
+    create: XOR<ListingCreateWithoutDueDiligenceRequestsInput, ListingUncheckedCreateWithoutDueDiligenceRequestsInput>
+    where?: ListingWhereInput
+  }
+
+  export type ListingUpdateToOneWithWhereWithoutDueDiligenceRequestsInput = {
+    where?: ListingWhereInput
+    data: XOR<ListingUpdateWithoutDueDiligenceRequestsInput, ListingUncheckedUpdateWithoutDueDiligenceRequestsInput>
+  }
+
+  export type ListingUpdateWithoutDueDiligenceRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutDueDiligenceRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+  }
+
+  export type UserUpsertWithoutDueDiligenceRequestsInput = {
+    update: XOR<UserUpdateWithoutDueDiligenceRequestsInput, UserUncheckedUpdateWithoutDueDiligenceRequestsInput>
+    create: XOR<UserCreateWithoutDueDiligenceRequestsInput, UserUncheckedCreateWithoutDueDiligenceRequestsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDueDiligenceRequestsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDueDiligenceRequestsInput, UserUncheckedUpdateWithoutDueDiligenceRequestsInput>
+  }
+
+  export type UserUpdateWithoutDueDiligenceRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDueDiligenceRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
   }
 
   export type UserCreateManyManagedByInput = {
@@ -12878,6 +27420,7 @@ export namespace Prisma {
     password: string
     name?: string
     role?: $Enums.UserRole
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     unreadCount?: number
@@ -12897,8 +27440,17 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     sellerId: string
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12907,8 +27459,36 @@ export namespace Prisma {
     id?: string
     type: $Enums.DocumentType
     status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
     url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
     buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateManyUploaderInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    listingId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12958,12 +27538,52 @@ export namespace Prisma {
     threadId?: string | null
   }
 
+  export type SellerProgressCreateManySellerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerProgressCreateManyBuyerInput = {
+    id?: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PreCloseChecklistCreateManyLastUpdatedByUserInput = {
+    id?: string
+    listingId: string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DueDiligenceRequestCreateManyBuyerInput = {
+    id?: string
+    listingId: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserUpdateWithoutManagedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -12972,9 +27592,18 @@ export namespace Prisma {
     listings?: ListingUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutManagedByInput = {
@@ -12983,6 +27612,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -12991,9 +27621,18 @@ export namespace Prisma {
     listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
     buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
     sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
     activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
     sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    buyingListings?: ListingUncheckedUpdateManyWithoutBuyersNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutManagedByInput = {
@@ -13002,6 +27641,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unreadCount?: IntFieldUpdateOperationsInput | number
@@ -13015,6 +27655,12 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyers?: UserUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateWithoutSellerInput = {
@@ -13024,6 +27670,12 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyers?: UserUncheckedUpdateManyWithoutBuyingListingsNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
   }
 
   export type ListingUncheckedUpdateManyWithoutSellerInput = {
@@ -13039,18 +27691,36 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
   }
 
   export type DocumentUncheckedUpdateWithoutBuyerInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13059,8 +27729,17 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     sellerId?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13069,18 +27748,36 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
   }
 
   export type DocumentUncheckedUpdateWithoutSellerInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13089,8 +27786,74 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
     status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
     url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
     buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUpdateWithoutUploaderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
+    buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    listing?: ListingUpdateOneWithoutDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutUploaderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutUploaderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13238,6 +28001,163 @@ export namespace Prisma {
     threadId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type ListingUpdateWithoutBuyersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutListingsNestedInput
+    documents?: DocumentUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateWithoutBuyersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    documents?: DocumentUncheckedUpdateManyWithoutListingNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    buyerSelectedProgress?: BuyerProgressUncheckedUpdateManyWithoutSelectedListingNestedInput
+    preCloseChecklist?: PreCloseChecklistUncheckedUpdateOneWithoutListingNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutListingNestedInput
+  }
+
+  export type ListingUncheckedUpdateManyWithoutBuyersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    status?: EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SellerProgressUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    selectedListing?: ListingUpdateOneWithoutSellerProgressNestedInput
+  }
+
+  export type SellerProgressUncheckedUpdateWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSellerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    selectedListing?: ListingUpdateOneWithoutBuyerSelectedProgressNestedInput
+  }
+
+  export type BuyerProgressUncheckedUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressUncheckedUpdateManyWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    selectedListingId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUpdateWithoutLastUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutPreCloseChecklistNestedInput
+  }
+
+  export type PreCloseChecklistUncheckedUpdateWithoutLastUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    buyerItems?: JsonNullValueInput | InputJsonValue
+    sellerItems?: JsonNullValueInput | InputJsonValue
+    brokerItems?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: ListingUpdateOneRequiredWithoutDueDiligenceRequestsNestedInput
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateManyWithoutBuyerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    listingId?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MessageCreateManyParentMessageInput = {
     id?: string
     subject: string
@@ -13352,6 +28272,270 @@ export namespace Prisma {
     fileType?: StringFieldUpdateOperationsInput | string
     fileUrl?: StringFieldUpdateOperationsInput | string
     uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentCreateManyListingInput = {
+    id?: string
+    type: $Enums.DocumentType
+    status?: $Enums.DocumentStatus
+    category?: $Enums.DocumentCategory
+    url?: string | null
+    fileName?: string | null
+    fileSize?: number | null
+    operationType?: $Enums.DocumentOperationType
+    stepId?: number | null
+    sellerId: string
+    buyerId?: string | null
+    uploadedAt?: Date | string | null
+    downloadedAt?: Date | string | null
+    uploadedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SellerProgressCreateManySelectedListingInput = {
+    id?: string
+    sellerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuyerProgressCreateManySelectedListingInput = {
+    id?: string
+    buyerId: string
+    currentStep?: number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DueDiligenceRequestCreateManyListingInput = {
+    id?: string
+    buyerId: string
+    documentName: string
+    status?: $Enums.DueDiligenceStatus
+    requestedAt?: Date | string
+    fulfilledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserUpdateWithoutBuyingListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managedBy?: UserUpdateOneWithoutManagingNestedInput
+    managing?: UserUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    sellerProgress?: SellerProgressUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBuyingListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    managing?: UserUncheckedUpdateManyWithoutManagedByNestedInput
+    listings?: ListingUncheckedUpdateManyWithoutSellerNestedInput
+    buyerDocs?: DocumentUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerDocs?: DocumentUncheckedUpdateManyWithoutSellerNestedInput
+    uploadedDocuments?: DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+    activities?: ActivityUncheckedUpdateManyWithoutUserNestedInput
+    sentMessages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    sellerProgress?: SellerProgressUncheckedUpdateManyWithoutSellerNestedInput
+    buyerProgress?: BuyerProgressUncheckedUpdateManyWithoutBuyerNestedInput
+    sellerQuestionnaire?: SellerQuestionnaireUncheckedUpdateOneWithoutSellerNestedInput
+    buyerNDA?: BuyerNDAUncheckedUpdateOneWithoutBuyerNestedInput
+    buyerFinancialStatement?: BuyerFinancialStatementUncheckedUpdateOneWithoutBuyerNestedInput
+    updatedChecklists?: PreCloseChecklistUncheckedUpdateManyWithoutLastUpdatedByUserNestedInput
+    dueDiligenceRequests?: DueDiligenceRequestUncheckedUpdateManyWithoutBuyerNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutBuyingListingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    unreadCount?: IntFieldUpdateOperationsInput | number
+    lastReadAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DocumentUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerDocsNestedInput
+    buyer?: UserUpdateOneWithoutBuyerDocsNestedInput
+    uploader?: UserUpdateOneWithoutUploadedDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+    status?: EnumDocumentStatusFieldUpdateOperationsInput | $Enums.DocumentStatus
+    category?: EnumDocumentCategoryFieldUpdateOperationsInput | $Enums.DocumentCategory
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    operationType?: EnumDocumentOperationTypeFieldUpdateOperationsInput | $Enums.DocumentOperationType
+    stepId?: NullableIntFieldUpdateOperationsInput | number | null
+    sellerId?: StringFieldUpdateOperationsInput | string
+    buyerId?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    uploadedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUpdateWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: UserUpdateOneRequiredWithoutSellerProgressNestedInput
+  }
+
+  export type SellerProgressUncheckedUpdateWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProgressUncheckedUpdateManyWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sellerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressUpdateWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneRequiredWithoutBuyerProgressNestedInput
+  }
+
+  export type BuyerProgressUncheckedUpdateWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuyerProgressUncheckedUpdateManyWithoutSelectedListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    currentStep?: IntFieldUpdateOperationsInput | number
+    completedSteps?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyer?: UserUpdateOneRequiredWithoutDueDiligenceRequestsNestedInput
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DueDiligenceRequestUncheckedUpdateManyWithoutListingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyerId?: StringFieldUpdateOperationsInput | string
+    documentName?: StringFieldUpdateOperationsInput | string
+    status?: EnumDueDiligenceStatusFieldUpdateOperationsInput | $Enums.DueDiligenceStatus
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

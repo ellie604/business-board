@@ -23,63 +23,71 @@ interface LoginResponse {
   token?: string;
 }
 
-// 检测是否是无痕模式
-const isIncognitoMode = async (): Promise<boolean> => {
-  try {
-    const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-    const tempStorage = window.TEMPORARY || 0;
-    
-    return new Promise(resolve => {
-      if (!fs || typeof tempStorage !== 'number') {
-        resolve(false);
-        return;
-      }
-      fs(tempStorage, 100, 
-        () => resolve(false), 
-        () => resolve(true)
-      );
-    });
-  } catch (e) {
-    return false;
-  }
-};
-
-// 重试函数
-const retryRequest = async <T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 2,
+// 添加重试机制
+async function retryRequest<T>(
+  requestFn: () => Promise<T>, 
+  maxRetries: number = 3, 
   delay: number = 1000
-): Promise<T> => {
+): Promise<T> {
+  let lastError: Error;
+  
   for (let i = 0; i < maxRetries; i++) {
     try {
-      return await fn();
+      return await requestFn();
     } catch (error) {
-      if (i === maxRetries - 1) throw error;
+      lastError = error as Error;
+      console.warn(`Request failed (attempt ${i + 1}/${maxRetries}):`, error);
       
-      console.log(`Request failed, retrying in ${delay}ms... (${i + 1}/${maxRetries})`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 1.2;
+      // 如果是最后一次尝试，直接抛出错误
+      if (i === maxRetries - 1) {
+        break;
+      }
+      
+      // 等待后重试
+      await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
     }
   }
-  throw new Error('Max retries exceeded');
-};
+  
+  throw lastError!;
+}
 
-// 创建一个通用的请求拦截器
-const createAuthenticatedRequest = () => {
-  const authHeader = authService.getAuthHeader();
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json'
-  };
-  
-  if (authHeader) {
-    headers['Authorization'] = authHeader;
+// 检测无痕模式的增强版本
+function detectIncognitoMode(): boolean {
+  try {
+    // 方法1：检测localStorage写入权限
+    const testKey = '__test_incognito__';
+    localStorage.setItem(testKey, 'test');
+    localStorage.removeItem(testKey);
+    
+    // 方法2：检测quota API
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      navigator.storage.estimate().then(estimate => {
+        // 无痕模式通常有较小的存储配额
+        if (estimate.quota && estimate.quota < 120000000) { // 小于120MB
+          console.log('Potential incognito mode detected via storage quota');
+        }
+      });
+    }
+    
+    // 方法3：检测requestFileSystem (Webkit)
+    if (window.RequestFileSystem || window.webkitRequestFileSystem) {
+      const requestFileSystem = window.RequestFileSystem || window.webkitRequestFileSystem;
+      if (requestFileSystem) {
+        requestFileSystem(
+          window.TEMPORARY || 0,
+          1,
+          () => {}, // Success callback - 正常模式
+          () => console.log('Potential incognito mode detected via FileSystem API') // Error callback - 可能是无痕模式
+        );
+      }
+    }
+    
+    return false; // localStorage写入成功，可能不是无痕模式
+  } catch (e) {
+    console.log('Incognito mode detected via localStorage exception');
+    return true; // localStorage访问失败，可能是无痕模式
   }
-  
-  return {
-    headers,
-    credentials: 'include' as const
-  };
-};
+}
 
 export const authService = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
@@ -135,6 +143,39 @@ export const authService = {
     }, 2, 1000);
   },
 
+  logout: async (): Promise<void> => {
+    try {
+      // 调用后端 logout 接口
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error) {
+      console.error('Logout request failed:', error);
+      // 即使后端请求失败，我们仍然清理本地状态
+    } finally {
+      // 清理本地存储
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_header');
+      
+      // 清理任何其他可能的认证相关数据
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('auth_') || key.includes('session'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      console.log('Local storage cleared');
+    }
+  },
+
   // 设置认证头
   setAuthHeader: (token: string) => {
     if (token) {
@@ -147,6 +188,17 @@ export const authService = {
   // 获取认证头
   getAuthHeader: (): string | null => {
     return localStorage.getItem('auth_header');
+  },
+
+  // 获取当前用户信息
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  // 检查用户是否已登录
+  isAuthenticated: (): boolean => {
+    return !!localStorage.getItem('user');
   },
 
   // 检查并恢复会话

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { agentService } from '../../services/agent';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { authService } from '../../services/auth';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/california-business-sales-logo.png';
 
 interface DashboardStats {
@@ -21,6 +22,7 @@ const useAuth = () => {
 export function AgentDashboard() {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalActiveListings: 0,
     totalUnderContract: 0,
@@ -50,6 +52,19 @@ export function AgentDashboard() {
     loadDashboardData();
   }, []);
 
+  const handleLogout = async () => {
+    if (confirm('Are you sure you want to logout?')) {
+      try {
+        await authService.logout();
+        navigate('/login');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // 即使 logout 请求失败，仍然跳转到登录页面
+        navigate('/login');
+      }
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
@@ -69,6 +84,31 @@ export function AgentDashboard() {
             alt="California Business Sales" 
             className="w-full"
           />
+        </div>
+
+        {/* User Info */}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">
+                {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.name || 'Agent'}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {user?.role || 'AGENT'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="mt-3 w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            Sign out
+          </button>
         </div>
 
         {/* 导航链接 */}

@@ -62,7 +62,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
         password: true,
         name: true,
         role: true,
-        // 移除 managing 查询以提高性能
+        managerId: true  // 添加managerId字段
       }
     });
 
@@ -76,7 +76,8 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
       id: user.id,
       role: user.role,
       name: user.name,
-      email: user.email
+      email: user.email,
+      managerId: user.managerId  // 添加managerId字段
     };
     
     typedReq.user = userInfo;
@@ -105,6 +106,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         name: user.name,
         role: user.role,
+        managerId: user.managerId,  // 添加managerId字段
         managing: [] // 暂时返回空数组，减少查询时间
       }
     });
@@ -154,6 +156,40 @@ const testUsersHandler = async (req: Request, res: Response): Promise<void> => {
 };
 
 router.post('/login', loginHandler);
+router.post('/logout', async (req: Request, res: Response): Promise<void> => {
+  const typedReq = req as AuthenticatedRequest;
+  
+  try {
+    // 清理会话
+    if (typedReq.session) {
+      await new Promise<void>((resolve, reject) => {
+        typedReq.session.destroy((error: Error | null) => {
+          if (error) {
+            console.error('Session destroy error:', error);
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
+    
+    // 清理 cookie
+    res.clearCookie('business.board.sid', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    
+    console.log('User logged out successfully');
+    res.json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    // 即使会话清理失败，也返回成功响应，因为客户端会清理本地状态
+    res.json({ message: 'Logout completed' });
+  }
+});
 router.get('/test-users', testUsersHandler);
 
 export default router;

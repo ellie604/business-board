@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../config';
+import { userService } from '../../services/listing';
 
 interface Listing {
   id: string;
@@ -16,6 +17,7 @@ interface Seller {
   name: string;
   email: string;
   createdAt: string;
+  isActive: boolean;
   listings: Listing[];
 }
 
@@ -25,33 +27,57 @@ const BrokerSellers: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchSellers = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/broker/sellers`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch sellers');
+  const fetchSellers = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/broker/sellers`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
+      });
 
-        const data = await response.json();
-        setSellers(data.sellers);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch sellers');
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error('Failed to fetch sellers');
       }
-    };
 
+      const data = await response.json();
+      setSellers(data.sellers);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to fetch sellers');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchSellers();
   }, []);
+
+  const handleArchiveSeller = async (sellerId: string) => {
+    if (!confirm('Are you sure you want to archive this seller?')) return;
+    
+    try {
+      await userService.archiveSeller(sellerId);
+      await fetchSellers(); // 重新加载数据
+    } catch (err) {
+      console.error('Failed to archive seller:', err);
+      setError('Failed to archive seller. Please try again later.');
+    }
+  };
+
+  const handleReactivateSeller = async (sellerId: string) => {
+    if (!confirm('Are you sure you want to reactivate this seller?')) return;
+    
+    try {
+      await userService.reactivateSeller(sellerId);
+      await fetchSellers(); // 重新加载数据
+    } catch (err) {
+      console.error('Failed to reactivate seller:', err);
+      setError('Failed to reactivate seller. Please try again later.');
+    }
+  };
 
   if (loading) {
     return (
@@ -76,12 +102,21 @@ const BrokerSellers: React.FC = () => {
         {sellers.map((seller) => (
           <div
             key={seller.id}
-            className="bg-white rounded-lg shadow-lg p-6"
+            className={`bg-white rounded-lg shadow-lg p-6 ${seller.isActive ? '' : 'opacity-60'}`}
           >
             {/* Seller Info - 不可点击部分 */}
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h2 className="text-xl font-semibold">{seller.name}</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-semibold">{seller.name}</h2>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    seller.isActive 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {seller.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
                 <p className="text-gray-600">{seller.email}</p>
                 <p className="text-sm text-gray-500">
                   Joined: {new Date(seller.createdAt).toLocaleDateString()}
@@ -91,6 +126,23 @@ const BrokerSellers: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">
                   {seller.listings.length} Listing{seller.listings.length !== 1 ? 's' : ''}
                 </p>
+                <div className="mt-2 space-x-2">
+                  {seller.isActive ? (
+                    <button 
+                      className="text-orange-500 hover:text-orange-600 text-sm" 
+                      onClick={() => handleArchiveSeller(seller.id)}
+                    >
+                      Archive
+                    </button>
+                  ) : (
+                    <button 
+                      className="text-green-500 hover:text-green-600 text-sm" 
+                      onClick={() => handleReactivateSeller(seller.id)}
+                    >
+                      Reactivate
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -116,6 +168,8 @@ const BrokerSellers: React.FC = () => {
                             ? 'bg-green-100 text-green-800'
                             : listing.status === 'UNDER_CONTRACT'
                             ? 'bg-yellow-100 text-yellow-800'
+                            : listing.status === 'INACTIVE'
+                            ? 'bg-gray-100 text-gray-800'
                             : 'bg-gray-100 text-gray-800'
                         }`}>
                           {listing.status.replace('_', ' ')}

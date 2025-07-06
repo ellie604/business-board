@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { sellerService } from '../../services/seller';
+import { authService } from '../../services/auth';
 import type { DashboardStats, Listing, SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
 import logo from '../../assets/california-business-sales-logo.png';
@@ -11,16 +12,17 @@ interface Buyer {
   email: string;
 }
 
-interface ExtendedListing extends Listing {
-  createdAt: string;
-  buyers: Buyer[];
-}
-
 interface CurrentListingResponse {
   listing: ExtendedListing | null;
   needsSelection: boolean;
-  currentStep?: number;
-  completedSteps?: number[];
+}
+
+interface ExtendedListing extends Listing {
+  buyers: Buyer[];
+  seller: {
+    id: string;
+    name: string;
+  };
 }
 
 // Simple hooks replacement
@@ -31,13 +33,8 @@ const useAuth = () => {
 };
 
 const useNotification = () => {
-  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
-    // Simple alert-based notification
-    if (type === 'error') {
-      alert(`Error: ${message}`);
-    } else {
-      alert(message);
-    }
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    console.log(`[${type.toUpperCase()}] ${message}`);
   };
   return { showNotification };
 };
@@ -75,7 +72,7 @@ const SellerDashboard: React.FC = () => {
     { label: 'Messages', path: '/seller/messages', stepId: 1 },
     { label: 'Listing Agreement', path: '/seller/listing-agreement', stepId: 2 },
     { label: 'Questionnaire', path: '/seller/questionnaire', stepId: 3 },
-    { label: 'Financials', path: '/seller/financials', stepId: 4 },
+    { label: 'Upload Docs', path: '/seller/financials', stepId: 4 },
     { label: 'Buyer Activity', path: '/seller/buyer-activity', stepId: 5 },
     { label: 'Purchase Agreement', path: '/seller/purchase-agreement', stepId: 6 },
     { label: 'Due Diligence', path: '/seller/due-diligence', stepId: 7 },
@@ -117,51 +114,50 @@ const SellerDashboard: React.FC = () => {
     }
   };
 
-  const handleSelectListing = async (listingId: string) => {
+  const handleLogout = async () => {
+    if (confirm('Are you sure you want to logout?')) {
+      try {
+        await authService.logout();
+        navigate('/login');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // 即使 logout 请求失败，仍然跳转到登录页面
+        navigate('/login');
+      }
+    }
+  };
+
+  const handleListingSelection = async (listingId: string) => {
     try {
       setSelecting(true);
-      
       await sellerService.selectListing(listingId);
       
-      // Reload current listing data and progress
-      const [currentListingData, progressRes] = await Promise.all([
-        sellerService.getCurrentListing(),
-        sellerService.getProgress()
-      ]);
-      
-      const currentData = currentListingData as CurrentListingResponse;
-      setCurrentListing(currentData.listing);
+      // Refetch data after selection
+      await fetchData();
       setNeedsSelection(false);
-      setProgress(progressRes.progress);
-      
-      showNotification('Listing selected successfully! You can now proceed with the process.', 'success');
-      
+      showNotification('Listing selected successfully', 'success');
     } catch (err) {
-      console.error('Error selecting listing:', err);
+      console.error('Failed to select listing:', err);
       showNotification('Failed to select listing', 'error');
     } finally {
       setSelecting(false);
     }
   };
 
-  const handleMenuClick = (item: any) => {
-    if (item.stepId === null) {
-      // Home page is always accessible
-      navigate(item.path);
-      return;
-    }
-
-    const currentStepIndex = getCurrentStepIndex();
-    
-    // Check if step is truly accessible (for StepGuard)
-    const isAccessible = item.stepId <= currentStepIndex;
+  const handleMenuClick = (item: typeof menuItems[0]) => {
+    const currentStepIndex = progress?.currentStep || 0;
+    const stepInfo = progress?.steps.find(s => s.id === item.stepId);
+    const isAccessible = item.stepId === null || item.stepId <= currentStepIndex;
+    const isCompleted = stepInfo?.completed || false;
     
     // Always navigate, but pass accessibility state
-    navigate(item.path, { 
-      state: { 
+    navigate(item.path, {
+      state: {
         stepAccessible: isAccessible,
-        currentStep: currentStepIndex
-      } 
+        stepCompleted: isCompleted,
+        currentStep: currentStepIndex,
+        stepId: item.stepId
+      }
     });
   };
 
@@ -169,28 +165,17 @@ const SellerDashboard: React.FC = () => {
     return progress?.currentStep || 0;
   };
 
-  // Helper functions for formatting
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
+      currency: 'USD'
     }).format(price);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
   const getBuyerStatusText = (buyers: Buyer[]) => {
-    const count = buyers.length;
-    if (count === 0) return 'No buyers yet';
-    if (count === 1) return '1 buyer interested';
-    return `${count} buyers interested`;
+    if (!buyers || buyers.length === 0) return 'No buyers';
+    if (buyers.length === 1) return `${buyers.length} buyer interested`;
+    return `${buyers.length} buyers interested`;
   };
 
   const getStatusColor = (status: string) => {
@@ -220,6 +205,31 @@ const SellerDashboard: React.FC = () => {
             alt="California Business Sales" 
             className="w-full"
           />
+        </div>
+
+        {/* User Info */}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">
+                {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.name || 'Seller'}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {user?.role || 'SELLER'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="mt-3 w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            Sign out
+          </button>
         </div>
 
         {/* Navigation Menu */}
@@ -308,132 +318,93 @@ const SellerDashboard: React.FC = () => {
             <ProgressBar currentStep={getCurrentStepIndex()} steps={steps} />
 
             {/* Listing Selection */}
-            {(needsSelection || !currentListing) && (
-              <div className="mb-8">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                  <h3 className="text-lg font-semibold text-yellow-900 mb-2">
-                    Select a Listing to Continue
-                  </h3>
-                  <p className="text-yellow-700">
-                    Please select which business listing you'd like to work with. All documents and progress will be tied to this selection.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Listings Grid */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Your Business Listings</h2>
-              
-              {listings.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-500 mb-4">
-                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No listings found</h3>
-                  <p className="text-gray-500">Contact your agent to create your first business listing.</p>
-                </div>
-              ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {needsSelection && (
+              <div className="mb-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 className="text-lg font-semibold text-yellow-900 mb-4">
+                  Select a Listing to Work On
+                </h3>
+                <div className="space-y-4">
                   {listings.map((listing) => (
                     <div
                       key={listing.id}
-                      className={`bg-white rounded-lg shadow-md border transition-all duration-200 hover:shadow-lg ${
-                        currentListing?.id === listing.id && !needsSelection
-                          ? 'border-blue-500 ring-2 ring-blue-200'
-                          : 'border-gray-200'
-                      }`}
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">
-                            {listing.title}
-                          </h3>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(listing.status)}`}>
-                            {listing.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                        
-                        <p className="text-gray-600 mb-4 line-clamp-3">
-                          {listing.description}
-                        </p>
-                        
-                        <div className="space-y-2 mb-4">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Price:</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">{listing.title}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{listing.description}</p>
+                          <div className="flex items-center mt-2 space-x-4">
                             <span className="text-sm font-medium text-gray-900">
                               {formatPrice(listing.price)}
                             </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Listed:</span>
-                            <span className="text-sm text-gray-700">
-                              {formatDate(listing.createdAt)}
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(listing.status)}`}>
+                              {listing.status}
                             </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Interest:</span>
-                            <span className="text-sm text-gray-700">
+                            <span className="text-xs text-gray-500">
                               {getBuyerStatusText(listing.buyers)}
                             </span>
                           </div>
                         </div>
-
-                        {/* Buyer List */}
-                        {listing.buyers.length > 0 && (
-                          <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-700 mb-2">Interested Buyers:</p>
-                            <div className="space-y-1">
-                              {listing.buyers.map((buyer) => (
-                                <div key={buyer.id} className="text-sm text-gray-600 bg-gray-50 rounded px-2 py-1">
-                                  {buyer.name}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Action Button */}
-                        {(needsSelection || !currentListing) && (
-                          <button
-                            onClick={() => handleSelectListing(listing.id)}
-                            disabled={selecting}
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {selecting ? 'Selecting...' : 'Select This Listing'}
-                          </button>
-                        )}
-
-                        {currentListing?.id === listing.id && !needsSelection && (
-                          <div className="w-full bg-blue-100 text-blue-800 py-2 px-4 rounded-md text-center font-medium">
-                            Currently Selected
-                          </div>
-                        )}
+                        <button
+                          onClick={() => handleListingSelection(listing.id)}
+                          disabled={selecting}
+                          className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {selecting ? 'Selecting...' : 'Select'}
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-
-            {/* Instructions */}
-            {!needsSelection && currentListing && (
-              <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Next Steps</h3>
-                <p className="text-gray-700 mb-4">
-                  You've selected "{currentListing.title}" as your active listing. You can now:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Navigate to other sections using the menu on the left</li>
-                  <li>Download documents provided by your broker/agent</li>
-                  <li>Upload required documents for the selling process</li>
-                  <li>Track your progress through the transaction steps</li>
-                  <li>Communicate with your agent via messages</li>
-                </ul>
               </div>
             )}
+
+            {/* Dashboard Stats */}
+            {stats && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-lg font-medium mb-2">Current Step</h3>
+                  <p className="text-3xl font-bold text-blue-600">{stats.currentStep}</p>
+                  <p className="text-sm text-gray-500">of {stats.totalSteps} steps</p>
+                </div>
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-lg font-medium mb-2">Completed Steps</h3>
+                  <p className="text-3xl font-bold text-green-600">{stats.completedSteps}</p>
+                  <p className="text-sm text-gray-500">steps finished</p>
+                </div>
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-lg font-medium mb-2">Total Listings</h3>
+                  <p className="text-3xl font-bold text-purple-600">{listings.length}</p>
+                  <p className="text-sm text-gray-500">your listings</p>
+                </div>
+              </div>
+            )}
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-lg font-medium mb-4">Your Listings</h3>
+              <div className="space-y-4">
+                {listings.slice(0, 3).map((listing) => (
+                  <div key={listing.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{listing.title}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{listing.description}</p>
+                      <div className="flex items-center mt-2 space-x-4">
+                        <span className="text-sm font-medium text-gray-900">
+                          {formatPrice(listing.price)}
+                        </span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(listing.status)}`}>
+                          {listing.status}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {getBuyerStatusText(listing.buyers)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>

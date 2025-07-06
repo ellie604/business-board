@@ -22,15 +22,13 @@ const router = (0, express_1.Router)();
 const prisma = (0, database_1.getPrisma)();
 const loginHandler = async (req, res) => {
     const typedReq = req;
-    console.log('Login request received - Body:', typedReq.body);
     const { email, password } = typedReq.body;
     if (!email || !password) {
-        console.error('Missing email or password in request');
         res.status(400).json({ message: 'Email and password are required' });
         return;
     }
     try {
-        console.log('Attempting to find user with email:', email);
+        // 优化数据库查询 - 只获取必要字段
         const user = await prisma.user.findUnique({
             where: {
                 email: email.toLowerCase()
@@ -41,68 +39,51 @@ const loginHandler = async (req, res) => {
                 password: true,
                 name: true,
                 role: true,
-                managing: {
-                    select: {
-                        id: true,
-                        email: true,
-                        role: true
-                    }
-                }
+                managerId: true // 添加managerId字段
             }
         });
-        console.log('Found user:', {
-            ...user,
-            password: user ? '******' : null
-        });
-        if (!user) {
-            console.log('No user found with email:', email);
+        if (!user || user.password !== password) {
             res.status(401).json({ message: 'Invalid email or password' });
             return;
         }
-        console.log('Found user details:', {
-            id: user.id,
-            role: user.role,
-            type_of_id: typeof user.id
-        });
-        if (user.password !== password) {
-            console.log('Password mismatch');
-            res.status(401).json({ message: 'Invalid email or password' });
-            return;
-        }
-        console.log('Login successful for:', email, 'with role:', user.role);
         // 设置用户信息到 request 和 session
         const userInfo = {
             id: user.id,
             role: user.role,
             name: user.name,
-            email: user.email
+            email: user.email,
+            managerId: user.managerId // 添加managerId字段
         };
         typedReq.user = userInfo;
         typedReq.session.user = userInfo;
-        // 确保 session 被保存
-        typedReq.session.save((error) => {
-            if (error) {
-                console.error('Session save error:', error);
-                res.status(500).json({ message: 'Failed to save session' });
-                return;
-            }
-            console.log('Session after login:', {
-                id: typedReq.sessionID,
-                user: typedReq.session.user
+        // 简化 session 保存 - 不使用异步回调
+        try {
+            await new Promise((resolve, reject) => {
+                typedReq.session.save((error) => {
+                    if (error)
+                        reject(error);
+                    else
+                        resolve();
+                });
             });
-            console.log('User after login:', typedReq.user);
-            res.json({
-                message: 'Login successful',
+        }
+        catch (sessionError) {
+            console.error('Session save error:', sessionError);
+            // 即使 session 保存失败，也继续登录流程
+        }
+        // 立即返回响应，不等待 session 完全保存
+        res.json({
+            message: 'Login successful',
+            role: user.role,
+            redirect: `/dashboard/${user.role.toLowerCase()}`,
+            user: {
+                id: user.id.toString(),
+                email: user.email,
+                name: user.name,
                 role: user.role,
-                redirect: `/dashboard/${user.role.toLowerCase()}`,
-                user: {
-                    id: user.id.toString(), // 确保返回的 ID 也是字符串
-                    email: user.email,
-                    name: user.name,
-                    role: user.role,
-                    managing: user.managing
-                }
-            });
+                managerId: user.managerId, // 添加managerId字段
+                managing: [] // 暂时返回空数组，减少查询时间
+            }
         });
     }
     catch (error) {
@@ -148,5 +129,38 @@ const testUsersHandler = async (req, res) => {
     }
 };
 router.post('/login', loginHandler);
+router.post('/logout', async (req, res) => {
+    const typedReq = req;
+    try {
+        // 清理会话
+        if (typedReq.session) {
+            await new Promise((resolve, reject) => {
+                typedReq.session.destroy((error) => {
+                    if (error) {
+                        console.error('Session destroy error:', error);
+                        reject(error);
+                    }
+                    else {
+                        resolve();
+                    }
+                });
+            });
+        }
+        // 清理 cookie
+        res.clearCookie('business.board.sid', {
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
+        console.log('User logged out successfully');
+        res.json({ message: 'Logout successful' });
+    }
+    catch (error) {
+        console.error('Logout error:', error);
+        // 即使会话清理失败，也返回成功响应，因为客户端会清理本地状态
+        res.json({ message: 'Logout completed' });
+    }
+});
 router.get('/test-users', testUsersHandler);
 exports.default = router;

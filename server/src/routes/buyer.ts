@@ -111,7 +111,7 @@ const getListings: RequestHandler = async (req, res, next) => {
       }
     });
 
-    res.json({ listings });
+    res.json(listings);
   } catch (error) {
     console.error('Error fetching listings:', error);
     next(error);
@@ -270,24 +270,21 @@ function checkBuyerStepCompletionOptimized(stepId: number, data: {
     case 0: // Select listing
       return !!listingId;
       
-    case 1: // Email agent
-      return !!messages;
+    case 1: // Email agent - automatically completed when step 0 is completed
+      // Messages are not mandatory, so this step is automatically completed 
+      // when the previous step (step 0) is completed
+      return checkBuyerStepCompletionOptimized(0, data);
       
     case 2: // Fill out NDA - now requires upload of signed NDA
       return documents.some(doc => 
         doc.stepId === 2 && 
-        doc.type === 'NDA' &&
-        doc.operationType === 'UPLOAD' &&
-        doc.category === 'BUYER_UPLOAD' &&
-        doc.status === 'COMPLETED'
+        doc.category === 'BUYER_UPLOAD'
       );
       
     case 3: // Fill out financial statement
       return documents.some(doc => 
         doc.stepId === 3 &&
-        doc.type === 'FINANCIAL_STATEMENT' &&
-        doc.operationType === 'UPLOAD' &&
-        doc.status === 'COMPLETED'
+        doc.category === 'BUYER_UPLOAD'
       );
       
     case 4: // Download CBR/CIM
@@ -1579,6 +1576,381 @@ async function updateChecklistItem(
   return checklist;
 }
 
+// Get buyer's NDA data
+router.get('/nda', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const nda = await getPrisma().buyerNDA.findFirst({
+      where: {
+        buyerId: typedReq.user.id
+      }
+    });
+
+    res.json({ nda: nda?.data || null });
+  } catch (error) {
+    console.error('Error getting NDA:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Save NDA (without generating PDF)
+router.post('/nda/save', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    const { nda } = req.body;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    await getPrisma().buyerNDA.upsert({
+      where: {
+        buyerId: typedReq.user.id
+      },
+      update: {
+        data: nda,
+        updatedAt: new Date()
+      },
+      create: {
+        buyerId: typedReq.user.id,
+        data: nda
+      }
+    });
+
+    res.json({ message: 'NDA saved successfully' });
+  } catch (error) {
+    console.error('Error saving NDA:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Submit NDA and generate PDF
+router.post('/nda/submit', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    const { nda } = req.body;
+    
+    if (!typedReq.user || !typedReq.user.id) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // Get buyer's progress to find selected listing
+    const buyerProgress = await getPrisma().buyerProgress.findUnique({
+      where: { buyerId: typedReq.user.id }
+    });
+
+    if (!buyerProgress?.selectedListingId) {
+      res.status(400).json({ message: 'No listing selected' });
+      return;
+    }
+
+    // Get the selected listing to include in the PDF
+    const listing = await getPrisma().listing.findUnique({
+      where: { id: buyerProgress.selectedListingId },
+      select: { id: true, title: true, description: true, price: true, sellerId: true }
+    });
+
+    if (!listing) {
+      res.status(400).json({ message: 'Selected listing not found' });
+      return;
+    }
+
+    // Save NDA data
+    await getPrisma().buyerNDA.upsert({
+      where: {
+        buyerId: typedReq.user.id
+      },
+      update: {
+        data: nda,
+        updatedAt: new Date(),
+        submitted: true,
+        submittedAt: new Date()
+      },
+      create: {
+        buyerId: typedReq.user.id,
+        data: nda,
+        submitted: true,
+        submittedAt: new Date()
+      }
+    });
+
+    // Generate filename with timestamp
+    const timestamp = Date.now();
+    const fileName = `listings/${buyerProgress.selectedListingId}/buyer/nda.pdf`;
+
+    // Delete previous NDA documents if they exist
+    const existingDocs = await getPrisma().document.findMany({
+      where: {
+        buyerId: typedReq.user.id,
+        listingId: buyerProgress.selectedListingId,
+        type: 'NDA',
+        category: 'BUYER_UPLOAD'
+      }
+    });
+
+    // Delete old files from Supabase Storage
+    const bucketName = getStorageBucket();
+    for (const doc of existingDocs) {
+      if (doc.url) {
+        const urlParts = doc.url.split('/');
+        const bucketIndex = urlParts.findIndex((part: string) => part === bucketName);
+        if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+          const filePath = urlParts.slice(bucketIndex + 1).join('/');
+          await supabase.storage.from(bucketName).remove([filePath]);
+        }
+      }
+    }
+
+    // Delete old database records
+    await getPrisma().document.deleteMany({
+      where: {
+        buyerId: typedReq.user.id,
+        listingId: buyerProgress.selectedListingId,
+        type: 'NDA',
+        category: 'BUYER_UPLOAD'
+      }
+    });
+
+    // Generate PDF
+    let pdfBuffer: Buffer | null = null;
+    try {
+      pdfBuffer = await generateNDAPDFAsync(nda, typedReq.user, listing);
+      
+      // Upload PDF to Supabase Storage
+      const supabaseFileName = `listings/${buyerProgress.selectedListingId}/buyer/nda_${timestamp}.pdf`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(supabaseFileName, pdfBuffer, {
+          contentType: 'application/pdf',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw new Error('Failed to upload PDF to storage');
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(supabaseFileName);
+
+      // Create new document record
+      const document = await getPrisma().document.create({
+        data: {
+          fileName: `nda_${timestamp}.pdf`,
+          url: publicUrl,
+          fileSize: pdfBuffer ? pdfBuffer.length : 0,
+          type: 'NDA',
+          category: 'BUYER_UPLOAD',
+          sellerId: listing.sellerId,  // Add the missing sellerId field
+          buyerId: typedReq.user.id,
+          listingId: buyerProgress.selectedListingId,
+          uploadedBy: typedReq.user.id,
+          stepId: 2,
+          status: 'COMPLETED',
+          operationType: 'UPLOAD',
+          uploadedAt: new Date()
+        }
+      });
+
+      res.json({ 
+        message: 'NDA submitted successfully',
+        document: document
+      });
+    } catch (pdfError) {
+      console.error('PDF generation or upload error:', pdfError);
+      res.status(500).json({ message: 'Failed to generate or upload NDA PDF' });
+    }
+  } catch (error) {
+    console.error('Error submitting NDA:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Async PDF generation function for NDA
+function generateNDAPDFAsync(nda: any, user: any, listing: any): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const PDFDocument = require('pdfkit');
+      const doc = new PDFDocument({ margin: 50 });
+      const chunks: Buffer[] = [];
+
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+      doc.on('error', (error: Error) => {
+        reject(error);
+      });
+
+      // PDF Header
+      doc.fontSize(20).font('Helvetica-Bold').text('NON-DISCLOSURE AGREEMENT', { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(14).font('Helvetica').text('California Business Sales', { align: 'center' });
+      doc.moveDown(2);
+
+      // Introduction
+      doc.fontSize(12).font('Helvetica').text(
+        'Our agreement with the seller requires that we obtain a nondisclosure and confidentiality agreement and evidence of financial ability before disclosing the name and location of his business. This information will be kept confidential. In compliance with the above, please read and complete the following nondisclosure and confidentiality agreement.',
+        { align: 'justify' }
+      );
+      doc.moveDown();
+
+      doc.text(
+        'In consideration of the broker, California Business Sales providing the information on businesses for sale, I/we, the undersigned, understand and agree:',
+        { align: 'justify' }
+      );
+      doc.moveDown(2);
+
+      // Personal Information
+      addNDASection(doc, 'PERSONAL INFORMATION');
+      addNDAField(doc, 'Name', `${nda.firstName} ${nda.lastName}`);
+      if (nda.organization) addNDAField(doc, 'Organization', nda.organization);
+      addNDAField(doc, 'Email', nda.email);
+      addNDAField(doc, 'Phone', nda.phone);
+      
+      if (nda.addressLine1 || nda.city || nda.state || nda.zipCode) {
+        const address = [
+          nda.addressLine1,
+          nda.addressLine2,
+          [nda.city, nda.state, nda.zipCode].filter(Boolean).join(', ')
+        ].filter(Boolean).join('\n');
+        addNDAField(doc, 'Address', address);
+      }
+      
+      doc.moveDown();
+
+      // Business Interest
+      addNDASection(doc, 'BUSINESS INTEREST');
+      if (nda.listingInterest && listing) {
+        addNDAField(doc, 'Listing Interest', `${listing.title} - $${listing.price.toLocaleString()}`);
+      }
+      if (nda.availableMoney) addNDAField(doc, 'Available Money', nda.availableMoney);
+      if (nda.minimumIncome) addNDAField(doc, 'Minimum Income Required', nda.minimumIncome);
+      if (nda.totalPriceWilling) addNDAField(doc, 'Total Price Willing to Pay', nda.totalPriceWilling);
+      if (nda.californiaRegions && nda.californiaRegions.length > 0) {
+        addNDAField(doc, 'California Regions of Interest', nda.californiaRegions.join(', '));
+      }
+      if (nda.timeFrameToPurchase) addNDAField(doc, 'Time Frame to Purchase', nda.timeFrameToPurchase);
+      
+      doc.moveDown();
+
+      // Agreement Terms
+      addNDASection(doc, 'AGREEMENT TERMS');
+      
+      const terms = [
+        'That information provided on businesses by California Business Sales is sensitive and confidential and that its disclosure to others would be damaging to the businesses and to the broker\'s fiduciary relationship with the seller.',
+        
+        'That I will not disclose any information regarding these businesses to any other person who has not also signed and dated this agreement, except to secure their advice and counsel, in which case I agree to obtain their consent to maintain such confidentiality. "Information" shall include the fact that the business is for sale, plus other data. The term "information" does not include any information, which is, or becomes, generally available to the public or is already in your possession. All information provided to review the business will be returned to California Business Sales without retaining copies, summaries, analyses, or extracts thereof in the event the review is terminated.',
+        
+        'That I will not contact the seller, his/her employees, suppliers, or customers except through California Business Sales.',
+        
+        'That all information is provided by the seller and is not verified in any way by California Business Sales. California Business Sales is relying on the seller for the accuracy and completeness of said information, has no knowledge of the accuracy of said information, and makes no warranty, express or implied, as to such information.',
+        
+        'California Business Sales does not give tax, accounting, or legal advice. That, prior to finalizing an agreement to purchase a business, it is my responsibility to make an independent verification of all information. I agree that California Business Sales is not responsible for the accuracy of any information I receive, and I agree to indemnify and hold California Business Sales harmless from any claims or damages resulting from its use. I will look only to the seller and to my own investigation for all information regarding any business offered by California Business Sales.',
+        
+        'That, should I enter into an agreement to purchase a business which California Business Sales offers for sale, I grant to the seller the right to obtain, through standard reporting agencies, financial and credit information concerning myself or the companies or other parties I represent; and I understand that this information will be held confidential by the seller and California Business Sales and will be used only for the purpose of the seller extending credit to me.',
+        
+        'That all correspondence, inquiries, offers to purchase, and negotiations relating to the purchase or lease of any business presented to me, or companies I represent, by California Business Sales, will be conducted exclusively through California Business Sales.'
+      ];
+
+      terms.forEach((term, index) => {
+        doc.fontSize(11).font('Helvetica').text(`${index + 1}. ${term}`, 50, doc.y, { align: 'justify' });
+        doc.moveDown();
+        
+        // Add new page if needed
+        if (doc.y > 700) {
+          doc.addPage();
+        }
+      });
+
+      doc.moveDown(2);
+
+      // Signature Section
+      addNDASection(doc, 'ACCEPTANCE & SIGNATURE');
+      doc.fontSize(11).font('Helvetica').text('By signing below, I agree to the terms of this agreement:', 50, doc.y);
+      doc.moveDown(2);
+      
+      // Signature line
+      doc.fontSize(11).font('Helvetica').text('Signature:', 50, doc.y);
+      doc.fontSize(14).font('Helvetica-Bold').text(nda.signature || '', 120, doc.y - 5);
+      doc.moveTo(120, doc.y + 15).lineTo(400, doc.y + 15).stroke();
+      doc.moveDown(2);
+      
+      // Date
+      doc.fontSize(11).font('Helvetica').text('Date:', 50, doc.y);
+      doc.text(new Date().toLocaleDateString(), 120, doc.y - 12);
+      doc.moveTo(120, doc.y + 3).lineTo(250, doc.y + 3).stroke();
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+// Helper functions for NDA PDF
+function addNDASection(doc: any, title: string) {
+  if (doc.y > 720) {
+    doc.addPage();
+  }
+  doc.fontSize(14).font('Helvetica-Bold').text(title, 50, doc.y);
+  doc.moveDown();
+}
+
+function addNDAField(doc: any, label: string, value: string) {
+  if (doc.y > 740) {
+    doc.addPage();
+  }
+  doc.fontSize(11).font('Helvetica-Bold').text(`${label}: `, 50, doc.y, { continued: true });
+  doc.font('Helvetica').text(value || 'N/A');
+  doc.moveDown(0.5);
+}
+
+// Get available listings for selection
+router.get('/available-listings', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const listings = await getPrisma().listing.findMany({
+      where: {
+        status: 'ACTIVE' // Only show active listings
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        price: true,
+        status: true,
+        createdAt: true,
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({ listings });
+  } catch (error) {
+    console.error('Error fetching available listings:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 router.get('/dashboard', authenticateBuyer, getDashboardStats);
 router.get('/listings', authenticateBuyer, getListings);
 router.get('/progress', authenticateBuyer, getProgress);
@@ -1588,5 +1960,371 @@ router.get('/step/:stepId/documents', authenticateBuyer, getStepDocuments);
 router.post('/step/:stepId/upload', authenticateBuyer, uploadStepDocument);
 router.post('/step/:stepId/download', authenticateBuyer, downloadStepDocument);
 router.get('/current-listing', authenticateBuyer, getCurrentListing);
+
+// Get buyer's financial statement data
+router.get('/financial-statement', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const financialStatement = await getPrisma().buyerFinancialStatement.findFirst({
+      where: {
+        buyerId: typedReq.user.id
+      }
+    });
+
+    res.json({ financialStatement: financialStatement?.data || null });
+  } catch (error) {
+    console.error('Error getting financial statement:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Save financial statement (without generating PDF)
+router.post('/financial-statement/save', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    const { financialStatement } = req.body;
+    
+    if (!typedReq.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    await getPrisma().buyerFinancialStatement.upsert({
+      where: {
+        buyerId: typedReq.user.id
+      },
+      update: {
+        data: financialStatement,
+        updatedAt: new Date()
+      },
+      create: {
+        buyerId: typedReq.user.id,
+        data: financialStatement
+      }
+    });
+
+    res.json({ message: 'Financial statement saved successfully' });
+  } catch (error) {
+    console.error('Error saving financial statement:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Submit financial statement and generate PDF
+router.post('/financial-statement/submit', authenticateBuyer, async (req, res): Promise<void> => {
+  try {
+    const typedReq = req as AuthenticatedRequest;
+    const { financialStatement } = req.body;
+    
+    if (!typedReq.user || !typedReq.user.id) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // Get buyer's progress to find selected listing
+    const buyerProgress = await getPrisma().buyerProgress.findUnique({
+      where: { buyerId: typedReq.user.id }
+    });
+
+    if (!buyerProgress?.selectedListingId) {
+      res.status(400).json({ message: 'No listing selected' });
+      return;
+    }
+
+    // Get the selected listing to include in the PDF
+    const listing = await getPrisma().listing.findUnique({
+      where: { id: buyerProgress.selectedListingId },
+      select: { id: true, title: true, description: true, price: true, sellerId: true }
+    });
+
+    if (!listing) {
+      res.status(400).json({ message: 'Selected listing not found' });
+      return;
+    }
+
+    // Save financial statement data
+    await getPrisma().buyerFinancialStatement.upsert({
+      where: {
+        buyerId: typedReq.user.id
+      },
+      update: {
+        data: financialStatement,
+        updatedAt: new Date(),
+        submitted: true,
+        submittedAt: new Date()
+      },
+      create: {
+        buyerId: typedReq.user.id,
+        data: financialStatement,
+        submitted: true,
+        submittedAt: new Date()
+      }
+    });
+
+    // Generate filename with timestamp
+    const timestamp = Date.now();
+
+    // Delete previous financial statement documents if they exist
+    const existingDocs = await getPrisma().document.findMany({
+      where: {
+        buyerId: typedReq.user.id,
+        listingId: buyerProgress.selectedListingId,
+        type: 'FINANCIAL_STATEMENT',
+        category: 'BUYER_UPLOAD'
+      }
+    });
+
+    // Delete old files from Supabase Storage
+    const bucketName = getStorageBucket();
+    for (const doc of existingDocs) {
+      if (doc.url) {
+        const urlParts = doc.url.split('/');
+        const bucketIndex = urlParts.findIndex((part: string) => part === bucketName);
+        if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+          const filePath = urlParts.slice(bucketIndex + 1).join('/');
+          await supabase.storage.from(bucketName).remove([filePath]);
+        }
+      }
+    }
+
+    // Delete old database records
+    await getPrisma().document.deleteMany({
+      where: {
+        buyerId: typedReq.user.id,
+        listingId: buyerProgress.selectedListingId,
+        type: 'FINANCIAL_STATEMENT',
+        category: 'BUYER_UPLOAD'
+      }
+    });
+
+    // Generate PDF
+    let pdfBuffer: Buffer | null = null;
+    try {
+      pdfBuffer = await generateFinancialStatementPDFAsync(financialStatement, typedReq.user, listing);
+      
+      // Upload PDF to Supabase Storage
+      const supabaseFileName = `listings/${buyerProgress.selectedListingId}/buyer/financial_statement_${timestamp}.pdf`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(supabaseFileName, pdfBuffer, {
+          contentType: 'application/pdf',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw new Error('Failed to upload PDF to storage');
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(supabaseFileName);
+
+      // Create new document record
+      const document = await getPrisma().document.create({
+        data: {
+          fileName: `financial_statement_${timestamp}.pdf`,
+          url: publicUrl,
+          fileSize: pdfBuffer ? pdfBuffer.length : 0,
+          type: 'FINANCIAL_STATEMENT',
+          category: 'BUYER_UPLOAD',
+          sellerId: listing.sellerId,
+          buyerId: typedReq.user.id,
+          listingId: buyerProgress.selectedListingId,
+          uploadedBy: typedReq.user.id,
+          stepId: 3,
+          status: 'COMPLETED',
+          operationType: 'UPLOAD',
+          uploadedAt: new Date()
+        }
+      });
+
+      res.json({ 
+        message: 'Financial statement submitted successfully',
+        document: document
+      });
+    } catch (pdfError) {
+      console.error('PDF generation or upload error:', pdfError);
+      res.status(500).json({ message: 'Failed to generate or upload financial statement PDF' });
+    }
+  } catch (error) {
+    console.error('Error submitting financial statement:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Async PDF generation function for Financial Statement
+function generateFinancialStatementPDFAsync(financialData: any, user: any, listing: any): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const PDFDocument = require('pdfkit');
+      const doc = new PDFDocument({ margin: 50 });
+      const chunks: Buffer[] = [];
+
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+      doc.on('error', (error: Error) => {
+        reject(error);
+      });
+
+      // PDF Header
+      doc.fontSize(20).font('Helvetica-Bold').text('PERSONAL FINANCIAL STATEMENT OF', { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(16).font('Helvetica-Bold').text(financialData.name || '', { align: 'center' });
+      
+      const line = '_'.repeat(50);
+      doc.fontSize(12).font('Helvetica').text(line, { align: 'center' });
+      doc.moveDown(2);
+
+      // Prepared on
+      doc.text(`Prepared on: ${financialData.preparedOn || new Date().toLocaleDateString()}`, 50, doc.y);
+      doc.moveDown(2);
+
+      // Personal Information
+      doc.text(`MAILING ADDRESS: ${financialData.mailingAddress || ''}`, 50, doc.y);
+      doc.moveDown();
+      if (financialData.spouseName) {
+        doc.text(`Spouse's Name (if applicable): ${financialData.spouseName}`, 50, doc.y);
+        doc.moveDown();
+      }
+      doc.moveDown();
+
+      // Assets Section
+      addFinancialSection(doc, 'ASSETS');
+      doc.fontSize(11).font('Helvetica').text(
+        'Provide the total value of each asset class; if you have more than one account or item, add up the individual amounts. See the attachment to provide greater detail.',
+        50, doc.y, { align: 'justify' }
+      );
+      doc.moveDown();
+
+      const assets = [
+        ['Checking Accounts', financialData.checkingAccounts],
+        ['Savings Accounts', financialData.savingsAccounts],
+        ['Certificates of Deposit', financialData.certificatesOfDeposit],
+        ['Securities (Stocks/Bonds/Mutual Funds)', financialData.securities],
+        ['Notes Receivable', financialData.notesReceivable],
+        ['Personal Property', financialData.personalProperty],
+        ['Real Estate', financialData.realEstate],
+        ['Life Insurance', financialData.lifeInsurance],
+        ['Retirement Accounts', financialData.retirementAccounts],
+        ['Other Assets', financialData.otherAssets]
+      ];
+
+      let totalAssets = 0;
+      assets.forEach(([label, value]) => {
+        const amount = parseFloat((value || '').replace(/[$,]/g, '')) || 0;
+        totalAssets += amount;
+        addFinancialLine(doc, label, formatCurrencyForPDF(amount));
+      });
+
+      doc.moveDown();
+      doc.fontSize(12).font('Helvetica-Bold').text(`TOTAL ASSETS: ${formatCurrencyForPDF(totalAssets)}`, 450, doc.y);
+      doc.moveDown(2);
+
+      // Liabilities Section
+      addFinancialSection(doc, 'LIABILITIES');
+      doc.fontSize(11).font('Helvetica').text(
+        'Provide the total value of each liability type; if you have more than one of a category, add up the individual amounts. See the attachment to provide greater detail.',
+        50, doc.y, { align: 'justify' }
+      );
+      doc.moveDown();
+
+      const liabilities = [
+        ['Credit Card Debt', financialData.creditCardDebt],
+        ['Student Loans', financialData.studentLoans],
+        ['Vehicle Loans', financialData.vehicleLoans],
+        ['Real Property Mortgages', financialData.realPropertyMortgages],
+        ['Notes Payable/Promissory Notes', financialData.notesPayable],
+        ['Other Liabilities', financialData.otherLiabilities]
+      ];
+
+      let totalLiabilities = 0;
+      liabilities.forEach(([label, value]) => {
+        const amount = parseFloat((value || '').replace(/[$,]/g, '')) || 0;
+        totalLiabilities += amount;
+        addFinancialLine(doc, label, formatCurrencyForPDF(amount));
+      });
+
+      doc.moveDown();
+      doc.fontSize(12).font('Helvetica-Bold').text(`TOTAL LIABILITIES: ${formatCurrencyForPDF(totalLiabilities)}`, 450, doc.y);
+      doc.moveDown(2);
+
+      // Net Worth
+      const netWorth = totalAssets - totalLiabilities;
+      addFinancialSection(doc, 'NET WORTH');
+      doc.fontSize(12).font('Helvetica').text(
+        `${formatCurrencyForPDF(totalAssets)} - ${formatCurrencyForPDF(totalLiabilities)} = ${formatCurrencyForPDF(netWorth)}`,
+        50, doc.y
+      );
+      doc.moveDown(2);
+
+      // Add new page if needed for certification
+      if (doc.y > 650) {
+        doc.addPage();
+      }
+
+      // Certification
+      addFinancialSection(doc, 'CERTIFICATION');
+      doc.fontSize(11).font('Helvetica').text(
+        'I certify that the information contained in this statement is true and accurate to the best of my knowledge on the date indicated. I agree that, if after submitting this statement, there are any material changes to my finances that would impact the information it contains, I have an affirmative duty to alert the person or entity receiving this statement as soon as possible. I acknowledge that, as a result of submitting this statement, further inquiries, including a credit report, may be necessary to verify the information contained, and I hereby authorize the person or entity receiving those statements to make such inquiries.',
+        50, doc.y, { align: 'justify' }
+      );
+      doc.moveDown(2);
+
+      // Signature
+      doc.fontSize(11).font('Helvetica').text('Signature:', 50, doc.y);
+      doc.fontSize(14).font('Helvetica-Bold').text(financialData.signature || '', 120, doc.y - 5);
+      doc.moveTo(120, doc.y + 15).lineTo(400, doc.y + 15).stroke();
+      
+      doc.fontSize(11).font('Helvetica').text('Date:', 420, doc.y - 12);
+      doc.text(financialData.certificationDate || new Date().toLocaleDateString(), 450, doc.y - 12);
+      doc.moveTo(450, doc.y + 3).lineTo(550, doc.y + 3).stroke();
+      doc.moveDown(2);
+
+      // Print Name
+      doc.fontSize(11).font('Helvetica').text('Print Name:', 50, doc.y);
+      doc.fontSize(12).font('Helvetica').text(financialData.printName || '', 120, doc.y - 5);
+      doc.moveTo(120, doc.y + 15).lineTo(400, doc.y + 15).stroke();
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+// Helper functions for Financial Statement PDF
+function addFinancialSection(doc: any, title: string) {
+  if (doc.y > 720) {
+    doc.addPage();
+  }
+  doc.fontSize(14).font('Helvetica-Bold').text(title, 50, doc.y);
+  const underline = '_'.repeat(title.length + 20);
+  doc.fontSize(12).font('Helvetica').text(underline, 50, doc.y);
+  doc.moveDown();
+}
+
+function addFinancialLine(doc: any, label: string, value: string) {
+  if (doc.y > 740) {
+    doc.addPage();
+  }
+  doc.fontSize(11).font('Helvetica').text(label, 50, doc.y, { width: 350, continued: true });
+  doc.text(value, 450, doc.y - 12);
+  doc.moveDown(0.5);
+}
+
+function formatCurrencyForPDF(amount: number): string {
+  return `$${amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+}
 
 export default router; 

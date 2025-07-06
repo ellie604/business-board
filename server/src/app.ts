@@ -10,6 +10,7 @@ import sellerRouter from './routes/seller';
 import usersRouter from './routes/users';
 import messagesRouter from './routes/messages';
 import listingRouter from './routes/listing';
+import adminRouter from './routes/admin';
 import { restoreUser } from './middleware/auth';
 import { checkDatabaseHealth } from '../database';
 
@@ -163,7 +164,7 @@ app.use(cors({
     console.log('=== End CORS Request Debug ===');
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type', 
     'Authorization', 
@@ -324,6 +325,7 @@ app.use('/api/buyer', buyerRouter);
 app.use('/api/seller', sellerRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/messages', messagesRouter);
+app.use('/api/admin', adminRouter);
 
 // 健康检查
 app.get('/health', async (req, res) => {

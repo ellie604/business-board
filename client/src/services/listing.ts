@@ -26,6 +26,22 @@ export const listingService = {
     if (!res.ok) throw new Error('Failed to update listing');
     return res.json();
   },
+  async archiveListing(id) {
+    const res = await fetch(`${API_BASE_URL}/broker/listings/${id}/archive`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error('Failed to archive listing');
+    return res.json();
+  },
+  async reactivateListing(id) {
+    const res = await fetch(`${API_BASE_URL}/broker/listings/${id}/reactivate`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error('Failed to reactivate listing');
+    return res.json();
+  },
   async deleteListing(id) {
     const res = await fetch(`${API_BASE_URL}/broker/listings/${id}`, {
       method: 'DELETE',
@@ -84,5 +100,37 @@ export const userService = {
       console.error('Error fetching agents:', error);
       throw error;
     }
+  },
+  async archiveSeller(id) {
+    const res = await fetch(`${API_BASE_URL}/broker/sellers/${id}/archive`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error('Failed to archive seller');
+    return res.json();
+  },
+  async reactivateSeller(id) {
+    const res = await fetch(`${API_BASE_URL}/broker/sellers/${id}/reactivate`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error('Failed to reactivate seller');
+    return res.json();
+  },
+  async archiveBuyer(id) {
+    const res = await fetch(`${API_BASE_URL}/broker/buyers/${id}/archive`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error('Failed to archive buyer');
+    return res.json();
+  },
+  async reactivateBuyer(id) {
+    const res = await fetch(`${API_BASE_URL}/broker/buyers/${id}/reactivate`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error('Failed to reactivate buyer');
+    return res.json();
   }
 }; 

@@ -393,6 +393,7 @@ const getSellers: RequestHandler = async (req: Request, res: Response, next: Nex
         name: true,
         email: true,
         createdAt: true,
+        isActive: true,  // 添加isActive字段
         listings: {
           select: {
             id: true,
@@ -431,6 +432,7 @@ const getBuyers: RequestHandler = async (req: Request, res: Response, next: Next
         name: true,
         email: true,
         createdAt: true,
+        isActive: true,  // 添加isActive字段
         buyingListings: {
           select: {
             id: true,
@@ -1931,5 +1933,227 @@ router.get('/buyers/:buyerId/listings/:listingId/due-diligence', authenticateBro
     });
   }
 });
+
+// 归档/停用seller
+const archiveSeller: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { sellerId } = req.params;
+
+    if (!sellerId) {
+      res.status(400).json({ error: 'Seller ID is required' });
+      return;
+    }
+
+    // 先检查seller是否存在
+    const existingSeller = await getPrisma().user.findUnique({
+      where: { id: sellerId, role: 'SELLER' }
+    });
+
+    if (!existingSeller) {
+      res.status(404).json({ error: 'Seller not found' });
+      return;
+    }
+
+    if (!existingSeller.isActive) {
+      res.status(400).json({ error: 'Seller is already archived' });
+      return;
+    }
+
+    const updatedSeller = await getPrisma().user.update({
+      where: { id: sellerId },
+      data: { isActive: false },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        updatedAt: true
+      }
+    });
+
+    res.json({ 
+      message: 'Seller archived successfully',
+      seller: updatedSeller
+    });
+  } catch (error) {
+    console.error('Error in archiveSeller:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// 重新激活seller
+const reactivateSeller: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { sellerId } = req.params;
+
+    if (!sellerId) {
+      res.status(400).json({ error: 'Seller ID is required' });
+      return;
+    }
+
+    // 先检查seller是否存在
+    const existingSeller = await getPrisma().user.findUnique({
+      where: { id: sellerId, role: 'SELLER' }
+    });
+
+    if (!existingSeller) {
+      res.status(404).json({ error: 'Seller not found' });
+      return;
+    }
+
+    if (existingSeller.isActive) {
+      res.status(400).json({ error: 'Seller is already active' });
+      return;
+    }
+
+    const updatedSeller = await getPrisma().user.update({
+      where: { id: sellerId },
+      data: { isActive: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        updatedAt: true
+      }
+    });
+
+    res.json({ 
+      message: 'Seller reactivated successfully',
+      seller: updatedSeller
+    });
+  } catch (error) {
+    console.error('Error in reactivateSeller:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// 归档/停用buyer
+const archiveBuyer: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { buyerId } = req.params;
+
+    if (!buyerId) {
+      res.status(400).json({ error: 'Buyer ID is required' });
+      return;
+    }
+
+    // 先检查buyer是否存在
+    const existingBuyer = await getPrisma().user.findUnique({
+      where: { id: buyerId, role: 'BUYER' }
+    });
+
+    if (!existingBuyer) {
+      res.status(404).json({ error: 'Buyer not found' });
+      return;
+    }
+
+    if (!existingBuyer.isActive) {
+      res.status(400).json({ error: 'Buyer is already archived' });
+      return;
+    }
+
+    const updatedBuyer = await getPrisma().user.update({
+      where: { id: buyerId },
+      data: { isActive: false },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        updatedAt: true
+      }
+    });
+
+    res.json({ 
+      message: 'Buyer archived successfully',
+      buyer: updatedBuyer
+    });
+  } catch (error) {
+    console.error('Error in archiveBuyer:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// 重新激活buyer
+const reactivateBuyer: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { buyerId } = req.params;
+
+    if (!buyerId) {
+      res.status(400).json({ error: 'Buyer ID is required' });
+      return;
+    }
+
+    // 先检查buyer是否存在
+    const existingBuyer = await getPrisma().user.findUnique({
+      where: { id: buyerId, role: 'BUYER' }
+    });
+
+    if (!existingBuyer) {
+      res.status(404).json({ error: 'Buyer not found' });
+      return;
+    }
+
+    if (existingBuyer.isActive) {
+      res.status(400).json({ error: 'Buyer is already active' });
+      return;
+    }
+
+    const updatedBuyer = await getPrisma().user.update({
+      where: { id: buyerId },
+      data: { isActive: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        updatedAt: true
+      }
+    });
+
+    res.json({ 
+      message: 'Buyer reactivated successfully',
+      buyer: updatedBuyer
+    });
+  } catch (error) {
+    console.error('Error in reactivateBuyer:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+router.delete('/agent/:agentId', authenticateBroker, deleteAgent);
+router.patch('/sellers/:sellerId/archive', authenticateBroker, archiveSeller);
+router.patch('/sellers/:sellerId/reactivate', authenticateBroker, reactivateSeller);
+router.patch('/buyers/:buyerId/archive', authenticateBroker, archiveBuyer);
+router.patch('/buyers/:buyerId/reactivate', authenticateBroker, reactivateBuyer);
 
 export default router;

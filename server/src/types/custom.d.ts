@@ -7,6 +7,7 @@ export interface User {
   name: string | null;
   email: string;
   role: string;
+  managerId?: string | null;
   managing?: any[];
 }
 

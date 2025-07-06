@@ -274,8 +274,10 @@ function checkStepCompletionOptimized(stepId: number, data: {
     case 0: // Select listing
       return !!listingId;
       
-    case 1: // Email agent
-      return !!messages;
+    case 1: // Email agent - automatically completed when step 0 is completed
+      // Messages are not mandatory, so this step is automatically completed 
+      // when the previous step (step 0) is completed
+      return checkStepCompletionOptimized(0, data);
       
     case 2: // Listing agreement - now requires upload of signed agreement
       return documents.some(doc => 
