@@ -68,7 +68,7 @@ const BuyerNonDisclosure: React.FC = () => {
     agreementAccepted: false,
     signature: ''
   });
-
+  
   const steps = useMemo(() => [
     'Select Listing',
     'Messages',
@@ -106,12 +106,12 @@ const BuyerNonDisclosure: React.FC = () => {
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setLoading(true);
-        
+    try {
+      setLoading(true);
+      
         // Get progress data
-        const progressRes = await buyerService.getProgress();
-        setProgressData(progressRes.progress);
+      const progressRes = await buyerService.getProgress();
+      setProgressData(progressRes.progress);
 
         // Get available listings
         const listingsRes = await buyerService.getListings();
@@ -121,12 +121,12 @@ const BuyerNonDisclosure: React.FC = () => {
         const savedData = await loadSavedNDA();
         if (savedData) {
           setFormData(savedData);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
       }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
     };
 
     fetchData();
@@ -169,14 +169,14 @@ const BuyerNonDisclosure: React.FC = () => {
       setMessage(null);
       
       const response = await fetch(`${API_BASE_URL}/buyer/nda/save`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
         credentials: 'include',
         body: JSON.stringify({ nda: formData })
-      });
-
+    });
+    
       if (response.ok) {
         setMessage({ type: 'success', text: 'NDA saved successfully!' });
       } else {
@@ -201,7 +201,7 @@ const BuyerNonDisclosure: React.FC = () => {
         setMessage({ type: 'error', text: 'Please fill in all required fields and accept the agreement.' });
         return;
       }
-
+      
       const response = await fetch(`${API_BASE_URL}/buyer/nda/submit`, {
         method: 'POST',
         headers: {
@@ -214,13 +214,13 @@ const BuyerNonDisclosure: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         setMessage({ type: 'success', text: 'NDA submitted successfully! PDF document has been generated.' });
-        
+      
         // Mark step as completed
         await buyerService.updateStep(2, true);
-        
-        // Refresh progress
-        const progressRes = await buyerService.getProgress();
-        setProgressData(progressRes.progress);
+      
+      // Refresh progress
+      const progressRes = await buyerService.getProgress();
+      setProgressData(progressRes.progress);
       } else {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error occurred' }));
         throw new Error(errorData.message || 'Failed to submit NDA');
@@ -352,7 +352,7 @@ const BuyerNonDisclosure: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+            <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email <span className="text-red-500">*</span>
                     </label>
@@ -363,8 +363,8 @@ const BuyerNonDisclosure: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
-                  </div>
-                  <div>
+            </div>
+            <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Phone <span className="text-red-500">*</span>
                     </label>
@@ -413,8 +413,8 @@ const BuyerNonDisclosure: React.FC = () => {
                       onChange={(e) => handleInputChange('city', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                  </div>
-                  <div>
+            </div>
+            <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       State
                     </label>
@@ -424,8 +424,8 @@ const BuyerNonDisclosure: React.FC = () => {
                       onChange={(e) => handleInputChange('state', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                  </div>
-                  <div>
+            </div>
+            <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Zip Code
                     </label>
@@ -435,15 +435,15 @@ const BuyerNonDisclosure: React.FC = () => {
                       onChange={(e) => handleInputChange('zipCode', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                  </div>
-                </div>
-              </div>
+            </div>
+          </div>
+        </div>
             </section>
-
+          
             {/* Business Interest Section */}
             <section>
               <h2 className="text-xl font-semibold mb-4 text-blue-600">Business Interest</h2>
-              <div className="space-y-4">
+          <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Listing Interest <span className="text-red-500">*</span>
@@ -501,8 +501,8 @@ const BuyerNonDisclosure: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g., $1,000,000"
                   />
-                </div>
-
+            </div>
+            
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     What regions of California would you consider owning a business in?
@@ -520,8 +520,8 @@ const BuyerNonDisclosure: React.FC = () => {
                       </label>
                     ))}
                   </div>
-                </div>
-
+            </div>
+            
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     What is your time frame to purchase?
@@ -567,9 +567,9 @@ const BuyerNonDisclosure: React.FC = () => {
                   </div>
                   <div>
                     <strong>7.</strong> That all correspondence, inquiries, offers to purchase, and negotiations relating to the purchase or lease of any business presented to me, or companies I represent, by California Business Sales, will be conducted exclusively through California Business Sales.
-                  </div>
-                </div>
-              </div>
+            </div>
+          </div>
+        </div>
 
               <div className="space-y-4">
                 <div>
@@ -586,7 +586,7 @@ const BuyerNonDisclosure: React.FC = () => {
                     </span>
                   </label>
                 </div>
-
+            
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Signature <span className="text-red-500">*</span>
@@ -653,7 +653,7 @@ const BuyerNonDisclosure: React.FC = () => {
             {message && (
               <div className={`rounded-lg p-4 mt-4 ${
                 message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-              }`}>
+                }`}>
                 {message.text}
               </div>
             )}

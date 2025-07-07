@@ -71,10 +71,10 @@ const BuyerFinancialStatement: React.FC = () => {
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [progressData, setProgressData] = useState<any>(null);
   const navigate = useNavigate();
-
+  
   const steps = useMemo(() => [
     'Select Listing',
-    'Messages', 
+    'Messages',
     'Non Disclosure',
     'Financial Statement',
     'CBR/CIM',
@@ -130,23 +130,23 @@ const BuyerFinancialStatement: React.FC = () => {
   // Load existing data
   useEffect(() => {
     const loadData = async () => {
-      try {
-        setLoading(true);
-        
+    try {
+      setLoading(true);
+      
         // Load progress data
-        const progressRes = await buyerService.getProgress();
-        setProgressData(progressRes.progress);
+      const progressRes = await buyerService.getProgress();
+      setProgressData(progressRes.progress);
 
         // Load existing financial statement data
         const financialRes = await buyerService.getFinancialStatement();
         if (financialRes.financialStatement) {
           setFinancialData(financialRes.financialStatement);
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
       }
+    } catch (error) {
+        console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
     };
 
     loadData();
@@ -299,8 +299,8 @@ const BuyerFinancialStatement: React.FC = () => {
 
           {/* Personal Information */}
           <div className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Personal Financial Statement Of: *
                 </label>
@@ -311,9 +311,9 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Full Name"
                 />
-              </div>
+            </div>
               
-              <div>
+            <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Prepared On:
                 </label>
@@ -425,8 +425,8 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="$0"
                 />
-              </div>
-              
+        </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Real Estate</label>
                 <input
@@ -447,8 +447,8 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="$0"
                 />
-              </div>
-              
+            </div>
+            
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Retirement Accounts</label>
                 <input
@@ -458,8 +458,8 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="$0"
                 />
-              </div>
-              
+            </div>
+            
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Other Assets</label>
                 <input
@@ -498,8 +498,8 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="$0"
                 />
-              </div>
-              
+        </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Student Loans</label>
                 <input
@@ -542,7 +542,7 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="$0"
                 />
-              </div>
+                </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Other Liabilities</label>
@@ -561,7 +561,7 @@ const BuyerFinancialStatement: React.FC = () => {
                 <span className="text-lg font-bold">
                   TOTAL LIABILITIES: {totalLiabilities.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}
                 </span>
-              </div>
+                </div>
             </div>
           </div>
 
@@ -579,7 +579,7 @@ const BuyerFinancialStatement: React.FC = () => {
               </div>
             </div>
           </div>
-
+              
           {/* Certification */}
           <div className="mb-8">
             <h3 className="text-xl font-bold text-gray-900 mb-4">CERTIFICATION</h3>
@@ -614,7 +614,7 @@ const BuyerFinancialStatement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-            </div>
+                </div>
 
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -640,26 +640,26 @@ const BuyerFinancialStatement: React.FC = () => {
               {messageType === 'success' && '✓ '}
               {messageType === 'error' && '⚠ '}
               {message}
-            </div>
+        </div>
           )}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <button
+                    <button
               onClick={saveForLater}
               disabled={saving}
               className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Saving...' : 'Save for Later'}
-            </button>
+                    </button>
             
-            <button
+                    <button
               onClick={submitFinancialStatement}
               disabled={submitting || !validateForm()}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Submitting...' : 'Submit Financial Statement'}
-            </button>
+                    </button>
           </div>
           
           <p className="text-sm text-gray-500 mt-4 text-center">

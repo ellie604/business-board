@@ -13,6 +13,7 @@ import listingRouter from './routes/listing';
 import adminRouter from './routes/admin';
 import { restoreUser } from './middleware/auth';
 import { checkDatabaseHealth } from '../database';
+import crypto from 'crypto';
 
 // 扩展 Express 的 Request 类型
 declare module 'express' {
@@ -26,12 +27,19 @@ declare module 'express' {
       };
     };
     sessionID: string;
+    user?: {
+      id: string;
+      role: string;
+      email?: string;
+      name?: string;
+      managerId?: string;
+    };
   }
 }
 
 const app = express();
 
-// 创建 MemoryStore 实例
+// 创建 MemoryStore 实例 - 增加配置
 const memoryStore = MemoryStore(session);
 
 // 根据环境配置允许的域名
@@ -180,21 +188,31 @@ app.use(cors({
 
 app.use(express.json());
 
+// 生产环境优化的session配置
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+const isVercelDeploy = process.env.VERCEL === '1';
+const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
+
 // 配置 session
 const sessionConfig: session.SessionOptions = {
   store: new memoryStore({
-    checkPeriod: 86400000 // prune expired entries every 24h
+    checkPeriod: 86400000, // prune expired entries every 24h
+    max: 1000000, // 增加最大存储条目数
+    ttl: 24 * 60 * 60 * 1000, // 24小时过期
+    dispose: function(key: string, val: any) {
+      console.log('Session disposed:', key);
+    }
   }),
   name: 'business.board.sid',
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: true,
-  saveUninitialized: true,
+  secret: sessionSecret,
+  resave: false, // 改为false避免race condition
+  saveUninitialized: false, // 改为false减少存储开销
   rolling: true,
-  proxy: true,
+  proxy: isVercelDeploy || isProduction, // 在生产环境信任代理
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // 先设为false，稍后根据环境调整
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: 'lax', // 先设为lax，稍后根据环境调整
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
     domain: undefined
@@ -204,42 +222,48 @@ const sessionConfig: session.SessionOptions = {
 console.log('Session configuration:', {
   env: process.env.NODE_ENV,
   vercelEnv: process.env.VERCEL_ENV,
-  secret: process.env.SESSION_SECRET ? '[SET]' : '[DEFAULT]',
+  isProduction,
+  isVercelDeploy,
+  secret: sessionSecret ? '[SET]' : '[DEFAULT]',
   secure: sessionConfig.cookie?.secure,
   sameSite: sessionConfig.cookie?.sameSite,
   domain: sessionConfig.cookie?.domain
 });
 
 // 根据环境调整 cookie 设置
-const isProduction = process.env.NODE_ENV === 'production';
-const isVercelDeploy = process.env.VERCEL === '1';
-const isLocalhost = !isVercelDeploy;
-
-if (isLocalhost) {
+if (!isVercelDeploy && !isProduction) {
   // 本地开发环境
   sessionConfig.cookie!.secure = false;
   sessionConfig.cookie!.sameSite = 'lax';
   console.log('Local development: Using secure=false, sameSite=lax');
-} else if (isVercelDeploy) {
-  // Vercel 部署环境（包括预览和生产）
-  sessionConfig.cookie!.secure = true;
-  sessionConfig.cookie!.sameSite = 'none';
-  
-  // 特别为无痕模式优化
-  sessionConfig.cookie!.partitioned = true; // Chrome 的新特性，有助于无痕模式
-  
-  console.log('Vercel deployment: Using secure=true, sameSite=none, partitioned=true');
 } else {
-  // 其他生产环境
+  // 生产/预览环境 - 使用更兼容的设置
   sessionConfig.cookie!.secure = true;
   sessionConfig.cookie!.sameSite = 'none';
-  console.log('Production environment: Using secure=true, sameSite=none');
+  
+  console.log('Production/Preview environment: Using secure=true, sameSite=none');
 }
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
 
-// 添加无痕模式支持的中间件
+// 添加session备份机制中间件
+app.use((req, res, next) => {
+  const originalSend = res.send;
+  
+  // 确保session在响应前保存
+  res.send = function(data) {
+    if (req.session && req.session.user) {
+      // 在响应头中添加session token作为备份
+      res.setHeader('X-Session-Token', req.session.user.id);
+    }
+    return originalSend.call(this, data);
+  };
+  
+  next();
+});
+
+// 添加生产环境session恢复中间件
 app.use((req, res, next) => {
   // 检查是否是无痕模式的请求
   const userAgent = req.headers['user-agent'] || '';
@@ -248,31 +272,36 @@ app.use((req, res, next) => {
                      !req.headers['referer'];
 
   // 为无痕模式设置额外的 CORS 头
-  if (isIncognito || process.env.VERCEL_ENV === 'preview') {
+  if (isIncognito || isVercelDeploy) {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Vary', 'Origin');
+  }
+
+  // 在生产环境中增强session恢复
+  if ((isProduction || isVercelDeploy) && !req.session?.user) {
+    console.log('Production environment: Attempting to restore session');
     
-    // 设置更宽松的 cookie 策略用于无痕模式
-    if (req.session && !req.session.user?.id) {
-      // 为无痕模式尝试从 Authorization header 中恢复会话
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const sessionId = authHeader.substring(7);
-        // 这里可以添加从其他地方恢复会话的逻辑
-        console.log('Attempting to restore session for incognito mode:', sessionId);
-      }
+    // 尝试从多个来源恢复session
+    const sessionToken = req.headers['x-session-token'] as string;
+    const authHeader = req.headers['authorization'];
+    
+    if (sessionToken || authHeader) {
+      console.log('Found potential session restore data:', {
+        hasSessionToken: !!sessionToken,
+        hasAuthHeader: !!authHeader
+      });
     }
   }
 
   // 添加调试信息
-  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_INCOGNITO) {
+  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_SESSION) {
     console.log('Request info:', {
       incognito: isIncognito,
-      userAgent: userAgent.substring(0, 50) + '...',
       hasSession: !!req.session?.user?.id,
       sessionID: req.sessionID,
       cookies: req.headers.cookie ? 'present' : 'missing',
-      origin: req.headers.origin
+      origin: req.headers.origin,
+      env: process.env.NODE_ENV
     });
   }
 
@@ -292,25 +321,20 @@ app.use(restoreUser);
 
 // 添加请求日志中间件
 app.use((req, res, next) => {
-  // 减少Session调试日志 - 只在需要时显示
-  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_SESSION) {
+  // 只在开发环境或明确启用时显示详细日志
+  if (process.env.DEBUG_SESSION && process.env.NODE_ENV === 'development') {
+    const typedReq = req as any; // 使用类型断言避免TypeScript错误
     console.log('=== Session Debug Info ===');
     console.log('Session ID:', req.sessionID);
-    console.log('Session:', req.session);
-    console.log('User:', req.session?.user);
-    console.log('Cookie:', req.headers.cookie);
-    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Session User:', req.session?.user ? {
+      id: req.session.user.id,
+      role: req.session.user.role
+    } : null);
+    console.log('Request User:', typedReq.user ? {
+      id: typedReq.user.id,
+      role: typedReq.user.role
+    } : null);
     console.log('=== End Session Debug Info ===');
-  }
-  
-  // 减少Request调试日志 - 只在需要时显示
-  if (process.env.NODE_ENV === 'development' && process.env.DEBUG_REQUESTS) {
-    console.log('=== Request Debug Info ===');
-    console.log('Method:', req.method);
-    console.log('URL:', req.url);
-    console.log('Headers:', req.headers);
-    console.log('Body:', req.body);
-    console.log('=== End Request Debug Info ===');
   }
   
   next();

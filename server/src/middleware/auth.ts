@@ -8,9 +8,10 @@ const prisma = getPrisma();
 // 从 session 恢复用户信息的中间件
 export const restoreUser = async (req: Request, _res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   
-  // 仅在开发环境记录详细日志
-  if (process.env.NODE_ENV !== 'production') {
+  // 在生产环境也记录关键信息用于调试
+  if (!isProduction) {
     console.log('=== Session Restore Debug ===');
     console.log('Request headers:', {
       cookie: req.headers.cookie,
@@ -29,16 +30,26 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
         role: typedReq.session.user.role
       } : null
     });
+  } else {
+    // 生产环境仍然记录基本信息
+    console.log('Production session restore:', {
+      hasSession: !!typedReq.session?.user,
+      sessionId: typedReq.sessionID?.substring(0, 8) + '...',
+      hasToken: !!req.headers['x-session-token'],
+      hasAuth: !!req.headers.authorization,
+      origin: req.headers.origin
+    });
   }
 
   // 尝试从多个来源恢复用户会话
   if (!typedReq.session?.user) {
+    console.log('No session user found, attempting restore...');
+    
     // 1. 尝试从 Authorization header 恢复
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       try {
-        // 这里应该验证 token 并恢复会话
         console.log('Attempting to restore session from Authorization header');
         // TODO: 实现 token 验证逻辑
       } catch (error) {
@@ -50,7 +61,7 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
     const sessionToken = req.headers['x-session-token'] as string;
     if (sessionToken) {
       try {
-        console.log('Attempting to restore session from x-session-token:', sessionToken);
+        console.log('Attempting to restore session from x-session-token:', sessionToken.substring(0, 8) + '...');
         
         // 从数据库查找用户信息
         const user = await getPrisma().user.findUnique({
@@ -66,7 +77,7 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
         
         if (user) {
           console.log('User found from x-session-token:', {
-            id: user.id,
+            id: user.id.substring(0, 8) + '...',
             role: user.role,
             email: user.email,
             managerId: user.managerId
@@ -91,7 +102,7 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
             console.log('Session restored from x-session-token successfully');
           }
         } else {
-          console.log('No user found for x-session-token:', sessionToken);
+          console.log('No user found for x-session-token');
         }
       } catch (error) {
         console.error('Failed to restore session from x-session-token:', error);
@@ -118,18 +129,18 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
       console.log('Adjusted cookie settings for incognito mode');
     }
     
-    if (process.env.NODE_ENV !== 'production') {
+    if (!isProduction) {
       console.log('User restored successfully:', {
-        id: typedReq.user.id,
+        id: typedReq.user.id.substring(0, 8) + '...',
         role: typedReq.user.role,
         isIncognito
       });
     }
-  } else if (process.env.NODE_ENV !== 'production') {
-    console.log('No user found in session');
+  } else {
+    console.log('No user found in session after restore attempts');
   }
   
-  if (process.env.NODE_ENV !== 'production') {
+  if (!isProduction) {
     console.log('=== End Session Restore Debug ===');
   }
   
@@ -138,14 +149,24 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
-  console.log('Checking auth - Session:', typedReq.session);
-  console.log('Checking auth - User:', typedReq.user);
   
+  // 在生产环境也记录认证失败信息
   if (!typedReq.user) {
-    console.log('No user found in request');
+    console.log('Authentication failed:', {
+      sessionId: typedReq.sessionID?.substring(0, 8) + '...',
+      hasSession: !!typedReq.session,
+      hasSessionUser: !!typedReq.session?.user,
+      userAgent: req.headers['user-agent']?.substring(0, 50) + '...',
+      origin: req.headers.origin
+    });
     res.status(401).json({ message: 'Authentication required' });
     return;
   }
+  
+  console.log('Authentication successful for user:', {
+    id: typedReq.user.id.substring(0, 8) + '...',
+    role: typedReq.user.role
+  });
   
   next();
 };
@@ -179,33 +200,40 @@ export const authenticateAgent: RequestHandler = (req, res, next) => {
 
 export const authenticateBroker: RequestHandler = (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   
-  // 仅在开发环境记录详细日志
-  if (process.env.NODE_ENV !== 'production') {
-  console.log('=== Broker Authentication Debug ===');
+  // 在所有环境下记录基本信息
+  console.log('=== Broker Authentication ===');
   console.log('Request details:', {
     method: req.method,
     path: req.path,
-    headers: {
-      cookie: req.headers.cookie,
-      origin: req.headers.origin,
-      referer: req.headers.referer
-    }
-  });
-  console.log('Session details:', {
-    id: typedReq.sessionID,
-    cookie: typedReq.session?.cookie,
-    user: typedReq.session?.user ? {
-      id: typedReq.session.user.id,
+    origin: req.headers.origin,
+    hasSession: !!typedReq.session?.user,
+    sessionUser: typedReq.session?.user ? {
+      id: typedReq.session.user.id.substring(0, 8) + '...',
       role: typedReq.session.user.role
+    } : null,
+    hasReqUser: !!typedReq.user,
+    reqUser: typedReq.user ? {
+      id: typedReq.user.id.substring(0, 8) + '...',
+      role: typedReq.user.role
     } : null
   });
+  
+  // 仅在开发环境记录详细信息
+  if (!isProduction) {
+    console.log('Detailed session info:', {
+      sessionId: typedReq.sessionID,
+      cookie: typedReq.session?.cookie,
+      headers: {
+        cookie: req.headers.cookie,
+        referer: req.headers.referer
+      }
+    });
   }
   
   if (!typedReq.user) {
-    if (process.env.NODE_ENV !== 'production') {
     console.log('Authentication failed: No user in request');
-    }
     res.status(401).json({ 
       message: 'Authentication required'
     });
@@ -213,22 +241,18 @@ export const authenticateBroker: RequestHandler = (req, res, next) => {
   }
 
   if (typedReq.user.role !== 'BROKER') {
-    if (process.env.NODE_ENV !== 'production') {
     console.log('Authorization failed: Invalid role:', typedReq.user.role);
-    }
     res.status(403).json({ 
       message: 'Access denied. Broker role required.'
     });
     return;
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-  console.log('Authentication successful:', {
-    userId: typedReq.user.id,
+  console.log('Broker authentication successful:', {
+    userId: typedReq.user.id.substring(0, 8) + '...',
     role: typedReq.user.role
   });
-  console.log('=== End Broker Authentication Debug ===');
-  }
+  console.log('=== End Broker Authentication ===');
   
   next();
 };

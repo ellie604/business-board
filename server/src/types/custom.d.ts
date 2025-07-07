@@ -4,10 +4,10 @@ import { Session } from 'express-session';
 // User interface
 export interface User {
   id: string;
-  name: string | null;
+  name?: string; // Changed from string | null to string | undefined
   email: string;
   role: string;
-  managerId?: string | null;
+  managerId?: string; // Changed from string | null to string | undefined
   managing?: any[];
 }
 
