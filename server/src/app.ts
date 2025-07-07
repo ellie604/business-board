@@ -190,6 +190,7 @@ app.use(express.json());
 
 // 生产环境优化的session配置
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV === 'preview';
 const isVercelDeploy = process.env.VERCEL === '1';
 const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -205,10 +206,10 @@ const sessionConfig: session.SessionOptions = {
   }),
   name: 'business.board.sid',
   secret: sessionSecret,
-  resave: false, // 改为false避免race condition
-  saveUninitialized: false, // 改为false减少存储开销
+  resave: true, // 在serverless环境中设为true，确保session持久化
+  saveUninitialized: true, // 在serverless环境中设为true，确保session创建
   rolling: true,
-  proxy: isVercelDeploy || isProduction, // 在生产环境信任代理
+  proxy: isVercelDeploy || isProduction || isPreview, // 在所有部署环境信任代理
   cookie: {
     secure: false, // 先设为false，稍后根据环境调整
     httpOnly: true,
@@ -223,6 +224,7 @@ console.log('Session configuration:', {
   env: process.env.NODE_ENV,
   vercelEnv: process.env.VERCEL_ENV,
   isProduction,
+  isPreview,
   isVercelDeploy,
   secret: sessionSecret ? '[SET]' : '[DEFAULT]',
   secure: sessionConfig.cookie?.secure,
@@ -231,17 +233,18 @@ console.log('Session configuration:', {
 });
 
 // 根据环境调整 cookie 设置
-if (!isVercelDeploy && !isProduction) {
+if (!isVercelDeploy && !isProduction && !isPreview) {
   // 本地开发环境
   sessionConfig.cookie!.secure = false;
   sessionConfig.cookie!.sameSite = 'lax';
   console.log('Local development: Using secure=false, sameSite=lax');
 } else {
   // 生产/预览环境 - 使用更兼容的设置
-  sessionConfig.cookie!.secure = true;
-  sessionConfig.cookie!.sameSite = 'none';
+  // 在serverless环境中，使用更宽松的cookie设置
+  sessionConfig.cookie!.secure = false; // 改为false，因为有些preview环境可能不是HTTPS
+  sessionConfig.cookie!.sameSite = 'lax'; // 改为lax，更兼容
   
-  console.log('Production/Preview environment: Using secure=true, sameSite=none');
+  console.log('Production/Preview environment: Using secure=false, sameSite=lax for better compatibility');
 }
 
 // 确保在所有路由之前初始化 session
@@ -277,9 +280,9 @@ app.use((req, res, next) => {
     res.setHeader('Vary', 'Origin');
   }
 
-  // 在生产环境中增强session恢复
-  if ((isProduction || isVercelDeploy) && !req.session?.user) {
-    console.log('Production environment: Attempting to restore session');
+  // 在生产环境和预览环境中增强session恢复
+  if ((isProduction || isPreview || isVercelDeploy) && !req.session?.user) {
+    console.log('Serverless environment: Attempting to restore session');
     
     // 尝试从多个来源恢复session
     const sessionToken = req.headers['x-session-token'] as string;
@@ -290,6 +293,12 @@ app.use((req, res, next) => {
         hasSessionToken: !!sessionToken,
         hasAuthHeader: !!authHeader
       });
+      
+      // 如果有session token，直接标记需要在下一个中间件中恢复
+      if (sessionToken) {
+        (req as any)._needsSessionRestore = true;
+        (req as any)._sessionToken = sessionToken;
+      }
     }
   }
 
@@ -301,7 +310,8 @@ app.use((req, res, next) => {
       sessionID: req.sessionID,
       cookies: req.headers.cookie ? 'present' : 'missing',
       origin: req.headers.origin,
-      env: process.env.NODE_ENV
+      env: process.env.NODE_ENV,
+      hasSessionToken: !!req.headers['x-session-token']
     });
   }
 

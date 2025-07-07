@@ -9,9 +9,11 @@ const prisma = getPrisma();
 export const restoreUser = async (req: Request, _res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+  const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV === 'preview';
+  const isServerless = isProduction || isPreview || process.env.VERCEL === '1';
   
   // 在生产环境也记录关键信息用于调试
-  if (!isProduction) {
+  if (!isProduction && !isPreview) {
     console.log('=== Session Restore Debug ===');
     console.log('Request headers:', {
       cookie: req.headers.cookie,
@@ -32,36 +34,26 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
     });
   } else {
     // 生产环境仍然记录基本信息
-    console.log('Production session restore:', {
+    console.log('Serverless session restore:', {
       hasSession: !!typedReq.session?.user,
       sessionId: typedReq.sessionID?.substring(0, 8) + '...',
       hasToken: !!req.headers['x-session-token'],
       hasAuth: !!req.headers.authorization,
-      origin: req.headers.origin
+      origin: req.headers.origin,
+      isServerless,
+      needsRestore: !!(req as any)._needsSessionRestore
     });
   }
 
-  // 尝试从多个来源恢复用户会话
-  if (!typedReq.session?.user) {
-    console.log('No session user found, attempting restore...');
+  // 在serverless环境中，优先尝试从headers恢复用户信息
+  if (isServerless && !typedReq.session?.user) {
+    console.log('Serverless environment: Session not found, attempting header-based restore...');
     
-    // 1. 尝试从 Authorization header 恢复
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      try {
-        console.log('Attempting to restore session from Authorization header');
-        // TODO: 实现 token 验证逻辑
-      } catch (error) {
-        console.error('Failed to restore session from token:', error);
-      }
-    }
-
-    // 2. 尝试从自定义 header 恢复 - 实现实际的恢复逻辑
-    const sessionToken = req.headers['x-session-token'] as string;
+    // 1. 优先尝试从 x-session-token header 恢复
+    const sessionToken = req.headers['x-session-token'] as string || (req as any)._sessionToken;
     if (sessionToken) {
       try {
-        console.log('Attempting to restore session from x-session-token:', sessionToken.substring(0, 8) + '...');
+        console.log('Attempting to restore user from x-session-token:', sessionToken.substring(0, 8) + '...');
         
         // 从数据库查找用户信息
         const user = await getPrisma().user.findUnique({
@@ -83,34 +75,64 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
             managerId: user.managerId
           });
           
-          // 恢复session
+          // 直接设置用户到请求对象（绕过session store）
+          typedReq.user = {
+            id: user.id.toString(),
+            email: user.email,
+            name: user.name || undefined,
+            role: user.role,
+            managerId: user.managerId || undefined
+          };
+          
+          // 尝试保存到session（如果可能）
           if (typedReq.session) {
-            typedReq.session.user = {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              managerId: user.managerId
-            };
-            
-            // 设置用户到请求对象
-            typedReq.user = {
-              ...user,
-              id: user.id.toString()
-            };
-            
-            console.log('Session restored from x-session-token successfully');
+            try {
+              typedReq.session.user = {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                managerId: user.managerId
+              };
+              console.log('Session also updated with user data');
+            } catch (sessionError) {
+              console.warn('Failed to save to session store, but user restored from token:', sessionError);
+            }
           }
+          
+          console.log('User restored successfully from x-session-token');
         } else {
           console.log('No user found for x-session-token');
         }
       } catch (error) {
-        console.error('Failed to restore session from x-session-token:', error);
+        console.error('Failed to restore user from x-session-token:', error);
       }
     }
+    
+    // 2. 如果还没有用户，尝试从 Authorization header 恢复
+    if (!typedReq.user) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          console.log('Attempting to restore user from Authorization header');
+          // 这里可以添加JWT token验证逻辑，暂时跳过
+          console.log('Authorization header token found but not implemented yet');
+        } catch (error) {
+          console.error('Failed to restore user from Authorization header:', error);
+        }
+      }
+    }
+  } else if (typedReq.session?.user && !typedReq.user) {
+    // 如果session中有用户但请求对象中没有，恢复它
+    typedReq.user = {
+      ...typedReq.session.user,
+      id: typedReq.session.user.id.toString()
+    };
   }
   
-  if (typedReq.session?.user) {
+  // 标准的session恢复逻辑（非serverless环境或作为备份）
+  if (!typedReq.user && typedReq.session?.user) {
     typedReq.user = {
       ...typedReq.session.user,
       id: typedReq.session.user.id.toString()
@@ -124,23 +146,32 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
     // 在无痕模式下特殊处理
     const isIncognito = !req.headers.referer && req.headers['sec-fetch-dest'] === 'document';
     if (isIncognito) {
-      typedReq.session.cookie.sameSite = 'none';
-      typedReq.session.cookie.secure = true;
+      typedReq.session.cookie.sameSite = 'lax'; // 改为lax，更兼容
+      typedReq.session.cookie.secure = false; // 改为false，更兼容
       console.log('Adjusted cookie settings for incognito mode');
     }
     
-    if (!isProduction) {
-      console.log('User restored successfully:', {
+    if (!isProduction && !isPreview) {
+      console.log('User restored from session:', {
         id: typedReq.user.id.substring(0, 8) + '...',
         role: typedReq.user.role,
         isIncognito
       });
     }
-  } else {
-    console.log('No user found in session after restore attempts');
   }
   
-  if (!isProduction) {
+  // 最终状态检查
+  if (typedReq.user) {
+    console.log('User authentication successful:', {
+      id: typedReq.user.id.substring(0, 8) + '...',
+      role: typedReq.user.role,
+      source: typedReq.session?.user ? 'session' : 'header'
+    });
+  } else {
+    console.log('No user found after all restore attempts');
+  }
+  
+  if (!isProduction && !isPreview) {
     console.log('=== End Session Restore Debug ===');
   }
   
