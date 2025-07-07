@@ -25,12 +25,17 @@ export const getStorageUrl = () => {
 // Get the appropriate bucket name based on environment
 export const getStorageBucket = () => {
   const env = process.env.NODE_ENV || 'development';
-  switch (env) {
-    case 'production':
-      return 'business-documents-prod';
-    case 'preview':
-      return 'business-documents-dev';
-    default:
-      return 'business-documents-dev';
+  const vercelEnv = process.env.VERCEL_ENV;
+  
+  console.log('Storage bucket selection:', { env, vercelEnv });
+  
+  // Use consistent folder structure across environments:
+  // Both environments should have the same structure with communications/ and listings/
+  if (vercelEnv === 'production' || env === 'production') {
+    // Production environment uses business-documents-prod
+    return 'business-documents-prod';
+  } else {
+    // Preview and development use business-documents-dev
+    return 'business-documents-dev';
   }
 }; 

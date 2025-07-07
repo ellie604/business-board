@@ -102,17 +102,29 @@ const getSentMessages: RequestHandler = async (req: Request, res: Response, next
 // Send a new message
 const sendMessage: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
+  console.log('=== Send Message Debug ===');
   console.log('Received message request:', req.body);
   console.log('Files:', (req as any).files);
+  console.log('User:', typedReq.user ? {
+    id: typedReq.user.id.substring(0, 8) + '...',
+    role: typedReq.user.role
+  } : 'No user');
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('Vercel Environment:', process.env.VERCEL_ENV);
+  console.log('Supabase URL:', process.env.SUPABASE_URL ? 'Set' : 'Not set');
+  console.log('Supabase Key:', process.env.SUPABASE_KEY ? 'Set' : 'Not set');
+  
   const { receiverId, subject, content } = req.body;
   const db = getPrisma();
 
   try {
     if (!typedReq.user) {
+      console.log('Authentication failed - no user');
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
+    console.log('Looking up receiver:', receiverId);
     const receiver = await db.user.findUnique({
       where: { id: receiverId },
       select: {
@@ -124,10 +136,12 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
     });
 
     if (!receiver) {
+      console.log('Receiver not found:', receiverId);
       res.status(404).json({ error: 'Receiver not found' });
       return;
     }
 
+    console.log('Creating message in database...');
     // Create message without attachments first
     const message = await db.message.create({
       data: {
@@ -141,6 +155,7 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
         receiverName: receiver.name || receiver.email,
       },
     });
+    console.log('Message created with ID:', message.id);
 
     // Handle attachments if any
     const files = (req as any).files;
@@ -151,9 +166,10 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
       
       const attachmentPromises = files.map(async (file: Express.Multer.File) => {
         try {
-          // Upload file to Supabase Storage
+          // Use consistent folder structure across all environments
           const fileName = `communications/attachments/${Date.now()}-${file.originalname}`;
-          console.log('Uploading file:', fileName);
+          
+          console.log('Uploading file to bucket:', bucketName, 'path:', fileName);
           
           const { data, error } = await supabase.storage
             .from(bucketName)
@@ -165,6 +181,7 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
 
           if (error) {
             console.error('Error uploading file to Supabase:', error);
+            console.error('Bucket:', bucketName, 'File:', fileName);
             throw error;
           }
 

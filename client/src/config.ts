@@ -15,7 +15,7 @@ const getBackendUrl = () => {
     return 'https://business-board.onrender.com/api';
   } else if (hostname === 'localhost') {
     console.log('Environment: development');
-    return 'http://localhost:3000/api';
+    return 'http://localhost:3001/api';
   } else {
     console.log('Environment: production');
     return 'https://business-board-backend.onrender.com/api';
