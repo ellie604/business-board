@@ -206,8 +206,8 @@ const sessionConfig: session.SessionOptions = {
   }),
   name: 'business.board.sid',
   secret: sessionSecret,
-  resave: true, // 在serverless环境中设为true，确保session持久化
-  saveUninitialized: true, // 在serverless环境中设为true，确保session创建
+  resave: false, // 恢复为false避免race condition
+  saveUninitialized: false, // 恢复为false减少存储开销
   rolling: true,
   proxy: isVercelDeploy || isProduction || isPreview, // 在所有部署环境信任代理
   cookie: {
@@ -238,33 +238,20 @@ if (!isVercelDeploy && !isProduction && !isPreview) {
   sessionConfig.cookie!.secure = false;
   sessionConfig.cookie!.sameSite = 'lax';
   console.log('Local development: Using secure=false, sameSite=lax');
+} else if (isProduction) {
+  // 生产环境 - 使用安全设置
+  sessionConfig.cookie!.secure = true;
+  sessionConfig.cookie!.sameSite = 'none';
+  console.log('Production environment: Using secure=true, sameSite=none');
 } else {
-  // 生产/预览环境 - 使用更兼容的设置
-  // 在serverless环境中，使用更宽松的cookie设置
-  sessionConfig.cookie!.secure = false; // 改为false，因为有些preview环境可能不是HTTPS
-  sessionConfig.cookie!.sameSite = 'lax'; // 改为lax，更兼容
-  
-  console.log('Production/Preview environment: Using secure=false, sameSite=lax for better compatibility');
+  // 预览环境 - 使用更兼容的设置
+  sessionConfig.cookie!.secure = false;
+  sessionConfig.cookie!.sameSite = 'lax';
+  console.log('Preview environment: Using secure=false, sameSite=lax for better compatibility');
 }
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
-
-// 添加session备份机制中间件
-app.use((req, res, next) => {
-  const originalSend = res.send;
-  
-  // 确保session在响应前保存
-  res.send = function(data) {
-    if (req.session && req.session.user) {
-      // 在响应头中添加session token作为备份
-      res.setHeader('X-Session-Token', req.session.user.id);
-    }
-    return originalSend.call(this, data);
-  };
-  
-  next();
-});
 
 // 添加生产环境session恢复中间件
 app.use((req, res, next) => {
@@ -278,28 +265,6 @@ app.use((req, res, next) => {
   if (isIncognito || isVercelDeploy) {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Vary', 'Origin');
-  }
-
-  // 在生产环境和预览环境中增强session恢复
-  if ((isProduction || isPreview || isVercelDeploy) && !req.session?.user) {
-    console.log('Serverless environment: Attempting to restore session');
-    
-    // 尝试从多个来源恢复session
-    const sessionToken = req.headers['x-session-token'] as string;
-    const authHeader = req.headers['authorization'];
-    
-    if (sessionToken || authHeader) {
-      console.log('Found potential session restore data:', {
-        hasSessionToken: !!sessionToken,
-        hasAuthHeader: !!authHeader
-      });
-      
-      // 如果有session token，直接标记需要在下一个中间件中恢复
-      if (sessionToken) {
-        (req as any)._needsSessionRestore = true;
-        (req as any)._sessionToken = sessionToken;
-      }
-    }
   }
 
   // 添加调试信息
