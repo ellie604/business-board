@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from '../assets/california-business-sales-logo.png';
+import angelaSims from '../assets/Angela-Sims.jpg';
+import davidSievers from '../assets/David-Sievers.jpg';
+import wesBrown from '../assets/wes-brown-profile.jpg';
 import CallbackRequest from './CallbackRequest';
 
 const About: React.FC = () => {
@@ -64,38 +67,101 @@ const About: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-50">
-        <div className="max-w-4xl mx-auto py-12 px-6">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">About Us</h1>
-            <p className="text-xl text-gray-600">Expert Business Sales & Acquisitions</p>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Experience</h2>
-                <p className="text-gray-600 mb-4">
-                  With years of experience in business sales and acquisitions, we understand the complexities 
-                  of buying and selling businesses. Our team is dedicated to providing professional, 
-                  confidential, and successful transactions.
-                </p>
-                <p className="text-gray-600">
-                  We work with business owners who are ready to transition to their next chapter and 
-                  with buyers who are looking for the right investment opportunity.
-                </p>
-              </div>
+      <main className="flex-1 bg-gray-50 py-6">
+        <div className="max-w-7xl mx-auto px-6 h-full">
+          <div className="grid grid-cols-2 gap-12 h-full">
+            {/* Left Column - About Company */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">About California Business Sales</h1>
+              <h2 className="text-xl text-blue-600 font-semibold mb-4">Get the Best Brokerage Service</h2>
               
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Services</h2>
-                <ul className="text-gray-600 space-y-2">
-                  <li>• Business Valuation & Analysis</li>
-                  <li>• Marketing & Buyer Identification</li>
-                  <li>• Due Diligence Support</li>
-                  <li>• Transaction Coordination</li>
-                  <li>• Confidential Negotiations</li>
-                  <li>• Closing Assistance</li>
-                </ul>
+              <div className="space-y-3 text-gray-700 text-sm leading-relaxed">
+                <p>
+                  California Business Sales is a boutique business brokerage firm led by Wes Brown, a seasoned broker with over 18 years of experience helping business owners across California. Our office is located near Sacramento.
+                </p>
+                
+                <p>
+                  We've grown from selling Main Street businesses to handling multi-million-dollar lower middle-market transactions. Our team includes a full-time broker, agent, and marketing manager.
+                </p>
+                
+                <p>
+                  We're known for high-touch, responsive service. Whether you need a fast sale (we've closed in six weeks) or want top dollar, we tailor our approach to your goals.
+                </p>
+                
+                <p>
+                  Selling your business is emotional and complex. We provide step-by-step guidance, regular updates, and expert negotiation backed by real-world experience. You may only sell a business once. We sell them every day.
+                </p>
+                
+                <div className="bg-blue-50 p-4 rounded-lg mt-4">
+                  <h3 className="font-semibold text-blue-800 mb-2">Thinking of selling?</h3>
+                  <p className="text-sm text-blue-700">
+                    Let's talk. We'll give you a realistic market value and timeline based on real data and decades of experience.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Our Team */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Team</h2>
+              
+              <div className="space-y-4">
+                {/* Wes Brown */}
+                <div className="flex items-start space-x-4 pb-4 border-b border-gray-200">
+                  <img 
+                    src={wesBrown} 
+                    alt="Wes Brown" 
+                    className="w-28 h-28 rounded-lg object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">Wes Brown</h3>
+                    <p className="text-blue-600 text-sm font-medium mb-1">Business Broker</p>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Email: awesb@comcast.net | Phone: (916) 474-0390
+                    </p>
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      18 years experience in business brokerage. CABB and IBBA trained. Specializes in maximizing exit strategies and tax reduction.
+                    </p>
+                  </div>
+                </div>
+
+                {/* David Sievers */}
+                <div className="flex items-start space-x-4 pb-4 border-b border-gray-200">
+                  <img 
+                    src={davidSievers} 
+                    alt="David Sievers" 
+                    className="w-28 h-28 rounded-lg object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">David Sievers</h3>
+                    <p className="text-blue-600 text-sm font-medium mb-1">Business Broker</p>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Email: davidpsievers@gmail.com | Phone: (209) 915-3844
+                    </p>
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      5+ years in real estate and commercial sales. Former Colliers International Junior Broker. Mentored by Wes Brown.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Angela Sims */}
+                <div className="flex items-start space-x-4">
+                  <img 
+                    src={angelaSims} 
+                    alt="Angela Sims" 
+                    className="w-28 h-28 rounded-lg object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">Angela Sims</h3>
+                    <p className="text-blue-600 text-sm font-medium mb-1">Director of Marketing</p>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Email: angela.sims211@gmail.com | Phone: (916) 846-5540
+                    </p>
+                    <p className="text-xs text-gray-700 leading-relaxed">
+                      B.A. Business Administration from Pacific University. Expert in strategic marketing, data analytics, and brand development.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
