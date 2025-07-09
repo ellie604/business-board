@@ -136,7 +136,7 @@ export const authService = {
       } catch (error) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
-          throw new Error('请求超时，请重试');
+          throw new Error('Request timeout, please try again');
         }
         throw error;
       }
