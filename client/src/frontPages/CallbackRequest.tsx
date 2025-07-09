@@ -71,7 +71,7 @@ const CallbackRequest: React.FC<CallbackRequestProps> = ({ onSubmit }) => {
       <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-50">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-yellow-700 hover:bg-yellow-800 text-white py-6 px-3 rounded-l-lg shadow-lg transition-colors duration-300"
+          className="bg-[#1a2341] hover:bg-[#B59152] hover:text-[#1a2341] text-white py-6 px-3 rounded-l-lg shadow-lg transition-colors duration-300 font-normal border border-[#1a2341]"
           style={{ 
             writingMode: 'vertical-lr',
             minHeight: '120px',

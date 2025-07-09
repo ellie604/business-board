@@ -1,67 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImage from '../assets/california-business-sales-logo.png';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import CallbackRequest from './CallbackRequest';
 
 const Buying: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header with Navigation */}
-      <header className="relative flex-shrink-0">
-        {/* Top bar with contact info */}
-        <div className="bg-gray-800 text-white text-sm py-1 px-6 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span>📞 Call (916) 474-0390</span>
-          </div>
-          <div className="flex space-x-4">
-            <Link to="/registration" className="hover:text-gray-300">Registration</Link>
-            <span>|</span>
-            <Link to="/nda" className="hover:text-gray-300">NDA</Link>
-          </div>
-        </div>
-
-        {/* Main navigation */}
-        <nav className="bg-white shadow-sm py-3 px-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img 
-                src={logoImage} 
-                alt="California Business Sales" 
-                className="h-10 w-auto"
-              />
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-orange-500 font-medium">
-                HOME
-              </Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-500 font-medium">
-                ABOUT
-              </Link>
-              <Link to="/selling" className="text-gray-700 hover:text-orange-500 font-medium">
-                SELLING
-              </Link>
-              <Link to="/buying" className="text-gray-700 hover:text-orange-500 font-medium border-b-2 border-orange-500">
-                BUYING
-              </Link>
-              <Link to="/listings" className="text-gray-700 hover:text-orange-500 font-medium">
-                LISTINGS
-              </Link>
-              <Link to="/blog" className="text-gray-700 hover:text-orange-500 font-medium">
-                BLOG
-              </Link>
-              <Link to="/contact" className="text-gray-700 hover:text-orange-500 font-medium">
-                CONTACT
-              </Link>
-              <Link to="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Login
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 bg-gray-50">
@@ -108,31 +55,23 @@ const Buying: React.FC = () => {
               Contact us to discuss your business acquisition goals and explore available opportunities.
             </p>
             <Link 
-              to="/listings" 
+              to="/contact" 
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300 mr-4"
             >
-              View Listings
+              Contact Us
             </Link>
             <Link 
               to="/contact" 
               className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium transition duration-300"
             >
-              Contact Us
+              Get Started
             </Link>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-4 flex-shrink-0">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-center items-center space-x-8 text-sm">
-            <span>915 Highland Pointe Drive, Roseville, CA 95747</span>
-            <span>|</span>
-            <span>Phone: (916) 474-0390</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Callback Request Component */}
       <CallbackRequest />

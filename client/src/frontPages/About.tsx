@@ -1,70 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import logoImage from '../assets/california-business-sales-logo.png';
 import angelaSims from '../assets/Angela-Sims.jpg';
 import davidSievers from '../assets/David-Sievers.jpg';
 import wesBrown from '../assets/wes-brown-profile.jpg';
+import xinyiLuo from '../assets/xinyi.jpg';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import CallbackRequest from './CallbackRequest';
 
 const About: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header with Navigation */}
-      <header className="relative flex-shrink-0">
-        {/* Top bar with contact info */}
-        <div className="bg-gray-800 text-white text-sm py-1 px-6 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span>📞 Call (916) 474-0390</span>
-          </div>
-          <div className="flex space-x-4">
-            <Link to="/registration" className="hover:text-gray-300">Registration</Link>
-            <span>|</span>
-            <Link to="/nda" className="hover:text-gray-300">NDA</Link>
-          </div>
-        </div>
-
-        {/* Main navigation */}
-        <nav className="bg-white shadow-sm py-3 px-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img 
-                src={logoImage} 
-                alt="California Business Sales" 
-                className="h-10 w-auto"
-              />
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-orange-500 font-medium">
-                HOME
-              </Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-500 font-medium border-b-2 border-orange-500">
-                ABOUT
-              </Link>
-              <Link to="/selling" className="text-gray-700 hover:text-orange-500 font-medium">
-                SELLING
-              </Link>
-              <Link to="/buying" className="text-gray-700 hover:text-orange-500 font-medium">
-                BUYING
-              </Link>
-              <Link to="/listings" className="text-gray-700 hover:text-orange-500 font-medium">
-                LISTINGS
-              </Link>
-              <Link to="/blog" className="text-gray-700 hover:text-orange-500 font-medium">
-                BLOG
-              </Link>
-              <Link to="/contact" className="text-gray-700 hover:text-orange-500 font-medium">
-                CONTACT
-              </Link>
-              <Link to="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Login
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 bg-gray-50 py-6">
@@ -111,7 +58,7 @@ const About: React.FC = () => {
                   <img 
                     src={wesBrown} 
                     alt="Wes Brown" 
-                    className="w-28 h-28 rounded-lg object-cover flex-shrink-0"
+                    className="w-36 h-36 rounded-lg object-cover flex-shrink-0"
                   />
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800">Wes Brown</h3>
@@ -130,7 +77,7 @@ const About: React.FC = () => {
                   <img 
                     src={davidSievers} 
                     alt="David Sievers" 
-                    className="w-28 h-28 rounded-lg object-cover flex-shrink-0"
+                    className="w-36 h-36 rounded-lg object-cover flex-shrink-0"
                   />
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800">David Sievers</h3>
@@ -144,21 +91,21 @@ const About: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Angela Sims */}
+                {/* Xinyi Luo */}
                 <div className="flex items-start space-x-4">
                   <img 
-                    src={angelaSims} 
-                    alt="Angela Sims" 
-                    className="w-28 h-28 rounded-lg object-cover flex-shrink-0"
+                    src={xinyiLuo} 
+                    alt="Xinyi Luo" 
+                    className="w-36 h-36 rounded-lg object-cover flex-shrink-0"
                   />
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800">Angela Sims</h3>
-                    <p className="text-blue-600 text-sm font-medium mb-1">Director of Marketing</p>
+                    <h3 className="text-lg font-semibold text-gray-800">Xinyi Luo</h3>
+                    <p className="text-blue-600 text-sm font-medium mb-1">Software Developer</p>
                     <p className="text-xs text-gray-600 mb-2">
-                      Email: angela.sims211@gmail.com | Phone: (916) 846-5540
+                      Email: xinyiluo2024@gmail.com | Phone: (412) 808-0588
                     </p>
                     <p className="text-xs text-gray-700 leading-relaxed">
-                      B.A. Business Administration from Pacific University. Expert in strategic marketing, data analytics, and brand development.
+                      Software developer engineer from Carnegie Mellon University. Expert in information networking, system design, and software development.
                     </p>
                   </div>
                 </div>
@@ -169,15 +116,7 @@ const About: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-4 flex-shrink-0">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-center items-center space-x-8 text-sm">
-            <span>915 Highland Pointe Drive, Roseville, CA 95747</span>
-            <span>|</span>
-            <span>Phone: (916) 474-0390</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Callback Request Component */}
       <CallbackRequest />

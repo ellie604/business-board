@@ -1,68 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImage from '../assets/california-business-sales-logo.png';
 import backgroundImage from '../assets/LASkylineSm.jpg';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import CallbackRequest from './CallbackRequest';
 
 const Home: React.FC = () => {
   return (
     <div className="h-screen bg-white flex flex-col">
       {/* Header with Navigation */}
-      <header className="relative flex-shrink-0">
-        {/* Top bar with contact info */}
-        <div className="bg-gray-800 text-white text-sm py-1 px-6 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span>📞 Call (916) 474-0390</span>
-          </div>
-          <div className="flex space-x-4">
-            <Link to="/registration" className="hover:text-gray-300">Registration</Link>
-            <span>|</span>
-            <Link to="/nda" className="hover:text-gray-300">NDA</Link>
-          </div>
-        </div>
-
-        {/* Main navigation */}
-        <nav className="bg-white shadow-sm py-3 px-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img 
-                src={logoImage} 
-                alt="California Business Sales" 
-                className="h-10 w-auto"
-              />
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-orange-500 font-medium border-b-2 border-orange-500">
-                HOME
-              </Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-500 font-medium">
-                ABOUT
-              </Link>
-              <Link to="/selling" className="text-gray-700 hover:text-orange-500 font-medium">
-                SELLING
-              </Link>
-              <Link to="/buying" className="text-gray-700 hover:text-orange-500 font-medium">
-                BUYING
-              </Link>
-              <Link to="/listings" className="text-gray-700 hover:text-orange-500 font-medium">
-                LISTINGS
-              </Link>
-              <Link to="/blog" className="text-gray-700 hover:text-orange-500 font-medium">
-                BLOG
-              </Link>
-              <Link to="/contact" className="text-gray-700 hover:text-orange-500 font-medium">
-                CONTACT
-              </Link>
-              <Link to="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Login
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       {/* Hero Section - Made larger */}
       <section 
@@ -84,12 +31,12 @@ const Home: React.FC = () => {
             Sell your business in a way that rewards you and honors your life's work.
           </p>
           <div className="flex justify-center space-x-4">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 text-base">
+            <Link to="/selling" className="bg-[#1a2341] hover:bg-[#B59152] hover:text-[#1a2341] text-white px-6 py-2 rounded-md text-sm font-normal border border-[#1a2341] transition-colors duration-200">
               GET STARTED
-            </button>
-            <button className="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white px-6 py-2 rounded-lg font-medium transition duration-300 text-base">
+            </Link>
+            <Link to="/about" className="bg-transparent border-2 border-[#1a2341] text-white hover:bg-[#B59152] hover:text-[#1a2341] hover:border-[#B59152] px-6 py-2 rounded-md text-sm font-normal transition-colors duration-200">
               ABOUT US
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -130,9 +77,9 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-3">Buy a Business</h3>
               <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                Click here to view our current business for sale listings. Not all business listings we have for sale are listed due to confidentiality.
+                Click here to view our current business for sale. Contact us to discuss available opportunities that meet your criteria and investment goals.
               </p>
-              <Link to="/listings" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
+              <Link to="/contact" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
                 Learn More →
               </Link>
             </div>
@@ -161,16 +108,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer - Single line */}
-      <footer className="bg-gray-800 text-white py-4 flex-shrink-0">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-center items-center space-x-8 text-sm">
-            <span>915 Highland Pointe Drive, Roseville, CA 95747</span>
-            <span>|</span>
-            <span>Phone: (916) 474-0390</span>
-          </div>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer />
 
       {/* Callback Request Component */}
       <CallbackRequest />

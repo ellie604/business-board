@@ -1,12 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Front Pages
 import Home from './frontPages/Home';
 import About from './frontPages/About';
 import Selling from './frontPages/Selling';
+import SellingYourBusiness from './frontPages/SellingYourBusiness';
+import SellerFAQs from './frontPages/SellerFAQs';
 import Buying from './frontPages/Buying';
+import BuyABusiness from './frontPages/BuyABusiness';
+import BuyerFAQs from './frontPages/BuyerFAQs';
+import NonDisclosureAgreement from './frontPages/NonDisclosureAgreement';
 import Contact from './frontPages/Contact';
 import Blog from './frontPages/Blog';
 
@@ -67,8 +72,15 @@ function App() {
           {/* Front-facing public pages */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/selling" element={<Selling />} />
-          <Route path="/buying" element={<Buying />} />
+          {/* Selling pages with sub-routes */}
+          <Route path="/selling" element={<Navigate to="/selling/your-business" replace />} />
+          <Route path="/selling/your-business" element={<SellingYourBusiness />} />
+          <Route path="/selling/faqs" element={<SellerFAQs />} />
+          {/* Buying pages with sub-routes */}
+          <Route path="/buying" element={<Navigate to="/buying/business" replace />} />
+          <Route path="/buying/business" element={<BuyABusiness />} />
+          <Route path="/buying/faqs" element={<BuyerFAQs />} />
+          <Route path="/buying/nda" element={<NonDisclosureAgreement />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/login" element={<Login />} />
