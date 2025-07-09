@@ -11,6 +11,7 @@ import usersRouter from './routes/users';
 import messagesRouter from './routes/messages';
 import listingRouter from './routes/listing';
 import adminRouter from './routes/admin';
+import callbackRequestRouter from './routes/callback-request';
 import { restoreUser } from './middleware/auth';
 import { checkDatabaseHealth } from '../database';
 import crypto from 'crypto';
@@ -325,6 +326,7 @@ app.use('/api/seller', sellerRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/callback-request', callbackRequestRouter);
 
 // 健康检查
 app.get('/health', async (req, res) => {

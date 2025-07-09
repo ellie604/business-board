@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from '../assets/california-business-sales-logo.png';
 import backgroundImage from '../assets/LASkylineSm.jpg';
+import CallbackRequest from './CallbackRequest';
 
 const Home: React.FC = () => {
   return (
@@ -170,6 +171,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Callback Request Component */}
+      <CallbackRequest />
     </div>
   );
 };
