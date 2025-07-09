@@ -2,6 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Front Pages
+import Home from './frontPages/Home';
+import About from './frontPages/About';
+import Selling from './frontPages/Selling';
+import Buying from './frontPages/Buying';
+import Contact from './frontPages/Contact';
+import Blog from './frontPages/Blog';
+
 // Pages
 import Login from './Login';
 import SellerDashboard from './pages/seller/SellerDashboard';
@@ -56,7 +64,16 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
+          {/* Front-facing public pages */}
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/selling" element={<Selling />} />
+          <Route path="/buying" element={<Buying />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/login" element={<Login />} />
+          
+          {/* Dashboard Routes */}
           <Route path="/broker" element={<BrokerDashboard />}>
             <Route path="messages" element={<MessagesPage userType="BROKER" />} />
             <Route path="agents" element={<BrokerAgentsPage />} />
@@ -105,8 +122,6 @@ function App() {
             <Route path="closing-docs" element={<BuyerClosingDocs />} />
             <Route path="after-sale" element={<BuyerAfterSale />} />
           </Route>
-          
-          <Route path="/" element={<Login />} />
         </Routes>
       </Router>
     </QueryClientProvider>
