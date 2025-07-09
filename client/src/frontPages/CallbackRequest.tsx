@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../config';
 
 interface CallbackRequestProps {
   onSubmit?: (data: CallbackFormData) => void;
@@ -35,7 +36,7 @@ const CallbackRequest: React.FC<CallbackRequestProps> = ({ onSubmit }) => {
 
     try {
       // Call API to send message to broker
-      const response = await fetch('/api/callback-request', {
+      const response = await fetch(`${API_BASE_URL}/callback-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
