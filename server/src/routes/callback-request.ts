@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
 import { getPrisma } from '../../database';
+import crypto from 'crypto';
 
 const router = Router();
 const prisma = getPrisma();
@@ -62,10 +63,13 @@ const submitCallbackRequest: RequestHandler = async (req: Request, res: Response
 
     if (!systemUser) {
       console.log('Creating system user for callback requests');
+      // Generate a secure random password for the system user
+      const systemPassword = crypto.randomBytes(32).toString('hex');
+      
       systemUser = await prisma.user.create({
         data: {
           email: 'system@website-callback.com',
-          password: 'system-generated',
+          password: systemPassword,
           name: 'Website Callback System',
           role: 'BUYER', // Use BUYER role as a placeholder
           isActive: false // Mark as inactive since it's not a real user
