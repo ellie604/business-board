@@ -1,61 +1,77 @@
 import { API_BASE_URL } from '../config';
 
-export interface DashboardStats {
-  totalListings: number;
-  documentsUploaded: number;
-  stepsCompleted: number;
-  currentStep: string;
-}
-
-export interface Document {
-  id: string;
-  name: string;
-  type: string;
-  uploadedAt: string;
-  size: number;
-  url: string;
-}
-
-export interface ExtendedListing {
+export interface Listing {
   id: string;
   title: string;
   description: string;
   price: number;
-  location: string;
-  businessType: string;
   status: string;
   createdAt: string;
-  updatedAt: string;
-  images: string[];
+}
+
+export interface ExtendedListing extends Listing {
+  createdAt: string;
   seller?: {
     id: string;
     name: string;
     email: string;
   };
-  agent?: {
-    id: string;
-    name: string;
-    email: string;
-  };
 }
 
-export interface BuyerProgress {
+export interface CurrentListingResponse {
+  listing: ExtendedListing | null;
+  needsSelection: boolean;
+  currentStep?: number;
+  completedSteps?: number[];
+}
+
+export interface DashboardStats {
+  emailAgent: 'completed' | 'pending';
+  nda: 'completed' | 'pending';
+  financialStatement: 'completed' | 'pending';
+  cbrCim: 'completed' | 'pending';
+  uploadedDocs: 'completed' | 'pending';
+  purchaseContract: 'completed' | 'pending';
+  dueDiligence: 'completed' | 'pending';
+  preCloseChecklist: 'completed' | 'pending';
+  closingDocs: 'completed' | 'pending';
+}
+
+export interface Document {
   id: string;
-  buyerId: string;
-  currentStep: number;
-  steps: {
-    id: number;
-    title: string;
-    description: string;
-    completed: boolean;
-    completedAt?: string;
-  }[];
+  type: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }
 
+interface DashboardResponse {
+  stats: DashboardStats;
+  message: string;
+}
+
+interface DocumentsResponse {
+  documents: Document[];
+  message: string;
+}
+
+export interface BuyerProgress {
+  currentStep: number;
+  steps: Array<{
+    id: number;
+    title: string;
+    completed: boolean;
+    accessible: boolean;
+    documentRequirement?: {
+      type: string;
+      operationType: string;
+      description: string;
+    };
+  }>;
+  selectedListingId: string | null;
+}
+
 export interface BuyerProgressResponse {
-  success: boolean;
   progress: BuyerProgress;
 }
 
@@ -67,7 +83,7 @@ const makeAuthenticatedRequest = async (
   // 获取用户信息
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
-
+  
   // 检测无痕模式
   const isIncognito = (() => {
     try {
@@ -111,17 +127,15 @@ const makeAuthenticatedRequest = async (
 
   try {
     const response = await fetch(url, config);
-
+    
     // 如果是认证错误，尝试清理本地状态并重定向到登录
     if (response.status === 401) {
       console.warn('Authentication failed, clearing local storage');
       localStorage.removeItem('user');
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_header');
       // 可以在这里添加重定向到登录页面的逻辑
       throw new Error('Authentication required');
     }
-
+    
     return response;
   } catch (error) {
     console.error('Request failed:', error);
@@ -132,87 +146,109 @@ const makeAuthenticatedRequest = async (
 // 创建一个包装函数来处理 JSON 响应
 const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
   const response = await makeAuthenticatedRequest(`${API_BASE_URL}${endpoint}`, options);
-
+  
   if (!response.ok) {
     const errorText = await response.text();
     console.error(`Buyer ${endpoint} request failed:`, response.status, errorText);
     throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${response.status} ${response.statusText}`);
   }
-
+  
   return response.json();
 };
 
 export const buyerService = {
   getDashboardStats: () => makeRequest('/buyer/dashboard'),
-
+  
   getDocuments: () => makeRequest('/buyer/documents'),
-
+  
   uploadDocument: async (formData: FormData) => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/buyer/documents/upload`, {
       method: 'POST',
       body: formData,
       headers: {} // 不设置 Content-Type，让浏览器自动设置
     });
-
+    
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to upload document: ${response.status} ${response.statusText}`);
     }
-
+    
     return response.json();
   },
-
+  
   emailAgent: (data: any) => makeRequest('/buyer/email-agent', {
     method: 'POST',
     body: JSON.stringify(data)
   }),
-
+  
   getNDA: () => makeRequest('/buyer/nda'),
-
+  
+  saveNDA: (nda: any) => makeRequest('/buyer/nda/save', {
+    method: 'POST',
+    body: JSON.stringify({ nda })
+  }),
+  
+  submitNDA: (nda: any) => makeRequest('/buyer/nda/submit', {
+    method: 'POST',
+    body: JSON.stringify({ nda })
+  }),
+  
   getFinancialStatement: () => makeRequest('/buyer/financial-statement'),
-
+  
+  saveFinancialStatement: (financialStatement: any) => makeRequest('/buyer/financial-statement/save', {
+    method: 'POST',
+    body: JSON.stringify({ financialStatement })
+  }),
+  
+  submitFinancialStatement: (financialStatement: any) => makeRequest('/buyer/financial-statement/submit', {
+    method: 'POST',
+    body: JSON.stringify({ financialStatement })
+  }),
+  
   getCbrCim: () => makeRequest('/buyer/cbr-cim'),
-
+  
   getPurchaseContract: () => makeRequest('/buyer/purchase-contract'),
-
+  
   getDueDiligence: () => makeRequest('/buyer/due-diligence'),
-
+  
   getPreCloseChecklist: () => makeRequest('/buyer/pre-close-checklist'),
-
+  
   updatePreCloseChecklist: (data: any) => makeRequest('/buyer/pre-close-checklist', {
     method: 'PUT',
     body: JSON.stringify(data)
   }),
-
+  
   getClosingDocuments: () => makeRequest('/buyer/closing-documents'),
-
+  
   getProgress: () => makeRequest('/buyer/progress'),
-
+  
   updateStep: (step: number, completed: boolean) => makeRequest('/buyer/update-step', {
-    method: 'PUT',
-    body: JSON.stringify({ step, completed })
+    method: 'POST',
+    body: JSON.stringify({ stepId: step })
   }),
-
+  
   selectListing: (listingId: string) => makeRequest('/buyer/select-listing', {
     method: 'POST',
     body: JSON.stringify({ listingId })
   }),
-
+  
   getCurrentListing: () => makeRequest('/buyer/current-listing'),
-
+  
   getListings: () => makeRequest('/buyer/listings'),
+
+  getAvailableListings: () => makeRequest('/buyer/available-listings'),
 
   // 新增的方法
   downloadDocument: (documentId: string) => makeRequest(`/buyer/download-document/${documentId}`),
-
+  
   requestDueDiligence: (listingId: string, documentTypes: string[]) => makeRequest(`/buyer/listings/${listingId}/due-diligence/request`, {
     method: 'POST',
     body: JSON.stringify({ documentTypes })
   }),
-
+  
   downloadDueDiligenceDocument: (listingId: string, documentId: string) => makeRequest(`/buyer/listings/${listingId}/due-diligence/download/${documentId}`),
-
+  
   getAgentDocuments: (listingId: string) => makeRequest(`/buyer/listings/${listingId}/agent-documents`),
-
+  
   downloadAgentDocument: (documentId: string) => makeRequest(`/buyer/download-agent-document/${documentId}`)
 }; 

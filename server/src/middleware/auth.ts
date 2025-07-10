@@ -11,31 +11,63 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV === 'preview';
   
-  // 1. 优先从session恢复用户（如果有有效session）
+  // 增强的调试信息
+  if (!isProduction) {
+    console.log('=== User Restore Debug ===');
+    console.log('Request details:', {
+      method: req.method,
+      path: req.path,
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent']?.substring(0, 50),
+      sessionID: typedReq.sessionID?.substring(0, 8) + '...',
+      hasSession: !!typedReq.session,
+      hasSessionUser: !!typedReq.session?.user,
+      sessionUserId: typedReq.session?.user?.id?.substring(0, 8) + '...' || 'none',
+      hasXSessionToken: !!req.headers['x-session-token'],
+      cookies: req.headers.cookie ? 'present' : 'missing'
+    });
+  }
+  
+  // 优先从session恢复用户
   if (typedReq.session?.user?.id) {
-    typedReq.user = {
-      ...typedReq.session.user,
-      id: typedReq.session.user.id.toString()
-    };
-    
-    // 确保会话持久化
-    typedReq.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-    
-    if (!isProduction && !isPreview) {
-      console.log('✅ User restored from session:', {
-        id: typedReq.user.id.substring(0, 8) + '...',
-        role: typedReq.user.role
-      });
+    try {
+      typedReq.user = {
+        ...typedReq.session.user,
+        id: typedReq.session.user.id.toString()
+      };
+      
+      // 确保会话持久化和延长过期时间
+      typedReq.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+      
+      // 强制保存session以确保持久化
+      if (typedReq.session.save) {
+        typedReq.session.save((err) => {
+          if (err && !isProduction) {
+            console.error('Failed to save session after user restore:', err);
+          }
+        });
+      }
+      
+      if (!isProduction) {
+        console.log('✅ User restored from session:', {
+          id: typedReq.user.id.substring(0, 8) + '...',
+          role: typedReq.user.role,
+          email: typedReq.user.email
+        });
+        console.log('=== End User Restore Debug ===');
+      }
+      
+      return next();
+    } catch (error) {
+      console.error('Error restoring user from session:', error);
     }
-    
-    return next();
   }
 
-  // 2. 备用：从X-Session-Token header恢复（为无痕模式和跨域场景）
+  // 备用：尝试从header恢复（为了向后兼容）
   const sessionToken = req.headers['x-session-token'] as string;
   if (sessionToken) {
     try {
-      if (!isProduction && !isPreview) {
+      if (!isProduction) {
         console.log('🔄 Attempting restore from x-session-token:', sessionToken.substring(0, 8) + '...');
       }
       
@@ -53,10 +85,11 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
       });
       
       if (user && user.isActive) {
-        if (!isProduction && !isPreview) {
+        if (!isProduction) {
           console.log('✅ User found from x-session-token:', {
             id: user.id.substring(0, 8) + '...',
-            role: user.role
+            role: user.role,
+            email: user.email
           });
         }
         
@@ -69,7 +102,7 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
           managerId: user.managerId || undefined
         };
         
-        // 同时恢复到session中（如果session可用）
+        // 同时更新session
         if (typedReq.session) {
           typedReq.session.user = {
             id: user.id,
@@ -81,15 +114,21 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
           
           // 强制保存session
           typedReq.session.save((err) => {
-            if (err && !isProduction && !isPreview) {
+            if (err && !isProduction) {
               console.error('Failed to save session from token restore:', err);
+            } else if (!isProduction) {
+              console.log('✅ Session saved after token restore');
             }
           });
         }
         
+        if (!isProduction) {
+          console.log('=== End User Restore Debug ===');
+        }
+        
         return next();
       } else {
-        if (!isProduction && !isPreview) {
+        if (!isProduction) {
           console.log('❌ User not found or inactive for token:', sessionToken.substring(0, 8) + '...');
         }
       }
@@ -98,13 +137,11 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
     }
   }
   
-  // 3. 检测无痕模式并提供友好提示
-  const isBrowserMode = req.headers['x-browser-mode'];
-  if (isBrowserMode === 'incognito' && !isProduction) {
-    console.log('🕵️ Incognito mode detected - user needs to login again');
+  if (!isProduction) {
+    console.log('❌ No user restored from any source');
+    console.log('=== End User Restore Debug ===');
   }
   
-  // 如果都没有成功，继续到下一个中间件（用户未认证状态）
   next();
 };
 

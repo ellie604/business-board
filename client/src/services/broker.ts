@@ -14,14 +14,13 @@ export interface AgentStats {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
   assignedListings: number;
   activeSellers: number;
   activeBuyers: number;
   completedDeals: number;
 }
 
-// 统一的认证请求函数 - 恢复到工作版本
+// 统一的认证请求函数
 const makeAuthenticatedRequest = async (
   url: string, 
   options: RequestInit = {}
@@ -53,7 +52,7 @@ const makeAuthenticatedRequest = async (
     headers['X-Browser-Mode'] = 'incognito';
   }
 
-  // 添加用户会话令牌（如果有）- 关键的双重认证机制
+  // 添加用户会话令牌（如果有）
   if (user?.id) {
     headers['X-Session-Token'] = user.id;
   }
@@ -78,8 +77,6 @@ const makeAuthenticatedRequest = async (
     if (response.status === 401) {
       console.warn('Authentication failed, clearing local storage');
       localStorage.removeItem('user');
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_header');
       // 可以在这里添加重定向到登录页面的逻辑
       throw new Error('Authentication required');
     }
@@ -94,65 +91,65 @@ const makeAuthenticatedRequest = async (
 // 创建一个包装函数来处理 JSON 响应
 const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
   const response = await makeAuthenticatedRequest(`${API_BASE_URL}${endpoint}`, options);
-
+  
   if (!response.ok) {
     const errorText = await response.text();
     console.error(`Broker ${endpoint} request failed:`, response.status, errorText);
     throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${response.status} ${response.statusText}`);
   }
-
+  
   return response.json();
 };
 
 export const brokerService = {
   getDashboardStats: () => makeRequest('/broker/dashboard'),
-
+  
   getAgents: () => makeRequest('/broker/agents'),
-
+  
   getAgentStats: (agentId: string) => makeRequest(`/broker/agent/${agentId}/stats`),
-
+  
   getAgentsWithStats: () => makeRequest('/broker/agents-with-stats'),
-
+  
   getAgentDetails: (agentId: string) => makeRequest(`/broker/agent/${agentId}`),
-
+  
   getListings: () => makeRequest('/broker/listings'),
-
+  
   getListingDetails: (listingId: string) => makeRequest(`/broker/listings/${listingId}`),
-
+  
   updateListing: (listingId: string, data: any) => makeRequest(`/broker/listings/${listingId}`, {
     method: 'PUT',
     body: JSON.stringify(data)
   }),
-
+  
   getSellers: () => makeRequest('/broker/sellers'),
-
+  
   getBuyers: () => makeRequest('/broker/buyers'),
-
+  
   // 文档相关
   getListingDocuments: (listingId: string) => makeRequest(`/broker/listings/${listingId}/documents`),
-
+  
   uploadListingDocument: async (listingId: string, formData: FormData) => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/listings/${listingId}/documents`, {
       method: 'POST',
       body: formData,
       headers: {} // 不设置 Content-Type，让浏览器自动设置
     });
-
+    
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to upload document: ${response.status} ${response.statusText}`);
     }
-
+    
     return response.json();
   },
-
+  
   deleteListingDocument: (listingId: string, documentId: string) => makeRequest(`/broker/listings/${listingId}/documents/${documentId}`, {
     method: 'DELETE'
   }),
-
+  
   // 预关闭清单
   getPreCloseChecklist: (listingId: string) => makeRequest(`/broker/listings/${listingId}/pre-close-checklist`),
-
+  
   updatePreCloseChecklist: (listingId: string, data: any) => makeRequest(`/broker/listings/${listingId}/pre-close-checklist`, {
     method: 'PUT',
     body: JSON.stringify(data)

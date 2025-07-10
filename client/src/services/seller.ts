@@ -38,49 +38,56 @@ export interface StepDocument {
 }
 
 export interface SellerProgress {
-  id: string;
-  sellerId: string;
   currentStep: number;
   steps: {
     id: number;
     title: string;
-    description: string;
     completed: boolean;
-    completedAt?: string;
+    accessible: boolean;
+    documentRequirement?: DocumentRequirement;
+    documents?: StepDocument[];
   }[];
+  selectedListingId?: string;
+}
+
+interface Document {
+  id: string;
+  type: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Document {
-  id: string;
-  name: string;
-  type: string;
-  uploadedAt: string;
-  size: number;
-  url: string;
+interface DashboardResponse {
+  stats: DashboardStats;
+  message: string;
 }
 
-export interface DocumentsResponse {
+interface DocumentsResponse {
   documents: Document[];
+  message: string;
 }
 
-export interface DocumentRequirement {
-  id: number;
-  title: string;
-  description: string;
-  required: boolean;
-  documentTypes: string[];
-  examples: string[];
+interface StepDocumentsResponse {
+  documents: StepDocument[];
+  requirement: DocumentRequirement;
 }
 
-// Simple cache implementation
+// Add simple in-memory cache
+interface CacheItem<T> {
+  data: T;
+  timestamp: number;
+  expiry: number;
+}
+
 class Cache {
-  private cache = new Map<string, { data: any; expiry: number }>();
+  private cache = new Map<string, CacheItem<any>>();
+  private readonly DEFAULT_TTL = 30000; // 30 seconds default TTL
 
-  set<T>(key: string, data: T, ttl: number = 30000): void {
+  set<T>(key: string, data: T, ttl: number = this.DEFAULT_TTL): void {
     this.cache.set(key, {
       data,
+      timestamp: Date.now(),
       expiry: Date.now() + ttl
     });
   }
@@ -94,18 +101,19 @@ class Cache {
       return null;
     }
     
-    return item.data;
-  }
-
-  delete(key: string): void {
-    this.cache.delete(key);
+    return item.data as T;
   }
 
   clear(): void {
     this.cache.clear();
   }
+
+  delete(key: string): void {
+    this.cache.delete(key);
+  }
 }
 
+// Global cache instance
 const cache = new Cache();
 
 // Request deduplication
@@ -119,7 +127,7 @@ const makeAuthenticatedRequest = async (
   // 获取用户信息
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
-
+  
   // 检测无痕模式
   const isIncognito = (() => {
     try {
@@ -163,7 +171,7 @@ const makeAuthenticatedRequest = async (
 
   try {
     const response = await fetch(url, config);
-
+    
     // 如果是认证错误，尝试清理本地状态并重定向到登录
     if (response.status === 401) {
       console.warn('Authentication failed, clearing local storage');
@@ -171,7 +179,7 @@ const makeAuthenticatedRequest = async (
       // 可以在这里添加重定向到登录页面的逻辑
       throw new Error('Authentication required');
     }
-
+    
     return response;
   } catch (error) {
     console.error('Request failed:', error);
@@ -182,98 +190,98 @@ const makeAuthenticatedRequest = async (
 // 创建一个包装函数来处理 JSON 响应
 const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
   const response = await makeAuthenticatedRequest(`${API_BASE_URL}${endpoint}`, options);
-
+  
   if (!response.ok) {
     const errorText = await response.text();
     console.error(`Seller ${endpoint} request failed:`, response.status, errorText);
     throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${response.status} ${response.statusText}`);
   }
-
+  
   return response.json();
 };
 
 export const sellerService = {
   getDashboardStats: () => makeRequest('/seller/dashboard'),
-
+  
   getDocuments: () => makeRequest('/seller/documents'),
-
+  
   uploadDocument: async (formData: FormData) => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/documents/upload`, {
       method: 'POST',
       body: formData,
       headers: {} // 不设置 Content-Type，让浏览器自动设置
     });
-
+    
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to upload document: ${response.status} ${response.statusText}`);
     }
-
+    
     return response.json();
   },
-
+  
   getListingAgreement: () => makeRequest('/seller/listing-agreement'),
-
+  
   getPurchaseAgreement: () => makeRequest('/seller/purchase-agreement'),
-
+  
   getDueDiligence: () => makeRequest('/seller/due-diligence'),
-
+  
   getPreCloseChecklist: () => makeRequest('/seller/pre-close-checklist'),
-
+  
   updatePreCloseChecklist: (data: any) => makeRequest('/seller/pre-close-checklist', {
     method: 'PUT',
     body: JSON.stringify(data)
   }),
-
+  
   getClosingDocuments: () => makeRequest('/seller/closing-documents'),
-
+  
   // 新增的方法
   downloadDocument: (documentId: string) => makeRequest(`/seller/download-document/${documentId}`),
-
+  
   getProgress: () => makeRequest('/seller/progress'),
-
+  
   updateStep: (step: number, completed: boolean) => makeRequest('/seller/update-step', {
     method: 'PUT',
     body: JSON.stringify({ step, completed })
   }),
-
+  
   // 尽职调查相关
   getDueDiligenceRequests: (listingId: string) => makeRequest(`/seller/listings/${listingId}/due-diligence/requests`),
-
+  
   uploadDueDiligenceDocument: async (listingId: string, requestId: string, formData: FormData) => {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/listings/${listingId}/due-diligence/${requestId}/upload`, {
       method: 'POST',
       body: formData,
       headers: {} // 不设置 Content-Type，让浏览器自动设置
     });
-
+    
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to upload due diligence document: ${response.status} ${response.statusText}`);
     }
-
+    
     return response.json();
   },
-
+  
   // 列表相关
   getListings: () => makeRequest('/seller/listings'),
-
+  
   getListingDetails: (listingId: string) => makeRequest(`/seller/listings/${listingId}`),
-
+  
   // 买家相关
   getInterestedBuyers: (listingId: string) => makeRequest(`/seller/listings/${listingId}/interested-buyers`),
-
+  
   approveBuyer: (listingId: string, buyerId: string) => makeRequest(`/seller/listings/${listingId}/approve-buyer`, {
     method: 'POST',
     body: JSON.stringify({ buyerId })
   }),
-
+  
   rejectBuyer: (listingId: string, buyerId: string) => makeRequest(`/seller/listings/${listingId}/reject-buyer`, {
     method: 'POST',
     body: JSON.stringify({ buyerId })
   }),
 
-  selectListing: (listingId: string) => {
+  async selectListing(listingId: string): Promise<{ message: string; listing: any; progress: any }> {
     // Clear both progress and listings cache when selecting
     cache.delete('seller_progress');
     cache.delete('current_listing');
@@ -283,11 +291,11 @@ export const sellerService = {
     });
   },
 
-  getCurrentListing: () => {
+  async getCurrentListing(): Promise<{ listing: any; needsSelection: boolean }> {
     return makeRequest('/seller/current-listing');
   },
 
-  markStepCompleted: (stepId: number) => {
+  async markStepCompleted(stepId: number): Promise<{ message: string; progress: any }> {
     // Clear progress cache when marking step as completed
     cache.delete('seller_progress');
     return makeRequest('/seller/mark-step-completed', {
@@ -296,7 +304,7 @@ export const sellerService = {
     });
   },
 
-  markStepIncomplete: (stepId: number) => {
+  async markStepIncomplete(stepId: number): Promise<{ message: string; progress: any }> {
     // Clear progress cache when marking step as incomplete
     cache.delete('seller_progress');
     return makeRequest('/seller/mark-step-incomplete', {
@@ -305,11 +313,11 @@ export const sellerService = {
     });
   },
 
-  getStepDocuments: (stepId: number) => {
+  async getStepDocuments(stepId: number): Promise<{ documents: any[]; requirement: DocumentRequirement }> {
     return makeRequest(`/seller/step/${stepId}/documents`);
   },
 
-  uploadStepDocument: (stepId: number, fileName: string, fileUrl: string, fileSize: number) => {
+  async uploadStepDocument(stepId: number, fileName: string, fileUrl: string, fileSize: number): Promise<{ document: any }> {
     // Clear step documents cache when uploading
     cache.delete(`step_${stepId}_documents`);
     return makeRequest(`/seller/step/${stepId}/upload`, {
@@ -318,13 +326,15 @@ export const sellerService = {
     });
   },
 
-  downloadStepDocument: (stepId: number) => {
+  async downloadStepDocument(stepId: number): Promise<{ document: any }> {
+    // Clear step documents cache when downloading
+    cache.delete(`step_${stepId}_documents`);
     return makeRequest(`/seller/step/${stepId}/download`, {
       method: 'POST',
     });
   },
 
-  submitQuestionnaire: (questionnaire: any) => {
+  async submitQuestionnaire(questionnaire: any): Promise<{ message: string; document: any }> {
     // Clear questionnaire cache when submitting
     cache.delete('seller_questionnaire');
     cache.delete('seller_progress'); // Also clear progress since this affects step completion
@@ -334,7 +344,7 @@ export const sellerService = {
     });
   },
 
-  submitListingAgreement: async (data: any): Promise<void> => {
+  async submitListingAgreement(data: any): Promise<void> {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/listing-agreement`, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -346,7 +356,7 @@ export const sellerService = {
     }
   },
 
-  submitDueDiligence: async (data: any): Promise<void> => {
+  async submitDueDiligence(data: any): Promise<void> {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/seller/due-diligence`, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -358,15 +368,15 @@ export const sellerService = {
     }
   },
 
-  getListingBuyers: () => {
+  async getListingBuyers(): Promise<any[]> {
     return makeRequest('/seller/listing-buyers');
   },
 
-  getQuestionnaire: () => {
+  async getQuestionnaire(): Promise<{ questionnaire: any }> {
     return makeRequest('/seller/questionnaire');
   },
 
-  saveQuestionnaire: (questionnaire: any) => {
+  async saveQuestionnaire(questionnaire: any): Promise<{ message: string }> {
     // Clear questionnaire cache when saving
     cache.delete('seller_questionnaire');
     return makeRequest('/seller/questionnaire/save', {
@@ -375,12 +385,10 @@ export const sellerService = {
     });
   },
 
-  // Clear all cache (useful when logging out or major state changes)
   clearCache(): void {
     cache.clear();
   },
 
-  // Clear specific cache entries
   clearCacheFor(keys: string[]): void {
     keys.forEach(key => cache.delete(key));
   }
