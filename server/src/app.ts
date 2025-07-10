@@ -195,6 +195,9 @@ const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV =
 const isVercelDeploy = process.env.VERCEL === '1';
 const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
 
+// 检测是否是跨域场景
+const isCrossDomain = process.env.NODE_ENV === 'production';
+
 // 配置 session
 const sessionConfig: session.SessionOptions = {
   store: new memoryStore({
@@ -214,9 +217,9 @@ const sessionConfig: session.SessionOptions = {
   rolling: true, // 每次请求时重置过期时间
   proxy: true, // 在所有环境信任代理
   cookie: {
-    secure: false, // 在所有环境都设为false以确保兼容性
+    secure: isCrossDomain, // 跨域时必须使用HTTPS
     httpOnly: true,
-    sameSite: 'lax', // 使用lax以确保跨站兼容性
+    sameSite: isCrossDomain ? 'none' : 'lax', // 跨域时必须使用'none'
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
     domain: undefined // 不设置domain以确保在所有子域名下都能工作
@@ -229,6 +232,7 @@ console.log('Session configuration:', {
   isProduction,
   isPreview,
   isVercelDeploy,
+  isCrossDomain,
   secret: sessionSecret ? '[SET]' : '[DEFAULT]',
   secure: sessionConfig.cookie?.secure,
   sameSite: sessionConfig.cookie?.sameSite,
@@ -240,6 +244,28 @@ console.log('Session configuration:', {
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
+
+// 添加跨域credentials支持中间件
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // 设置CORS headers以支持credentials
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, X-Browser-Mode, X-Session-Token');
+  res.header('Access-Control-Expose-Headers', 'X-Session-Token');
+  
+  // 处理preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
 
 // 添加生产环境session恢复中间件
 app.use((req, res, next) => {
@@ -346,8 +372,41 @@ app.get('/debug/session', (req, res) => {
     },
     environment: process.env.NODE_ENV,
     vercelEnv: process.env.VERCEL_ENV,
+    sessionConfig: {
+      cookieName: 'business.board.sid',
+      secure: sessionConfig.cookie?.secure,
+      sameSite: sessionConfig.cookie?.sameSite,
+      httpOnly: sessionConfig.cookie?.httpOnly,
+      maxAge: sessionConfig.cookie?.maxAge
+    },
     timestamp: new Date().toISOString()
   });
+});
+
+// 添加session验证端点
+app.get('/api/auth/verify-session', (req, res) => {
+  const typedReq = req as any;
+  
+  console.log('=== Session Verification Debug ===');
+  console.log('Session ID:', typedReq.sessionID);
+  console.log('Has session user:', !!typedReq.session?.user);
+  console.log('Session user data:', typedReq.session?.user);
+  console.log('Request user:', typedReq.user);
+  console.log('Cookies:', req.headers.cookie);
+  console.log('Origin:', req.headers.origin);
+  
+  if (typedReq.session?.user || typedReq.user) {
+    res.json({
+      authenticated: true,
+      user: typedReq.session?.user || typedReq.user,
+      sessionId: typedReq.sessionID
+    });
+  } else {
+    res.status(401).json({
+      authenticated: false,
+      message: 'No valid session found'
+    });
+  }
 });
 
 export default app; 

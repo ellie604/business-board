@@ -1176,12 +1176,15 @@ router.post('/logout', async (req: Request, res: Response): Promise<void> => {
       });
     }
     
+    // 检测是否是跨域场景
+    const isCrossDomain = process.env.NODE_ENV === 'production';
+    
     // 清理 cookie
     res.clearCookie('business.board.sid', {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      secure: isCrossDomain,
+      sameSite: isCrossDomain ? 'none' : 'lax'
     });
     
     console.log('User logged out successfully');
