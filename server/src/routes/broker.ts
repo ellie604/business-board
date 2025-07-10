@@ -1262,12 +1262,12 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
           const ndaDoc = await getPrisma().document.findFirst({
             where: { 
               buyerId, 
-              listingId, // Make sure it's for this specific listing
               stepId: 2, 
               type: 'NDA',
               category: 'BUYER_UPLOAD',
               operationType: 'UPLOAD',
-              status: 'COMPLETED'
+              status: 'COMPLETED',
+              listingId: listingId
             }
           });
           return !!ndaDoc;
@@ -1473,9 +1473,9 @@ router.get('/buyers/:buyerId/listings/:listingId/documents', authenticateBroker,
     // Get buyer's documents for this listing
     const documents = await getPrisma().document.findMany({
       where: {
-        listingId,
         buyerId,
-        category: 'BUYER_UPLOAD'
+        category: 'BUYER_UPLOAD',
+        listingId: listingId
       },
       include: {
         uploader: {

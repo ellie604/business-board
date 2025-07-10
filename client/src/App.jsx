@@ -12,6 +12,8 @@ import Buying from './frontPages/Buying';
 import BuyABusiness from './frontPages/BuyABusiness';
 import BuyerFAQs from './frontPages/BuyerFAQs';
 import NonDisclosureAgreement from './frontPages/NonDisclosureAgreement';
+import Registration from './frontPages/Registration';
+import NDAFrontend from './frontPages/NDAFrontend';
 import Contact from './frontPages/Contact';
 import Blog from './frontPages/Blog';
 
@@ -80,11 +82,15 @@ function App() {
           <Route path="/buying" element={<Navigate to="/buying/business" replace />} />
           <Route path="/buying/business" element={<BuyABusiness />} />
           <Route path="/buying/faqs" element={<BuyerFAQs />} />
-          <Route path="/buying/nda" element={<NonDisclosureAgreement />} />
+          <Route path="/buying/nda" element={<NDAFrontend />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/login" element={<Login />} />
           
+          {/* New Registration and NDA pages */}
+          <Route path="/registration" element={<Registration />} />
+          <Route path="/nda" element={<NDAFrontend />} />
+
           {/* Dashboard Routes */}
           <Route path="/broker" element={<BrokerDashboard />}>
             <Route path="messages" element={<MessagesPage userType="BROKER" />} />
