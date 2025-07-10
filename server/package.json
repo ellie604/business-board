@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@swc/core": "^1.11.24",
+    "@types/connect-pg-simple": "^7.0.3",
     "@types/node": "^22.15.23",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2"
