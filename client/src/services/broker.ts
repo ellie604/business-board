@@ -29,6 +29,9 @@ const makeAuthenticatedRequest = async (
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   
+  // 获取session token用于跨域认证
+  const sessionToken = localStorage.getItem('session_token');
+  
   // 检测无痕模式
   const isIncognito = (() => {
     try {
@@ -52,21 +55,24 @@ const makeAuthenticatedRequest = async (
     headers['X-Browser-Mode'] = 'incognito';
   }
 
-  // 添加用户会话令牌（如果有）
-  if (user?.id) {
+  // 优先使用session token，然后是用户ID
+  if (sessionToken) {
+    headers['X-Session-Token'] = sessionToken;
+  } else if (user?.id) {
     headers['X-Session-Token'] = user.id;
   }
 
   const config: RequestInit = {
     ...options,
     headers,
-    credentials: 'include' // 确保发送 cookies
+    credentials: 'include' // 仍然发送 cookies，作为备用
   };
 
   console.log('Making authenticated request:', {
     url,
     isIncognito,
     hasUser: !!user,
+    hasSessionToken: !!sessionToken,
     headers: Object.keys(headers)
   });
 
@@ -77,6 +83,8 @@ const makeAuthenticatedRequest = async (
     if (response.status === 401) {
       console.warn('Authentication failed, clearing local storage');
       localStorage.removeItem('user');
+      localStorage.removeItem('session_token');
+      localStorage.removeItem('auth_token');
       // 可以在这里添加重定向到登录页面的逻辑
       throw new Error('Authentication required');
     }

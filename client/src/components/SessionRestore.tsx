@@ -46,9 +46,19 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
         // 首先检查当前session状态
         console.log('🔍 SessionRestore: Testing current session state...');
         try {
+          const sessionToken = localStorage.getItem('session_token');
+          const testHeaders: Record<string, string> = {
+            'Content-Type': 'application/json'
+          };
+          
+          if (sessionToken) {
+            testHeaders['X-Session-Token'] = sessionToken;
+          }
+          
           const testResponse = await fetch(`${API_BASE_URL}/users`, {
             method: 'GET',
             credentials: 'include',
+            headers: testHeaders
           });
           
           if (testResponse.ok) {
@@ -90,9 +100,19 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
           // 验证恢复后的session是否工作
           console.log('🔍 SessionRestore: Verifying restored session...');
           try {
+            const newSessionToken = data.user?.id || localStorage.getItem('session_token');
+            const verifyHeaders: Record<string, string> = {
+              'Content-Type': 'application/json'
+            };
+            
+            if (newSessionToken) {
+              verifyHeaders['X-Session-Token'] = newSessionToken;
+            }
+            
             const verifyResponse = await fetch(`${API_BASE_URL}/users`, {
               method: 'GET',
               credentials: 'include',
+              headers: verifyHeaders
             });
             
             if (verifyResponse.ok) {
@@ -103,11 +123,13 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
             } else {
               console.log('❌ SessionRestore: Session verification failed, redirecting to login...');
               localStorage.removeItem('user');
+              localStorage.removeItem('session_token');
               window.location.href = '/login';
             }
           } catch (verifyError) {
             console.log('❌ SessionRestore: Session verification error:', verifyError);
             localStorage.removeItem('user');
+            localStorage.removeItem('session_token');
             window.location.href = '/login';
           }
         } else {
@@ -119,6 +141,7 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
           localStorage.removeItem('user');
           localStorage.removeItem('auth_token');
           localStorage.removeItem('auth_header');
+          localStorage.removeItem('session_token');
           
           // 重定向到登录页面
           if (window.location.pathname !== '/login') {
@@ -133,6 +156,7 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
         localStorage.removeItem('user');
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_header');
+        localStorage.removeItem('session_token');
         
         // 如果不在登录页面，重定向到登录页面
         if (window.location.pathname !== '/login') {

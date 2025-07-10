@@ -157,6 +157,7 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
         managerId: user.managerId,  // 添加managerId字段
         managing: [] // 暂时返回空数组，减少查询时间
       },
+      sessionToken: user.id.toString(), // 添加session token用于跨域认证
       sessionDebug: {
         sessionId: typedReq.sessionID,
         cookieWillBeSet: true,

@@ -125,6 +125,12 @@ export const authService = {
           localStorage.setItem('user', JSON.stringify(data.user));
           console.log('User data saved to localStorage:', data.user);
 
+          // 保存session token用于跨域认证
+          if (data.sessionToken) {
+            localStorage.setItem('session_token', data.sessionToken);
+            console.log('Session token saved:', data.sessionToken);
+          }
+
           // 如果有 token，保存它
           if (data.token) {
             localStorage.setItem('auth_token', data.token);
@@ -161,6 +167,7 @@ export const authService = {
       localStorage.removeItem('user');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_header');
+      localStorage.removeItem('session_token');
       
       // 清理任何其他可能的认证相关数据
       const keysToRemove: string[] = [];
