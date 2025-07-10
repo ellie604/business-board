@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // import { AuthErrorHandler } from './components/ErrorBoundary'; // 临时禁用
+import { SessionRestore } from './components/SessionRestore';
 
 // Front Pages
 import Home from './frontPages/Home';
@@ -70,81 +71,83 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <AuthErrorHandler> */}
-        <Router>
-          <Routes>
-            {/* Front-facing public pages */}
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            {/* Selling pages with sub-routes */}
-            <Route path="/selling" element={<Navigate to="/selling/your-business" replace />} />
-            <Route path="/selling/your-business" element={<SellingYourBusiness />} />
-            <Route path="/selling/faqs" element={<SellerFAQs />} />
-            {/* Buying pages with sub-routes */}
-            <Route path="/buying" element={<Navigate to="/buying/business" replace />} />
-            <Route path="/buying/business" element={<BuyABusiness />} />
-            <Route path="/buying/faqs" element={<BuyerFAQs />} />
-            <Route path="/buying/nda" element={<NDAFrontend />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/login" element={<Login />} />
-            
-            {/* New Registration and NDA pages */}
-            <Route path="/registration" element={<Registration />} />
-            <Route path="/nda" element={<NDAFrontend />} />
+      <SessionRestore>
+        {/* <AuthErrorHandler> */}
+          <Router>
+            <Routes>
+              {/* Front-facing public pages */}
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              {/* Selling pages with sub-routes */}
+              <Route path="/selling" element={<Navigate to="/selling/your-business" replace />} />
+              <Route path="/selling/your-business" element={<SellingYourBusiness />} />
+              <Route path="/selling/faqs" element={<SellerFAQs />} />
+              {/* Buying pages with sub-routes */}
+              <Route path="/buying" element={<Navigate to="/buying/business" replace />} />
+              <Route path="/buying/business" element={<BuyABusiness />} />
+              <Route path="/buying/faqs" element={<BuyerFAQs />} />
+              <Route path="/buying/nda" element={<NDAFrontend />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/login" element={<Login />} />
+              
+              {/* New Registration and NDA pages */}
+              <Route path="/registration" element={<Registration />} />
+              <Route path="/nda" element={<NDAFrontend />} />
 
-            {/* Dashboard Routes */}
-            <Route path="/broker" element={<BrokerDashboard />}>
-              <Route path="messages" element={<MessagesPage userType="BROKER" />} />
-              <Route path="agents" element={<BrokerAgentsPage />} />
-              <Route path="listings" element={<BrokerListingsPage />} />
-              <Route path="sellers" element={<BrokerSellers />} />
-              <Route path="buyers" element={<BrokerBuyers />} />
-              <Route path="admin" element={<AdminPortal />} />
-              <Route path="sellers/:sellerId/:listingId/*" element={<SellerProgressView />} />
-              <Route path="buyers/:buyerId/:listingId/*" element={<BuyerProgressView />} />
-            </Route>
-            <Route path="/agent" element={<AgentDashboard />}>
-              <Route path="messages" element={<MessagesPage userType="AGENT" />} />
-              <Route path="listings" element={<AgentListingsPage />} />
-              <Route path="sellers" element={<AgentSellersPage />} />
-              <Route path="buyers" element={<AgentBuyersPage />} />
-              <Route path="sellers/:sellerId/:listingId/*" element={<SellerProgressView />} />
-              <Route path="buyers/:buyerId/:listingId/*" element={<BuyerProgressView />} />
-            </Route>
-            
-            {/* Seller Routes - 所有页面都在dashboard内 */}
-            <Route path="/seller" element={<SellerDashboard />}>
-              <Route index element={<div />} /> {/* 空的index route */}
-              <Route path="messages" element={<SellerMessages />} />
-              <Route path="listing-agreement" element={<SellerListingAgreement />} />
-              <Route path="questionnaire" element={<SellerQuestionnaire />} />
-              <Route path="financials" element={<SellerUploadDocs />} />
-              <Route path="buyer-activity" element={<SellerBuyerActivity />} />
-              <Route path="purchase-agreement" element={<SellerPurchaseAgreement />} />
-              <Route path="due-diligence" element={<SellerDueDiligence />} />
-              <Route path="pre-close-checklist" element={<SellerPreCloseChecklist />} />
-              <Route path="closing-docs" element={<SellerClosingDocs />} />
-              <Route path="after-sale" element={<SellerAfterSale />} />
-            </Route>
-            
-            {/* Buyer Routes - 所有页面都在dashboard内 */}
-            <Route path="/buyer" element={<BuyerDashboard />}>
-              <Route index element={<div />} /> {/* 空的index route */}
-              <Route path="messages" element={<BuyerMessages />} />
-              <Route path="non-disclosure" element={<BuyerNonDisclosure />} />
-              <Route path="financial-statement" element={<BuyerFinancialStatement />} />
-              <Route path="cbr-cim" element={<BuyerCbrCim />} />
-              <Route path="upload-docs" element={<BuyerUploadDocs />} />
-              <Route path="purchase-contract" element={<BuyerPurchaseContract />} />
-              <Route path="due-diligence" element={<BuyerDueDiligence />} />
-              <Route path="pre-close-checklist" element={<BuyerPreCloseChecklist />} />
-              <Route path="closing-docs" element={<BuyerClosingDocs />} />
-              <Route path="after-sale" element={<BuyerAfterSale />} />
-            </Route>
-          </Routes>
-        </Router>
-      {/* </AuthErrorHandler> */}
+              {/* Dashboard Routes */}
+              <Route path="/broker" element={<BrokerDashboard />}>
+                <Route path="messages" element={<MessagesPage userType="BROKER" />} />
+                <Route path="agents" element={<BrokerAgentsPage />} />
+                <Route path="listings" element={<BrokerListingsPage />} />
+                <Route path="sellers" element={<BrokerSellers />} />
+                <Route path="buyers" element={<BrokerBuyers />} />
+                <Route path="admin" element={<AdminPortal />} />
+                <Route path="sellers/:sellerId/:listingId/*" element={<SellerProgressView />} />
+                <Route path="buyers/:buyerId/:listingId/*" element={<BuyerProgressView />} />
+              </Route>
+              <Route path="/agent" element={<AgentDashboard />}>
+                <Route path="messages" element={<MessagesPage userType="AGENT" />} />
+                <Route path="listings" element={<AgentListingsPage />} />
+                <Route path="sellers" element={<AgentSellersPage />} />
+                <Route path="buyers" element={<AgentBuyersPage />} />
+                <Route path="sellers/:sellerId/:listingId/*" element={<SellerProgressView />} />
+                <Route path="buyers/:buyerId/:listingId/*" element={<BuyerProgressView />} />
+              </Route>
+              
+              {/* Seller Routes - 所有页面都在dashboard内 */}
+              <Route path="/seller" element={<SellerDashboard />}>
+                <Route index element={<div />} /> {/* 空的index route */}
+                <Route path="messages" element={<SellerMessages />} />
+                <Route path="listing-agreement" element={<SellerListingAgreement />} />
+                <Route path="questionnaire" element={<SellerQuestionnaire />} />
+                <Route path="financials" element={<SellerUploadDocs />} />
+                <Route path="buyer-activity" element={<SellerBuyerActivity />} />
+                <Route path="purchase-agreement" element={<SellerPurchaseAgreement />} />
+                <Route path="due-diligence" element={<SellerDueDiligence />} />
+                <Route path="pre-close-checklist" element={<SellerPreCloseChecklist />} />
+                <Route path="closing-docs" element={<SellerClosingDocs />} />
+                <Route path="after-sale" element={<SellerAfterSale />} />
+              </Route>
+              
+              {/* Buyer Routes - 所有页面都在dashboard内 */}
+              <Route path="/buyer" element={<BuyerDashboard />}>
+                <Route index element={<div />} /> {/* 空的index route */}
+                <Route path="messages" element={<BuyerMessages />} />
+                <Route path="non-disclosure" element={<BuyerNonDisclosure />} />
+                <Route path="financial-statement" element={<BuyerFinancialStatement />} />
+                <Route path="cbr-cim" element={<BuyerCbrCim />} />
+                <Route path="upload-docs" element={<BuyerUploadDocs />} />
+                <Route path="purchase-contract" element={<BuyerPurchaseContract />} />
+                <Route path="due-diligence" element={<BuyerDueDiligence />} />
+                <Route path="pre-close-checklist" element={<BuyerPreCloseChecklist />} />
+                <Route path="closing-docs" element={<BuyerClosingDocs />} />
+                <Route path="after-sale" element={<BuyerAfterSale />} />
+              </Route>
+            </Routes>
+          </Router>
+        {/* </AuthErrorHandler> */}
+      </SessionRestore>
     </QueryClientProvider>
   );
 }

@@ -91,20 +91,49 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     typedReq.user = userInfo;
     typedReq.session.user = userInfo;
 
-    // 简化 session 保存 - 不使用异步回调
+    console.log('🔐 Login successful, saving user to session:', {
+      userId: user.id,
+      role: user.role,
+      email: user.email,
+      sessionId: typedReq.sessionID
+    });
+
+    // 强制保存session并等待完成
     try {
       await new Promise<void>((resolve, reject) => {
         typedReq.session.save((error: Error | null) => {
-          if (error) reject(error);
-          else resolve();
+          if (error) {
+            console.error('❌ Session save failed:', error);
+            reject(error);
+          } else {
+            console.log('✅ Session saved successfully');
+            resolve();
+          }
         });
       });
     } catch (sessionError) {
-      console.error('Session save error:', sessionError);
-      // 即使 session 保存失败，也继续登录流程
+      console.error('❌ Critical session error:', sessionError);
+      // 如果session保存失败，返回错误
+      res.status(500).json({ 
+        message: 'Login failed due to session error',
+        error: 'Session could not be saved'
+      });
+      return;
     }
 
-    // 立即返回响应，不等待 session 完全保存
+    // 验证session是否真的保存了
+    if (!typedReq.session.user || !typedReq.session.user.id) {
+      console.error('❌ Session verification failed after save');
+      res.status(500).json({ 
+        message: 'Login failed due to session verification error',
+        error: 'Session was not properly saved'
+      });
+      return;
+    }
+
+    console.log('✅ Session verification passed, user logged in successfully');
+
+    // 返回成功响应
     res.json({ 
       message: 'Login successful',
       role: user.role,
@@ -122,6 +151,99 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     console.error('Login error:', error);
     res.status(500).json({ 
       message: 'Server error during login', 
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+// Session恢复端点 - 用于恢复已有用户的session
+const restoreSessionHandler = async (req: Request, res: Response): Promise<void> => {
+  const typedReq = req as AuthenticatedRequest;
+  
+  const { userId, email } = typedReq.body;
+  
+  if (!userId && !email) {
+    res.status(400).json({ message: 'User ID or email is required' });
+    return;
+  }
+  
+  try {
+    // 根据userId或email查找用户
+    const whereCondition = userId ? { id: parseInt(userId) } : { email: email.toLowerCase() };
+    
+    const user = await prisma.user.findUnique({
+      where: whereCondition,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        managerId: true,
+        isActive: true
+      }
+    });
+
+    if (!user || !user.isActive) {
+      res.status(401).json({ message: 'User not found or inactive' });
+      return;
+    }
+    
+    // 设置用户信息到 request 和 session
+    const userInfo = {
+      id: user.id,
+      role: user.role,
+      name: user.name,
+      email: user.email,
+      managerId: user.managerId
+    };
+    
+    typedReq.user = userInfo;
+    typedReq.session.user = userInfo;
+
+    console.log('🔄 Session restore for user:', {
+      userId: user.id,
+      role: user.role,
+      email: user.email,
+      sessionId: typedReq.sessionID
+    });
+
+    // 强制保存session
+    try {
+      await new Promise<void>((resolve, reject) => {
+        typedReq.session.save((error: Error | null) => {
+          if (error) {
+            console.error('❌ Session restore save failed:', error);
+            reject(error);
+          } else {
+            console.log('✅ Session restored successfully');
+            resolve();
+          }
+        });
+      });
+    } catch (sessionError) {
+      console.error('❌ Session restore error:', sessionError);
+      res.status(500).json({ 
+        message: 'Session restore failed',
+        error: 'Session could not be saved'
+      });
+      return;
+    }
+
+    // 返回成功响应
+    res.json({ 
+      message: 'Session restored successfully',
+      user: {
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        managerId: user.managerId
+      }
+    });
+  } catch (error: unknown) {
+    console.error('Session restore error:', error);
+    res.status(500).json({ 
+      message: 'Server error during session restore', 
       error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
@@ -1035,6 +1157,7 @@ router.post('/register', registerHandler);
 router.post('/nda-submit', ndaSubmitHandler);
 router.get('/available-listings', getAvailableListingsHandler); // Add public listings endpoint
 router.post('/contact-message', contactMessageHandler); // Add contact form endpoint
+router.post('/restore-session', restoreSessionHandler);
 router.post('/logout', async (req: Request, res: Response): Promise<void> => {
   const typedReq = req as AuthenticatedRequest;
   
