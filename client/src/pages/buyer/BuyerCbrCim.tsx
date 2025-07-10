@@ -130,7 +130,7 @@ const BuyerCbrCim: React.FC = () => {
         
         if (response.ok) {
           // 标记步骤完成
-          await buyerService.updateStep(4);
+          await buyerService.updateStep(4, true);
           
           // 刷新进度数据
           const progressRes = await buyerService.getProgress();
@@ -194,18 +194,18 @@ const BuyerCbrCim: React.FC = () => {
 
   return (
     <StepGuard stepName="CBR/CIM">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto p-4 lg:p-0">
         {/* Progress Bar */}
         <ProgressBar currentStep={progressData?.currentStep || 0} steps={steps} />
         
-        {/* Step Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Header - Mobile Responsive */}
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 5: CBR/CIM</h1>
-              <p className="text-gray-600 mt-2">Download Confidential Business Review or Confidential Information Memorandum</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 5: CBR/CIM</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Download Confidential Business Review or Confidential Information Memorandum</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 5 of 11
               </span>

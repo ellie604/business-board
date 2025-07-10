@@ -26,6 +26,7 @@ const BrokerBuyers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchBuyers = async () => {
     try {
@@ -79,6 +80,11 @@ const BrokerBuyers: React.FC = () => {
     }
   };
 
+  const filteredBuyers = buyers.filter(buyer => 
+    buyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    buyer.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -96,93 +102,103 @@ const BrokerBuyers: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Buyers</h1>
-      <div className="space-y-6">
-        {buyers.map((buyer) => (
-          <div
-            key={buyer.id}
-            className={`bg-white rounded-lg shadow-lg p-6 ${buyer.isActive ? '' : 'opacity-60'}`}
-          >
-            {/* Buyer Info - 不可点击部分 */}
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-semibold">{buyer.name}</h2>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    buyer.isActive 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
+    <div className="space-y-4 lg:space-y-6 p-4 lg:p-0">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <h1 className="text-2xl lg:text-3xl font-bold">Buyers</h1>
+        <input
+          type="text"
+          placeholder="Search buyers..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full lg:w-auto max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Joined
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredBuyers.map((buyer) => (
+              <tr key={buyer.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">{buyer.name || 'N/A'}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-500">{buyer.email}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    buyer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {buyer.isActive ? 'Active' : 'Inactive'}
                   </span>
-                </div>
-                <p className="text-gray-600">{buyer.email}</p>
-                <p className="text-sm text-gray-500">
-                  Joined: {new Date(buyer.createdAt).toLocaleDateString()}
-                </p>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {new Date(buyer.createdAt).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-4">
+        {filteredBuyers.map((buyer) => (
+          <div key={buyer.id} className="bg-white rounded-lg shadow p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-medium text-gray-900">
+                {buyer.name || 'N/A'}
+              </h3>
+              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                buyer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                {buyer.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Email:</span>
+                <span className="text-gray-900 break-all">{buyer.email}</span>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-600">
-                  {buyer.buyingListings.length} Interested Listing{buyer.buyingListings.length !== 1 ? 's' : ''}
-                </p>
-                <div className="mt-2 space-x-2">
-                  {buyer.isActive ? (
-                    <button 
-                      className="text-orange-500 hover:text-orange-600 text-sm" 
-                      onClick={() => handleArchiveBuyer(buyer.id)}
-                    >
-                      Archive
-                    </button>
-                  ) : (
-                    <button 
-                      className="text-green-500 hover:text-green-600 text-sm" 
-                      onClick={() => handleReactivateBuyer(buyer.id)}
-                    >
-                      Reactivate
-                    </button>
-                  )}
-                </div>
+              
+              <div className="flex justify-between">
+                <span className="text-gray-500">Joined:</span>
+                <span className="text-gray-900">{new Date(buyer.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
-
-            {/* Listings - 可点击部分 */}
-            {buyer.buyingListings.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-lg font-medium mb-2">Interested In</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {buyer.buyingListings.map((listing) => (
-                    <div
-                      key={listing.id}
-                      className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => navigate(`/broker/buyers/${buyer.id}/${listing.id}`)}
-                    >
-                      <h4 className="font-medium">{listing.title}</h4>
-                      <p className="text-sm text-gray-600 line-clamp-2">{listing.description}</p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-blue-600 font-medium">
-                          ${listing.price.toLocaleString()}
-                        </span>
-                        <span className={`text-sm px-2 py-1 rounded ${
-                          listing.status === 'ACTIVE'
-                            ? 'bg-green-100 text-green-800'
-                            : listing.status === 'UNDER_CONTRACT'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : listing.status === 'INACTIVE'
-                            ? 'bg-gray-100 text-gray-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {listing.status.replace('_', ' ')}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>
+
+      {filteredBuyers.length === 0 && !loading && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No buyers found.</p>
+        </div>
+      )}
     </div>
   );
 };

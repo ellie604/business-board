@@ -853,6 +853,147 @@ const getAvailableListingsHandler = async (req: Request, res: Response): Promise
   }
 };
 
+// Handle contact form submissions
+const contactMessageHandler = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { firstName, lastName, email, phone, subject, message } = req.body;
+
+    // Validate required fields
+    if (!firstName || !lastName || !email || !phone || !subject || !message) {
+      res.status(400).json({ message: 'All fields are required' });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400).json({ message: 'Please enter a valid email address' });
+      return;
+    }
+
+    // Check if the sender is an existing user
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    });
+
+    // Get or create a special VISITOR user for non-registered users
+    let senderUser = existingUser;
+    let isVisitor = false;
+
+    if (!existingUser) {
+      // Try to find existing VISITOR user, or create one
+      let visitorUser = await prisma.user.findFirst({
+        where: {
+          role: 'BUYER', // Use BUYER role since we don't have VISITOR role
+          email: 'visitor@californiabusinesssales.com'
+        }
+      });
+
+      if (!visitorUser) {
+        // Create a special visitor user
+        visitorUser = await prisma.user.create({
+          data: {
+            name: 'Website Visitor',
+            email: 'visitor@californiabusinesssales.com',
+            password: 'no-password-visitor-account',
+            role: 'BUYER',
+            isActive: false // Mark as inactive so it doesn't show up in normal user lists
+          }
+        });
+      }
+
+      senderUser = visitorUser;
+      isVisitor = true;
+    }
+
+    // Get all active brokers to send the message to
+    const brokers: BrokerUser[] = await prisma.user.findMany({
+      where: {
+        role: 'BROKER',
+        isActive: true
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    });
+
+    if (brokers.length === 0) {
+      res.status(404).json({ message: 'No active brokers found to receive your message' });
+      return;
+    }
+
+    // Create message content
+    const fullName = `${firstName} ${lastName}`;
+    const messageContent = `Contact Form Submission from ${fullName}
+    
+Email: ${email}
+Phone: ${phone}
+Subject: ${subject}
+
+Message:
+${message}
+
+${isVisitor ? 'This message is from a website visitor (not a registered user).' : `This message is from an existing ${existingUser!.role.toLowerCase()} user.`}`;
+
+    // Create messages for all brokers
+    const messagePromises = brokers.map(async (broker: BrokerUser) => {
+      const newMessage = await prisma.message.create({
+        data: {
+          subject: `Contact Form: ${subject} - ${fullName}`,
+          content: messageContent,
+          senderId: senderUser.id, // Always use a valid user ID
+          senderType: isVisitor ? 'BUYER' : existingUser!.role, // Use BUYER for visitors
+          senderName: isVisitor ? fullName : existingUser!.name,
+          receiverId: broker.id,
+          receiverType: broker.role,
+          receiverName: broker.name || broker.email,
+        }
+      });
+      return newMessage;
+    });
+
+    await Promise.all(messagePromises);
+
+    // Update unread count for all brokers
+    const updatePromises = brokers.map((broker: BrokerUser) =>
+      prisma.user.update({
+        where: { id: broker.id },
+        data: {
+          unreadCount: {
+            increment: 1
+          }
+        }
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    console.log(`Contact form message sent to ${brokers.length} brokers from: ${email} (${isVisitor ? 'visitor' : 'existing user'})`);
+
+    res.status(200).json({
+      message: 'Your message has been sent successfully. We will get back to you soon!',
+      sentTo: brokers.length,
+      userType: isVisitor ? 'visitor' : 'registered_user'
+    });
+
+  } catch (error) {
+    console.error('Contact message error:', error);
+    res.status(500).json({ 
+      message: 'Failed to send message. Please try again.',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
 // 测试路由 - 用于验证数据库连接
 const testUsersHandler = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -893,6 +1034,7 @@ router.post('/login', loginHandler);
 router.post('/register', registerHandler);
 router.post('/nda-submit', ndaSubmitHandler);
 router.get('/available-listings', getAvailableListingsHandler); // Add public listings endpoint
+router.post('/contact-message', contactMessageHandler); // Add contact form endpoint
 router.post('/logout', async (req: Request, res: Response): Promise<void> => {
   const typedReq = req as AuthenticatedRequest;
   

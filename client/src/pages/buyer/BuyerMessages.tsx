@@ -124,7 +124,7 @@ const BuyerMessages: React.FC = () => {
       // Invalidate and refetch queries efficiently
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['messages'] }),
-        buyerService.updateStep(1).then(() => {
+        buyerService.updateStep(1, true).then(() => {
           queryClient.invalidateQueries({ queryKey: ['buyer-progress'] });
         })
       ]);
@@ -195,18 +195,18 @@ const BuyerMessages: React.FC = () => {
 
   return (
     <StepGuard stepName="Messages">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto p-4 lg:p-0">
         {/* Progress Bar */}
         <ProgressBar currentStep={progressData?.currentStep || 0} steps={steps} />
         
-        {/* Step Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Step Header - Mobile Responsive */}
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 2: Messages</h1>
-              <p className="text-gray-600 mt-2">Contact your acquisition specialist via secure messaging</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 2: Messages</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Contact your acquisition specialist via secure messaging</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 2 of 11
               </span>
@@ -230,22 +230,22 @@ const BuyerMessages: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 lg:mb-6 space-y-4 lg:space-y-0">
             <div>
-              <h2 className="text-xl font-semibold">Messages</h2>
+              <h2 className="text-lg lg:text-xl font-semibold">Messages</h2>
               <p className="text-sm text-gray-600">Secure communication with your acquisition specialist</p>
             </div>
             <button
               onClick={() => setIsComposing(!isComposing)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="w-full lg:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               {isComposing ? 'Cancel' : 'New Message'}
             </button>
           </div>
 
           {isComposing ? (
-            <div className="border rounded-lg p-6 mb-6">
+            <div className="border rounded-lg p-4 lg:p-6 mb-4 lg:mb-6">
               <h3 className="text-lg font-semibold mb-4">New Message</h3>
               {isLoadingContacts ? (
                 <div className="flex items-center justify-center p-8">
@@ -263,7 +263,7 @@ const BuyerMessages: React.FC = () => {
               <div className="border-b">
                 <nav className="flex">
                   <button
-                    className={`px-4 py-2 ${
+                    className={`flex-1 lg:flex-none px-4 py-2 text-center ${
                       activeTab === 'inbox'
                         ? 'border-b-2 border-blue-500 text-blue-600'
                         : 'text-gray-500'
@@ -273,7 +273,7 @@ const BuyerMessages: React.FC = () => {
                     Inbox
                   </button>
                   <button
-                    className={`px-4 py-2 ${
+                    className={`flex-1 lg:flex-none px-4 py-2 text-center ${
                       activeTab === 'sent'
                         ? 'border-b-2 border-blue-500 text-blue-600'
                         : 'text-gray-500'

@@ -289,7 +289,7 @@ const SellerQuestionnaire: React.FC = () => {
         setMessage({ type: 'success', text: 'Questionnaire submitted successfully! PDF document has been generated.' });
         
         // Only update step completion if submission was successful
-      await sellerService.updateStep(3);
+      await sellerService.updateStep(3, true);
       
       // Refresh progress
       const progressRes = await sellerService.getProgress();
@@ -374,18 +374,18 @@ const SellerQuestionnaire: React.FC = () => {
 
   return (
     <StepGuard stepName="Business Questionnaire">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto p-4 lg:p-0">
         {/* Progress Bar */}
         <ProgressBar currentStep={progress?.currentStep || 0} steps={steps} />
         
-        {/* Step Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Header - Mobile Responsive */}
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 4: Business Questionnaire</h1>
-              <p className="text-gray-600 mt-2">Complete the comprehensive business questionnaire</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 4: Business Questionnaire</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Complete the comprehensive business questionnaire</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 4 of 11
               </span>
@@ -410,8 +410,8 @@ const SellerQuestionnaire: React.FC = () => {
         </div>
 
         {/* Main Questionnaire Form */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="space-y-8">
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+          <div className="space-y-6 lg:space-y-8">
             {/* Business Summary and History */}
             <section>
               <h2 className="text-xl font-semibold mb-4 text-blue-600">Business Summary and History</h2>

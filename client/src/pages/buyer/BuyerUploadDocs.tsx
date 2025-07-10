@@ -165,7 +165,7 @@ const BuyerUploadDocs: React.FC = () => {
       // Mark step as completed after first successful upload
       if (previousFileCount === 0) {
         console.log('First upload detected, marking step 5 as completed');
-        await buyerService.updateStep(5);
+        await buyerService.updateStep(5, true);
         // Refresh progress
         const progressRes = await buyerService.getProgress();
         setProgressData(progressRes.progress);
@@ -240,18 +240,18 @@ const BuyerUploadDocs: React.FC = () => {
 
   return (
     <StepGuard stepName="Upload Docs">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto p-4 lg:p-0">
         {/* Progress Bar */}
         <ProgressBar currentStep={progressData?.currentStep || 0} steps={steps} />
         
-        {/* Step Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Header - Mobile Responsive */}
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 6: Upload Documents</h1>
-              <p className="text-gray-600 mt-2">Please upload the requested documents for verification and due diligence</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 6: Upload Documents</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Please upload the requested documents for verification and due diligence</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 6 of 11
               </span>
@@ -426,16 +426,16 @@ const BuyerUploadDocs: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between mt-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:justify-between mt-6">
           <button
             onClick={() => navigate('/buyer/cbr-cim')}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Previous: CBR/CIM
           </button>
           <button
             onClick={() => navigate('/buyer/purchase-contract')}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
             Next: Purchase Contract
           </button>

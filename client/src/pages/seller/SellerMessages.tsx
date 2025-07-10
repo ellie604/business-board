@@ -165,7 +165,7 @@ const SellerMessages: React.FC = () => {
       
       // Update step progress - mark step 1 (Messages) as completed
       try {
-        await sellerService.updateStep(1);
+        await sellerService.updateStep(1, true);
         
         // Refresh progress data
         const progressRes = await sellerService.getProgress();
@@ -238,18 +238,18 @@ const SellerMessages: React.FC = () => {
 
   return (
     <StepGuard stepName="Messages">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto p-4 lg:p-0">
         {/* Progress Bar */}
         <ProgressBar currentStep={progress?.currentStep || 0} steps={steps} />
         
-        {/* Step Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Header - Mobile Responsive */}
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 1: Messages</h1>
-              <p className="text-gray-600 mt-2">Contact your agent via secure messaging</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 1: Messages</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Contact your agent via secure messaging</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 1 of 11
               </span>
@@ -273,15 +273,15 @@ const SellerMessages: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 lg:mb-6 space-y-4 lg:space-y-0">
             <div>
-              <h2 className="text-xl font-semibold">Messages</h2>
+              <h2 className="text-lg lg:text-xl font-semibold">Messages</h2>
               <p className="text-sm text-gray-600">Secure communication with your listing agent</p>
             </div>
             <button
               onClick={() => setIsComposing(!isComposing)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="w-full lg:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               {isComposing ? 'Cancel' : 'New Message'}
             </button>

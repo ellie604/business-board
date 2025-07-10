@@ -259,18 +259,18 @@ const BuyerFinancialStatement: React.FC = () => {
 
   return (
     <StepGuard stepName="Financial Statement">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto p-4 lg:p-0">
         {/* Progress Bar */}
         <ProgressBar currentStep={progressData?.currentStep || 0} steps={steps} />
         
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        {/* Header - Mobile Responsive */}
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step 4: Financial Statement</h1>
-              <p className="text-gray-600 mt-2">Complete your personal financial statement online</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 4: Financial Statement</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Complete your personal financial statement online</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 Step 4 of 11
               </span>
@@ -291,9 +291,9 @@ const BuyerFinancialStatement: React.FC = () => {
         </div>
 
         {/* Financial Statement Form */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">PERSONAL FINANCIAL STATEMENT</h2>
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-8">
+          <div className="text-center mb-6 lg:mb-8">
+            <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-2">PERSONAL FINANCIAL STATEMENT</h2>
             <div className="border-b-2 border-gray-300 w-full mb-4"></div>
           </div>
 
@@ -668,17 +668,17 @@ const BuyerFinancialStatement: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between mt-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:justify-between mt-6">
           <button
             onClick={() => navigate('/buyer/non-disclosure')}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Previous: Non Disclosure
           </button>
           <button
             onClick={() => stepStatus.stepCompleted ? navigate('/buyer/cbr-cim') : null}
             disabled={!stepStatus.stepCompleted}
-            className={`px-4 py-2 rounded-lg ${
+            className={`w-full sm:w-auto px-4 py-2 rounded-lg transition-colors ${
               stepStatus.stepCompleted 
                 ? 'bg-green-600 text-white hover:bg-green-700' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'

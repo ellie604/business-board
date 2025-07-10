@@ -23,7 +23,7 @@ const blogPosts = [
   {
     image: BlogImg3,
     title: 'The Kaizen Mindset: Continuous Improvement for Exit-Ready Businesses',
-    content: `Selling your business isn’t a one-time event. It’s a process.\nThe most successful exits are never rushed. They’re prepared for—years in advance—with intentional improvements that quietly increase value over time.\n\nThat’s the California Business Sales mindset: continuous, daily refinement toward a better version of your business.\n\nHere’s how to apply it:\n\n1. Audit Your Bottlenecks\nWhere do things slow down? Where do errors keep happening? Start tracking inefficiencies and redesign systems to make them smoother and more resilient.\n\n2. Delegate Like a Seller\nStart acting like the business is no longer yours. What would break without you? Fix that now—delegate, document, and train. Buyers love businesses that run without the founder.\n\n3. Trim the Fat\nDead inventory, legacy software, stale offerings—clean it up. Lean operations are attractive and easier to transition.\n\n4. Build Your Data Story\nStart tracking key metrics: Customer retention, lifetime value, profit per employee. Buyers eat this up—it shows control, insight, and maturity.\n\n5. Ask This Weekly:\n“If I were buying this business today, what would I want fixed first?”\n\nImprovement isn’t just about growth—it’s about readiness. At California Business Sales, we help business owners build with the end in mind. Because the best exit is the one you prepared for all along.`
+    content: `Selling your business isn't a one-time event. It's a process.\nThe most successful exits are never rushed. They're prepared for—years in advance—with intentional improvements that quietly increase value over time.\n\nThat's the Kaizen mindset: continuous, daily refinement toward a better version of your business.\n\nHere's how to apply it:\n\n1. Audit Your Bottlenecks\nWhere do things slow down? Where do errors keep happening? Start tracking inefficiencies and redesign systems to make them smoother and more resilient.\n\n2. Delegate Like a Seller\nStart acting like the business is no longer yours. What would break without you? Fix that now—delegate, document, and train. Buyers love businesses that run without the founder.\n\n3. Trim the Fat\nDead inventory, legacy software, stale offerings—clean it up. Lean operations are attractive and easier to transition.\n\n4. Build Your Data Story\nStart tracking key metrics: Customer retention, lifetime value, profit per employee. Buyers eat this up—it shows control, insight, and maturity.\n\n5. Ask This Weekly:\n"If I were buying this business today, what would I want fixed first?"\n\nImprovement isn't just about growth—it's about readiness. At California Business Sales, we help business owners build with the end in mind. Because the best exit is the one you prepared for all along.`
   },
   {
     image: BlogImg4,
@@ -33,7 +33,7 @@ const blogPosts = [
   {
     image: BlogImg5,
     title: 'Business Brokering with Integrity: Why It’s Time for a New Standard',
-    content: `Let’s be honest. This industry has trust issues.\nToo many brokers are glorified salespeople. Rushing deals. Hiding flaws. Churning listings. I started Kaizen because I believe there’s a better way.\n\nWe do things differently—by design.\n\nHere’s what we stand for:\n1. No Fluff, No Hype\nWe tell the truth—even if it costs us the deal. Because in the long run, honesty earns trust. And trust builds businesses.\n\n2. Education Over Pressure\nMost sellers (and buyers) don’t know how deals really work. We teach first, guide second, close third.\n\n3. Fit Over Fees\nNot every deal is a good match. If it’s not right, we say so. We’re not in this for a fast payday. We’re in this for long-term relationships.\n\n4. Stewardship, Not Just Sales\nYou’ve poured your life into this business. You deserve a broker who respects that—and treats the transition with care, not urgency.\n\nWe call it the California Business Sales Standard—an honest, intelligent, human-centered approach to deal-making. If that resonates with you, we’d be honored to help.`
+    content: `Let’s be honest. This industry has trust issues.\nToo many brokers are glorified salespeople. Rushing deals. Hiding flaws. Churning listings. I started California Business Sales because I believe there’s a better way.\n\nWe do things differently—by design.\n\nHere’s what we stand for:\n1. No Fluff, No Hype\nWe tell the truth—even if it costs us the deal. Because in the long run, honesty earns trust. And trust builds businesses.\n\n2. Education Over Pressure\nMost sellers (and buyers) don’t know how deals really work. We teach first, guide second, close third.\n\n3. Fit Over Fees\nNot every deal is a good match. If it’s not right, we say so. We’re not in this for a fast payday. We’re in this for long-term relationships.\n\n4. Stewardship, Not Just Sales\nYou’ve poured your life into this business. You deserve a broker who respects that—and treats the transition with care, not urgency.\n\nWe call it the California Business Sales Standard—an honest, intelligent, human-centered approach to deal-making. If that resonates with you, we’d be honored to help.`
   },
   {
     image: BlogImg6,
@@ -45,33 +45,35 @@ const blogPosts = [
 const Blog: React.FC = () => {
   const [expanded, setExpanded] = useState<number | null>(null);
 
-  // For no scroll, fix the height to 100vh minus header/footer
-  // Header: ~80px, Footer: ~60px, Padding: ~32px
+  // For mobile responsiveness, adjust heights dynamically
   const mainHeight = 'calc(100vh - 80px - 60px)';
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-hidden">
       <Header />
       <main className="flex-1 bg-gray-50 flex flex-col items-center justify-center" style={{ minHeight: mainHeight, height: mainHeight }}>
-        <div className="w-full max-w-[1400px] px-2">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 mt-2">Blog</h1>
+        <div className="w-full max-w-[1400px] px-2 md:px-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 mt-2">Blog</h1>
           {expanded === null ? (
-            // Normal grid view, tighter
-            <div className="grid grid-cols-3 grid-rows-2 gap-4" style={{height: 'calc(100vh - 180px)'}}>
+            // Responsive grid view
+            <div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" 
+              style={{height: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)', overflow: 'auto'}}
+            >
               {blogPosts.map((post, idx) => (
                 <div
                   key={idx}
                   className="bg-white rounded-lg shadow flex flex-col cursor-pointer transition-transform hover:scale-105 overflow-hidden"
                   onClick={() => setExpanded(idx)}
-                  style={{ minHeight: 0, minWidth: 0 }}
+                  style={{ minHeight: '200px', maxHeight: '300px' }}
                 >
                   <img
                     src={post.image}
                     alt={post.title}
-                    className="h-28 w-full object-cover"
+                    className="h-24 md:h-28 w-full object-cover"
                   />
                   <div className="p-3 flex-1 flex flex-col">
-                    <h2 className="text-base font-semibold text-gray-800 mb-1 leading-tight line-clamp-2">{post.title}</h2>
+                    <h2 className="text-sm md:text-base font-semibold text-gray-800 mb-1 leading-tight line-clamp-2">{post.title}</h2>
                     <div className="text-gray-600 text-xs flex-1 whitespace-pre-line line-clamp-3">
                       {post.content.split('\n').slice(0, 2).join(' ')} ...
                     </div>
@@ -83,18 +85,18 @@ const Blog: React.FC = () => {
               ))}
             </div>
           ) : (
-            // Expanded view: left big, right 5 small
-            <div className="flex w-full h-[calc(100vh-180px)] gap-4">
-              {/* Left: expanded card */}
-              <div className="flex-1 bg-white rounded-lg shadow flex flex-col overflow-hidden" style={{minWidth:0}}>
+            // Responsive expanded view
+            <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-140px)] gap-4">
+              {/* Main expanded card */}
+              <div className="flex-1 bg-white rounded-lg shadow flex flex-col overflow-hidden" style={{minWidth:0, minHeight: '300px'}}>
                 <img
                   src={blogPosts[expanded].image}
                   alt={blogPosts[expanded].title}
-                  className="h-56 w-full object-cover"
+                  className="h-32 md:h-56 w-full object-cover"
                 />
-                <div className="p-6 flex-1 flex flex-col">
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">{blogPosts[expanded].title}</h2>
-                  <div className="text-gray-700 text-sm flex-1 whitespace-pre-line overflow-y-auto pr-2" style={{maxHeight:'28vh'}}>
+                <div className="p-4 md:p-6 flex-1 flex flex-col">
+                  <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">{blogPosts[expanded].title}</h2>
+                  <div className="text-gray-700 text-sm flex-1 whitespace-pre-line overflow-y-auto pr-2" style={{maxHeight:'40vh'}}>
                     {blogPosts[expanded].content}
                   </div>
                   <div className="mt-4 text-right">
@@ -104,25 +106,24 @@ const Blog: React.FC = () => {
                   </div>
                 </div>
               </div>
-              {/* Right: 5 small cards */}
-              <div className="flex flex-col gap-2 w-[320px] min-w-[220px] max-w-[340px]">
+              
+              {/* Side cards - hidden on mobile, shown on larger screens */}
+              <div className="hidden lg:flex flex-col gap-2 w-[280px] xl:w-[320px] min-w-[220px] max-w-[340px]">
                 {blogPosts.map((post, idx) => (
                   idx !== expanded && (
                     <div
                       key={idx}
-                      className="bg-white rounded-lg shadow flex flex-col cursor-pointer transition-transform hover:scale-105 overflow-hidden min-h-[70px] h-[70px]"
+                      className="bg-white rounded-lg shadow flex cursor-pointer transition-transform hover:scale-105 overflow-hidden h-[60px] min-h-[60px]"
                       onClick={() => setExpanded(idx)}
                     >
-                      <div className="flex items-center h-full">
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          className="h-full w-20 object-cover flex-shrink-0 rounded-l-lg"
-                        />
-                        <div className="pl-2 pr-1 flex-1">
-                          <div className="text-xs font-semibold text-gray-800 truncate">{post.title}</div>
-                          <div className="text-gray-500 text-xs truncate">{post.content.split('\n')[0]}</div>
-                        </div>
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="h-full w-16 object-cover flex-shrink-0 rounded-l-lg"
+                      />
+                      <div className="pl-2 pr-1 flex-1 flex flex-col justify-center">
+                        <div className="text-xs font-semibold text-gray-800 truncate">{post.title}</div>
+                        <div className="text-gray-500 text-xs truncate">{post.content.split('\n')[0]}</div>
                       </div>
                     </div>
                   )

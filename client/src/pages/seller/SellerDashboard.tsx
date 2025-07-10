@@ -50,6 +50,7 @@ const SellerDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile sidebar state
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -84,6 +85,11 @@ const SellerDashboard: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const fetchData = async () => {
     try {
@@ -194,219 +200,276 @@ const SellerDashboard: React.FC = () => {
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
-  return (
-    <div className="flex w-full min-h-screen bg-gray-100">
-      {/* Left Navigation */}
-      <div className="w-64 min-h-screen bg-white shadow-lg flex-shrink-0">
-        {/* Logo */}
-        <div className="p-6">
-          <img 
-            src={logo}
-            alt="California Business Sales" 
-            className="w-full"
-          />
-        </div>
+  // Sidebar content component for reuse
+  const SidebarContent = () => (
+    <>
+      {/* Logo */}
+      <div className="p-6">
+        <img 
+          src={logo}
+          alt="California Business Sales" 
+          className="w-full"
+        />
+      </div>
 
-        {/* User Info */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">
-                {user?.name?.charAt(0)?.toUpperCase() || 'S'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.name || 'Seller'}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {user?.role || 'SELLER'}
-              </p>
-            </div>
+      {/* User Info */}
+      <div className="px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm font-medium">
+              {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+            </span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="mt-3 w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors"
-          >
-            Sign out
-          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {user?.name || 'Seller'}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {user?.role || 'SELLER'}
+            </p>
+          </div>
         </div>
+        <button
+          onClick={handleLogout}
+          className="mt-3 w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          Sign out
+        </button>
+      </div>
 
-        {/* Navigation Menu */}
-        <nav className="mt-6">
-          {menuItems.map((item, index) => {
-            const currentStepIndex = progress?.currentStep || 0;
-            const stepInfo = progress?.steps.find(s => s.id === item.stepId);
-            const isCompleted = stepInfo?.completed || false;
-            const isCurrentStep = item.stepId === currentStepIndex;
-            const isAccessible = item.stepId === null || item.stepId <= currentStepIndex;
-            
-            return (
+      {/* Navigation Menu */}
+      <nav className="mt-6">
+        {menuItems.map((item, index) => {
+          const currentStepIndex = progress?.currentStep || 0;
+          const stepInfo = progress?.steps.find(s => s.id === item.stepId);
+          const isCompleted = stepInfo?.completed || false;
+          const isCurrentStep = item.stepId === currentStepIndex;
+          const isAccessible = item.stepId === null || item.stepId <= currentStepIndex;
+          
+          return (
             <button
               key={index}
-                onClick={() => handleMenuClick(item)}
-                className={`block w-full px-6 py-4 text-base text-left relative hover:bg-gray-50 ${
+              onClick={() => handleMenuClick(item)}
+              className={`block w-full px-6 py-4 text-base text-left relative hover:bg-gray-50 ${
                 location.pathname === item.path
                   ? 'bg-blue-100 text-blue-800 font-medium'
-                    : isCompleted
-                    ? 'text-green-600'
-                    : isCurrentStep
-                    ? 'text-yellow-600'
-                    : isAccessible
-                    ? 'text-gray-600'
-                    : 'text-gray-400'
+                  : isCompleted
+                  ? 'text-green-600'
+                  : isCurrentStep
+                  ? 'text-yellow-600'
+                  : isAccessible
+                  ? 'text-gray-600'
+                  : 'text-gray-400'
               }`}
             >
               {item.label}
-                {isCompleted && (
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  </span>
-                )}
-                {isCurrentStep && !isCompleted && (
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  </span>
-                )}
+              {isCompleted && (
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              )}
+              {isCurrentStep && !isCompleted && (
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                </span>
+              )}
             </button>
-            );
-          })}
-        </nav>
+          );
+        })}
+      </nav>
+    </>
+  );
+
+  return (
+    <div className="flex w-full min-h-screen bg-gray-100">
+      {/* Mobile Menu Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex lg:w-64 lg:min-h-screen bg-white shadow-lg flex-shrink-0">
+        <div className="w-full">
+          <SidebarContent />
+        </div>
+      </div>
+
+      {/* Mobile Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto">
+            <SidebarContent />
+          </div>
+        </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 p-8">
-        <Outlet />
-        {location.pathname === '/seller' && (
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome {user?.name || 'Seller'} to Your Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Manage your business listings and track the selling process
-              </p>
-            </div>
-
-            {/* Current Selection Status */}
-            {currentListing && !needsSelection && (
-              <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-blue-900">
-                      Currently Working On
-                    </h3>
-                    <p className="text-blue-700">{currentListing.title}</p>
-                    <p className="text-sm text-blue-600">
-                      {getBuyerStatusText(currentListing.buyers)} • {formatPrice(currentListing.price)}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setNeedsSelection(true)}
-                    className="px-4 py-2 text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
-                  >
-                    Change Listing
-                  </button>
-                </div>
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-medium">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                </span>
               </div>
-            )}
+              <span className="text-sm font-medium text-gray-900 truncate">
+                {user?.name || 'Seller'}
+              </span>
+            </div>
+          </div>
+        </div>
 
-            {/* Progress Bar */}
-            <ProgressBar currentStep={getCurrentStepIndex()} steps={steps} />
+        {/* Content */}
+        <div className="flex-1 p-4 lg:p-8">
+          <Outlet />
+          {location.pathname === '/seller' && (
+            <div className="max-w-6xl mx-auto">
+              {/* Header */}
+              <div className="mb-6 lg:mb-8">
+                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+                  Welcome {user?.name || 'Seller'} to Your Customized Dashboard
+                </h1>
+                <p className="text-gray-600">
+                  Manage your business listing and track the sale process
+                </p>
+              </div>
 
-            {/* Listing Selection */}
-            {needsSelection && (
-              <div className="mb-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h3 className="text-lg font-semibold text-yellow-900 mb-4">
-                  Select a Listing to Work On
-                </h3>
+              {/* Current Listing Status */}
+              {currentListing && !needsSelection && (
+                <div className="mb-6 lg:mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-900">
+                        Your Active Listing
+                      </h3>
+                      <p className="text-green-700">{currentListing.title}</p>
+                      <p className="text-sm text-green-600">
+                        {formatPrice(currentListing.price)} • {getBuyerStatusText(currentListing.buyers)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setNeedsSelection(true)}
+                      className="px-4 py-2 text-green-600 border border-green-300 rounded-md hover:bg-green-50 transition-colors"
+                    >
+                      Change Selection
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Progress Bar */}
+              <ProgressBar currentStep={getCurrentStepIndex()} steps={steps} />
+
+              {/* Listing Selection */}
+              {needsSelection && (
+                <div className="mb-6 lg:mb-8 p-4 lg:p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Select a Listing to Work On
+                  </h3>
+                  <div className="space-y-4">
+                    {listings.map((listing) => (
+                      <div
+                        key={listing.id}
+                        className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900">{listing.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{listing.description}</p>
+                            <div className="flex items-center mt-2 space-x-4">
+                              <span className="text-sm font-medium text-gray-900">
+                                {formatPrice(listing.price)}
+                              </span>
+                              <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(listing.status)}`}>
+                                {listing.status}
+                              </span>
+                              <span className="text-sm text-gray-600">
+                                {getBuyerStatusText(listing.buyers)}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleListingSelection(listing.id)}
+                            disabled={selecting}
+                            className="lg:ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {selecting ? 'Selecting...' : 'Select'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Dashboard Stats */}
+              {stats && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 lg:mb-8">
+                  <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+                    <h3 className="text-lg font-medium mb-2">Current Step</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-blue-600">{(stats as any).currentStep || 0}</p>
+                    <p className="text-sm text-gray-500">of {(stats as any).totalSteps || 11} steps</p>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+                    <h3 className="text-lg font-medium mb-2">Completed Steps</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-green-600">{(stats as any).completedSteps || 0}</p>
+                    <p className="text-sm text-gray-500">steps finished</p>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+                    <h3 className="text-lg font-medium mb-2">Total Buyers</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-purple-600">
+                      {currentListing?.buyers?.length || 0}
+                    </p>
+                    <p className="text-sm text-gray-500">interested buyers</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Your Listings */}
+              <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+                <h3 className="text-lg font-medium mb-4">Your Business Listings</h3>
                 <div className="space-y-4">
                   {listings.map((listing) => (
-                    <div
-                      key={listing.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{listing.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{listing.description}</p>
-                          <div className="flex items-center mt-2 space-x-4">
-                            <span className="text-sm font-medium text-gray-900">
-                              {formatPrice(listing.price)}
-                            </span>
-                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(listing.status)}`}>
-                              {listing.status}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {getBuyerStatusText(listing.buyers)}
-                            </span>
-                          </div>
+                    <div key={listing.id} className="flex flex-col lg:flex-row lg:items-center lg:justify-between p-4 border border-gray-200 rounded-lg space-y-3 lg:space-y-0">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">{listing.title}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{listing.description}</p>
+                        <div className="flex flex-wrap items-center mt-2 gap-4">
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatPrice(listing.price)}
+                          </span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(listing.status)}`}>
+                            {listing.status}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {getBuyerStatusText(listing.buyers)}
+                          </span>
                         </div>
-                        <button
-                          onClick={() => handleListingSelection(listing.id)}
-                          disabled={selecting}
-                          className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          {selecting ? 'Selecting...' : 'Select'}
-                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
-
-            {/* Dashboard Stats */}
-            {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-medium mb-2">Current Step</h3>
-                  <p className="text-3xl font-bold text-blue-600">{stats.currentStep}</p>
-                  <p className="text-sm text-gray-500">of {stats.totalSteps} steps</p>
-                </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-medium mb-2">Completed Steps</h3>
-                  <p className="text-3xl font-bold text-green-600">{stats.completedSteps}</p>
-                  <p className="text-sm text-gray-500">steps finished</p>
-                </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-medium mb-2">Total Listings</h3>
-                  <p className="text-3xl font-bold text-purple-600">{listings.length}</p>
-                  <p className="text-sm text-gray-500">your listings</p>
-                </div>
-              </div>
-            )}
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-medium mb-4">Your Listings</h3>
-              <div className="space-y-4">
-                {listings.slice(0, 3).map((listing) => (
-                  <div key={listing.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{listing.title}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{listing.description}</p>
-                      <div className="flex items-center mt-2 space-x-4">
-                        <span className="text-sm font-medium text-gray-900">
-                          {formatPrice(listing.price)}
-                        </span>
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(listing.status)}`}>
-                          {listing.status}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {getBuyerStatusText(listing.buyers)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
