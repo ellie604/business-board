@@ -195,10 +195,10 @@ const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV =
 const isVercelDeploy = process.env.VERCEL === '1';
 const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
 
-// 检测是否是跨域场景
+// 检测是否是跨域场景 - 暂时禁用secure模式来测试
 const isCrossDomain = process.env.NODE_ENV === 'production';
 
-// 配置 session
+// 配置 session - 使用更宽松的设置来测试跨域问题
 const sessionConfig: session.SessionOptions = {
   store: new memoryStore({
     checkPeriod: 86400000, // 每24小时清理过期会话  
@@ -217,9 +217,9 @@ const sessionConfig: session.SessionOptions = {
   rolling: true, // 每次请求时重置过期时间
   proxy: true, // 在所有环境信任代理
   cookie: {
-    secure: isCrossDomain, // 跨域时必须使用HTTPS
+    secure: false, // 暂时设为false来测试跨域问题
     httpOnly: true,
-    sameSite: isCrossDomain ? 'none' : 'lax', // 跨域时必须使用'none'
+    sameSite: 'lax', // 暂时改回lax来测试
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
     domain: undefined // 不设置domain以确保在所有子域名下都能工作
@@ -239,7 +239,8 @@ console.log('Session configuration:', {
   domain: sessionConfig.cookie?.domain,
   maxAge: sessionConfig.cookie?.maxAge,
   storeType: 'MemoryStore',
-  maxSessions: 10000
+  maxSessions: 10000,
+  note: 'Using relaxed settings for cross-domain testing'
 });
 
 // 确保在所有路由之前初始化 session

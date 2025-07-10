@@ -132,6 +132,17 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
     }
 
     console.log('✅ Session verification passed, user logged in successfully');
+    console.log('🍪 Session details:', {
+      sessionId: typedReq.sessionID,
+      userId: typedReq.session.user.id,
+      cookieSettings: {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: '7 days'
+      }
+    });
 
     // 返回成功响应
     res.json({ 
@@ -145,6 +156,11 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         managerId: user.managerId,  // 添加managerId字段
         managing: [] // 暂时返回空数组，减少查询时间
+      },
+      sessionDebug: {
+        sessionId: typedReq.sessionID,
+        cookieWillBeSet: true,
+        origin: typedReq.headers.origin
       }
     });
   } catch (error: unknown) {
@@ -1176,15 +1192,12 @@ router.post('/logout', async (req: Request, res: Response): Promise<void> => {
       });
     }
     
-    // 检测是否是跨域场景
-    const isCrossDomain = process.env.NODE_ENV === 'production';
-    
-    // 清理 cookie
+    // 清理 cookie - 使用宽松设置来测试
     res.clearCookie('business.board.sid', {
       path: '/',
       httpOnly: true,
-      secure: isCrossDomain,
-      sameSite: isCrossDomain ? 'none' : 'lax'
+      secure: false,
+      sameSite: 'lax'
     });
     
     console.log('User logged out successfully');
