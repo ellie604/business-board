@@ -1,45 +1,91 @@
 import { API_BASE_URL } from '../config';
 
-interface UserFormData {
-  email: string;
-  password: string;
+export interface UserFormData {
   name: string;
-  role: string;
+  email: string;
+  role: 'BUYER' | 'SELLER' | 'AGENT' | 'BROKER';
+  managerId?: string;
 }
 
-interface UpdateUserData {
-  email?: string;
-  password?: string;
+export interface UpdateUserData {
   name?: string;
-  role?: string;
-  isActive?: boolean;
+  email?: string;
+  role?: 'BUYER' | 'SELLER' | 'AGENT' | 'BROKER';
+  managerId?: string;
 }
+
+// 统一的认证请求函数 - 与broker service保持一致
+const makeAuthenticatedRequest = async (
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> => {
+  // 获取用户信息
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  
+  // 检测无痕模式
+  const isIncognito = (() => {
+    try {
+      const testKey = '__test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return false;
+    } catch {
+      return true;
+    }
+  })();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>
+  };
+
+  // 添加浏览器模式标识
+  if (isIncognito) {
+    headers['X-Browser-Mode'] = 'incognito';
+  }
+
+  // 添加用户会话令牌（如果有）- 关键的双重认证机制
+  if (user?.id) {
+    headers['X-Session-Token'] = user.id;
+  }
+
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include' // 确保发送 cookies
+  };
+
+  try {
+    const response = await fetch(url, config);
+    
+    // 如果是认证错误，清理本地状态
+    if (response.status === 401) {
+      console.warn('Authentication failed, clearing local storage');
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_header');
+      throw new Error('Authentication required');
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('Admin request failed:', error);
+    throw error;
+  }
+};
 
 class AdminService {
   private async request(endpoint: string, options: RequestInit = {}): Promise<any> {
     const url = `${API_BASE_URL}${endpoint}`;
-    const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      credentials: 'include',
-      ...options,
-    };
-
-    try {
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || errorData.message || 'Request failed');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Admin service request failed:', error);
-      throw error;
+    const response = await makeAuthenticatedRequest(url, options);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(errorData.error || errorData.message || 'Request failed');
     }
+    
+    return await response.json();
   }
 
   // 获取所有用户
