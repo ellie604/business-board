@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthErrorHandler } from './components/ErrorBoundary';
+// import { AuthErrorHandler } from './components/ErrorBoundary'; // 临时禁用
 
 // Front Pages
 import Home from './frontPages/Home';
@@ -70,7 +70,7 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthErrorHandler>
+      {/* <AuthErrorHandler> */}
         <Router>
           <Routes>
             {/* Front-facing public pages */}
@@ -144,7 +144,7 @@ function App() {
             </Route>
           </Routes>
         </Router>
-      </AuthErrorHandler>
+      {/* </AuthErrorHandler> */}
     </QueryClientProvider>
   );
 }
