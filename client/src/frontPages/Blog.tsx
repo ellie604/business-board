@@ -1,169 +1,138 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import logoImage from '../assets/california-business-sales-logo.png';
+import React, { useState } from 'react';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import CallbackRequest from './CallbackRequest';
+import BlogImg1 from '../assets/Blog Images/BlogPost1.jpg';
+import BlogImg2 from '../assets/Blog Images/BlogPost2.jpg';
+import BlogImg3 from '../assets/Blog Images/BlogPost3.jpeg';
+import BlogImg4 from '../assets/Blog Images/BlogPost4.jpg';
+import BlogImg5 from '../assets/Blog Images/BlogPost5.jpg';
+import BlogImg6 from '../assets/Blog Images/BlogPost6.jpg';
+
+const blogPosts = [
+  {
+    image: BlogImg1,
+    title: 'The Silent Goldmine: Why Small Business Acquisitions Are the Smartest Play of the Decade',
+    content: `You’ve been lied to.\nEveryone glorifies the startup grind—endless pitches, risky prototypes, and five years of ramen noodles. But there’s a better way. And it’s been hiding in plain sight.\n\nBuying an existing business is one of the most overlooked, underrated wealth-building strategies of our time.\n\nHere’s why:\n\n1. Proven Cash Flow, Day One\nYou’re not guessing. You’re stepping into something that already works. Revenue is coming in. Customers exist. Systems are in place. You’re not starting at zero—you’re starting at profitable.\n\n2. The Boomer Boom\nMillions of baby boomers are retiring—and many own successful small businesses with no succession plan. This creates a historic transfer of ownership opportunity for savvy buyers. The supply is there. Are you ready to meet it?\n\n3. Built-in Teams, Brand Equity, and Vendor Relationships\nThese are intangibles that take years to build. When you buy a business, you inherit its reputation, loyal customers, trained staff, and vendor deals. You don’t just buy a business. You buy momentum.\n\n4. SBA-Backed Leverage\nWith the right deal structure and 10% down, you can control a six- or seven-figure business using smart leverage. Try doing that with real estate or tech stocks.\n\nBuying smart beats building from scratch.\nIf you’re ready to stop guessing and start growing—welcome to the world of small business acquisition. At California Business Sales, we’re not here to sell you a dream. We’re here to help you buy reality.`
+  },
+  {
+    image: BlogImg2,
+    title: 'Beyond the Deal: What Makes a Business Truly Valuable',
+    content: `Everyone talks about EBITDA. Few understand value.\nAs a business broker, I can tell you this: Value isn’t just about the numbers. Some businesses with strong financials struggle to sell. Others with modest profit margins get snapped up.\n\nWhy? Because smart buyers look beyond the spreadsheet.\n\nLet’s break down what really drives value:\n\n1. Transferable Systems\nIf the business falls apart without the owner, it’s not a business—it’s a job. A company with documented systems, delegated tasks, and process automation is infinitely more attractive to buyers.\n\n2. Brand and Customer Loyalty\nIs your business just another name on Google? Or does your name mean something in your industry? Loyal, returning customers—and a strong reputation—carry massive value.\n\n3. Team Strength\nBuyers care about culture. Is your team empowered? Are they staying post-sale? A dependable, experienced team reduces transition risk and increases the perceived value of your business.\n\n4. Recurring Revenue\nPredictability is power. Subscription models, service contracts, and long-term clients are value goldmines.\n\n5. Digital Footprint & Data\nIn today’s world, an optimized website, active customer database, and social proof can be the difference between a decent offer and a great one.\n\nIf you want to sell for a premium, start adding value now. At California Business Sales, we help owners prep early and exit strong. Because the real value of a business? It’s in how well it runs—without you.`
+  },
+  {
+    image: BlogImg3,
+    title: 'The Kaizen Mindset: Continuous Improvement for Exit-Ready Businesses',
+    content: `Selling your business isn’t a one-time event. It’s a process.\nThe most successful exits are never rushed. They’re prepared for—years in advance—with intentional improvements that quietly increase value over time.\n\nThat’s the California Business Sales mindset: continuous, daily refinement toward a better version of your business.\n\nHere’s how to apply it:\n\n1. Audit Your Bottlenecks\nWhere do things slow down? Where do errors keep happening? Start tracking inefficiencies and redesign systems to make them smoother and more resilient.\n\n2. Delegate Like a Seller\nStart acting like the business is no longer yours. What would break without you? Fix that now—delegate, document, and train. Buyers love businesses that run without the founder.\n\n3. Trim the Fat\nDead inventory, legacy software, stale offerings—clean it up. Lean operations are attractive and easier to transition.\n\n4. Build Your Data Story\nStart tracking key metrics: Customer retention, lifetime value, profit per employee. Buyers eat this up—it shows control, insight, and maturity.\n\n5. Ask This Weekly:\n“If I were buying this business today, what would I want fixed first?”\n\nImprovement isn’t just about growth—it’s about readiness. At California Business Sales, we help business owners build with the end in mind. Because the best exit is the one you prepared for all along.`
+  },
+  {
+    image: BlogImg4,
+    title: 'Behind the Curtain: How Buyers Evaluate Your Business',
+    content: `Want to sell your business for top dollar?\nThen stop thinking like a seller—and start thinking like a buyer.\n\nBuyers aren’t just looking at your income statement. They’re analyzing risk. They’re looking for landmines. They’re scanning for red flags that even you may have missed.\n\nLet’s peek behind the curtain.\n\nWhat serious buyers evaluate:\n1. Owner Dependency\nIf everything runs through you, the business feels risky. Buyers want turnkey operations—teams, systems, and processes they can step into.\n\n2. Customer Concentration\nDoes 40% of your revenue come from one client? That’s a deal killer. Diversification is security.\n\n3. Financial Hygiene\nClean, accurate books build trust. Sloppy numbers raise suspicion—even if you're profitable.\n\n4. Lease & Contracts\nBuyers check for renewal risk, unfavorable terms, or pending liabilities. If you haven’t reviewed your leases or vendor contracts in a while—do it now.\n\n5. Online Reviews & Reputation\nYes, they Google you. Bad Yelp or BBB ratings? It matters. Start cleaning up your digital reputation long before you sell.\n\nWant top dollar? Think like a buyer.\nAt California Business Sales, we walk sellers through every lens a buyer will use—so you’re never caught off guard. Transparency isn’t just ethical—it’s profitable.`
+  },
+  {
+    image: BlogImg5,
+    title: 'Business Brokering with Integrity: Why It’s Time for a New Standard',
+    content: `Let’s be honest. This industry has trust issues.\nToo many brokers are glorified salespeople. Rushing deals. Hiding flaws. Churning listings. I started Kaizen because I believe there’s a better way.\n\nWe do things differently—by design.\n\nHere’s what we stand for:\n1. No Fluff, No Hype\nWe tell the truth—even if it costs us the deal. Because in the long run, honesty earns trust. And trust builds businesses.\n\n2. Education Over Pressure\nMost sellers (and buyers) don’t know how deals really work. We teach first, guide second, close third.\n\n3. Fit Over Fees\nNot every deal is a good match. If it’s not right, we say so. We’re not in this for a fast payday. We’re in this for long-term relationships.\n\n4. Stewardship, Not Just Sales\nYou’ve poured your life into this business. You deserve a broker who respects that—and treats the transition with care, not urgency.\n\nWe call it the California Business Sales Standard—an honest, intelligent, human-centered approach to deal-making. If that resonates with you, we’d be honored to help.`
+  },
+  {
+    image: BlogImg6,
+    title: 'From Confusion to Clarity: The Seller’s Guide to a Smooth Exit',
+    content: `Selling your business is a big deal. Emotionally. Logistically. Financially.\nIt’s not just paperwork. It’s the culmination of your life’s work. And if you’ve never done it before, it can feel overwhelming.\n\nThat’s why we built this guide—to simplify the journey.\n\nStep 1: Get a Valuation\nDon’t guess your business’s worth. Have a professional run the numbers, compare comps, and assess value drivers.\n\nStep 2: Clean the Books\nTighten your P&L, separate personal expenses, and prepare clean financials. Buyers will ask for them—and then ask again.\n\nStep 3: Prepare Your Team\nBe discreet, but prep key staff for a transition plan. Employees often fear the unknown. A calm handoff plan brings peace of mind.\n\nStep 4: List With Purpose\nNot every buyer is the right buyer. Your broker should filter, vet, and qualify leads—not just hand you inquiries.\n\nStep 5: Negotiate Smart, Exit Proud\nIt’s not just about price. It’s about terms, trust, and transition. Don’t rush. The right buyer will honor your legacy.\n\nAt California Business Sales, we help sellers exit with dignity, not desperation.\nYou’ve built something real. Now let’s make sure the handoff honors it.`
+  },
+];
 
 const Blog: React.FC = () => {
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  // For no scroll, fix the height to 100vh minus header/footer
+  // Header: ~80px, Footer: ~60px, Padding: ~32px
+  const mainHeight = 'calc(100vh - 80px - 60px)';
+
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header with Navigation */}
-      <header className="relative flex-shrink-0">
-        {/* Top bar with contact info */}
-        <div className="bg-gray-800 text-white text-sm py-1 px-6 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span>📞 Call (916) 474-0390</span>
-          </div>
-          <div className="flex space-x-4">
-            <Link to="/registration" className="hover:text-gray-300">Registration</Link>
-            <span>|</span>
-            <Link to="/nda" className="hover:text-gray-300">NDA</Link>
-          </div>
-        </div>
-
-        {/* Main navigation */}
-        <nav className="bg-white shadow-sm py-3 px-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img 
-                src={logoImage} 
-                alt="California Business Sales" 
-                className="h-10 w-auto"
-              />
+    <div className="min-h-screen bg-white flex flex-col overflow-hidden">
+      <Header />
+      <main className="flex-1 bg-gray-50 flex flex-col items-center justify-center" style={{ minHeight: mainHeight, height: mainHeight }}>
+        <div className="w-full max-w-[1400px] px-2">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 mt-2">Blog</h1>
+          {expanded === null ? (
+            // Normal grid view, tighter
+            <div className="grid grid-cols-3 grid-rows-2 gap-4" style={{height: 'calc(100vh - 180px)'}}>
+              {blogPosts.map((post, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white rounded-lg shadow flex flex-col cursor-pointer transition-transform hover:scale-105 overflow-hidden"
+                  onClick={() => setExpanded(idx)}
+                  style={{ minHeight: 0, minWidth: 0 }}
+                >
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="h-28 w-full object-cover"
+                  />
+                  <div className="p-3 flex-1 flex flex-col">
+                    <h2 className="text-base font-semibold text-gray-800 mb-1 leading-tight line-clamp-2">{post.title}</h2>
+                    <div className="text-gray-600 text-xs flex-1 whitespace-pre-line line-clamp-3">
+                      {post.content.split('\n').slice(0, 2).join(' ')} ...
+                    </div>
+                    <div className="mt-2 text-right">
+                      <span className="text-[#1a2341] text-xs font-medium">Click to expand</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-orange-500 font-medium">
-                HOME
-              </Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-500 font-medium">
-                ABOUT
-              </Link>
-              <Link to="/selling" className="text-gray-700 hover:text-orange-500 font-medium">
-                SELLING
-              </Link>
-              <Link to="/buying" className="text-gray-700 hover:text-orange-500 font-medium">
-                BUYING
-              </Link>
-              <Link to="/listings" className="text-gray-700 hover:text-orange-500 font-medium">
-                LISTINGS
-              </Link>
-              <Link to="/blog" className="text-gray-700 hover:text-orange-500 font-medium border-b-2 border-orange-500">
-                BLOG
-              </Link>
-              <Link to="/contact" className="text-gray-700 hover:text-orange-500 font-medium">
-                CONTACT
-              </Link>
-              <Link to="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Login
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 bg-gray-50">
-        <div className="max-w-4xl mx-auto py-12 px-6">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">Business Sales Blog</h1>
-            <p className="text-xl text-gray-600">Insights, tips, and news about buying and selling businesses</p>
-          </div>
-          
-          {/* Blog Posts Grid */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Sample Blog Post 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="h-48 bg-gradient-to-r from-blue-400 to-blue-600"></div>
-              <div className="p-6">
-                <div className="text-sm text-gray-500 mb-2">March 15, 2024</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">5 Key Factors That Determine Business Value</h3>
-                <p className="text-gray-600 mb-4">
-                  Understanding what drives business valuation is crucial for any business owner considering a sale...
-                </p>
-                <Link to="#" className="text-blue-600 hover:text-blue-800 font-medium">
-                  Read More →
-                </Link>
+          ) : (
+            // Expanded view: left big, right 5 small
+            <div className="flex w-full h-[calc(100vh-180px)] gap-4">
+              {/* Left: expanded card */}
+              <div className="flex-1 bg-white rounded-lg shadow flex flex-col overflow-hidden" style={{minWidth:0}}>
+                <img
+                  src={blogPosts[expanded].image}
+                  alt={blogPosts[expanded].title}
+                  className="h-56 w-full object-cover"
+                />
+                <div className="p-6 flex-1 flex flex-col">
+                  <h2 className="text-xl font-bold text-gray-800 mb-2">{blogPosts[expanded].title}</h2>
+                  <div className="text-gray-700 text-sm flex-1 whitespace-pre-line overflow-y-auto pr-2" style={{maxHeight:'28vh'}}>
+                    {blogPosts[expanded].content}
+                  </div>
+                  <div className="mt-4 text-right">
+                    <button className="text-[#1a2341] text-xs font-medium underline" onClick={() => setExpanded(null)}>
+                      Collapse
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* Right: 5 small cards */}
+              <div className="flex flex-col gap-2 w-[320px] min-w-[220px] max-w-[340px]">
+                {blogPosts.map((post, idx) => (
+                  idx !== expanded && (
+                    <div
+                      key={idx}
+                      className="bg-white rounded-lg shadow flex flex-col cursor-pointer transition-transform hover:scale-105 overflow-hidden min-h-[70px] h-[70px]"
+                      onClick={() => setExpanded(idx)}
+                    >
+                      <div className="flex items-center h-full">
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="h-full w-20 object-cover flex-shrink-0 rounded-l-lg"
+                        />
+                        <div className="pl-2 pr-1 flex-1">
+                          <div className="text-xs font-semibold text-gray-800 truncate">{post.title}</div>
+                          <div className="text-gray-500 text-xs truncate">{post.content.split('\n')[0]}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                ))}
               </div>
             </div>
-
-            {/* Sample Blog Post 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="h-48 bg-gradient-to-r from-green-400 to-green-600"></div>
-              <div className="p-6">
-                <div className="text-sm text-gray-500 mb-2">March 10, 2024</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">How to Prepare Your Business for Sale</h3>
-                <p className="text-gray-600 mb-4">
-                  Proper preparation can significantly increase your business value and reduce time to sale...
-                </p>
-                <Link to="#" className="text-blue-600 hover:text-blue-800 font-medium">
-                  Read More →
-                </Link>
-              </div>
-            </div>
-
-            {/* Sample Blog Post 3 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="h-48 bg-gradient-to-r from-purple-400 to-purple-600"></div>
-              <div className="p-6">
-                <div className="text-sm text-gray-500 mb-2">March 5, 2024</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Due Diligence: What Buyers Really Look For</h3>
-                <p className="text-gray-600 mb-4">
-                  Understanding the due diligence process from a buyer's perspective can help sellers prepare...
-                </p>
-                <Link to="#" className="text-blue-600 hover:text-blue-800 font-medium">
-                  Read More →
-                </Link>
-              </div>
-            </div>
-
-            {/* Sample Blog Post 4 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="h-48 bg-gradient-to-r from-orange-400 to-orange-600"></div>
-              <div className="p-6">
-                <div className="text-sm text-gray-500 mb-2">February 28, 2024</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Market Trends in Business Acquisitions</h3>
-                <p className="text-gray-600 mb-4">
-                  Current market conditions and trends affecting business buyers and sellers in California...
-                </p>
-                <Link to="#" className="text-blue-600 hover:text-blue-800 font-medium">
-                  Read More →
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Newsletter Signup */}
-          <div className="bg-blue-600 rounded-lg p-8 mt-12 text-center text-white">
-            <h3 className="text-2xl font-semibold mb-4">Stay Updated</h3>
-            <p className="mb-6">Subscribe to our newsletter for the latest insights on business sales and acquisitions.</p>
-            <div className="flex max-w-md mx-auto">
-              <input 
-                type="email" 
-                placeholder="Your email address"
-                className="flex-1 px-4 py-2 rounded-l-lg text-gray-800 focus:outline-none"
-              />
-              <button className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-r-lg font-medium transition duration-300">
-                Subscribe
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-4 flex-shrink-0">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-center items-center space-x-8 text-sm">
-            <span>915 Highland Pointe Drive, Roseville, CA 95747</span>
-            <span>|</span>
-            <span>Phone: (916) 474-0390</span>
-          </div>
-        </div>
-      </footer>
-
-      {/* Callback Request Component */}
+      <Footer />
       <CallbackRequest />
     </div>
   );
