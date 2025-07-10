@@ -295,8 +295,8 @@ const BuyerDashboard: React.FC = () => {
 
             {/* Listing Selection */}
             {needsSelection && (
-              <div className="mb-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h3 className="text-lg font-semibold text-yellow-900 mb-4">
+              <div className="mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Select a Listing to Work On
                 </h3>
                 <div className="space-y-4">
@@ -357,7 +357,7 @@ const BuyerDashboard: React.FC = () => {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-medium mb-4">Available Business Opportunities</h3>
               <div className="space-y-4">
-                {listings.slice(0, 3).map((listing) => (
+                {listings.map((listing) => (
                   <div key={listing.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900">{listing.title}</h4>

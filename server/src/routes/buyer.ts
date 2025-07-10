@@ -278,7 +278,9 @@ function checkBuyerStepCompletionOptimized(stepId: number, data: {
     case 2: // Fill out NDA - now requires upload of signed NDA
       return documents.some(doc => 
         doc.stepId === 2 && 
-        doc.category === 'BUYER_UPLOAD'
+        doc.category === 'BUYER_UPLOAD' &&
+        doc.type === 'NDA' &&
+        doc.listingId === listingId
       );
       
     case 3: // Fill out financial statement

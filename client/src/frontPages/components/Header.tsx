@@ -206,7 +206,7 @@ const Header: React.FC = () => {
                             FAQs
                           </Link>
                           <Link
-                            to="/buying/nda"
+                            to="/nda"
                             className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
                             onClick={() => setShowBuyingDropdown(false)}
                           >
