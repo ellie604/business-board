@@ -87,11 +87,29 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
           localStorage.setItem('user', JSON.stringify(data.user));
           console.log('✅ SessionRestore: Updated localStorage with new user data');
           
-          // 短暂延迟后刷新页面
-          console.log('🔄 SessionRestore: Refreshing page in 1 second...');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // 验证恢复后的session是否工作
+          console.log('🔍 SessionRestore: Verifying restored session...');
+          try {
+            const verifyResponse = await fetch(`${API_BASE_URL}/users`, {
+              method: 'GET',
+              credentials: 'include',
+            });
+            
+            if (verifyResponse.ok) {
+              console.log('✅ SessionRestore: Session verification successful, refreshing page...');
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+            } else {
+              console.log('❌ SessionRestore: Session verification failed, redirecting to login...');
+              localStorage.removeItem('user');
+              window.location.href = '/login';
+            }
+          } catch (verifyError) {
+            console.log('❌ SessionRestore: Session verification error:', verifyError);
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+          }
         } else {
           const errorData = await response.text();
           console.log('❌ SessionRestore: Restore failed with status:', response.status, 'response:', errorData);
@@ -128,13 +146,26 @@ export const SessionRestore: React.FC<SessionRestoreProps> = ({ children }) => {
       }
     };
 
-    // 延迟执行，避免在页面加载时立即触发
-    console.log('🔍 SessionRestore: Scheduling restore attempt in 1 second...');
-    const timer = setTimeout(attemptSessionRestore, 1000);
-    return () => {
-      console.log('🔍 SessionRestore: Cleanup timer');
-      clearTimeout(timer);
-    };
+    // 检查是否在dashboard页面且刚刚登录（有localStorage但可能session没有正确设置）
+    const isDashboardPage = window.location.pathname.includes('/broker') || 
+                            window.location.pathname.includes('/agent') || 
+                            window.location.pathname.includes('/buyer') || 
+                            window.location.pathname.includes('/seller');
+    
+    const shouldCheckImmediately = isDashboardPage && localStorage.getItem('user');
+    
+    if (shouldCheckImmediately) {
+      console.log('🔍 SessionRestore: Dashboard page detected, checking session immediately...');
+      attemptSessionRestore();
+    } else {
+      // 延迟执行，避免在页面加载时立即触发
+      console.log('🔍 SessionRestore: Scheduling restore attempt in 1 second...');
+      const timer = setTimeout(attemptSessionRestore, 1000);
+      return () => {
+        console.log('🔍 SessionRestore: Cleanup timer');
+        clearTimeout(timer);
+      };
+    }
   }, [hasAttemptedRestore, isRestoring]);
 
   // 显示恢复状态
