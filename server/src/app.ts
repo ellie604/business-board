@@ -207,8 +207,8 @@ const sessionConfig: session.SessionOptions = {
   }),
   name: 'business.board.sid',
   secret: sessionSecret,
-  resave: false, // 恢复为false避免race condition
-  saveUninitialized: false, // 恢复为false减少存储开销
+  resave: true, // 修改为true确保session被保存
+  saveUninitialized: true, // 修改为true确保未初始化的session也被保存
   rolling: true,
   proxy: isVercelDeploy || isProduction || isPreview, // 在所有部署环境信任代理
   cookie: {
@@ -240,10 +240,10 @@ if (!isVercelDeploy && !isProduction && !isPreview) {
   sessionConfig.cookie!.sameSite = 'lax';
   console.log('Local development: Using secure=false, sameSite=lax');
 } else if (isProduction) {
-  // 生产环境 - 使用安全设置
-  sessionConfig.cookie!.secure = true;
-  sessionConfig.cookie!.sameSite = 'none';
-  console.log('Production environment: Using secure=true, sameSite=none');
+  // 生产环境 - 使用安全设置但保持兼容性
+  sessionConfig.cookie!.secure = false; // 暂时设为false以确保兼容性
+  sessionConfig.cookie!.sameSite = 'lax'; // 改为lax以确保兼容性
+  console.log('Production environment: Using secure=false, sameSite=lax for compatibility');
 } else {
   // 预览环境 - 使用更兼容的设置
   sessionConfig.cookie!.secure = false;

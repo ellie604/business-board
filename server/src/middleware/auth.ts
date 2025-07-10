@@ -11,24 +11,7 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV === 'preview';
   
-  // 在开发环境记录详细信息
-  if (!isProduction && !isPreview) {
-    console.log('=== Session Restore Debug ===');
-    console.log('Request headers:', {
-      cookie: req.headers.cookie,
-      origin: req.headers.origin,
-      'x-session-token': req.headers['x-session-token']
-    });
-    console.log('Session details:', {
-      id: typedReq.sessionID,
-      user: typedReq.session?.user ? {
-        id: typedReq.session.user.id,
-        role: typedReq.session.user.role
-      } : null
-    });
-  }
-
-  // 首先，如果session中有用户，直接使用session
+  // 简化：如果session中有用户，直接使用
   if (typedReq.session?.user) {
     typedReq.user = {
       ...typedReq.session.user,
@@ -36,76 +19,76 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
     };
     
     // 确保会话持久化
-    if (!typedReq.session.cookie.maxAge) {
-      typedReq.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    typedReq.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    
+    if (!isProduction && !isPreview) {
+      console.log('User restored from session:', {
+        id: typedReq.user.id.substring(0, 8) + '...',
+        role: typedReq.user.role
+      });
     }
     
-    console.log('User restored from session:', {
-      id: typedReq.user.id.substring(0, 8) + '...',
-      role: typedReq.user.role
-    });
-  } else {
-    // 只有当session为空时，才尝试从headers恢复
-    console.log('No session user found, attempting header-based restore...');
-    
-    const sessionToken = req.headers['x-session-token'] as string;
-    if (sessionToken) {
-      try {
+    return next();
+  }
+
+  // 如果没有session用户，尝试从header恢复
+  const sessionToken = req.headers['x-session-token'] as string;
+  if (sessionToken) {
+    try {
+      if (!isProduction && !isPreview) {
         console.log('Attempting to restore user from x-session-token:', sessionToken.substring(0, 8) + '...');
-        
-        // 从数据库查找用户信息
-        const user = await getPrisma().user.findUnique({
-          where: { id: sessionToken },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true,
-            managerId: true
-          }
-        });
-        
-        if (user) {
+      }
+      
+      // 从数据库查找用户信息
+      const user = await getPrisma().user.findUnique({
+        where: { id: sessionToken },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          managerId: true
+        }
+      });
+      
+      if (user) {
+        if (!isProduction && !isPreview) {
           console.log('User found from x-session-token:', {
             id: user.id.substring(0, 8) + '...',
             role: user.role
           });
-          
-          // 设置用户到请求对象
-          typedReq.user = {
-            id: user.id.toString(),
+        }
+        
+        // 设置用户到请求对象
+        typedReq.user = {
+          id: user.id.toString(),
+          email: user.email,
+          name: user.name || undefined,
+          role: user.role,
+          managerId: user.managerId || undefined
+        };
+        
+        // 同时设置到session
+        if (typedReq.session) {
+          typedReq.session.user = {
+            id: user.id,
             email: user.email,
-            name: user.name || undefined,
+            name: user.name,
             role: user.role,
-            managerId: user.managerId || undefined
+            managerId: user.managerId
           };
           
-          // 尝试恢复到session（如果可能）
-          if (typedReq.session) {
-            try {
-              typedReq.session.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                managerId: user.managerId
-              };
-              console.log('Session also restored from header data');
-            } catch (sessionError) {
-              console.warn('Failed to save to session store, continuing with request user only');
+          // 强制保存session
+          typedReq.session.save((err) => {
+            if (err && !isProduction && !isPreview) {
+              console.error('Failed to save session:', err);
             }
-          }
-        } else {
-          console.log('No user found for x-session-token');
+          });
         }
-      } catch (error) {
-        console.error('Failed to restore user from x-session-token:', error);
       }
+    } catch (error) {
+      console.error('Failed to restore user from x-session-token:', error);
     }
-  }
-  
-  if (!isProduction && !isPreview) {
-    console.log('=== End Session Restore Debug ===');
   }
   
   next();
