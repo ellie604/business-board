@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import session from 'express-session';
-import connectPgSimple from 'connect-pg-simple';
+import MemoryStore from 'memorystore';
 import authRouter from './routes/auth';
 import brokerRouter from './routes/broker';
 import agentRouter from './routes/agent';
@@ -13,7 +13,7 @@ import listingRouter from './routes/listing';
 import adminRouter from './routes/admin';
 import callbackRequestRouter from './routes/callback-request';
 import { restoreUser } from './middleware/auth';
-import { checkDatabaseHealth, getPrisma } from '../database';
+import { checkDatabaseHealth } from '../database';
 import crypto from 'crypto';
 
 // 扩展 Express 的 Request 类型
@@ -40,13 +40,8 @@ declare module 'express' {
 
 const app = express();
 
-// 创建 PostgreSQL Session Store
-const PgSession = connectPgSimple(session);
-
-// 获取数据库配置
-const getDatabaseUrl = () => {
-  return process.env.DATABASE_URL || 'postgresql://localhost:5432/business_board';
-};
+// 创建 MemoryStore 实例 - 增强配置用于临时解决方案
+const memoryStore = MemoryStore(session);
 
 // 根据环境配置允许的域名
 const getAllowedOrigins = () => {
@@ -202,18 +197,20 @@ const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toStr
 
 // 配置 session
 const sessionConfig: session.SessionOptions = {
-  store: new PgSession({
-    conString: getDatabaseUrl(), // 使用数据库连接字符串
-    createTableIfMissing: true, // 如果表不存在则创建
-    pruneSessionInterval: 86400000, // 每24小时清理过期会话
+  store: new memoryStore({
+    checkPeriod: 86400000, // 每24小时清理过期会话  
+    max: 10000, // 最大session数量（减少以避免内存问题）
     ttl: 7 * 24 * 60 * 60 * 1000, // 7天过期时间
-    schemaName: 'public', // 使用public schema
-    tableName: 'session' // session表名
+    dispose: function(key: string, val: any) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Session disposed:', key);
+      }
+    }
   }),
   name: 'business.board.sid',
   secret: sessionSecret,
-  resave: false, // PostgreSQL store推荐设为false
-  saveUninitialized: false, // PostgreSQL store推荐设为false以减少无用session
+  resave: true, // 强制保存session
+  saveUninitialized: false, // 不保存未初始化的session以减少内存使用
   rolling: true, // 每次请求时重置过期时间
   proxy: true, // 在所有环境信任代理
   cookie: {
@@ -237,8 +234,8 @@ console.log('Session configuration:', {
   sameSite: sessionConfig.cookie?.sameSite,
   domain: sessionConfig.cookie?.domain,
   maxAge: sessionConfig.cookie?.maxAge,
-  storeType: 'PostgreSQL',
-  databaseUrl: getDatabaseUrl() ? '[SET]' : '[NOT_SET]'
+  storeType: 'MemoryStore',
+  maxSessions: 10000
 });
 
 // 确保在所有路由之前初始化 session
