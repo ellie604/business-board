@@ -329,4 +329,24 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// 临时调试endpoint
+app.get('/debug/session', (req, res) => {
+  const typedReq = req as any;
+  res.json({
+    sessionID: typedReq.sessionID,
+    hasSession: !!typedReq.session,
+    sessionUser: typedReq.session?.user || null,
+    user: typedReq.user || null,
+    cookies: req.headers.cookie,
+    headers: {
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent'],
+      xSessionToken: req.headers['x-session-token']
+    },
+    environment: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV,
+    timestamp: new Date().toISOString()
+  });
+});
+
 export default app; 
