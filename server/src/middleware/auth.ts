@@ -11,32 +11,64 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV === 'preview';
   
-  // 简化：如果session中有用户，直接使用
-  if (typedReq.session?.user) {
-    typedReq.user = {
-      ...typedReq.session.user,
-      id: typedReq.session.user.id.toString()
-    };
-    
-    // 确保会话持久化
-    typedReq.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 24 hours
-    
-    if (!isProduction && !isPreview) {
-      console.log('User restored from session:', {
-        id: typedReq.user.id.substring(0, 8) + '...',
-        role: typedReq.user.role
-      });
+  // 增强的调试信息
+  if (!isProduction) {
+    console.log('=== User Restore Debug ===');
+    console.log('Request details:', {
+      method: req.method,
+      path: req.path,
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent']?.substring(0, 50),
+      sessionID: typedReq.sessionID?.substring(0, 8) + '...',
+      hasSession: !!typedReq.session,
+      hasSessionUser: !!typedReq.session?.user,
+      sessionUserId: typedReq.session?.user?.id?.substring(0, 8) + '...' || 'none',
+      hasXSessionToken: !!req.headers['x-session-token'],
+      cookies: req.headers.cookie ? 'present' : 'missing'
+    });
+  }
+  
+  // 优先从session恢复用户
+  if (typedReq.session?.user?.id) {
+    try {
+      typedReq.user = {
+        ...typedReq.session.user,
+        id: typedReq.session.user.id.toString()
+      };
+      
+      // 确保会话持久化和延长过期时间
+      typedReq.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+      
+      // 强制保存session以确保持久化
+      if (typedReq.session.save) {
+        typedReq.session.save((err) => {
+          if (err && !isProduction) {
+            console.error('Failed to save session after user restore:', err);
+          }
+        });
+      }
+      
+      if (!isProduction) {
+        console.log('✅ User restored from session:', {
+          id: typedReq.user.id.substring(0, 8) + '...',
+          role: typedReq.user.role,
+          email: typedReq.user.email
+        });
+        console.log('=== End User Restore Debug ===');
+      }
+      
+      return next();
+    } catch (error) {
+      console.error('Error restoring user from session:', error);
     }
-    
-    return next();
   }
 
-  // 如果没有session用户，尝试从header恢复
+  // 备用：尝试从header恢复（为了向后兼容）
   const sessionToken = req.headers['x-session-token'] as string;
   if (sessionToken) {
     try {
-      if (!isProduction && !isPreview) {
-        console.log('Attempting to restore user from x-session-token:', sessionToken.substring(0, 8) + '...');
+      if (!isProduction) {
+        console.log('🔄 Attempting restore from x-session-token:', sessionToken.substring(0, 8) + '...');
       }
       
       // 从数据库查找用户信息
@@ -47,15 +79,17 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
           email: true,
           name: true,
           role: true,
-          managerId: true
+          managerId: true,
+          isActive: true
         }
       });
       
-      if (user) {
-        if (!isProduction && !isPreview) {
-          console.log('User found from x-session-token:', {
+      if (user && user.isActive) {
+        if (!isProduction) {
+          console.log('✅ User found from x-session-token:', {
             id: user.id.substring(0, 8) + '...',
-            role: user.role
+            role: user.role,
+            email: user.email
           });
         }
         
@@ -68,7 +102,7 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
           managerId: user.managerId || undefined
         };
         
-        // 同时设置到session
+        // 同时更新session
         if (typedReq.session) {
           typedReq.session.user = {
             id: user.id,
@@ -80,15 +114,32 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
           
           // 强制保存session
           typedReq.session.save((err) => {
-            if (err && !isProduction && !isPreview) {
-              console.error('Failed to save session:', err);
+            if (err && !isProduction) {
+              console.error('Failed to save session from token restore:', err);
+            } else if (!isProduction) {
+              console.log('✅ Session saved after token restore');
             }
           });
         }
+        
+        if (!isProduction) {
+          console.log('=== End User Restore Debug ===');
+        }
+        
+        return next();
+      } else {
+        if (!isProduction) {
+          console.log('❌ User not found or inactive for token:', sessionToken.substring(0, 8) + '...');
+        }
       }
     } catch (error) {
-      console.error('Failed to restore user from x-session-token:', error);
+      console.error('❌ Failed to restore user from x-session-token:', error);
     }
+  }
+  
+  if (!isProduction) {
+    console.log('❌ No user restored from any source');
+    console.log('=== End User Restore Debug ===');
   }
   
   next();
@@ -96,24 +147,60 @@ export const restoreUser = async (req: Request, _res: Response, next: NextFuncti
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const typedReq = req as AuthenticatedRequest;
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   
-  // 在生产环境也记录认证失败信息
+  // 记录认证尝试
+  if (!isProduction) {
+    console.log('=== Authentication Check ===');
+    console.log('Auth details:', {
+      path: req.path,
+      method: req.method,
+      hasUser: !!typedReq.user,
+      hasSession: !!typedReq.session?.user,
+      sessionID: typedReq.sessionID?.substring(0, 8) + '...',
+      userFromReq: typedReq.user ? {
+        id: typedReq.user.id.substring(0, 8) + '...',
+        role: typedReq.user.role,
+        email: typedReq.user.email
+      } : null,
+      userFromSession: typedReq.session?.user ? {
+        id: typedReq.session.user.id.substring(0, 8) + '...',
+        role: typedReq.session.user.role,
+        email: typedReq.session.user.email
+      } : null
+    });
+  }
+  
   if (!typedReq.user) {
-    console.log('Authentication failed:', {
+    // 在所有环境记录认证失败
+    console.log('❌ Authentication failed:', {
+      path: req.path,
+      method: req.method,
       sessionId: typedReq.sessionID?.substring(0, 8) + '...',
       hasSession: !!typedReq.session,
       hasSessionUser: !!typedReq.session?.user,
       userAgent: req.headers['user-agent']?.substring(0, 50) + '...',
-      origin: req.headers.origin
+      origin: req.headers.origin,
+      hasCookies: !!req.headers.cookie,
+      hasXSessionToken: !!req.headers['x-session-token']
     });
-    res.status(401).json({ message: 'Authentication required' });
+    
+    res.status(401).json({ 
+      message: 'Authentication required',
+      error: 'AUTHENTICATION_REQUIRED',
+      timestamp: new Date().toISOString()
+    });
     return;
   }
   
-  console.log('Authentication successful for user:', {
-    id: typedReq.user.id.substring(0, 8) + '...',
-    role: typedReq.user.role
-  });
+  if (!isProduction) {
+    console.log('✅ Authentication successful:', {
+      id: typedReq.user.id.substring(0, 8) + '...',
+      role: typedReq.user.role,
+      email: typedReq.user.email
+    });
+    console.log('=== End Authentication Check ===');
+  }
   
   next();
 };

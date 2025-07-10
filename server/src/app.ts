@@ -199,25 +199,27 @@ const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toStr
 const sessionConfig: session.SessionOptions = {
   store: new memoryStore({
     checkPeriod: 86400000, // prune expired entries every 24h
-    max: 1000000, // 增加最大存储条目数
-    ttl: 24 * 60 * 60 * 1000, // 24小时过期
+    max: 5000000, // 大幅增加最大存储条目数以防止session丢失
+    ttl: 7 * 24 * 60 * 60 * 1000, // 增加到7天过期时间
     dispose: function(key: string, val: any) {
-      console.log('Session disposed:', key);
+      if (!isProduction && !isPreview) {
+        console.log('Session disposed:', key);
+      }
     }
   }),
   name: 'business.board.sid',
   secret: sessionSecret,
-  resave: true, // 修改为true确保session被保存
-  saveUninitialized: true, // 修改为true确保未初始化的session也被保存
-  rolling: true,
-  proxy: isVercelDeploy || isProduction || isPreview, // 在所有部署环境信任代理
+  resave: true, // 确保session被保存
+  saveUninitialized: true, // 确保未初始化的session也被保存
+  rolling: true, // 每次请求时重置过期时间
+  proxy: true, // 在所有环境信任代理
   cookie: {
-    secure: false, // 先设为false，稍后根据环境调整
+    secure: false, // 在所有环境都设为false以确保兼容性
     httpOnly: true,
-    sameSite: 'lax', // 先设为lax，稍后根据环境调整
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax', // 使用lax以确保跨站兼容性
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
-    domain: undefined
+    domain: undefined // 不设置domain以确保在所有子域名下都能工作
   }
 };
 
@@ -230,26 +232,10 @@ console.log('Session configuration:', {
   secret: sessionSecret ? '[SET]' : '[DEFAULT]',
   secure: sessionConfig.cookie?.secure,
   sameSite: sessionConfig.cookie?.sameSite,
-  domain: sessionConfig.cookie?.domain
+  domain: sessionConfig.cookie?.domain,
+  maxAge: sessionConfig.cookie?.maxAge,
+  storeMaxEntries: 5000000
 });
-
-// 根据环境调整 cookie 设置
-if (!isVercelDeploy && !isProduction && !isPreview) {
-  // 本地开发环境
-  sessionConfig.cookie!.secure = false;
-  sessionConfig.cookie!.sameSite = 'lax';
-  console.log('Local development: Using secure=false, sameSite=lax');
-} else if (isProduction) {
-  // 生产环境 - 使用安全设置但保持兼容性
-  sessionConfig.cookie!.secure = false; // 暂时设为false以确保兼容性
-  sessionConfig.cookie!.sameSite = 'lax'; // 改为lax以确保兼容性
-  console.log('Production environment: Using secure=false, sameSite=lax for compatibility');
-} else {
-  // 预览环境 - 使用更兼容的设置
-  sessionConfig.cookie!.secure = false;
-  sessionConfig.cookie!.sameSite = 'lax';
-  console.log('Preview environment: Using secure=false, sameSite=lax for better compatibility');
-}
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
