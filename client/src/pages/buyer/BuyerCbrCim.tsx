@@ -4,6 +4,7 @@ import { buyerService } from '../../services/buyer';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
 import { API_BASE_URL } from '../../config';
+import { apiGet } from '../../utils/apiHelper';
 
 const BuyerCbrCim: React.FC = () => {
   const [downloading, setDownloading] = useState(false);
@@ -43,30 +44,20 @@ const BuyerCbrCim: React.FC = () => {
         setDocumentsLoading(true);
         
         // 获取broker/agent上传的CBR/CIM文档
-        const response = await fetch(`${API_BASE_URL}/buyer/listings/${progressRes.progress.selectedListingId}/agent-documents`, {
-          method: 'GET',
-          credentials: 'include'
-        });
+        const documentsData = await apiGet(`/buyer/listings/${progressRes.progress.selectedListingId}/agent-documents`);
         
-        if (response.ok) {
-          const documentsData = await response.json();
-          console.log('=== Debug: Agent CBR/CIM Documents Response ===');
-          console.log('Full response:', documentsData);
-          console.log('Documents array:', documentsData.documents);
-          
-          const cbrCimDocuments = documentsData.documents?.filter(
-            (doc: any) => doc.type === 'CBR_CIM'
-          ) || [];
-          
-          console.log('Filtered CBR/CIM documents:', cbrCimDocuments);
-          console.log('CBR/CIM documents URLs:', cbrCimDocuments.map((doc: any) => ({ id: doc.id, url: doc.url, fileName: doc.fileName })));
-          
-          setCbrCimDocuments(cbrCimDocuments);
-        } else {
-          console.error('Failed to fetch documents:', response.status, response.statusText);
-          setCbrCimDocuments([]);
-        }
+        console.log('=== Debug: Agent CBR/CIM Documents Response ===');
+        console.log('Full response:', documentsData);
+        console.log('Documents array:', documentsData.documents);
         
+        const cbrCimDocuments = documentsData.documents?.filter(
+          (doc: any) => doc.type === 'CBR_CIM'
+        ) || [];
+        
+        console.log('Filtered CBR/CIM documents:', cbrCimDocuments);
+        console.log('CBR/CIM documents URLs:', cbrCimDocuments.map((doc: any) => ({ id: doc.id, url: doc.url, fileName: doc.fileName })));
+        
+        setCbrCimDocuments(cbrCimDocuments);
         setDocumentsLoading(false);
       }
     } catch (error) {

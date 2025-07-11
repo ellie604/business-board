@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../config';
 import { userService } from '../../services/listing';
-
-interface Listing {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  status: string;
-  createdAt: string;
-}
+import { apiGet } from '../../utils/apiHelper';
+import { API_BASE_URL } from '../../config';
 
 interface Buyer {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
+  phone?: string;
+  location?: string;
   isActive: boolean;
-  buyingListings: Listing[];
+  createdAt: string;
+  selectedListing?: {
+    id: string;
+    title: string;
+    price: number;
+  };
+  unreadCount: number;
 }
 
 const BrokerBuyers: React.FC = () => {
@@ -30,20 +29,7 @@ const BrokerBuyers: React.FC = () => {
 
   const fetchBuyers = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/broker/buyers`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch buyers');
-      }
-
-      const data = await response.json();
+      const data = await apiGet('/broker/buyers');
       setBuyers(data.buyers);
       setLoading(false);
     } catch (err) {

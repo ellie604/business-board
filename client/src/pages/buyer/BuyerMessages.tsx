@@ -4,6 +4,7 @@ import MessageList from '../../components/messages/MessageList';
 import MessageCompose from '../../components/messages/MessageCompose';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import { apiGet, apiPost, apiPut, makeAuthenticatedRequest } from '../../utils/apiHelper';
 
 import { API_BASE_URL } from '../../config';
 import { buyerService } from '../../services/buyer';
@@ -47,13 +48,7 @@ const BuyerMessages: React.FC = () => {
   const { data: inboxMessages, isLoading: isLoadingInbox } = useQuery({
     queryKey: ['messages', 'inbox'],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await apiGet('/messages/inbox');
       return data;
     },
   });
@@ -62,13 +57,7 @@ const BuyerMessages: React.FC = () => {
   const { data: sentMessages, isLoading: isLoadingSent } = useQuery({
     queryKey: ['messages', 'sent'],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/messages/sent`, {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await apiGet('/messages/sent');
       return data;
     },
     enabled: activeTab === 'sent', // Only fetch when needed
@@ -78,13 +67,7 @@ const BuyerMessages: React.FC = () => {
   const { data: contacts, isLoading: isLoadingContacts } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/users`, {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await apiGet('/users');
       return data.users || [];
     },
     enabled: isComposing, // Only fetch when composing
@@ -108,9 +91,8 @@ const BuyerMessages: React.FC = () => {
         });
       }
       
-      const response = await fetch(`${API_BASE_URL}/messages/send`, {
+      const response = await makeAuthenticatedRequest('/messages/send', {
         method: 'POST',
-        credentials: 'include',
         body: formData,
       });
 
@@ -140,14 +122,7 @@ const BuyerMessages: React.FC = () => {
   // Mark message as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
-      const response = await fetch(`${API_BASE_URL}/messages/${messageId}/read`, {
-        method: 'PUT',
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await apiPut(`/messages/${messageId}/read`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages', 'inbox'] });
@@ -195,38 +170,19 @@ const BuyerMessages: React.FC = () => {
 
   return (
     <StepGuard stepName="Messages">
-      <div className="max-w-6xl mx-auto p-4 lg:p-0">
-        {/* Progress Bar */}
-        <ProgressBar currentStep={progressData?.currentStep || 0} steps={steps} />
-        
-        {/* Step Header - Mobile Responsive */}
-        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 2: Messages</h1>
-              <p className="text-gray-600 mt-1 lg:mt-2">Contact your acquisition specialist via secure messaging</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                Step 2 of 11
-              </span>
-              {stepStatus.isStepFinished ? (
-                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Finished
-                </span>
-              ) : stepStatus.isCurrentStep ? (
-                <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                  In Progress
-                </span>
-              ) : (
-                <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
-                  Not Available
-                </span>
-              )}
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-2">Messages</h1>
+          <p className="text-sm text-gray-600">Communicate with your broker and other parties</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg mb-6">
+          <div className="p-4 border-b">
+            <h2 className="text-lg font-semibold mb-2">Step 2: Messages</h2>
+            <ProgressBar 
+              currentStep={stepStatus.currentStepIndex}
+              steps={steps}
+            />
           </div>
         </div>
 
@@ -263,7 +219,7 @@ const BuyerMessages: React.FC = () => {
               <div className="border-b">
                 <nav className="flex">
                   <button
-                    className={`flex-1 lg:flex-none px-4 py-2 text-center ${
+                    className={`px-4 py-2 ${
                       activeTab === 'inbox'
                         ? 'border-b-2 border-blue-500 text-blue-600'
                         : 'text-gray-500'
@@ -273,7 +229,7 @@ const BuyerMessages: React.FC = () => {
                     Inbox
                   </button>
                   <button
-                    className={`flex-1 lg:flex-none px-4 py-2 text-center ${
+                    className={`px-4 py-2 ${
                       activeTab === 'sent'
                         ? 'border-b-2 border-blue-500 text-blue-600'
                         : 'text-gray-500'

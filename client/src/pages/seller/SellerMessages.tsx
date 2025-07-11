@@ -4,6 +4,7 @@ import MessageList from '../../components/messages/MessageList';
 import MessageCompose from '../../components/messages/MessageCompose';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
+import { apiGet, apiPost, apiPut, makeAuthenticatedRequest } from '../../utils/apiHelper';
 
 import { API_BASE_URL } from '../../config';
 import { sellerService } from '../../services/seller';
@@ -59,13 +60,7 @@ const SellerMessages: React.FC = () => {
     queryFn: async () => {
       try {
         console.log('Fetching inbox messages...');
-        const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await apiGet('/messages/inbox');
         console.log('Inbox response:', data);
         return data;
       } catch (error) {
@@ -81,13 +76,7 @@ const SellerMessages: React.FC = () => {
     queryFn: async () => {
       try {
         console.log('Fetching sent messages...');
-        const response = await fetch(`${API_BASE_URL}/messages/sent`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await apiGet('/messages/sent');
         console.log('Sent response:', data);
         return data;
       } catch (error) {
@@ -103,13 +92,7 @@ const SellerMessages: React.FC = () => {
     queryFn: async () => {
       try {
         console.log('Fetching users...');
-        const response = await fetch(`${API_BASE_URL}/users`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await apiGet('/users');
         console.log('Users response:', data);
         // Return the users array from the response object
         return data.users || [];
@@ -145,9 +128,8 @@ const SellerMessages: React.FC = () => {
         attachmentsCount: data.attachments?.length || 0
       });
       
-      const response = await fetch(`${API_BASE_URL}/messages/send`, {
+      const response = await makeAuthenticatedRequest('/messages/send', {
         method: 'POST',
-        credentials: 'include',
         body: formData,
       });
 
@@ -184,14 +166,7 @@ const SellerMessages: React.FC = () => {
   // Mark message as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
-      const response = await fetch(`${API_BASE_URL}/messages/${messageId}/read`, {
-        method: 'PUT',
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await apiPut(`/messages/${messageId}/read`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
@@ -242,16 +217,16 @@ const SellerMessages: React.FC = () => {
         {/* Progress Bar */}
         <ProgressBar currentStep={progress?.currentStep || 0} steps={steps} />
         
-        {/* Header - Mobile Responsive */}
+        {/* Step Header - Mobile Responsive */}
         <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 mb-4 lg:mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 1: Messages</h1>
-              <p className="text-gray-600 mt-1 lg:mt-2">Contact your agent via secure messaging</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Step 2: Messages</h1>
+              <p className="text-gray-600 mt-1 lg:mt-2">Contact your acquisition specialist via secure messaging</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:gap-4">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                Step 1 of 11
+                Step 2 of 11
               </span>
               {isStepFinished ? (
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
@@ -273,11 +248,12 @@ const SellerMessages: React.FC = () => {
           </div>
         </div>
 
+        {/* Messages Section */}
         <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 lg:mb-6 space-y-4 lg:space-y-0">
             <div>
               <h2 className="text-lg lg:text-xl font-semibold">Messages</h2>
-              <p className="text-sm text-gray-600">Secure communication with your listing agent</p>
+              <p className="text-sm text-gray-600">Secure communication with your acquisition specialist</p>
             </div>
             <button
               onClick={() => setIsComposing(!isComposing)}
@@ -288,7 +264,7 @@ const SellerMessages: React.FC = () => {
           </div>
 
           {isComposing ? (
-            <div className="border rounded-lg p-6 mb-6">
+            <div className="border rounded-lg p-4 lg:p-6 mb-4 lg:mb-6">
               <h3 className="text-lg font-semibold mb-4">New Message</h3>
               <MessageCompose
                 contacts={contacts || []}

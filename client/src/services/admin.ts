@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { makeAuthenticatedRequest } from '../utils/apiHelper';
 
 interface UserFormData {
   email: string;
@@ -17,29 +18,14 @@ interface UpdateUserData {
 
 class AdminService {
   private async request(endpoint: string, options: RequestInit = {}): Promise<any> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      credentials: 'include',
-      ...options,
-    };
-
-    try {
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || errorData.message || 'Request failed');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Admin service request failed:', error);
-      throw error;
+    const response = await makeAuthenticatedRequest(endpoint, options);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || errorData.message || 'Request failed');
     }
+    
+    return await response.json();
   }
 
   // 获取所有用户

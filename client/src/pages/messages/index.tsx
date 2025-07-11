@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MessageList from '../../components/messages/MessageList';
 import MessageCompose from '../../components/messages/MessageCompose';
+import { apiGet, apiPost, apiPut, makeAuthenticatedRequest } from '../../utils/apiHelper';
 
 import { API_BASE_URL } from '../../config';
 
@@ -27,13 +28,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     queryFn: async () => {
       try {
         console.log('Fetching inbox messages...');
-        const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await apiGet('/messages/inbox');
         console.log('Inbox response:', data);
         return data;
       } catch (error) {
@@ -49,13 +44,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     queryFn: async () => {
       try {
         console.log('Fetching sent messages...');
-        const response = await fetch(`${API_BASE_URL}/messages/sent`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await apiGet('/messages/sent');
         console.log('Sent response:', data);
         return data;
       } catch (error) {
@@ -71,13 +60,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     queryFn: async () => {
       try {
         console.log('Fetching users...');
-        const response = await fetch(`${API_BASE_URL}/users`, {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await apiGet('/users');
         console.log('Users response:', data);
         // Return the users array from the response object
         return data.users || [];
@@ -113,9 +96,8 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
         attachmentsCount: data.attachments?.length || 0
       });
       
-      const response = await fetch(`${API_BASE_URL}/messages/send`, {
+      const response = await makeAuthenticatedRequest('/messages/send', {
         method: 'POST',
-        credentials: 'include',
         body: formData,
       });
 
@@ -140,14 +122,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
   // Mark message as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
-      const response = await fetch(`${API_BASE_URL}/messages/${messageId}/read`, {
-        method: 'PUT',
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await apiPut(`/messages/${messageId}/read`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
