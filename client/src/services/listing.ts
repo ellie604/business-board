@@ -1,69 +1,42 @@
 import { API_BASE_URL } from '../config';
+import { makeAuthenticatedRequest, apiGet, apiPost, apiPut, apiDelete } from '../utils/apiHelper';
 
 export const listingService = {
   async getListings() {
-    const res = await fetch(`${API_BASE_URL}/broker/listings`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to fetch listings');
-    return res.json();
+    const res = await apiGet('/broker/listings');
+    return res;
   },
   async addListing(data) {
-    const res = await fetch(`${API_BASE_URL}/broker/listings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error('Failed to add listing');
-    return res.json();
+    const res = await apiPost('/broker/listings', data);
+    return res;
   },
   async updateListing(id, data) {
-    const res = await fetch(`${API_BASE_URL}/broker/listings/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error('Failed to update listing');
-    return res.json();
+    const res = await apiPut(`/broker/listings/${id}`, data);
+    return res;
   },
   async archiveListing(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/listings/${id}/archive`, {
-      method: 'PATCH',
-      credentials: 'include'
+    const res = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/listings/${id}/archive`, {
+      method: 'PATCH'
     });
-    if (!res.ok) throw new Error('Failed to archive listing');
     return res.json();
   },
   async reactivateListing(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/listings/${id}/reactivate`, {
-      method: 'PATCH',
-      credentials: 'include'
+    const res = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/listings/${id}/reactivate`, {
+      method: 'PATCH'
     });
-    if (!res.ok) throw new Error('Failed to reactivate listing');
     return res.json();
   },
   async deleteListing(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/listings/${id}`, {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-    if (!res.ok) throw new Error('Failed to delete listing');
-    return res.json();
+    const res = await apiDelete(`/broker/listings/${id}`);
+    return res;
   }
 };
 
 export const userService = {
   async getSellers() {
     try {
-      const res = await fetch(`${API_BASE_URL}/users/by-role?role=SELLER`, { 
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to fetch sellers');
-      }
-      return res.json();
+      const res = await apiGet('/users/by-role?role=SELLER');
+      return res;
     } catch (error) {
       console.error('Error fetching sellers:', error);
       throw error;
@@ -71,15 +44,8 @@ export const userService = {
   },
   async getBuyers() {
     try {
-      const res = await fetch(`${API_BASE_URL}/users/by-role?role=BUYER`, { 
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to fetch buyers');
-      }
-      return res.json();
+      const res = await apiGet('/users/by-role?role=BUYER');
+      return res;
     } catch (error) {
       console.error('Error fetching buyers:', error);
       throw error;
@@ -87,50 +53,35 @@ export const userService = {
   },
   async getAgents() {
     try {
-      const res = await fetch(`${API_BASE_URL}/users/by-role?role=AGENT`, { 
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to fetch agents');
-      }
-      return res.json();
+      const res = await apiGet('/users/by-role?role=AGENT');
+      return res;
     } catch (error) {
       console.error('Error fetching agents:', error);
       throw error;
     }
   },
   async archiveSeller(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/sellers/${id}/archive`, {
-      method: 'PATCH',
-      credentials: 'include'
+    const res = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/sellers/${id}/archive`, {
+      method: 'PATCH'
     });
-    if (!res.ok) throw new Error('Failed to archive seller');
     return res.json();
   },
   async reactivateSeller(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/sellers/${id}/reactivate`, {
-      method: 'PATCH',
-      credentials: 'include'
+    const res = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/sellers/${id}/reactivate`, {
+      method: 'PATCH'
     });
-    if (!res.ok) throw new Error('Failed to reactivate seller');
     return res.json();
   },
   async archiveBuyer(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/buyers/${id}/archive`, {
-      method: 'PATCH',
-      credentials: 'include'
+    const res = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/buyers/${id}/archive`, {
+      method: 'PATCH'
     });
-    if (!res.ok) throw new Error('Failed to archive buyer');
     return res.json();
   },
   async reactivateBuyer(id) {
-    const res = await fetch(`${API_BASE_URL}/broker/buyers/${id}/reactivate`, {
-      method: 'PATCH',
-      credentials: 'include'
+    const res = await makeAuthenticatedRequest(`${API_BASE_URL}/broker/buyers/${id}/reactivate`, {
+      method: 'PATCH'
     });
-    if (!res.ok) throw new Error('Failed to reactivate buyer');
     return res.json();
   }
 }; 
