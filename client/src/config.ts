@@ -9,6 +9,7 @@ const getBackendUrl = () => {
   // 前端在Vercel，后端在Render
   // 如果域名包含 -dev- 就是 preview 环境
   // 如果是 localhost 就是本地开发环境
+  // 如果是 bribizsales.com 或其他生产域名就是 production 环境
   // 其他情况都是 production 环境
   if (hostname.includes('-dev-')) {
     console.log('Environment: preview');
@@ -16,8 +17,11 @@ const getBackendUrl = () => {
   } else if (hostname === 'localhost') {
     console.log('Environment: development');
     return 'http://localhost:3001/api';
+  } else if (hostname === 'bribizsales.com' || hostname === 'www.bribizsales.com') {
+    console.log('Environment: production (custom domain)');
+    return 'https://business-board-backend.onrender.com/api';
   } else {
-    console.log('Environment: production');
+    console.log('Environment: production (default)');
     return 'https://business-board-backend.onrender.com/api';
   }
 };

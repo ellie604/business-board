@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CallbackRequest from './CallbackRequest';
 import contactImage from '../assets/corpofficeimages/IMG_1508.jpeg';
+import { API_BASE_URL } from '../config';
 
 interface ContactFormData {
   firstName: string;
@@ -47,7 +48,7 @@ const Contact: React.FC = () => {
     setSubmitMessage(null);
 
     try {
-      const response = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://california-business-sales-server.vercel.app' : 'http://localhost:3001'}/api/auth/contact-message`, {
+      const response = await fetch(`${API_BASE_URL}/auth/contact-message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

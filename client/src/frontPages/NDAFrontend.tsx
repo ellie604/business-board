@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CallbackRequest from './CallbackRequest';
+import { API_BASE_URL } from '../config';
 
 interface NDAFormData {
   // User Registration Info
@@ -101,7 +102,7 @@ const NDAFrontend: React.FC = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://california-business-sales-server.vercel.app' : 'http://localhost:3001'}/api/auth/available-listings`, {
+        const response = await fetch(`${API_BASE_URL}/auth/available-listings`, {
           credentials: 'include'
         });
         
@@ -148,7 +149,7 @@ const NDAFrontend: React.FC = () => {
         return;
       }
       
-      const response = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://california-business-sales-server.vercel.app' : 'http://localhost:3001'}/api/auth/nda-submit`, {
+      const response = await fetch(`${API_BASE_URL}/auth/nda-submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
