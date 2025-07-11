@@ -151,7 +151,7 @@ const Contact: React.FC = () => {
                   </svg>
                   <div>
                     <p className="font-medium text-blue-800">Email Us</p>
-                    <p className="text-blue-700">info@californiabusinesssales.com</p>
+                    <p className="text-blue-700">awesb@comcast.net</p>
                   </div>
                 </div>
               </div>
