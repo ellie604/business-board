@@ -235,23 +235,27 @@ I have since transitioned into the world of business brokerage where I am being 
             {/* Left Column - About Company */}
             <div className="bg-white rounded-lg shadow-sm p-6 backdrop-blur-sm bg-opacity-95">
               <h1 className="text-3xl font-bold text-gray-800 mb-2">About California Business Sales</h1>
-              <h2 className="text-xl text-blue-600 font-semibold mb-4">Get the Best Brokerage Service</h2>
+              <h2 className="text-xl text-blue-600 font-semibold mb-4">Expert Guidance. Proven Results. Now Powered by Technology.</h2>
               
               <div className="space-y-3 text-gray-700 text-sm leading-relaxed">
                 <p>
-                  California Business Sales is a boutique business brokerage firm led by Wes Brown, a seasoned broker with over 18 years of experience helping business owners across California. Our office is located near Sacramento.
+                  California Business Sales is a boutique business brokerage firm led by Wes Brown, a seasoned advisor with over 18 years of experience helping business owners across California. Headquartered just outside Sacramento, we've built a reputation for integrity, discretion, and results.
                 </p>
                 
                 <p>
-                  We've grown from selling Main Street businesses to handling multi-million-dollar lower middle-market transactions. Our team includes a full-time broker, agent, and marketing manager.
+                  What began with Main Street businesses has grown into a thriving firm handling multi-million-dollar lower middle-market transactions. Today, our team includes a full-time broker, licensed agent, and full stack web developer—offering high-touch, personalized service every step of the way.
                 </p>
                 
                 <p>
-                  We're known for high-touch, responsive service. Whether you need a fast sale (we've closed in six weeks) or want top dollar, we tailor our approach to your goals.
+                  To make the process even smoother for our clients, we've launched a customized web portal for buyers and sellers. This secure online web portal offers, Personalized deal tracking, Document storage and e-signin, Real-time updates and communication.
                 </p>
                 
                 <p>
-                  Selling your business is emotional and complex. We provide step-by-step guidance, regular updates, and expert negotiation backed by real-world experience. You may only sell a business once. We sell them every day.
+                  What began as a vision on a whiteboard is now a powerful digital platform—thanks to the talent of our developer and our ongoing commitment to innovation.
+                </p>
+                
+                <p>
+                  Whether you're seeking a fast sale (we've closed deals in as little as six weeks) or holding out for top dollar, we tailor our strategy to meet your goals. Selling your business is emotional and complex—often the biggest decision of your life. That's why we provide step-by-step guidance, regular communication, and expert negotiation grounded in real-world experience.
                 </p>
                 
                 <div className="bg-blue-50 p-4 rounded-lg mt-4">
