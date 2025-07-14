@@ -5,6 +5,7 @@ import { AuthenticatedRequest } from '../types/custom';
 import multer from 'multer';
 import path from 'path';
 import { supabase, getStorageBucket } from '../config/supabase';
+import { emailService } from '../services/emailService';
 
 const router = Router();
 const prisma = getPrisma();
@@ -156,6 +157,23 @@ const sendMessage: RequestHandler = async (req: Request, res: Response, next: Ne
       },
     });
     console.log('Message created with ID:', message.id);
+
+    // 如果接收者是broker，发送邮件通知
+    if (receiver.role === 'BROKER') {
+      try {
+        await emailService.sendBrokerNotification({
+          subject: message.subject,
+          content: message.content,
+          senderName: message.senderName,
+          senderEmail: typedReq.user.email,
+          receiverName: message.receiverName,
+          createdAt: message.createdAt
+        });
+      } catch (error) {
+        console.error('Failed to send email notification:', error);
+        // 继续执行，不中断消息创建流程
+      }
+    }
 
     // Handle attachments if any
     const files = (req as any).files;

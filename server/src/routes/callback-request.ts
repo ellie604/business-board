@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
 import { getPrisma } from '../../database';
 import crypto from 'crypto';
+import { emailService } from '../services/emailService';
 
 const router = Router();
 const prisma = getPrisma();
@@ -109,7 +110,23 @@ Contact Information:
       })
     );
 
-    await Promise.all(messagePromises);
+    const createdMessages = await Promise.all(messagePromises);
+
+    // 发送邮件通知到私人邮箱
+    try {
+      for (const message of createdMessages) {
+        await emailService.sendBrokerNotification({
+          subject: message.subject,
+          content: message.content,
+          senderName: message.senderName,
+          senderEmail: email,
+          receiverName: message.receiverName,
+          createdAt: message.createdAt
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send email notifications for callback request:', error);
+    }
 
     // Update unread count for all brokers
     const updatePromises = brokers.map((broker: BrokerUser) =>

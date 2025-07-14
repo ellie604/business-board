@@ -25,6 +25,7 @@ import { Router, Request, Response, NextFunction, RequestHandler } from 'express
 import { getPrisma } from '../../database';
 import { AuthenticatedRequest } from '../types/custom';
 import { supabase, getStorageBucket } from '../config/supabase';
+import { emailService } from '../services/emailService';
 
 const router = Router();
 const prisma = getPrisma();
@@ -418,7 +419,23 @@ You can view more details about this user in the admin portal.
         })
       );
 
-      await Promise.all(messagePromises);
+      const createdMessages = await Promise.all(messagePromises);
+
+      // 发送邮件通知到私人邮箱
+      try {
+        for (const message of createdMessages) {
+          await emailService.sendBrokerNotification({
+            subject: message.subject,
+            content: message.content,
+            senderName: message.senderName,
+            senderEmail: email,
+            receiverName: message.receiverName,
+            createdAt: message.createdAt
+          });
+        }
+      } catch (error) {
+        console.error('Failed to send email notifications for registration:', error);
+      }
 
       // Update unread count for all brokers
       const updatePromises = brokers.map((broker: BrokerUser) =>
@@ -916,7 +933,23 @@ ${pdfUrl ? `NDA PDF Document: ${pdfUrl}` : 'PDF generation failed - please check
         return message;
       });
 
-      await Promise.all(messagePromises);
+      const createdMessages = await Promise.all(messagePromises);
+
+      // 发送邮件通知到私人邮箱
+      try {
+        for (const message of createdMessages) {
+          await emailService.sendBrokerNotification({
+            subject: message.subject,
+            content: message.content,
+            senderName: message.senderName,
+            senderEmail: email,
+            receiverName: message.receiverName,
+            createdAt: message.createdAt
+          });
+        }
+      } catch (error) {
+        console.error('Failed to send email notifications for NDA:', error);
+      }
 
       // Update unread count for all brokers
       const updatePromises = brokers.map((broker: BrokerUser) =>
@@ -1100,7 +1133,23 @@ ${isVisitor ? 'This message is from a website visitor (not a registered user).' 
       return newMessage;
     });
 
-    await Promise.all(messagePromises);
+    const createdMessages = await Promise.all(messagePromises);
+
+    // 发送邮件通知到私人邮箱
+    try {
+      for (const message of createdMessages) {
+        await emailService.sendBrokerNotification({
+          subject: message.subject,
+          content: message.content,
+          senderName: message.senderName,
+          senderEmail: email,
+          receiverName: message.receiverName,
+          createdAt: message.createdAt
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send email notifications for contact form:', error);
+    }
 
     // Update unread count for all brokers
     const updatePromises = brokers.map((broker: BrokerUser) =>

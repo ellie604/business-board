@@ -1,0 +1,307 @@
+// server/prisma/schema.production.prisma
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma-production"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("PRO_DATABASE_URL")
+  directUrl = env("PRO_DIRECT_URL")
+}
+
+enum UserRole {
+  BROKER
+  AGENT
+  SELLER
+  BUYER
+}
+
+enum ListingStatus {
+  ACTIVE
+  UNDER_CONTRACT
+  CLOSED
+  INACTIVE
+}
+
+enum DocumentType {
+  // Common documents
+  EMAIL_AGENT
+  UPLOADED_DOC
+  PURCHASE_AGREEMENT
+  DUE_DILIGENCE
+  PRE_CLOSE_CHECKLIST
+  CLOSING_DOCS
+
+  // Buyer documents
+  NDA
+  FINANCIAL_STATEMENT
+  CBR_CIM
+  PURCHASE_CONTRACT
+
+  // Seller documents
+  LISTING_AGREEMENT
+  QUESTIONNAIRE
+  AFTER_SALE
+  FINANCIAL_DOCUMENTS
+}
+
+enum DocumentStatus {
+  PENDING
+  COMPLETED
+}
+
+enum DocumentOperationType {
+  UPLOAD
+  DOWNLOAD
+  BOTH
+  NONE
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum DocumentCategory {
+  SELLER_UPLOAD // seller上传的文件
+  AGENT_PROVIDED // broker/agent提供给seller的文件
+  BUYER_UPLOAD // buyer上传的文件
+  SYSTEM_GENERATED // 系统生成的文件
+}
+
+model Document {
+  id            String                @id @default(uuid())
+  type          DocumentType
+  status        DocumentStatus        @default(PENDING)
+  category      DocumentCategory      @default(SELLER_UPLOAD) // 新增：文件分类
+  url           String?
+  fileName      String?
+  fileSize      Int?
+  operationType DocumentOperationType @default(NONE)
+  stepId        Int? // 关联到具体的步骤
+  sellerId      String
+  seller        User                  @relation("SellerDocuments", fields: [sellerId], references: [id])
+  buyerId       String?
+  buyer         User?                 @relation("BuyerDocuments", fields: [buyerId], references: [id])
+  listingId     String? // 关联到具体的listing
+  listing       Listing?              @relation(fields: [listingId], references: [id]) // 新增关联
+  uploadedAt    DateTime? // 上传时间
+  downloadedAt  DateTime? // 下载时间
+  uploadedBy    String? // 新增：上传者ID（可能是broker）
+  uploader      User?                 @relation("UploadedDocuments", fields: [uploadedBy], references: [id]) // 新增关联
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([sellerId])
+  @@index([buyerId])
+  @@index([listingId])
+  @@index([stepId])
+  @@index([type])
+  @@index([category])
+  @@index([sellerId, stepId])
+  @@index([sellerId, type, category])
+  @@index([listingId, category])
+}
+
+model User {
+  id                      String                   @id @default(uuid())
+  email                   String                   @unique
+  password                String
+  name                    String                   @default("")
+  role                    UserRole                 @default(BUYER)
+  isActive                Boolean                  @default(true) // 新增：标记用户是否处于活跃状态
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @default(now()) @updatedAt
+  managedBy               User?                    @relation("UserManagement", fields: [managerId], references: [id])
+  managerId               String?
+  managing                User[]                   @relation("UserManagement")
+  listings                Listing[]                @relation("SellerListings")
+  buyerDocs               Document[]               @relation("BuyerDocuments")
+  sellerDocs              Document[]               @relation("SellerDocuments")
+  uploadedDocuments       Document[]               @relation("UploadedDocuments") // 新增：用户上传的文档
+  activities              Activity[]
+  sentMessages            Message[]                @relation("SentMessages")
+  receivedMessages        Message[]                @relation("ReceivedMessages")
+  unreadCount             Int                      @default(0)
+  lastReadAt              DateTime?
+  buyingListings          Listing[]                @relation("BuyerListings")
+  sellerProgress          SellerProgress[]
+  buyerProgress           BuyerProgress[]
+  sellerQuestionnaire     SellerQuestionnaire?     @relation("SellerQuestionnaire")
+  buyerNDA                BuyerNDA?                @relation("BuyerNDA")
+  buyerFinancialStatement BuyerFinancialStatement? @relation("BuyerFinancialStatement")
+  updatedChecklists       PreCloseChecklist[]      @relation("ChecklistUpdater")
+  dueDiligenceRequests    DueDiligenceRequest[]    @relation("BuyerDueDiligenceRequests")
+}
+
+model SellerProgress {
+  id                String   @id @default(uuid())
+  sellerId          String   @unique
+  seller            User     @relation(fields: [sellerId], references: [id])
+  currentStep       Int      @default(0)
+  completedSteps    Json     @default("[]")
+  selectedListingId String?
+  selectedListing   Listing? @relation(fields: [selectedListingId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model BuyerProgress {
+  id                String   @id @default(uuid())
+  buyerId           String   @unique
+  buyer             User     @relation(fields: [buyerId], references: [id])
+  currentStep       Int      @default(0)
+  completedSteps    Json     @default("[]")
+  selectedListingId String?
+  selectedListing   Listing? @relation("BuyerSelectedListing", fields: [selectedListingId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  subject   String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  readAt    DateTime?
+
+  senderId   String
+  senderType UserRole
+  senderName String
+
+  receiverId   String
+  receiverType UserRole
+  receiverName String
+
+  status     MessageStatus @default(SENT)
+  isRead     Boolean       @default(false)
+  isArchived Boolean       @default(false)
+
+  parentMessageId String?
+  threadId        String?
+
+  sender        User      @relation("SentMessages", fields: [senderId], references: [id])
+  receiver      User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  parentMessage Message?  @relation("MessageReplies", fields: [parentMessageId], references: [id])
+  replies       Message[] @relation("MessageReplies")
+
+  attachments MessageAttachment[]
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([threadId])
+}
+
+model MessageAttachment {
+  id         String   @id @default(cuid())
+  messageId  String
+  fileName   String
+  fileSize   Int
+  fileType   String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id])
+}
+
+model Listing {
+  id                    String                @id @default(uuid())
+  title                 String
+  description           String
+  price                 Float
+  status                ListingStatus         @default(ACTIVE)
+  createdAt             DateTime              @default(now())
+  seller                User                  @relation("SellerListings", fields: [sellerId], references: [id])
+  sellerId              String
+  buyers                User[]                @relation("BuyerListings")
+  documents             Document[] // 新增：listing相关的文档
+  sellerProgress        SellerProgress[] // 关联到seller进度（一个listing可能被多个seller选择，虽然通常只有一个）
+  buyerSelectedProgress BuyerProgress[]       @relation("BuyerSelectedListing") // 关联到buyer进度
+  preCloseChecklist     PreCloseChecklist?    @relation("ListingPreCloseChecklist")
+  dueDiligenceRequests  DueDiligenceRequest[]
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SellerQuestionnaire {
+  id          String    @id @default(uuid())
+  sellerId    String    @unique
+  seller      User      @relation("SellerQuestionnaire", fields: [sellerId], references: [id])
+  data        Json // 存储问卷答案的JSON数据
+  submitted   Boolean   @default(false)
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model BuyerNDA {
+  id          String    @id @default(uuid())
+  buyerId     String    @unique
+  buyer       User      @relation("BuyerNDA", fields: [buyerId], references: [id], onDelete: Cascade)
+  data        Json
+  submitted   Boolean   @default(false)
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+}
+
+model BuyerFinancialStatement {
+  id          String    @id @default(uuid())
+  buyerId     String    @unique
+  buyer       User      @relation("BuyerFinancialStatement", fields: [buyerId], references: [id], onDelete: Cascade)
+  data        Json
+  submitted   Boolean   @default(false)
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+}
+
+model PreCloseChecklist {
+  id                String   @id @default(uuid())
+  listingId         String   @unique
+  listing           Listing  @relation("ListingPreCloseChecklist", fields: [listingId], references: [id])
+  buyerItems        Json     @default("{}") // 存储buyer需要完成的checklist项目
+  sellerItems       Json     @default("{}") // 存储seller需要完成的checklist项目
+  brokerItems       Json     @default("{}") // 存储broker/agent需要完成的checklist项目
+  lastUpdatedBy     String?
+  lastUpdatedByUser User?    @relation("ChecklistUpdater", fields: [lastUpdatedBy], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum DueDiligenceStatus {
+  REQUESTED
+  FULFILLED
+  CANCELLED
+}
+
+model DueDiligenceRequest {
+  id           String             @id @default(uuid())
+  listingId    String
+  listing      Listing            @relation(fields: [listingId], references: [id])
+  buyerId      String
+  buyer        User               @relation("BuyerDueDiligenceRequests", fields: [buyerId], references: [id])
+  documentName String // 请求的文档名称
+  status       DueDiligenceStatus @default(REQUESTED)
+  requestedAt  DateTime           @default(now())
+  fulfilledAt  DateTime? // broker/agent上传文档后的时间
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@unique([listingId, buyerId, documentName])
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([status])
+}
