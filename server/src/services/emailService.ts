@@ -10,7 +10,7 @@ interface EmailConfig {
 
 class EmailService {
   private transporter: nodemailer.Transporter;
-  private forwardingEmail: string = 'xinyiluo2024@gmail.com';
+  private forwardingEmail: string;
 
   constructor() {
     // 使用Gmail SMTP配置
@@ -23,6 +23,9 @@ class EmailService {
     };
 
     this.transporter = nodemailer.createTransport(config);
+    
+    // 使用环境变量配置转发邮箱，如果没有设置则使用EMAIL_USER作为默认值
+    this.forwardingEmail = process.env.FORWARDING_EMAIL || process.env.EMAIL_USER || 'xinyiluo2024@gmail.com';
   }
 
   async sendBrokerNotification(messageData: {
