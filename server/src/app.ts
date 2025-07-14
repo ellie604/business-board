@@ -53,16 +53,20 @@ const getAllowedOrigins = () => {
       'https://business-board-git-main-xinyis-projects-6c0795d6.vercel.app',  // 生产环境 git 域名
       /https:\/\/business-board-git-main-.*\.vercel\.app/,  // 生产环境的其他 main 分支域名
       /https:\/\/business-board-.*-xinyis-projects-6c0795d6\.vercel\.app/, // 用户特定的生产域名
-      'https://bribizsales.com',                // 新的自定义域名
-      'https://www.bribizsales.com'             // 新的自定义域名 www
+      'https://bribizsales.com',                // 自定义域名
+      'https://www.bribizsales.com',            // 自定义域名 www
+      'https://californiabizsales.com',         // 新的自定义域名
+      'https://www.californiabizsales.com'      // 新的自定义域名 www
     ],
     preview: [
       'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app',  // 你的具体预览环境域名
       /https:\/\/business-board-git-dev-.*\.vercel\.app/,  // 预览环境的 dev 分支域名
       /https:\/\/business-board-.*-xinyis-projects-6c0795d6\.vercel\.app/,  // 用户特定的预览域名
       /https:\/\/business-board-.*\.vercel\.app/,  // 所有 business-board 相关的 Vercel 域名
-      'https://bribizsales.com',                // 新的自定义域名也允许在预览环境
-      'https://www.bribizsales.com'             // 新的自定义域名 www 也允许在预览环境
+      'https://bribizsales.com',                // 自定义域名也允许在预览环境
+      'https://www.bribizsales.com',            // 自定义域名 www 也允许在预览环境
+      'https://californiabizsales.com',         // 新的自定义域名也允许在预览环境
+      'https://www.californiabizsales.com'      // 新的自定义域名 www 也允许在预览环境
     ],
     development: [
       'http://localhost:5174', 
@@ -138,8 +142,10 @@ app.use(cors({
     const explicitAllowedDomains = [
       'https://business-board-git-dev-xinyis-projects-6c0795d6.vercel.app',
       'https://business-board.vercel.app',
-      'https://bribizsales.com',                // 添加新的自定义域名
-      'https://www.bribizsales.com',            // 添加新的自定义域名 www
+      'https://bribizsales.com',                // 自定义域名
+      'https://www.bribizsales.com',            // 自定义域名 www
+      'https://californiabizsales.com',         // 新的自定义域名
+      'https://www.californiabizsales.com',     // 新的自定义域名 www
       'http://localhost:5173',
       'http://localhost:5174'
     ];
