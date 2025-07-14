@@ -1,84 +1,84 @@
-# Broker邮件转发功能设置说明
+# Broker Email Forwarding Setup Guide
 
-## 功能介绍
+## Feature Description
 
-现在系统已经支持将broker收到的所有消息自动转发到私人邮箱 `xinyiluo2024@gmail.com`。
+The system now supports automatically forwarding all broker messages to the personal email `xinyiluo2024@gmail.com`.
 
-当以下情况发生时，会自动发送邮件通知：
+Email notifications will be sent in the following scenarios:
 
-1. **用户注册** - 新用户注册时发送给broker的消息
-2. **NDA提交** - 用户提交NDA表单时发送给broker的消息  
-3. **联系表单** - 网站访客通过联系表单发送消息给broker
-4. **回调请求** - 网站访客请求回调时发送给broker的消息
-5. **用户间消息** - 任何用户直接发送消息给broker
+1. **User Registration** - Messages sent to broker when new users register
+2. **NDA Submission** - Messages sent to broker when users submit NDA forms  
+3. **Contact Form** - Messages sent to broker from website visitors via contact form
+4. **Callback Request** - Messages sent to broker when website visitors request callbacks
+5. **User Messages** - Any user directly sending messages to broker
 
-## 环境变量配置
+## Environment Variables Configuration
 
-需要在部署平台（Render）添加以下环境变量：
+Need to add the following environment variables on deployment platform (Render):
 
 ```bash
-# 邮件配置
+# Email Configuration
 EMAIL_USER=your-gmail-address@gmail.com
 EMAIL_PASSWORD=your-gmail-app-password
 ```
 
-## Gmail邮箱设置步骤
+## Gmail Setup Steps
 
-### 1. 启用Gmail的两步验证
-- 登录 Gmail 账户
-- 进入 Google 账户设置
-- 选择"安全性"
-- 启用"两步验证"
+### 1. Enable Gmail Two-Step Verification
+- Login to Gmail account
+- Go to Google Account settings
+- Select "Security"
+- Enable "Two-Step Verification"
 
-### 2. 生成应用专用密码
-- 在Google账户的"安全性"页面
-- 点击"应用专用密码"
-- 选择"邮件"和设备类型
-- 生成16位应用专用密码
-- 将此密码用作 `EMAIL_PASSWORD`
+### 2. Generate App-Specific Password
+- In Google Account "Security" page
+- Click "App passwords"
+- Select "Mail" and device type
+- Generate 16-digit app-specific password
+- Use this password as `EMAIL_PASSWORD`
 
-### 3. 在Render上配置环境变量
-- 登录 Render Dashboard
-- 选择后端服务 (business-board-backend)
-- 进入 "Environment" 标签
-- 添加环境变量：
+### 3. Configure Environment Variables in Render
+- Login to Render Dashboard
+- Select backend service (business-board-backend)
+- Go to "Environment" tab
+- Add environment variables:
   ```
   EMAIL_USER = your-gmail-address@gmail.com
   EMAIL_PASSWORD = your-16-digit-app-password
   ```
 
-## 邮件模板
+## Email Template
 
-邮件将包含以下信息：
-- 消息发送时间（加州时间）
-- 发件人姓名和邮箱
-- 收件人（broker）姓名
-- 消息主题
-- 消息内容
-- 系统链接（用于查看详细信息）
+Emails will contain the following information (all in English):
+- Message timestamp (California time)
+- Sender name and email
+- Receiver (broker) name
+- Message subject
+- Message content
+- System link (for viewing details)
 
-## 测试功能
+## Testing the Feature
 
-部署完成后，可以通过以下方式测试：
+After deployment, you can test by:
 
-1. **注册新用户** - 在网站注册新账户
-2. **提交联系表单** - 使用网站联系表单
-3. **发送消息** - 登录系统后向broker发送消息
+1. **Register New User** - Register a new account on the website
+2. **Submit Contact Form** - Use the website contact form
+3. **Send Message** - Login to system and send message to broker
 
-每次操作后，`xinyiluo2024@gmail.com` 应该会收到相应的邮件通知。
+After each operation, `xinyiluo2024@gmail.com` should receive corresponding email notifications.
 
-## 注意事项
+## Important Notes
 
-- 邮件发送是异步的，不会影响正常的消息创建流程
-- 如果邮件发送失败，会在服务器日志中记录错误，但不会中断系统操作
-- 邮件内容支持中英文显示
-- 所有时间都按加州时间格式显示
+- Email sending is asynchronous and won't affect normal message creation flow
+- If email sending fails, errors will be logged on server but won't interrupt system operations
+- Email content supports English display
+- All timestamps are displayed in California time format
 
-## 排查问题
+## Troubleshooting
 
-如果没有收到邮件：
+If not receiving emails:
 
-1. 检查Render环境变量是否正确设置
-2. 检查Gmail应用专用密码是否有效
-3. 查看Render服务器日志中的邮件发送日志
-4. 确认 `xinyiluo2024@gmail.com` 的垃圾邮件文件夹 
+1. Check if Render environment variables are correctly set
+2. Verify Gmail app-specific password is valid
+3. Check Render server logs for email sending logs
+4. Check spam folder of `xinyiluo2024@gmail.com` 
