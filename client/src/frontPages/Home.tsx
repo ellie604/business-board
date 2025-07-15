@@ -31,7 +31,11 @@ const Home: React.FC = () => {
             Sell your business in a way that rewards you and honors your life's work.
           </p>
           <div className="flex justify-center space-x-4">
-            <Link to="/selling" className="bg-[#1a2341] hover:bg-[#B59152] hover:text-[#1a2341] text-white px-6 py-2 rounded-md text-sm font-normal border border-[#1a2341] transition-colors duration-200">
+            <Link 
+              to="/registration" 
+              className="bg-[#1a2341] hover:bg-[#B59152] hover:text-[#1a2341] text-white px-6 py-2 rounded-md text-sm font-normal border border-[#1a2341] transition-colors duration-200"
+              title="Create your personalized buyer or seller portal"
+            >
               GET STARTED
             </Link>
             <Link to="/about" className="bg-transparent border-2 border-[#1a2341] text-white hover:bg-[#B59152] hover:text-[#1a2341] hover:border-[#B59152] px-6 py-2 rounded-md text-sm font-normal transition-colors duration-200">
@@ -58,10 +62,10 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-3">Sell a Business</h3>
               <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                Selling your business is a major decision! You have devoted your time, money, and energy into building, running, and operating your business.
+                Register today to access your secure seller portal — a private command center where you can submit your business details, track buyer activity, review signed NDAs, and communicate directly with our team.
               </p>
-              <Link to="/selling" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
-                Learn More →
+              <Link to="/registration" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
+                Explore Your Seller Portal →
               </Link>
             </div>
 
@@ -77,10 +81,10 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-3">Buy a Business</h3>
               <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                Click here to view our current business for sale. Contact us to discuss available opportunities that meet your criteria and investment goals.
+                Ready to explore businesses for sale? Register today to unlock your personalized buyer portal — where you can browse listings, sign NDAs, and take the next step toward owning the right business.
               </p>
-              <Link to="/contact" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
-                Learn More →
+              <Link to="/registration" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
+                Explore Your Buyer Portal →
               </Link>
             </div>
 
@@ -99,7 +103,7 @@ const Home: React.FC = () => {
               <p className="text-gray-600 mb-4 leading-relaxed text-sm">
                 Buying a business can be a complicated procedure, from finding the right one to working out all the details required for a smooth transfer.
               </p>
-              <Link to="/buying" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
+              <Link to="/registration" className="text-orange-500 hover:text-orange-600 font-medium text-sm">
                 Learn More →
               </Link>
             </div>
