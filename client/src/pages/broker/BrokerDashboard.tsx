@@ -87,7 +87,8 @@ export function BrokerDashboard() {
         <img 
           src={logo}
           alt="California Business Sales" 
-          className="w-full"
+          className="w-full cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => window.location.href = '/'}
         />
       </div>
 
