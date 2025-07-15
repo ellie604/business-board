@@ -149,6 +149,47 @@ export const authService = {
     }, 2, 1000);
   },
 
+  // 重置密码
+  resetPassword: async (email: string, newPassword: string): Promise<void> => {
+    console.log('Attempting password reset for:', email);
+    
+    return retryRequest(async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ email, newPassword }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Password reset failed' }));
+          console.error('Password reset failed:', errorData);
+          throw new Error(errorData.message || 'Password reset failed');
+        }
+
+        const data = await response.json();
+        console.log('Password reset response:', data);
+        
+        return data;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout, please try again');
+        }
+        throw error;
+      }
+    }, 2, 1000);
+  },
+
   logout: async (): Promise<void> => {
     try {
       // 调用后端 logout 接口

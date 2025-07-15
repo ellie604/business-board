@@ -21,6 +21,7 @@ import Blog from './frontPages/Blog';
 
 // Pages
 import Login from './Login';
+import ResetPassword from './ResetPassword';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import BuyerDashboard from './pages/buyer/BuyerDashboard';
 import MessagesPage from './pages/messages';
@@ -90,6 +91,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               
               {/* New Registration and NDA pages */}
               <Route path="/registration" element={<Registration />} />
