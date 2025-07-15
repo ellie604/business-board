@@ -247,7 +247,7 @@ I have since transitioned into the world of business brokerage where I am being 
                 </p>
                 
                 <p>
-                  To make the process even smoother for our clients, we've launched a customized web portal for buyers and sellers. This secure online web portal offers, Personalized deal tracking, Document storage and e-signin, Real-time updates and communication.
+                  To make the process even smoother for our clients, we've launched a customized web portal for buyers and sellers. This secure online web portal offers, Personalized deal tracking, Document storage and e-signatures, Real-time updates and communication.
                 </p>
                 
                 <p>
