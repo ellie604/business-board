@@ -85,7 +85,7 @@ const BuyerDashboard: React.FC = () => {
       ]);
       
       setStats(statsRes);
-      setListings(Array.isArray(listingsRes) ? listingsRes : []); // 确保listings是数组
+      setListings(listingsRes.listings || []); // 修改：处理包装格式的响应，移除不必要的Array.isArray检查
       setProgress(progressRes.progress);
       
       const currentData = currentListingData as CurrentListingResponse;

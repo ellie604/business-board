@@ -96,7 +96,7 @@ const SellerDashboard: React.FC = () => {
       setLoading(true);
       
       // Load all data: stats, listings, progress, and current selection
-      const [statsRes, allListings, progressRes, currentListingData] = await Promise.all([
+      const [statsRes, listingsRes, progressRes, currentListingData] = await Promise.all([
         sellerService.getDashboardStats(),
         sellerService.getListings(),
         sellerService.getProgress(),
@@ -104,7 +104,7 @@ const SellerDashboard: React.FC = () => {
       ]);
       
       setStats(statsRes);
-      setListings(allListings);
+      setListings(listingsRes.listings || []); // 修改：处理包装格式的响应
       setProgress(progressRes.progress);
       
       const currentData = currentListingData as CurrentListingResponse;

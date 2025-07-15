@@ -115,7 +115,7 @@ const BuyerNonDisclosure: React.FC = () => {
 
         // Get available listings
         const listingsRes = await buyerService.getListings();
-        setListings(Array.isArray(listingsRes) ? listingsRes : []);
+        setListings(listingsRes.listings || []); // 修改：处理包装格式的响应
 
         // Try to load existing NDA data
         const savedData = await loadSavedNDA();
