@@ -326,6 +326,61 @@ const BuyerDashboard: React.FC = () => {
                 </p>
               </div>
 
+              {/* Step One Instructions */}
+              <div className="mb-6 lg:mb-8 p-4 lg:p-6 bg-orange-50 border border-orange-200 rounded-lg">
+                <h2 className="text-lg lg:text-xl font-semibold text-orange-900 mb-3">
+                  Step One: Get Started with Our Team
+                </h2>
+                <p className="text-orange-800 mb-4 leading-relaxed">
+                  Please either message, text or call the broker or one of our agents to get started. If there is a listing you're interested in, then also please fill out the NDA and personal financial statement.
+                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-lg border border-orange-200">
+                  <div className="mb-3 sm:mb-0">
+                    <h3 className="font-semibold text-gray-900">Contact Our Business Broker</h3>
+                    <p className="text-sm text-gray-600">Wes Brown - Your dedicated acquisition specialist</p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <a 
+                      href="tel:(916)474-0390" 
+                      className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                      </svg>
+                      (916) 474-0390
+                    </a>
+                    <button
+                      onClick={() => navigate('/buyer/messages')}
+                      className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                      </svg>
+                      Send Message
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-800">
+                    <strong>Quick Start:</strong> If you've found a listing of interest, start with the 
+                    <button
+                      onClick={() => navigate('/buyer/non-disclosure')}
+                      className="mx-1 text-blue-600 hover:text-blue-800 underline font-medium"
+                    >
+                      NDA
+                    </button>
+                    and 
+                    <button
+                      onClick={() => navigate('/buyer/financial-statement')}
+                      className="mx-1 text-blue-600 hover:text-blue-800 underline font-medium"
+                    >
+                      Financial Statement
+                    </button>
+                  </p>
+                </div>
+              </div>
+
               {/* Current Selection Status */}
               {currentListing && !needsSelection && (
                 <div className="mb-6 lg:mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
