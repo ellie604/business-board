@@ -133,6 +133,23 @@ export const brokerService = {
   
   getBuyers: () => makeRequest('/broker/buyers'),
   
+  // Delete functions
+  deleteAgent: (agentId: string) => makeRequest(`/broker/agent/${agentId}`, {
+    method: 'DELETE'
+  }),
+  
+  deleteSeller: (sellerId: string) => makeRequest(`/broker/sellers/${sellerId}`, {
+    method: 'DELETE'
+  }),
+  
+  deleteBuyer: (buyerId: string) => makeRequest(`/broker/buyers/${buyerId}`, {
+    method: 'DELETE'
+  }),
+  
+  deleteMessage: (messageId: string) => makeRequest(`/messages/${messageId}`, {
+    method: 'DELETE'
+  }),
+  
   // 文档相关
   getListingDocuments: (listingId: string) => makeRequest(`/broker/listings/${listingId}/documents`),
   

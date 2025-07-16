@@ -129,11 +129,28 @@ const BuyerMessages: React.FC = () => {
     },
   });
 
+  // Delete message mutation
+  const deleteMessageMutation = useMutation({
+    mutationFn: async (messageId: string) => {
+      await buyerService.deleteMessage(messageId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+    },
+    onError: (error) => {
+      console.error('Failed to delete message:', error);
+    },
+  });
+
   const handleMessageClick = useCallback(async (message: any) => {
     if (!message.isRead) {
       await markAsReadMutation.mutateAsync(message.id);
     }
   }, [markAsReadMutation]);
+
+  const handleDeleteMessage = useCallback(async (messageId: string) => {
+    await deleteMessageMutation.mutateAsync(messageId);
+  }, [deleteMessageMutation]);
 
   const handleSendMessage = useCallback(async (data: {
     receiverId: string;
@@ -246,6 +263,7 @@ const BuyerMessages: React.FC = () => {
                   <MessageList
                     messages={inboxMessages}
                     onMessageClick={handleMessageClick}
+                    onDeleteMessage={handleDeleteMessage}
                   />
                 ) : (
                   <div className="p-6 text-center text-gray-500">
@@ -262,6 +280,7 @@ const BuyerMessages: React.FC = () => {
                     <MessageList
                       messages={sentMessages}
                       onMessageClick={handleMessageClick}
+                      onDeleteMessage={handleDeleteMessage}
                     />
                   ) : (
                     <div className="p-6 text-center text-gray-500">

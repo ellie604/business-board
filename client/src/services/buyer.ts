@@ -258,5 +258,9 @@ export const buyerService = {
   
   getAgentDocuments: (listingId: string) => makeRequest(`/buyer/listings/${listingId}/agent-documents`),
   
-  downloadAgentDocument: (documentId: string) => makeRequest(`/buyer/download-agent-document/${documentId}`)
+  downloadAgentDocument: (documentId: string) => makeRequest(`/buyer/download-agent-document/${documentId}`),
+
+  deleteMessage: (messageId: string) => makeRequest(`/messages/${messageId}`, {
+    method: 'DELETE'
+  })
 }; 

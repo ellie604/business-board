@@ -276,6 +276,26 @@ const markMessageAsRead: RequestHandler = async (req: Request, res: Response, ne
       return;
     }
 
+    // First check if the message exists and user has access to it
+    const existingMessage = await db.message.findFirst({
+      where: {
+        id,
+        receiverId: typedReq.user.id,
+      },
+    });
+
+    if (!existingMessage) {
+      res.status(404).json({ error: 'Message not found or access denied' });
+      return;
+    }
+
+    // If message is already read, just return it
+    if (existingMessage.isRead) {
+      res.json(existingMessage);
+      return;
+    }
+
+    // Update the message as read
     const message = await db.message.update({
       where: {
         id,
@@ -288,7 +308,7 @@ const markMessageAsRead: RequestHandler = async (req: Request, res: Response, ne
       },
     });
 
-    // Update user's unread count
+    // Update user's unread count only if the message was previously unread
     await db.user.update({
       where: { id: typedReq.user.id },
       data: {
@@ -302,6 +322,62 @@ const markMessageAsRead: RequestHandler = async (req: Request, res: Response, ne
     res.json(message);
     return;
   } catch (error) {
+    console.error('Error marking message as read:', error);
+    next(error);
+    return;
+  }
+};
+
+// Delete message
+const deleteMessage: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  const typedReq = req as AuthenticatedRequest;
+  const db = getPrisma();
+  
+  try {
+    if (!typedReq.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const messageId = req.params.id;
+    
+    // Find the message and verify the user can delete it
+    const message = await db.message.findFirst({
+      where: {
+        id: messageId,
+        OR: [
+          { senderId: typedReq.user.id }, // User sent the message
+          { receiverId: typedReq.user.id } // User received the message
+        ]
+      },
+      include: {
+        attachments: true // Include attachments to check if any exist
+      }
+    });
+
+    if (!message) {
+      res.status(404).json({ error: 'Message not found or access denied' });
+      return;
+    }
+
+    // First delete all attachments if any exist
+    if (message.attachments && message.attachments.length > 0) {
+      await db.messageAttachment.deleteMany({
+        where: { messageId: messageId }
+      });
+      console.log(`Deleted ${message.attachments.length} attachments for message ${messageId}`);
+    }
+
+    // Then delete the message
+    await db.message.delete({
+      where: { id: messageId }
+    });
+
+    console.log(`Message ${messageId} deleted successfully`);
+    res.json({ message: 'Message deleted successfully' });
+    return;
+  } catch (error) {
+    console.error('Error deleting message:', error);
     next(error);
     return;
   }
@@ -355,8 +431,9 @@ const getContacts: RequestHandler = async (req: Request, res: Response, next: Ne
 
 router.get('/inbox', authenticateUser, getInbox);
 router.get('/sent', authenticateUser, getSentMessages);
-router.post('/send', authenticateUser, upload.array('attachments'), sendMessage);
+router.post('/send', authenticateUser, upload.array('attachments', 5), sendMessage);
 router.put('/:id/read', authenticateUser, markMessageAsRead);
+router.delete('/:id', authenticateUser, deleteMessage);
 router.get('/contacts', authenticateUser, getContacts);
 
 export default router; 

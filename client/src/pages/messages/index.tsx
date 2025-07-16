@@ -3,6 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MessageList from '../../components/messages/MessageList';
 import MessageCompose from '../../components/messages/MessageCompose';
 import { apiGet, apiPost, apiPut, makeAuthenticatedRequest } from '../../utils/apiHelper';
+import { brokerService } from '../../services/broker';
+import { agentService } from '../../services/agent';
+import { buyerService } from '../../services/buyer';
+import { sellerService } from '../../services/seller';
 
 import { API_BASE_URL } from '../../config';
 
@@ -129,10 +133,37 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
     },
   });
 
+  // Delete message mutation
+  const deleteMessageMutation = useMutation({
+    mutationFn: async (messageId: string) => {
+      if (userType === 'BROKER') {
+        return await brokerService.deleteMessage(messageId);
+      } else if (userType === 'AGENT') {
+        return await agentService.deleteMessage(messageId);
+      } else if (userType === 'SELLER') {
+        return await sellerService.deleteMessage(messageId);
+      } else if (userType === 'BUYER') {
+        return await buyerService.deleteMessage(messageId);
+      } else {
+        throw new Error('Invalid user type');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+    },
+    onError: (error) => {
+      console.error('Failed to delete message:', error);
+    },
+  });
+
   const handleMessageClick = async (message: any) => {
     if (!message.isRead) {
       await markAsReadMutation.mutateAsync(message.id);
     }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    await deleteMessageMutation.mutateAsync(messageId);
   };
 
   const handleSendMessage = async (data: {
@@ -207,6 +238,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
               <MessageList
                 messages={inboxMessages}
                 onMessageClick={handleMessageClick}
+                onDeleteMessage={handleDeleteMessage}
               />
             ) : (
               <div className="p-6 text-center text-gray-500">
@@ -218,6 +250,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ userType }) => {
               <MessageList
                 messages={sentMessages}
                 onMessageClick={handleMessageClick}
+                onDeleteMessage={handleDeleteMessage}
               />
             ) : (
               <div className="p-6 text-center text-gray-500">

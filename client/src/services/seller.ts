@@ -399,5 +399,9 @@ export const sellerService = {
 
   clearCacheFor(keys: string[]): void {
     keys.forEach(key => cache.delete(key));
-  }
+  },
+
+  deleteMessage: (messageId: string) => makeRequest(`/messages/${messageId}`, {
+    method: 'DELETE'
+  })
 }; 

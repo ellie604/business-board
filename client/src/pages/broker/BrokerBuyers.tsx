@@ -4,6 +4,7 @@ import { ChevronDownIcon, ChevronRightIcon, DocumentArrowUpIcon, FolderOpenIcon 
 import { userService } from '../../services/listing';
 import { apiGet, makeAuthenticatedRequest } from '../../utils/apiHelper';
 import { API_BASE_URL } from '../../config';
+import { brokerService } from '../../services/broker';
 
 interface Listing {
   id: string;
@@ -189,6 +190,18 @@ const BrokerBuyers: React.FC = () => {
     }
   };
 
+  const handleDeleteBuyer = async (buyerId: string) => {
+    if (!confirm('Are you sure you want to delete this buyer?')) return;
+
+    try {
+      await brokerService.deleteBuyer(buyerId);
+      await fetchBuyers(); // 重新加载数据
+    } catch (err) {
+      console.error('Failed to delete buyer:', err);
+      setError('Failed to delete buyer. Please try again later.');
+    }
+  };
+
   const filteredBuyers = buyers.filter(buyer => 
     buyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     buyer.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -272,19 +285,35 @@ const BrokerBuyers: React.FC = () => {
                     </div>
                     <div className="mt-3 flex space-x-2">
                       {buyer.isActive ? (
-                        <button
-                          onClick={() => handleArchiveBuyer(buyer.id)}
-                          className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
-                        >
-                          Archive Buyer
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleArchiveBuyer(buyer.id)}
+                            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
+                          >
+                            Archive Buyer
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBuyer(buyer.id)}
+                            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
+                          >
+                            Delete Buyer
+                          </button>
+                        </>
                       ) : (
-                        <button
-                          onClick={() => handleReactivateBuyer(buyer.id)}
-                          className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200"
-                        >
-                          Reactivate Buyer
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleReactivateBuyer(buyer.id)}
+                            className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200"
+                          >
+                            Reactivate Buyer
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBuyer(buyer.id)}
+                            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
+                          >
+                            Delete Buyer
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>

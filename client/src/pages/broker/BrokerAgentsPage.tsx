@@ -62,8 +62,23 @@ export default function BrokerAgentsPage() {
   }, []);
 
   const handleDelete = async (agentId: string) => {
-    // TODO: 调用 brokerService.deleteAgent(agentId)
-    setAgents(agents => agents.filter(a => a.id !== agentId));
+    if (!confirm('Are you sure you want to delete this agent? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      await brokerService.deleteAgent(agentId);
+      setAgents(agents => agents.filter(a => a.id !== agentId));
+      // Update totals after deletion
+      const remainingAgents = agents.filter(a => a.id !== agentId);
+      setTotals({
+        numberOfListings: remainingAgents.reduce((sum, a) => sum + (a.stats?.numberOfListings || 0), 0),
+        numberUnderContract: remainingAgents.reduce((sum, a) => sum + (a.stats?.numberUnderContract || 0), 0),
+        closingsToDate: remainingAgents.reduce((sum, a) => sum + (a.stats?.closingsToDate || 0), 0),
+      });
+    } catch (error: any) {
+      alert(`Failed to delete agent: ${error.message || 'Unknown error'}`);
+    }
   };
 
   if (loading) return <div className="p-8">Loading...</div>;

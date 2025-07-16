@@ -131,5 +131,19 @@ export const agentService = {
     }
     
     return response.json();
+  },
+
+  deleteMessage: async (messageId: string) => {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/messages/${messageId}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Delete message request failed:', response.status, errorText);
+      throw new Error(`Failed to delete message: ${response.status} ${response.statusText}`);
+    }
+    
+    return response.json();
   }
 }; 

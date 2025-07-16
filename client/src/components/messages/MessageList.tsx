@@ -19,14 +19,16 @@ interface Message {
 interface MessageListProps {
   messages: Message[];
   onMessageClick: (message: Message) => void;
+  onDeleteMessage?: (messageId: string) => void;
 }
 
 const MessageItem: React.FC<{ 
   message: Message; 
   onMessageClick: (message: Message) => void;
+  onDeleteMessage?: (messageId: string) => void;
   isExpanded: boolean;
   onToggleExpanded: () => void;
-}> = React.memo(({ message, onMessageClick, isExpanded, onToggleExpanded }) => {
+}> = React.memo(({ message, onMessageClick, onDeleteMessage, isExpanded, onToggleExpanded }) => {
   const handleClick = useCallback(() => {
     // Mark as read if not read
     if (!message.isRead) {
@@ -39,6 +41,13 @@ const MessageItem: React.FC<{
   const handleAttachmentClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
   }, []);
+
+  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDeleteMessage && confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
+      onDeleteMessage(message.id);
+    }
+  }, [message.id, onDeleteMessage]);
 
   return (
     <div
@@ -67,6 +76,17 @@ const MessageItem: React.FC<{
           <span className="text-sm text-gray-500">
             {format(new Date(message.createdAt), 'MMM d, yyyy h:mm a')}
           </span>
+          {onDeleteMessage && (
+            <button
+              onClick={handleDeleteClick}
+              className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50"
+              title="Delete message"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
           <div className="text-gray-400">
             {isExpanded ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +154,7 @@ const MessageItem: React.FC<{
 
 MessageItem.displayName = 'MessageItem';
 
-const MessageList: React.FC<MessageListProps> = React.memo(({ messages, onMessageClick }) => {
+const MessageList: React.FC<MessageListProps> = React.memo(({ messages, onMessageClick, onDeleteMessage }) => {
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
 
   const handleToggleExpanded = useCallback((messageId: string) => {
@@ -156,6 +176,7 @@ const MessageList: React.FC<MessageListProps> = React.memo(({ messages, onMessag
           key={message.id}
           message={message}
           onMessageClick={onMessageClick}
+          onDeleteMessage={onDeleteMessage}
           isExpanded={expandedMessages.has(message.id)}
           onToggleExpanded={() => handleToggleExpanded(message.id)}
         />

@@ -253,19 +253,19 @@ const getAgentsWithStats: RequestHandler = async (req, res, next) => {
   }
 };
 
-// 删除代理
+// 删除 agent
 const deleteAgent: RequestHandler = async (req, res, next) => {
   const typedReq = req as AuthenticatedRequest;
   try {
     const brokerId = typedReq.user?.id;
-    const agentId = req.params.agentId;
-
+    const agentId = req.params.agentId; // Fix: use agentId instead of id
+    
     if (!brokerId) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
 
-    // 验证代理是否属于该经纪人
+    // 验证 agent 是否属于当前 broker
     const agent = await getPrisma().user.findFirst({
       where: {
         id: agentId,
@@ -275,21 +275,108 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
     });
 
     if (!agent) {
-      res.status(404).json({ message: 'Agent not found or not managed by this broker' });
+      res.status(404).json({ message: 'Agent not found or not authorized' });
       return;
     }
 
-    // 删除代理
+    // 删除 agent（这也会影响所有相关的关系）
     await getPrisma().user.delete({
+      where: { id: agentId }
+    });
+
+    res.json({ message: 'Agent deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting agent:', error);
+    next(error);
+  }
+};
+
+// 删除 seller
+const deleteSeller: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const brokerId = typedReq.user?.id;
+    const sellerId = req.params.sellerId;
+    
+    if (!brokerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证 seller 是否属于当前 broker 或其 agents
+    const seller = await getPrisma().user.findFirst({
       where: {
-        id: agentId
+        id: sellerId,
+        role: 'SELLER',
+        OR: [
+          { managerId: brokerId }, // 直接被 broker 管理
+          { 
+            managedBy: {
+              managerId: brokerId // 被 broker 的 agent 管理
+            }
+          }
+        ]
       }
     });
 
-    res.json({
-      message: 'Agent deleted successfully'
+    if (!seller) {
+      res.status(404).json({ message: 'Seller not found or not authorized' });
+      return;
+    }
+
+    // 删除 seller
+    await getPrisma().user.delete({
+      where: { id: sellerId }
     });
+
+    res.json({ message: 'Seller deleted successfully' });
   } catch (error) {
+    console.error('Error deleting seller:', error);
+    next(error);
+  }
+};
+
+// 删除 buyer
+const deleteBuyer: RequestHandler = async (req, res, next) => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const brokerId = typedReq.user?.id;
+    const buyerId = req.params.buyerId;
+    
+    if (!brokerId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    // 验证 buyer 是否属于当前 broker 或其 agents
+    const buyer = await getPrisma().user.findFirst({
+      where: {
+        id: buyerId,
+        role: 'BUYER',
+        OR: [
+          { managerId: brokerId }, // 直接被 broker 管理
+          { 
+            managedBy: {
+              managerId: brokerId // 被 broker 的 agent 管理
+            }
+          }
+        ]
+      }
+    });
+
+    if (!buyer) {
+      res.status(404).json({ message: 'Buyer not found or not authorized' });
+      return;
+    }
+
+    // 删除 buyer
+    await getPrisma().user.delete({
+      where: { id: buyerId }
+    });
+
+    res.json({ message: 'Buyer deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting buyer:', error);
     next(error);
   }
 };
@@ -2151,6 +2238,8 @@ const reactivateBuyer: RequestHandler = async (req, res, next) => {
 };
 
 router.delete('/agent/:agentId', authenticateBroker, deleteAgent);
+router.delete('/sellers/:sellerId', authenticateBroker, deleteSeller);
+router.delete('/buyers/:buyerId', authenticateBroker, deleteBuyer);
 router.patch('/sellers/:sellerId/archive', authenticateBroker, archiveSeller);
 router.patch('/sellers/:sellerId/reactivate', authenticateBroker, reactivateSeller);
 router.patch('/buyers/:buyerId/archive', authenticateBroker, archiveBuyer);
