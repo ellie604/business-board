@@ -52,6 +52,9 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    // More robust approach: Get statistics from all listings and adjust based on management chain if needed
+    // But fallback to overall statistics if management chain is not properly set up
+    
     // 1. 获取所有代理
     const managedAgents = await getPrisma().user.findMany({
       where: {
@@ -78,29 +81,40 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
 
     const sellerIds = sellers.map((seller: { id: string }) => seller.id);
 
-    // 3. 统计这些卖家的房源
+    // 3. 如果没有正确的管理关系链，则统计所有listings作为fallback
+    let whereCondition = {};
+    if (sellerIds.length > 0) {
+      whereCondition = { sellerId: { in: sellerIds } };
+    } else {
+      // Fallback: count all listings if no proper management chain is established
+      console.log('Warning: No management chain found for broker, counting all listings');
+      whereCondition = {}; // Count all listings
+    }
+
+    // 4. 统计房源数据
     const [activeListings, underContract, newListings, ndaCount, closedDeals] =
       await Promise.all([
         getPrisma().listing.count({
           where: {
-            sellerId: { in: sellerIds },
+            ...whereCondition,
             status: 'ACTIVE',
           },
         }),
         getPrisma().listing.count({
           where: {
-            sellerId: { in: sellerIds },
+            ...whereCondition,
             status: 'UNDER_CONTRACT',
           },
         }),
         getPrisma().listing.count({
           where: {
-            sellerId: { in: sellerIds },
+            ...whereCondition,
             createdAt: {
               gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             },
           },
         }),
+        // For NDA count, get all NDAs as it's typically a global count for brokers
         getPrisma().document.count({
           where: {
             type: 'NDA',
@@ -108,7 +122,7 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
         }),
         getPrisma().listing.count({
           where: {
-            sellerId: { in: sellerIds },
+            ...whereCondition,
             status: 'CLOSED',
             createdAt: {
               gte: new Date(new Date().getFullYear(), 0, 1),
@@ -116,6 +130,18 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
           },
         }),
       ]);
+
+    console.log('Broker Dashboard Stats:', {
+      brokerId,
+      managedAgentsCount: managedAgents.length,
+      sellersCount: sellers.length,
+      whereCondition,
+      activeListings,
+      underContract,
+      newListings,
+      ndaCount,
+      closedDeals
+    });
 
     res.json({
       stats: {

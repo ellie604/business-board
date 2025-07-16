@@ -248,9 +248,9 @@ export const sellerService = {
   
   getProgress: () => makeRequest('/seller/progress'),
   
-  updateStep: (step: number, completed: boolean) => makeRequest('/seller/update-step', {
-    method: 'PUT',
-    body: JSON.stringify({ step, completed })
+  updateStep: (stepId: number) => makeRequest('/seller/update-step', {
+    method: 'POST',
+    body: JSON.stringify({ stepId })
   }),
   
   // 尽职调查相关
