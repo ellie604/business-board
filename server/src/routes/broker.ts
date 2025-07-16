@@ -2237,7 +2237,6 @@ const reactivateBuyer: RequestHandler = async (req, res, next) => {
   }
 };
 
-router.delete('/agent/:agentId', authenticateBroker, deleteAgent);
 router.delete('/sellers/:sellerId', authenticateBroker, deleteSeller);
 router.delete('/buyers/:buyerId', authenticateBroker, deleteBuyer);
 router.patch('/sellers/:sellerId/archive', authenticateBroker, archiveSeller);
