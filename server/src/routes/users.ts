@@ -24,13 +24,30 @@ const getUsersByRole: RequestHandler = async (req: Request, res: Response, next:
       return;
     }
 
+    // Special case: when requesting AGENT, also include BROKER users
+    // This allows brokers to assign themselves as agents for listings
+    let roleFilter;
+    if (role.toString().toUpperCase() === 'AGENT') {
+      roleFilter = { in: ['AGENT', 'BROKER'] };
+    } else {
+      roleFilter = role.toString().toUpperCase();
+    }
+
+    // Set up where condition
+    let whereCondition: any = { 
+      role: roleFilter
+    };
+
+    // Only exclude current user if they are not a BROKER requesting AGENT role
+    // This allows brokers to see themselves in the agent list
+    if (!(typedReq.user.role === 'BROKER' && role.toString().toUpperCase() === 'AGENT')) {
+      whereCondition.NOT = {
+        id: typedReq.user.id
+      };
+    }
+
     const users = await prisma.user.findMany({
-      where: { 
-        role: role.toString().toUpperCase(),
-        NOT: {
-          id: typedReq.user.id // Exclude current user
-        }
-      },
+      where: whereCondition,
       select: { 
         id: true, 
         name: true,
