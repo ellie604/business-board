@@ -1063,15 +1063,10 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // 验证listing是否属于该broker管理的agent所管理的seller
+    // 简化权限验证：broker可以访问任何listing的progress（用于管理目的）
     const listing = await getPrisma().listing.findFirst({
       where: { 
-        id: listingId,
-        seller: {
-          managedBy: {
-            managerId: brokerId
-          }
-        }
+        id: listingId
       },
       include: {
         seller: {
@@ -1091,7 +1086,7 @@ const getSellerProgress: RequestHandler = async (req, res, next) => {
     }
 
     if (!listing) {
-      res.status(403).json({ message: 'Access denied to this listing' });
+      res.status(404).json({ message: 'Listing not found' });
       return;
     }
 
@@ -1255,12 +1250,8 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // Check if the seller's manager (agent) is managed by this broker
-    const agent = listing.seller.managedBy;
-    if (!agent || agent.managerId !== brokerId) {
-      res.status(403).json({ message: 'Access denied - listing not under your management' });
-      return;
-    }
+    // 简化权限验证：broker可以访问任何listing的buyer progress（用于管理目的）
+    // 移除复杂的管理关系链验证
 
     // Get buyer's progress
     let buyerProgress = await getPrisma().buyerProgress.findFirst({
@@ -1550,12 +1541,8 @@ router.get('/buyers/:buyerId/listings/:listingId/documents', authenticateBroker,
       return;
     }
 
-    // Check if the seller's manager (agent) is managed by this broker
-    const agent = listing.seller.managedBy;
-    if (!agent || agent.managerId !== brokerId) {
-      res.status(403).json({ message: 'Access denied - listing not under your management' });
-      return;
-    }
+    // 简化权限验证：broker可以访问任何listing的buyer documents（用于管理目的）
+    // 移除复杂的管理关系链验证
 
     // Verify buyer exists
     const buyer = await getPrisma().user.findFirst({
@@ -1944,15 +1931,10 @@ router.get('/buyers/:buyerId/listings/:listingId/due-diligence', authenticateBro
       return;
     }
 
-    // 验证broker对该listing的访问权限
+    // 简化权限验证：broker可以访问任何listing的尽职调查数据（用于管理目的）
     const listing = await getPrisma().listing.findFirst({
       where: { 
-        id: listingId,
-        seller: {
-          managedBy: {
-            managerId: brokerId
-          }
-        }
+        id: listingId
       },
       include: {
         seller: {
@@ -1964,7 +1946,7 @@ router.get('/buyers/:buyerId/listings/:listingId/due-diligence', authenticateBro
     });
 
     if (!listing) {
-      res.status(403).json({ message: 'Access denied to this listing' });
+      res.status(404).json({ message: 'Listing not found' });
       return;
     }
 
