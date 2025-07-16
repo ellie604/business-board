@@ -107,7 +107,7 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
 
     // 在代码中过滤处于step 9及以上的sellers
     let underContract = 0;
-    allSellerProgress.forEach(progress => {
+    allSellerProgress.forEach((progress: any) => {
       const completedSteps = progress.completedSteps as number[] || [];
       const currentStep = progress.currentStep || 0;
       
