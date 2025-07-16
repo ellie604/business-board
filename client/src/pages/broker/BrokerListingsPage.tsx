@@ -216,12 +216,12 @@ export default function BrokerListingsPage() {
       {isEmpty ? (
         <div className="bg-white rounded shadow p-8 text-center text-gray-500">
           No {title.toLowerCase()} found.
-        </div>
+      </div>
       ) : (
         <div className="bg-white rounded shadow overflow-hidden">
           <table className="w-full">
-            <thead>
-              <tr className="bg-yellow-300">
+        <thead>
+          <tr className="bg-yellow-300">
                 <th className="p-2 text-left">Title</th>
                 <th className="p-2 text-left">Description</th>
                 <th className="p-2 text-left">Price</th>
@@ -230,52 +230,52 @@ export default function BrokerListingsPage() {
                 <th className="p-2 text-left">Buyers</th>
                 <th className="p-2 text-left">Agent</th>
                 <th className="p-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          </tr>
+        </thead>
+        <tbody>
               {listingsToShow.map(listing => (
-                <tr 
-                  key={listing.id} 
+            <tr 
+              key={listing.id} 
                   className="border-t hover:bg-gray-50"
+            >
+              <td className="p-2">{listing.title}</td>
+              <td className="p-2">{listing.description}</td>
+              <td className="p-2">${listing.price.toLocaleString()}</td>
+              <td className="p-2">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
+                  {listing.status.replace('_', ' ')}
+                </span>
+              </td>
+              <td className="p-2">{listing.seller.name}</td>
+              <td className="p-2">{listing.buyers.map(b => b.name).join(', ')}</td>
+              <td className="p-2">{listing.agent?.name || '-'}</td>
+              <td className="p-2">
+                <button 
+                  className="mr-2 text-blue-500 hover:text-blue-600"
+                  onClick={() => handleEdit(listing)}
                 >
-                  <td className="p-2">{listing.title}</td>
-                  <td className="p-2">{listing.description}</td>
-                  <td className="p-2">${listing.price.toLocaleString()}</td>
-                  <td className="p-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
-                      {listing.status.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="p-2">{listing.seller.name}</td>
-                  <td className="p-2">{listing.buyers.map(b => b.name).join(', ')}</td>
-                  <td className="p-2">{listing.agent?.name || '-'}</td>
-                  <td className="p-2">
-                    <button 
-                      className="mr-2 text-blue-500 hover:text-blue-600"
-                      onClick={() => handleEdit(listing)}
-                    >
-                      Edit
-                    </button>
-                    {listing.status === 'INACTIVE' ? (
-                      <button 
-                        className="text-green-500 hover:text-green-600" 
-                        onClick={() => handleReactivate(listing.id)}
-                      >
-                        Reactivate
-                      </button>
-                    ) : (
-                      <button 
-                        className="text-orange-500 hover:text-orange-600" 
-                        onClick={() => handleArchive(listing.id)}
-                      >
-                        Archive
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  Edit
+                </button>
+                {listing.status === 'INACTIVE' ? (
+                  <button 
+                    className="text-green-500 hover:text-green-600" 
+                    onClick={() => handleReactivate(listing.id)}
+                  >
+                    Reactivate
+                  </button>
+                ) : (
+                  <button 
+                    className="text-orange-500 hover:text-orange-600" 
+                    onClick={() => handleArchive(listing.id)}
+                  >
+                    Archive
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
         </div>
       )}
     </div>

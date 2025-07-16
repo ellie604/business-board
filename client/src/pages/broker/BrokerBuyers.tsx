@@ -286,12 +286,12 @@ const BrokerBuyers: React.FC = () => {
                     <div className="mt-3 flex space-x-2">
                       {buyer.isActive ? (
                         <>
-                          <button
-                            onClick={() => handleArchiveBuyer(buyer.id)}
-                            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
-                          >
-                            Archive Buyer
-                          </button>
+                        <button
+                          onClick={() => handleArchiveBuyer(buyer.id)}
+                          className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
+                        >
+                          Archive Buyer
+                        </button>
                           <button
                             onClick={() => handleDeleteBuyer(buyer.id)}
                             className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
@@ -301,12 +301,12 @@ const BrokerBuyers: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <button
-                            onClick={() => handleReactivateBuyer(buyer.id)}
-                            className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200"
-                          >
-                            Reactivate Buyer
-                          </button>
+                        <button
+                          onClick={() => handleReactivateBuyer(buyer.id)}
+                          className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200"
+                        >
+                          Reactivate Buyer
+                        </button>
                           <button
                             onClick={() => handleDeleteBuyer(buyer.id)}
                             className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"

@@ -167,18 +167,18 @@ router.post('/', authenticateBroker, async (req: Request, res: Response, next: N
     let seller: any | null = null; // Changed type to any to accommodate privateSeller
     if (sellerId) {
       seller = await prisma.user.findUnique({
-        where: { id: sellerId },
-        include: { managedBy: true }
-      });
+      where: { id: sellerId },
+      include: { managedBy: true }
+    });
 
-      if (!seller) {
-        res.status(400).json({ message: 'Invalid seller ID' });
-        return;
-      }
+    if (!seller) {
+      res.status(400).json({ message: 'Invalid seller ID' });
+      return;
+    }
 
-      if (seller.role !== 'SELLER') {
-        res.status(400).json({ message: 'Selected user is not a seller' });
-        return;
+    if (seller.role !== 'SELLER') {
+      res.status(400).json({ message: 'Selected user is not a seller' });
+      return;
       }
     } else if (privateSeller) {
       // 创建私人卖家

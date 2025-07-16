@@ -68,7 +68,7 @@ export default function BrokerAgentsPage() {
     
     try {
       await brokerService.deleteAgent(agentId);
-      setAgents(agents => agents.filter(a => a.id !== agentId));
+    setAgents(agents => agents.filter(a => a.id !== agentId));
       // Update totals after deletion
       const remainingAgents = agents.filter(a => a.id !== agentId);
       setTotals({

@@ -288,12 +288,12 @@ const BrokerSellers: React.FC = () => {
                     <div className="mt-3 flex space-x-2">
                       {seller.isActive ? (
                         <>
-                          <button
-                            onClick={() => handleArchiveSeller(seller.id)}
-                            className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
-                          >
-                            Archive Seller
-                          </button>
+                        <button
+                          onClick={() => handleArchiveSeller(seller.id)}
+                          className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
+                        >
+                          Archive Seller
+                        </button>
                           <button
                             onClick={() => handleDeleteSeller(seller.id)}
                             className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
@@ -303,12 +303,12 @@ const BrokerSellers: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <button
-                            onClick={() => handleReactivateSeller(seller.id)}
-                            className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200"
-                          >
-                            Reactivate Seller
-                          </button>
+                        <button
+                          onClick={() => handleReactivateSeller(seller.id)}
+                          className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200"
+                        >
+                          Reactivate Seller
+                        </button>
                           <button
                             onClick={() => handleDeleteSeller(seller.id)}
                             className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"

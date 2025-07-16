@@ -162,44 +162,44 @@ export default function ListingEditModal({
         
         <div className="flex-1 overflow-y-auto p-6 pt-4">
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="block mb-1">Title</label>
-              <input className="w-full border rounded p-2" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1">Description</label>
-              <textarea className="w-full border rounded p-2" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1">Price</label>
-              <input 
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full border rounded p-2" 
-                value={form.price || ''} 
-                onChange={handlePriceChange}
-                required 
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1">Status</label>
-              <select className="w-full border rounded p-2" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
-                {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1">Seller</label>
+          <div className="mb-3">
+            <label className="block mb-1">Title</label>
+            <input className="w-full border rounded p-2" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+          </div>
+          <div className="mb-3">
+            <label className="block mb-1">Description</label>
+            <textarea className="w-full border rounded p-2" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
+          </div>
+          <div className="mb-3">
+            <label className="block mb-1">Price</label>
+            <input 
+              type="number"
+              min="0"
+              step="0.01"
+              className="w-full border rounded p-2" 
+              value={form.price || ''} 
+              onChange={handlePriceChange}
+              required 
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block mb-1">Status</label>
+            <select className="w-full border rounded p-2" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
+              {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="block mb-1">Seller</label>
               <select className="w-full border rounded p-2" value={isPrivateSeller ? 'PRIVATE' : form.sellerId} onChange={handleSellerChange} required>
-                <option value="">Select seller</option>
-                {sellers.map(s => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}{s.manager ? ` (Agent: ${s.manager.name})` : ''}
-                  </option>
-                ))}
+              <option value="">Select seller</option>
+              {sellers.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.name}{s.manager ? ` (Agent: ${s.manager.name})` : ''}
+                </option>
+              ))}
                 <option value="PRIVATE">Private Seller</option>
-              </select>
-            </div>
+            </select>
+          </div>
             
             {isPrivateSeller && (
               <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
@@ -251,38 +251,38 @@ export default function ListingEditModal({
               </div>
             )}
             
-            <div className="mb-3">
-              <label className="block mb-1">Agent</label>
+          <div className="mb-3">
+            <label className="block mb-1">Agent</label>
               {hasExistingAgent && !isPrivateSeller ? (
-                <div className="w-full border rounded p-2 bg-gray-100">
-                  {selectedSeller?.manager?.name} (Assigned)
-                </div>
-              ) : (
-                <select 
-                  className="w-full border rounded p-2" 
-                  value={form.agentId || ''} 
-                  onChange={e => setForm(f => ({ ...f, agentId: e.target.value || undefined }))}
-                >
-                  <option value="">Select agent</option>
-                  {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                </select>
-              )}
-              {hasExistingAgent && !isPrivateSeller && (
-                <small className="text-gray-500 mt-1 block">
-                  This seller already has an assigned agent. To change the agent, please use the agent management interface.
-                </small>
-              )}
-            </div>
-            <div className="mb-6">
-              <label className="block mb-1">Buyers</label>
-              <select multiple className="w-full border rounded p-2 h-24" value={form.buyerIds} onChange={e => {
-                const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
-                setForm(f => ({ ...f, buyerIds: options }));
-              }}>
-                {buyers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              <div className="w-full border rounded p-2 bg-gray-100">
+                {selectedSeller?.manager?.name} (Assigned)
+              </div>
+            ) : (
+              <select 
+                className="w-full border rounded p-2" 
+                value={form.agentId || ''} 
+                onChange={e => setForm(f => ({ ...f, agentId: e.target.value || undefined }))}
+              >
+                <option value="">Select agent</option>
+                {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
-              <small className="text-gray-500">Hold Ctrl/Cmd to select multiple buyers</small>
-            </div>
+            )}
+              {hasExistingAgent && !isPrivateSeller && (
+              <small className="text-gray-500 mt-1 block">
+                This seller already has an assigned agent. To change the agent, please use the agent management interface.
+              </small>
+            )}
+          </div>
+            <div className="mb-6">
+            <label className="block mb-1">Buyers</label>
+              <select multiple className="w-full border rounded p-2 h-24" value={form.buyerIds} onChange={e => {
+              const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
+              setForm(f => ({ ...f, buyerIds: options }));
+            }}>
+              {buyers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+            <small className="text-gray-500">Hold Ctrl/Cmd to select multiple buyers</small>
+          </div>
           </form>
         </div>
         
