@@ -138,8 +138,8 @@ const loginHandler = async (req: Request, res: Response): Promise<void> => {
       userId: typedReq.session.user.id,
       cookieSettings: {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
         maxAge: '7 days'
       }

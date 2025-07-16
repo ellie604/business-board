@@ -226,9 +226,9 @@ const sessionConfig: session.SessionOptions = {
   rolling: true, // 每次请求时重置过期时间
   proxy: true, // 在所有环境信任代理
   cookie: {
-    secure: false, // 暂时设为false来测试跨域问题
+    secure: isProduction, // production环境使用secure cookies
     httpOnly: true,
-    sameSite: 'lax', // 暂时改回lax来测试
+    sameSite: isProduction ? 'none' : 'lax', // production环境需要'none'来支持跨域
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
     domain: undefined // 不设置domain以确保在所有子域名下都能工作
@@ -255,7 +255,7 @@ console.log('Session configuration:', {
   maxAge: sessionConfig.cookie?.maxAge,
   storeType: 'MemoryStore',
   maxSessions: 10000,
-  note: 'Using relaxed settings for cross-domain testing'
+  note: `Using ${isProduction ? 'secure' : 'relaxed'} settings for ${isProduction ? 'production cross-domain' : 'development'} environment`
 });
 
 // 确保在所有路由之前初始化 session
