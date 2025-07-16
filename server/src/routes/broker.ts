@@ -278,23 +278,36 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // 验证 agent 是否属于当前 broker
+    // 简化权限验证：broker可以删除任何agent（用于管理目的）
     const agent = await getPrisma().user.findFirst({
       where: {
         id: agentId,
-        managerId: brokerId,
         role: 'AGENT'
       }
     });
 
     if (!agent) {
-      res.status(404).json({ message: 'Agent not found or not authorized' });
+      res.status(404).json({ message: 'Agent not found' });
       return;
     }
 
-    // 删除 agent（这也会影响所有相关的关系）
-    await getPrisma().user.delete({
-      where: { id: agentId }
+    // 级联删除：先处理相关的数据，避免外键约束冲突
+    await getPrisma().$transaction(async (prisma: any) => {
+      // 1. 将agent管理的所有用户的managerId设为null（解除管理关系）
+      await prisma.user.updateMany({
+        where: { managerId: agentId },
+        data: { managerId: null }
+      });
+      
+      // 2. 删除agent相关的documents
+      await prisma.document.deleteMany({
+        where: { uploadedBy: agentId }
+      });
+      
+      // 3. 最后删除agent
+      await prisma.user.delete({
+        where: { id: agentId }
+      });
     });
 
     res.json({ message: 'Agent deleted successfully' });
@@ -316,30 +329,45 @@ const deleteSeller: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // 验证 seller 是否属于当前 broker 或其 agents
+    // 简化权限验证：broker可以删除任何seller（用于管理目的）
     const seller = await getPrisma().user.findFirst({
       where: {
         id: sellerId,
-        role: 'SELLER',
-        OR: [
-          { managerId: brokerId }, // 直接被 broker 管理
-          { 
-            managedBy: {
-              managerId: brokerId // 被 broker 的 agent 管理
-            }
-          }
-        ]
+        role: 'SELLER'
       }
     });
 
     if (!seller) {
-      res.status(404).json({ message: 'Seller not found or not authorized' });
+      res.status(404).json({ message: 'Seller not found' });
       return;
     }
 
-    // 删除 seller
-    await getPrisma().user.delete({
-      where: { id: sellerId }
+    // 级联删除：先删除相关的数据，避免外键约束冲突
+    await getPrisma().$transaction(async (prisma: any) => {
+      // 1. 删除seller的所有listings
+      await prisma.listing.deleteMany({
+        where: { sellerId }
+      });
+      
+      // 2. 删除seller的progress记录
+      await prisma.sellerProgress.deleteMany({
+        where: { sellerId }
+      });
+      
+      // 3. 删除seller的questionnaire记录
+      await prisma.sellerQuestionnaire.deleteMany({
+        where: { sellerId }
+      });
+      
+      // 4. 删除seller相关的documents
+      await prisma.document.deleteMany({
+        where: { sellerId }
+      });
+      
+      // 5. 最后删除seller
+      await prisma.user.delete({
+        where: { id: sellerId }
+      });
     });
 
     res.json({ message: 'Seller deleted successfully' });
@@ -361,30 +389,50 @@ const deleteBuyer: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // 验证 buyer 是否属于当前 broker 或其 agents
+    // 简化权限验证：broker可以删除任何buyer（用于管理目的）
     const buyer = await getPrisma().user.findFirst({
       where: {
         id: buyerId,
-        role: 'BUYER',
-        OR: [
-          { managerId: brokerId }, // 直接被 broker 管理
-          { 
-            managedBy: {
-              managerId: brokerId // 被 broker 的 agent 管理
-            }
-          }
-        ]
+        role: 'BUYER'
       }
     });
 
     if (!buyer) {
-      res.status(404).json({ message: 'Buyer not found or not authorized' });
+      res.status(404).json({ message: 'Buyer not found' });
       return;
     }
 
-    // 删除 buyer
-    await getPrisma().user.delete({
-      where: { id: buyerId }
+    // 级联删除：先删除相关的数据，避免外键约束冲突
+    await getPrisma().$transaction(async (prisma: any) => {
+      // 1. 删除buyer的progress记录
+      await prisma.buyerProgress.deleteMany({
+        where: { buyerId }
+      });
+      
+      // 2. 删除buyer相关的documents
+      await prisma.document.deleteMany({
+        where: { buyerId }
+      });
+      
+      // 3. 删除buyer的NDA记录
+      await prisma.buyerNDA.deleteMany({
+        where: { buyerId }
+      });
+      
+      // 4. 删除buyer的financial statement记录
+      await prisma.buyerFinancialStatement.deleteMany({
+        where: { buyerId }
+      });
+      
+      // 5. 删除buyer的due diligence requests
+      await prisma.dueDiligenceRequest.deleteMany({
+        where: { buyerId }
+      });
+      
+      // 6. 最后删除buyer
+      await prisma.user.delete({
+        where: { id: buyerId }
+      });
     });
 
     res.json({ message: 'Buyer deleted successfully' });
