@@ -52,96 +52,82 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // More robust approach: Get statistics from all listings and adjust based on management chain if needed
-    // But fallback to overall statistics if management chain is not properly set up
-    
-    // 1. 获取所有代理
-    const managedAgents = await getPrisma().user.findMany({
-      where: {
-        managerId: brokerId,
-        role: 'AGENT',
-      },
-      select: {
-        id: true,
-      },
-    });
+    console.log('=== Broker Dashboard Stats Debug ===');
+    console.log('BrokerId:', brokerId);
 
-    // 2. 获取这些代理管理的所有卖家
-    const sellers = await getPrisma().user.findMany({
-      where: {
-        managerId: {
-          in: managedAgents.map((agent: { id: string }) => agent.id)
+    // 简化统计逻辑：直接统计所有listings，不依赖复杂的管理关系链
+    // 4. 统计房源数据
+    const [activeListings, newListings, ndaCount, closedDeals] = await Promise.all([
+      // Active listings: 直接统计所有ACTIVE状态的listings
+      getPrisma().listing.count({
+        where: {
+          status: 'ACTIVE',
         },
-        role: 'SELLER'
-      },
-      select: {
-        id: true
+      }),
+      // New listings this month: 统计本月创建的所有listings
+      getPrisma().listing.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
+        },
+      }),
+      // NDA count: 统计所有NDA文档
+      getPrisma().document.count({
+        where: {
+          type: 'NDA',
+        },
+      }),
+      // Closed deals this year: 统计今年关闭的所有deals
+      getPrisma().listing.count({
+        where: {
+          status: 'CLOSED',
+          createdAt: {
+            gte: new Date(new Date().getFullYear(), 0, 1),
+          },
+        },
+      }),
+    ]);
+
+    // Under contract: 统计处于closing doc步骤(step 9)的listings
+    // 先获取所有seller progress，然后在代码中过滤
+    const allSellerProgress = await getPrisma().sellerProgress.findMany({
+      include: {
+        seller: {
+          include: {
+            listings: {
+              where: {
+                status: { in: ['ACTIVE', 'UNDER_CONTRACT'] } // 只统计active或under_contract状态的
+              }
+            }
+          }
+        }
       }
     });
 
-    const sellerIds = sellers.map((seller: { id: string }) => seller.id);
+    // 在代码中过滤处于step 9及以上的sellers
+    let underContract = 0;
+    allSellerProgress.forEach(progress => {
+      const completedSteps = progress.completedSteps as number[] || [];
+      const currentStep = progress.currentStep || 0;
+      
+      // 检查是否处于closing doc步骤（step 9）或已完成step 9
+      const isAtClosingStep = currentStep >= 9 || completedSteps.includes(9);
+      
+      if (isAtClosingStep && progress.seller && progress.seller.listings) {
+        underContract += progress.seller.listings.length;
+      }
+    });
 
-    // 3. 如果没有正确的管理关系链，则统计所有listings作为fallback
-    let whereCondition = {};
-    if (sellerIds.length > 0) {
-      whereCondition = { sellerId: { in: sellerIds } };
-    } else {
-      // Fallback: count all listings if no proper management chain is established
-      console.log('Warning: No management chain found for broker, counting all listings');
-      whereCondition = {}; // Count all listings
-    }
-
-    // 4. 统计房源数据
-    const [activeListings, underContract, newListings, ndaCount, closedDeals] =
-      await Promise.all([
-        getPrisma().listing.count({
-          where: {
-            ...whereCondition,
-            status: 'ACTIVE',
-          },
-        }),
-        getPrisma().listing.count({
-          where: {
-            ...whereCondition,
-            status: 'UNDER_CONTRACT',
-          },
-        }),
-        getPrisma().listing.count({
-          where: {
-            ...whereCondition,
-            createdAt: {
-              gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            },
-          },
-        }),
-        // For NDA count, get all NDAs as it's typically a global count for brokers
-        getPrisma().document.count({
-          where: {
-            type: 'NDA',
-          },
-        }),
-        getPrisma().listing.count({
-          where: {
-            ...whereCondition,
-            status: 'CLOSED',
-            createdAt: {
-              gte: new Date(new Date().getFullYear(), 0, 1),
-            },
-          },
-        }),
-      ]);
-
-    console.log('Broker Dashboard Stats:', {
-      brokerId,
-      managedAgentsCount: managedAgents.length,
-      sellersCount: sellers.length,
-      whereCondition,
+    console.log('Broker Dashboard Stats Results:', {
       activeListings,
       underContract,
       newListings,
       ndaCount,
-      closedDeals
+      closedDeals,
+      sellersAtClosingStepCount: allSellerProgress.length
     });
+    console.log('=== End Broker Dashboard Stats Debug ===');
 
     res.json({
       stats: {
@@ -154,6 +140,7 @@ const getDashboardStats: RequestHandler = async (req, res, next) => {
       message: 'Dashboard stats retrieved successfully',
     });
   } catch (error) {
+    console.error('Error in getDashboardStats:', error);
     next(error);
   }
 };
