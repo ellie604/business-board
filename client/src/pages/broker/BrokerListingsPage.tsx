@@ -28,6 +28,7 @@ export default function BrokerListingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [showArchived, setShowArchived] = useState(false); // New state for hiding/showing archived listings
 
   // 加载数据
   const loadData = async () => {
@@ -199,6 +200,87 @@ export default function BrokerListingsPage() {
     }
   };
 
+  // Separate active and archived listings
+  const activeListings = listings.filter(listing => listing.status !== 'INACTIVE');
+  const archivedListings = listings.filter(listing => listing.status === 'INACTIVE');
+
+  // Function to render a table of listings
+  const renderListingsTable = (listingsToShow: Listing[], title: string, isEmpty: boolean) => (
+    <div className="mb-8">
+      <h3 className="text-xl font-semibold mb-4 flex items-center">
+        {title}
+        <span className="ml-2 text-sm font-normal text-gray-500">
+          ({listingsToShow.length} {listingsToShow.length === 1 ? 'listing' : 'listings'})
+        </span>
+      </h3>
+      {isEmpty ? (
+        <div className="bg-white rounded shadow p-8 text-center text-gray-500">
+          No {title.toLowerCase()} found.
+        </div>
+      ) : (
+        <div className="bg-white rounded shadow overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-yellow-300">
+                <th className="p-2 text-left">Title</th>
+                <th className="p-2 text-left">Description</th>
+                <th className="p-2 text-left">Price</th>
+                <th className="p-2 text-left">Status</th>
+                <th className="p-2 text-left">Seller</th>
+                <th className="p-2 text-left">Buyers</th>
+                <th className="p-2 text-left">Agent</th>
+                <th className="p-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {listingsToShow.map(listing => (
+                <tr 
+                  key={listing.id} 
+                  className="border-t hover:bg-gray-50"
+                >
+                  <td className="p-2">{listing.title}</td>
+                  <td className="p-2">{listing.description}</td>
+                  <td className="p-2">${listing.price.toLocaleString()}</td>
+                  <td className="p-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
+                      {listing.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="p-2">{listing.seller.name}</td>
+                  <td className="p-2">{listing.buyers.map(b => b.name).join(', ')}</td>
+                  <td className="p-2">{listing.agent?.name || '-'}</td>
+                  <td className="p-2">
+                    <button 
+                      className="mr-2 text-blue-500 hover:text-blue-600"
+                      onClick={() => handleEdit(listing)}
+                    >
+                      Edit
+                    </button>
+                    {listing.status === 'INACTIVE' ? (
+                      <button 
+                        className="text-green-500 hover:text-green-600" 
+                        onClick={() => handleReactivate(listing.id)}
+                      >
+                        Reactivate
+                      </button>
+                    ) : (
+                      <button 
+                        className="text-orange-500 hover:text-orange-600" 
+                        onClick={() => handleArchive(listing.id)}
+                      >
+                        Archive
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
   if (loading) {
     return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
@@ -219,72 +301,36 @@ export default function BrokerListingsPage() {
 
   return (
     <div className="w-full">
-      <h2 className="text-2xl font-bold mb-4">Listings Overview</h2>
-      <div className="mb-4">
-        <button 
-          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-          onClick={handleAdd}
-        >
-          Add Listing
-        </button>
-      </div>
-      <table className="w-full bg-white rounded shadow">
-        <thead>
-          <tr className="bg-yellow-300">
-            <th className="p-2">Title</th>
-            <th className="p-2">Description</th>
-            <th className="p-2">Price</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Seller</th>
-            <th className="p-2">Buyers</th>
-            <th className="p-2">Agent</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listings.map(listing => (
-            <tr 
-              key={listing.id} 
-              className={`border-t ${listing.status === 'INACTIVE' ? 'opacity-60' : ''}`}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Listings Overview</h2>
+        <div className="flex items-center space-x-4">
+          {archivedListings.length > 0 && (
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                showArchived 
+                  ? 'bg-gray-500 text-white hover:bg-gray-600' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
             >
-              <td className="p-2">{listing.title}</td>
-              <td className="p-2">{listing.description}</td>
-              <td className="p-2">${listing.price.toLocaleString()}</td>
-              <td className="p-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
-                  {listing.status.replace('_', ' ')}
-                </span>
-              </td>
-              <td className="p-2">{listing.seller.name}</td>
-              <td className="p-2">{listing.buyers.map(b => b.name).join(', ')}</td>
-              <td className="p-2">{listing.agent?.name || '-'}</td>
-              <td className="p-2">
-                <button 
-                  className="mr-2 text-blue-500 hover:text-blue-600"
-                  onClick={() => handleEdit(listing)}
-                >
-                  Edit
-                </button>
-                {listing.status === 'INACTIVE' ? (
-                  <button 
-                    className="text-green-500 hover:text-green-600" 
-                    onClick={() => handleReactivate(listing.id)}
-                  >
-                    Reactivate
-                  </button>
-                ) : (
-                  <button 
-                    className="text-orange-500 hover:text-orange-600" 
-                    onClick={() => handleArchive(listing.id)}
-                  >
-                    Archive
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              {showArchived ? 'Hide' : 'Show'} Archived ({archivedListings.length})
+            </button>
+          )}
+          <button 
+            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+            onClick={handleAdd}
+          >
+            Add Listing
+          </button>
+        </div>
+      </div>
+
+      {/* Active Listings */}
+      {renderListingsTable(activeListings, 'Active Listings', activeListings.length === 0)}
+
+      {/* Archived Listings - Only show if showArchived is true */}
+      {showArchived && renderListingsTable(archivedListings, 'Archived Listings', archivedListings.length === 0)}
+
       {modalOpen && (
         <ListingEditModal
           open={modalOpen}
