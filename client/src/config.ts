@@ -13,7 +13,7 @@ const getBackendUrl = () => {
   // 其他情况都是 production 环境
   if (hostname.includes('-dev-')) {
     console.log('Environment: preview');
-    return 'https://business-board.onrender.com/api';
+    return 'https://business-board-preview.onrender.com/api';
   } else if (hostname === 'localhost') {
     console.log('Environment: development');
     return 'http://localhost:3001/api';
@@ -24,10 +24,10 @@ const getBackendUrl = () => {
     hostname === 'www.californiabizsales.com'
   ) {
     console.log('Environment: production (custom domain)');
-    return 'https://business-board-backend.onrender.com/api';
+    return 'https://business-board-alv2.onrender.com/api';
   } else {
     console.log('Environment: production (default)');
-    return 'https://business-board-backend.onrender.com/api';
+    return 'https://business-board-alv2.onrender.com/api';
   }
 };
 
