@@ -214,7 +214,10 @@ const sessionConfig: session.SessionOptions = {
       if (process.env.NODE_ENV !== 'production') {
         console.log('Session disposed:', key);
       }
-    }
+    },
+    // 增强production环境的session存储
+    stale: true, // 允许返回过期的session
+    noDisposeOnSet: true // 设置时不自动dispose
   }),
   name: 'business.board.sid',
   secret: sessionSecret,
@@ -229,6 +232,12 @@ const sessionConfig: session.SessionOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
     domain: undefined // 不设置domain以确保在所有子域名下都能工作
+  },
+  // 增强session处理
+  unset: 'destroy', // 明确指定unset行为
+  genid: function() {
+    // 自定义session ID生成以确保唯一性
+    return crypto.randomBytes(24).toString('hex');
   }
 };
 
@@ -251,6 +260,35 @@ console.log('Session configuration:', {
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
+
+// 添加production环境的session调试中间件
+app.use((req, res, next) => {
+  // 在production环境也记录关键session信息以诊断问题
+  if (isProduction && req.path.includes('/broker/dashboard')) {
+    console.log('=== Production Session Debug ===');
+    console.log('Request details:', {
+      method: req.method,
+      path: req.path,
+      origin: req.headers.origin,
+      sessionID: req.sessionID,
+      hasSession: !!req.session,
+      hasSessionUser: !!req.session?.user,
+      sessionUserId: req.session?.user?.id,
+      cookieHeader: req.headers.cookie ? 'present' : 'missing',
+      hasXSessionToken: !!req.headers['x-session-token'],
+      userAgent: req.headers['user-agent']?.substring(0, 50)
+    });
+    
+    // 如果session存在但没有user，可能是store问题
+    if (req.session && !req.session.user) {
+      console.log('⚠️ Session exists but no user found - possible store issue');
+    }
+    
+    console.log('=== End Production Session Debug ===');
+  }
+  
+  next();
+});
 
 // 添加跨域credentials支持中间件
 app.use((req, res, next) => {
