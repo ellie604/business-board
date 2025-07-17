@@ -201,21 +201,21 @@ const isPreview = process.env.VERCEL_ENV === 'preview' || process.env.NODE_ENV =
 const isVercelDeploy = process.env.VERCEL === '1';
 const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
 
-// 检测是否是跨域场景 - 暂时禁用secure模式来测试
-const isCrossDomain = process.env.NODE_ENV === 'production';
+// 检测是否需要跨域设置 - preview和production都需要跨域设置
+const needsCrossDomainSettings = isProduction || isPreview;
 
-// 配置 session - 使用更宽松的设置来测试跨域问题
+// 配置 session - preview和production都使用相同的跨域设置
 const sessionConfig: session.SessionOptions = {
   store: new memoryStore({
     checkPeriod: 86400000, // 每24小时清理过期会话  
     max: 10000, // 最大session数量（减少以避免内存问题）
     ttl: 7 * 24 * 60 * 60 * 1000, // 7天过期时间
     dispose: function(key: string, val: any) {
-      if (process.env.NODE_ENV !== 'production') {
+      if (!needsCrossDomainSettings) {
         console.log('Session disposed:', key);
       }
     },
-    // 增强production环境的session存储
+    // 增强production和preview环境的session存储
     stale: true, // 允许返回过期的session
     noDisposeOnSet: true // 设置时不自动dispose
   }),
@@ -226,9 +226,9 @@ const sessionConfig: session.SessionOptions = {
   rolling: true, // 每次请求时重置过期时间
   proxy: true, // 在所有环境信任代理
   cookie: {
-    secure: isProduction, // production环境使用secure cookies
+    secure: needsCrossDomainSettings, // preview和production环境都使用secure cookies
     httpOnly: true,
-    sameSite: isProduction ? 'none' : 'lax', // production环境需要'none'来支持跨域
+    sameSite: needsCrossDomainSettings ? 'none' : 'lax', // preview和production环境都需要'none'来支持跨域
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
     domain: undefined // 不设置domain以确保在所有子域名下都能工作
@@ -247,7 +247,7 @@ console.log('Session configuration:', {
   isProduction,
   isPreview,
   isVercelDeploy,
-  isCrossDomain,
+  needsCrossDomainSettings,
   secret: sessionSecret ? '[SET]' : '[DEFAULT]',
   secure: sessionConfig.cookie?.secure,
   sameSite: sessionConfig.cookie?.sameSite,
@@ -255,17 +255,17 @@ console.log('Session configuration:', {
   maxAge: sessionConfig.cookie?.maxAge,
   storeType: 'MemoryStore',
   maxSessions: 10000,
-  note: `Using ${isProduction ? 'secure' : 'relaxed'} settings for ${isProduction ? 'production cross-domain' : 'development'} environment`
+  note: `Using ${needsCrossDomainSettings ? 'secure cross-domain' : 'relaxed'} settings for ${isProduction ? 'production' : isPreview ? 'preview' : 'development'} environment`
 });
 
 // 确保在所有路由之前初始化 session
 app.use(session(sessionConfig));
 
-// 添加production环境的session调试中间件
+// 添加production和preview环境的session调试中间件
 app.use((req, res, next) => {
-  // 在production环境也记录关键session信息以诊断问题
-  if (isProduction && req.path.includes('/broker/dashboard')) {
-    console.log('=== Production Session Debug ===');
+  // 在production和preview环境都记录关键session信息以诊断问题
+  if ((isProduction || isPreview) && (req.path.includes('/broker/dashboard') || req.path.includes('/buyer/nda'))) {
+    console.log('=== Session Debug ===');
     console.log('Request details:', {
       method: req.method,
       path: req.path,
@@ -276,7 +276,8 @@ app.use((req, res, next) => {
       sessionUserId: req.session?.user?.id,
       cookieHeader: req.headers.cookie ? 'present' : 'missing',
       hasXSessionToken: !!req.headers['x-session-token'],
-      userAgent: req.headers['user-agent']?.substring(0, 50)
+      userAgent: req.headers['user-agent']?.substring(0, 50),
+      environment: isProduction ? 'production' : isPreview ? 'preview' : 'development'
     });
     
     // 如果session存在但没有user，可能是store问题
@@ -284,7 +285,7 @@ app.use((req, res, next) => {
       console.log('⚠️ Session exists but no user found - possible store issue');
     }
     
-    console.log('=== End Production Session Debug ===');
+    console.log('=== End Session Debug ===');
   }
   
   next();
