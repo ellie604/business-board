@@ -155,9 +155,9 @@ const getAgents: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    // 简化权限验证：broker可以查看所有agent（用于管理目的）
     const agents = await getPrisma().user.findMany({
       where: {
-        managerId: brokerId,
         role: 'AGENT',
       },
       select: {
@@ -187,10 +187,9 @@ const getAgentsWithStats: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // 获取所有代理
+    // 简化权限验证：broker可以查看所有agent（用于管理目的）
     const agents = await getPrisma().user.findMany({
       where: {
-        managerId: brokerId,
         role: 'AGENT',
       },
       select: {
@@ -326,18 +325,37 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
         data: { lastUpdatedBy: null }
       });
       
-      // 5. 删除agent上传的所有文档
+      // 5. 删除agent管理的所有listings的pre-close checklist
+      const managedListings = await prisma.listing.findMany({
+        where: {
+          seller: {
+            managerId: agentId
+          }
+        },
+        select: { id: true }
+      });
+      
+      const listingIds = managedListings.map((listing: any) => listing.id);
+      if (listingIds.length > 0) {
+        await prisma.preCloseChecklist.deleteMany({
+          where: {
+            listingId: { in: listingIds }
+          }
+        });
+      }
+      
+      // 6. 删除agent上传的所有文档
       await prisma.document.deleteMany({
         where: { uploadedBy: agentId }
       });
       
-      // 6. 将agent管理的所有用户的managerId设为null（解除管理关系）
+      // 7. 将agent管理的所有用户的managerId设为null（解除管理关系）
       await prisma.user.updateMany({
         where: { managerId: agentId },
         data: { managerId: null }
       });
       
-      // 7. 最后删除agent
+      // 8. 最后删除agent
       await prisma.user.delete({
         where: { id: agentId }
       });
@@ -410,27 +428,41 @@ const deleteSeller: RequestHandler = async (req, res, next) => {
         data: { lastUpdatedBy: null }
       });
       
-      // 5. 删除seller上传的所有文档
+      // 5. 删除seller的所有listings的pre-close checklist
+      const sellerListings = await prisma.listing.findMany({
+        where: { sellerId }
+      });
+      
+      const listingIds = sellerListings.map((listing: any) => listing.id);
+      if (listingIds.length > 0) {
+        await prisma.preCloseChecklist.deleteMany({
+          where: {
+            listingId: { in: listingIds }
+          }
+        });
+      }
+      
+      // 6. 删除seller上传的所有文档
       await prisma.document.deleteMany({
         where: { uploadedBy: sellerId }
       });
       
-      // 6. 删除seller的所有listings
+      // 7. 删除seller的所有listings
       await prisma.listing.deleteMany({
         where: { sellerId }
       });
       
-      // 7. 删除seller的progress记录
+      // 8. 删除seller的progress记录
       await prisma.sellerProgress.deleteMany({
         where: { sellerId }
       });
       
-      // 8. 删除seller的questionnaire记录
+      // 9. 删除seller的questionnaire记录
       await prisma.sellerQuestionnaire.deleteMany({
         where: { sellerId }
       });
       
-      // 9. 删除seller相关的documents（作为seller或buyer）
+      // 10. 删除seller相关的documents（作为seller或buyer）
       await prisma.document.deleteMany({
         where: {
           OR: [
@@ -440,13 +472,13 @@ const deleteSeller: RequestHandler = async (req, res, next) => {
         }
       });
       
-      // 10. 将seller管理的所有用户的managerId设为null（解除管理关系）
+      // 11. 将seller管理的所有用户的managerId设为null（解除管理关系）
       await prisma.user.updateMany({
         where: { managerId: sellerId },
         data: { managerId: null }
       });
       
-      // 11. 最后删除seller
+      // 12. 最后删除seller
       await prisma.user.delete({
         where: { id: sellerId }
       });
@@ -580,17 +612,16 @@ const getAgentStats: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // 验证代理是否属于该经纪人
+    // 简化权限验证：broker可以查看任何agent的统计数据（用于管理目的）
     const agent = await getPrisma().user.findFirst({
       where: {
         id: agentId,
-        managerId: brokerId,
         role: 'AGENT'
       }
     });
 
     if (!agent) {
-      res.status(404).json({ message: 'Agent not found or not managed by this broker' });
+      res.status(404).json({ message: 'Agent not found' });
       return;
     }
 
@@ -976,16 +1007,9 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
       return;
     }
 
-    // Verify listing exists and get agent information for access control
+    // 简化权限验证：broker可以删除任何listing的文档（用于管理目的）
     const listing = await getPrisma().listing.findFirst({
-      where: { id: listingId },
-      include: {
-        seller: {
-          include: {
-            managedBy: true // Get the agent managing this seller
-          }
-        }
-      }
+      where: { id: listingId }
     });
 
     if (!listing) {
@@ -993,20 +1017,12 @@ router.delete('/listings/:listingId/documents/:documentId', authenticateBroker, 
       return;
     }
 
-    // Check if the listing's agent is managed by this broker
-    const agent = listing.seller.managedBy;
-    if (!agent || agent.managerId !== typedReq.user.id) {
-      res.status(403).json({ message: 'Access denied - listing not under your management' });
-      return;
-    }
-
-    // Broker can delete any AGENT_PROVIDED document for listings under their management
+    // 简化权限验证：broker可以删除任何AGENT_PROVIDED文档
     const document = await getPrisma().document.findFirst({
       where: {
         id: documentId,
         listingId,
         category: 'AGENT_PROVIDED'
-        // 移除了 uploadedBy 检查，broker可以删除所有AGENT_PROVIDED文档
       }
     });
 
