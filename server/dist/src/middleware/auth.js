@@ -55,7 +55,7 @@ const restoreUser = async (req, _res, next) => {
             console.error('Error restoring user from session:', error);
         }
     }
-    // 备用：尝试从header恢复（为了向后兼容）
+    // 备用：尝试从header恢复（为了向后兼容和production环境的可靠性）
     const sessionToken = req.headers['x-session-token'];
     if (sessionToken) {
         try {
@@ -90,7 +90,7 @@ const restoreUser = async (req, _res, next) => {
                     role: user.role,
                     managerId: user.managerId || undefined
                 };
-                // 同时更新session
+                // 同时更新session，重要的是要在production环境中也保存session
                 if (typedReq.session) {
                     typedReq.session.user = {
                         id: user.id,
@@ -99,13 +99,17 @@ const restoreUser = async (req, _res, next) => {
                         role: user.role,
                         managerId: user.managerId
                     };
-                    // 强制保存session
+                    // 强制保存session，特别是在production环境中
                     typedReq.session.save((err) => {
-                        if (err && !isProduction) {
+                        if (err) {
                             console.error('Failed to save session from token restore:', err);
                         }
                         else if (!isProduction) {
                             console.log('✅ Session saved after token restore');
+                        }
+                        else {
+                            // 在production环境中也记录成功信息
+                            console.log('✅ Production session saved from token restore');
                         }
                     });
                 }
@@ -240,6 +244,23 @@ const authenticateBroker = (req, res, next) => {
                 referer: req.headers.referer
             }
         });
+    }
+    // Production环境的特殊处理：如果没有user但有session，尝试从session恢复
+    if (!typedReq.user && typedReq.session?.user && isProduction) {
+        console.log('🔄 Production fallback: attempting to restore user from session');
+        try {
+            typedReq.user = {
+                id: typedReq.session.user.id.toString(),
+                email: typedReq.session.user.email,
+                name: typedReq.session.user.name,
+                role: typedReq.session.user.role,
+                managerId: typedReq.session.user.managerId
+            };
+            console.log('✅ Production fallback successful: user restored from session');
+        }
+        catch (error) {
+            console.error('❌ Production fallback failed:', error);
+        }
     }
     if (!typedReq.user) {
         console.log('Authentication failed: No user in request');

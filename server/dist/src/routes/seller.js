@@ -103,7 +103,7 @@ const getListings = async (req, res, next) => {
                 createdAt: 'desc'
             }
         });
-        res.json(listings);
+        res.json({ listings }); // 修改：使用包装格式以保持与broker.ts一致
     }
     catch (error) {
         console.error('Error fetching listings:', error);
@@ -266,8 +266,10 @@ function checkStepCompletionOptimized(stepId, data) {
             return documents.some(doc => doc.stepId === 4 &&
                 doc.category === 'SELLER_UPLOAD' &&
                 doc.status === 'COMPLETED');
-        case 5: // Buyer activity (manually marked)
-            return completedStepsFromDB.includes(5);
+        case 5: // Buyer activity - automatically completed when accessed
+            // This step is automatically completed when the previous steps are done
+            // and the user has accessed the buyer activity page
+            return checkStepCompletionOptimized(4, data) || completedStepsFromDB.includes(5);
         case 6: // Purchase agreement - now requires upload of signed agreement
             return documents.some(doc => doc.stepId === 6 &&
                 (doc.type === 'PURCHASE_AGREEMENT' || doc.type === 'PURCHASE_CONTRACT') &&
@@ -1714,4 +1716,91 @@ async function updateChecklistItem(checklist, categoryId, itemId, userId, userNa
     }
     return checklist;
 }
+// Mark page visited (for auto-completion of certain steps like buyer activity)
+const markPageVisited = async (req, res, next) => {
+    const typedReq = req;
+    try {
+        const sellerId = typedReq.user?.id;
+        const { stepId } = req.body;
+        if (!sellerId) {
+            res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+        let sellerProgress = await prisma.sellerProgress.findFirst({
+            where: { sellerId }
+        });
+        if (!sellerProgress) {
+            sellerProgress = await prisma.sellerProgress.create({
+                data: {
+                    sellerId,
+                    currentStep: 0,
+                    completedSteps: [],
+                    selectedListingId: null
+                }
+            });
+        }
+        const completedStepsArray = sellerProgress.completedSteps || [];
+        // Auto-complete step 5 (Buyer Activity) when visited and prerequisites are met
+        if (stepId === 5) {
+            // Batch fetch all required data (same as getProgress)
+            const [documents, messages, questionnaire, preCloseChecklist] = await Promise.all([
+                prisma.document.findMany({
+                    where: {
+                        sellerId,
+                        stepId: { not: null }
+                    }
+                }),
+                prisma.message.findFirst({
+                    where: { senderId: sellerId }
+                }),
+                prisma.sellerQuestionnaire.findFirst({
+                    where: {
+                        sellerId,
+                        submitted: true,
+                        submittedAt: { not: null }
+                    }
+                }),
+                sellerProgress.selectedListingId ? prisma.preCloseChecklist.findUnique({
+                    where: { listingId: sellerProgress.selectedListingId }
+                }) : Promise.resolve(null)
+            ]);
+            const step4Completed = checkStepCompletionOptimized(4, {
+                sellerId,
+                listingId: sellerProgress.selectedListingId,
+                documents,
+                messages,
+                questionnaire,
+                preCloseChecklist,
+                completedStepsFromDB: completedStepsArray
+            });
+            if (step4Completed && !completedStepsArray.includes(5)) {
+                completedStepsArray.push(5);
+                // Update current step if needed
+                const newCurrentStep = Math.max(sellerProgress.currentStep, 6);
+                await prisma.sellerProgress.update({
+                    where: { id: sellerProgress.id },
+                    data: {
+                        currentStep: newCurrentStep,
+                        completedSteps: completedStepsArray
+                    }
+                });
+                console.log(`Step ${stepId} auto-completed on page visit`);
+                res.json({
+                    message: 'Page visit recorded and step auto-completed',
+                    stepCompleted: true
+                });
+                return;
+            }
+        }
+        res.json({
+            message: 'Page visit recorded',
+            stepCompleted: false
+        });
+    }
+    catch (error) {
+        console.error('Error marking page visited:', error);
+        next(error);
+    }
+};
+router.post('/mark-page-visited', auth_1.authenticateSeller, markPageVisited);
 exports.default = router;

@@ -7,7 +7,6 @@ exports.emailService = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 class EmailService {
     constructor() {
-        this.forwardingEmail = 'xinyiluo2024@gmail.com';
         // 使用Gmail SMTP配置
         const config = {
             service: 'gmail',
@@ -17,53 +16,55 @@ class EmailService {
             }
         };
         this.transporter = nodemailer_1.default.createTransport(config);
+        // 使用环境变量配置转发邮箱，如果没有设置则使用EMAIL_USER作为默认值
+        this.forwardingEmail = process.env.FORWARDING_EMAIL || process.env.EMAIL_USER || 'xinyiluo2024@gmail.com';
     }
     async sendBrokerNotification(messageData) {
         try {
             const emailContent = `
-      Broker收到新消息通知
+      New Broker Message Notification
       
-      时间: ${messageData.createdAt.toLocaleString('zh-CN', { timeZone: 'America/Los_Angeles' })}
+      Time: ${messageData.createdAt.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })}
       
-      发件人: ${messageData.senderName}${messageData.senderEmail ? ` (${messageData.senderEmail})` : ''}
-      收件人: ${messageData.receiverName}
-      主题: ${messageData.subject}
+      From: ${messageData.senderName}${messageData.senderEmail ? ` (${messageData.senderEmail})` : ''}
+      To: ${messageData.receiverName}
+      Subject: ${messageData.subject}
       
-      消息内容:
+      Message Content:
       ${messageData.content}
       
-      请登录系统查看详细信息: https://californiabizsales.com/broker/messages
+      Please login to the system for more details: https://californiabizsales.com/broker/messages
       `;
             const mailOptions = {
                 from: process.env.EMAIL_USER || 'system@californiabusinesssales.com',
                 to: this.forwardingEmail,
-                subject: `[Broker消息通知] ${messageData.subject}`,
+                subject: `[Broker Notification] ${messageData.subject}`,
                 text: emailContent,
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">Broker收到新消息通知</h2>
+            <h2 style="color: #2563eb;">New Broker Message Notification</h2>
             
             <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p><strong>时间:</strong> ${messageData.createdAt.toLocaleString('zh-CN', { timeZone: 'America/Los_Angeles' })}</p>
-              <p><strong>发件人:</strong> ${messageData.senderName}${messageData.senderEmail ? ` (${messageData.senderEmail})` : ''}</p>
-              <p><strong>收件人:</strong> ${messageData.receiverName}</p>
-              <p><strong>主题:</strong> ${messageData.subject}</p>
+              <p><strong>Time:</strong> ${messageData.createdAt.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })}</p>
+              <p><strong>From:</strong> ${messageData.senderName}${messageData.senderEmail ? ` (${messageData.senderEmail})` : ''}</p>
+              <p><strong>To:</strong> ${messageData.receiverName}</p>
+              <p><strong>Subject:</strong> ${messageData.subject}</p>
             </div>
             
             <div style="background-color: #ffffff; padding: 20px; border: 1px solid #d1d5db; border-radius: 8px;">
-              <h3 style="color: #374151; margin-top: 0;">消息内容:</h3>
+              <h3 style="color: #374151; margin-top: 0;">Message Content:</h3>
               <div style="white-space: pre-wrap; color: #6b7280;">${messageData.content}</div>
             </div>
             
             <div style="text-align: center; margin: 30px 0;">
               <a href="https://californiabizsales.com/broker/messages" 
                  style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-                查看详细信息
+                View Details
               </a>
             </div>
             
             <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-              此邮件由California Business Sales系统自动发送
+              This email is automatically sent by California Business Sales system
             </p>
           </div>
         `

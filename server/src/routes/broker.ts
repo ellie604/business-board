@@ -1410,67 +1410,74 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    // First, get the buyer and verify access
-    const buyer = await getPrisma().user.findFirst({
-      where: { 
-        id: buyerId,
-        role: 'BUYER'
-      }
-    });
+    // Batch fetch all required data to avoid N+1 queries
+    const [buyer, listing, buyerProgress, documents, messages] = await Promise.all([
+      // Get buyer info
+      getPrisma().user.findFirst({
+        where: { 
+          id: buyerId,
+          role: 'BUYER'
+        }
+      }),
+      
+      // Get listing info
+      getPrisma().listing.findFirst({
+        where: { id: listingId },
+        include: {
+          seller: {
+            include: {
+              managedBy: true
+            }
+          }
+        }
+      }),
+      
+      // Get buyer progress
+      getPrisma().buyerProgress.findFirst({
+        where: { buyerId }
+      }),
+      
+      // Get all documents for this buyer and listing
+      getPrisma().document.findMany({
+        where: { 
+          buyerId,
+          listingId: listingId
+        }
+      }),
+      
+      // Get messages for this buyer
+      getPrisma().message.findFirst({
+        where: { senderId: buyerId }
+      })
+    ]);
 
     if (!buyer) {
       res.status(404).json({ message: 'Buyer not found' });
       return;
     }
 
-    // Get the listing to verify it exists
-    const listing = await getPrisma().listing.findFirst({
-      where: { id: listingId },
-      include: {
-        seller: {
-          include: {
-            managedBy: true // This should be the agent
-          }
-        }
-      }
-    });
-
     if (!listing) {
       res.status(404).json({ message: 'Listing not found' });
       return;
     }
 
-    // 简化权限验证：broker可以访问任何listing的buyer progress（用于管理目的）
-    // 移除复杂的管理关系链验证
-
-    // Get buyer's progress
-    let buyerProgress = await getPrisma().buyerProgress.findFirst({
-      where: { buyerId }
-    });
-
-    if (!buyerProgress) {
-      // Create default progress if none exists - but don't force a selectedListingId
-      buyerProgress = await getPrisma().buyerProgress.create({
+    // Create buyer progress if none exists
+    let finalBuyerProgress = buyerProgress;
+    if (!finalBuyerProgress) {
+      finalBuyerProgress = await getPrisma().buyerProgress.create({
         data: {
           buyerId,
           currentStep: 0,
           completedSteps: [],
-          selectedListingId: null // Don't force the URL listingId - buyer must select it themselves
+          selectedListingId: null
         }
       });
     }
 
-    // Use buyer's actual selectedListingId, not the URL listingId
-    const actualSelectedListingId = buyerProgress.selectedListingId;
-    
-    // If buyer hasn't selected this specific listing, they may be at step 0 or working on a different listing
+    const actualSelectedListingId = finalBuyerProgress.selectedListingId;
     const isViewingSelectedListing = actualSelectedListingId === listingId;
-
-    // For step completion checks, we need to check if buyer has done activities for THIS specific listing
-    // Even if buyer has selected a different listing, we want to see their progress on this one
     const checkListingId = listingId; // Always use the URL listingId for checking progress
 
-    // Import the step definitions and completion logic from buyer routes
     const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
       0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
       1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
@@ -1499,155 +1506,88 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
       { id: 10, title: 'After the Sale: Tips to make your transition smoother', completed: false, accessible: false }
     ];
 
-    // Check step completion using the same logic as buyer routes
-    const checkBuyerStepCompletion = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
-      // First, check if all previous steps are completed (except for step 0)
-      if (stepId > 0) {
-        // Check all previous steps
-        for (let i = 0; i < stepId; i++) {
-          const previousStepCompleted = await checkBuyerStepCompletionInternal(buyerId, i, listingId);
-          if (!previousStepCompleted) {
-            return false;
-          }
-        }
-      }
-      
-      // If all previous steps are completed (or this is step 0), check this step
-      return await checkBuyerStepCompletionInternal(buyerId, stepId, listingId);
-    };
-
-    // Internal function to check buyer step completion without considering dependencies
-    const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
-      // For steps 8, 9, 10, check the buyer's completedSteps from database like buyer route does
+    // Optimized step completion check using batched data
+    const checkBuyerStepCompletionOptimized = (stepId: number): boolean => {
+      // For steps 8, 9, 10, check the buyer's completedSteps from database
       if (stepId === 8 || stepId === 9 || stepId === 10) {
-        const buyerProgress = await getPrisma().buyerProgress.findFirst({
-          where: { buyerId }
-        });
-        const completedStepsFromDB = buyerProgress?.completedSteps as number[] || [];
+        const completedStepsFromDB = finalBuyerProgress.completedSteps as number[] || [];
         return completedStepsFromDB.includes(stepId);
       }
 
       switch (stepId) {
         case 0: // Select listing
-          return !!listingId;
+          return !!checkListingId;
           
-        case 1: // Email agent - FIXED: Only check if this buyer has selected this specific listing
-          // For buyer, step 1 completion should only count if they've selected this listing AND sent messages
-          if (!listingId) return false; // No listing selected means step 1 cannot be completed
+        case 1: // Email agent - check if buyer has selected this listing and sent messages
+          if (!checkListingId) return false;
           
           // Check if buyer has selected this specific listing
-          const buyerProgress = await getPrisma().buyerProgress.findFirst({
-            where: { 
-              buyerId,
-              selectedListingId: listingId 
-            }
-          });
+          const hasSelectedThisListing = actualSelectedListingId === checkListingId;
+          const hasSentMessages = !!messages;
           
-          if (!buyerProgress) return false; // Haven't selected this listing
+          return hasSelectedThisListing && hasSentMessages;
           
-          // If they've selected this listing, check if they've sent any messages (global check is acceptable for now)
-          const sentMessages = await getPrisma().message.findFirst({
-            where: { senderId: buyerId }
-          });
-          return !!sentMessages;
+        case 2: // Fill out NDA
+          return documents.some((doc: any) => 
+            doc.stepId === 2 && 
+            doc.type === 'NDA' &&
+            doc.category === 'BUYER_UPLOAD' &&
+            doc.operationType === 'UPLOAD' &&
+            doc.status === 'COMPLETED'
+          );
           
-        case 2: // Fill out NDA - should be tied to specific listing
-          if (!listingId) return false;
-          const ndaDoc = await getPrisma().document.findFirst({
-            where: { 
-              buyerId, 
-              stepId: 2, 
-              type: 'NDA',
-              category: 'BUYER_UPLOAD',
-              operationType: 'UPLOAD',
-              status: 'COMPLETED',
-              listingId: listingId
-            }
-          });
-          return !!ndaDoc;
+        case 3: // Fill out financial statement
+          return documents.some((doc: any) => 
+            doc.stepId === 3 &&
+            doc.category === 'BUYER_UPLOAD' &&
+            doc.status === 'COMPLETED'
+          );
           
-        case 3: // Fill out financial statement - should be tied to specific listing
-          if (!listingId) return false;
-          const financialDoc = await getPrisma().document.findFirst({
-            where: { 
-              buyerId, 
-              stepId: 3, 
-              category: 'BUYER_UPLOAD',
-              status: 'COMPLETED',
-              listingId: listingId
-            }
-          });
-          return !!financialDoc;
+        case 4: // Download CBR/CIM
+          return documents.some((doc: any) => 
+            doc.stepId === 4 &&
+            doc.type === 'CBR_CIM' &&
+            doc.operationType === 'DOWNLOAD' &&
+            doc.downloadedAt
+          );
           
-        case 4: // Download CBR/CIM - should be tied to specific listing
-          if (!listingId) return false;
-          const cbrDoc = await getPrisma().document.findFirst({
-            where: { 
-              buyerId, 
-              listingId,
-              stepId: 4, 
-              type: 'CBR_CIM',
-              operationType: 'DOWNLOAD',
-              downloadedAt: { not: null }
-            }
-          });
-          return !!cbrDoc;
+        case 5: // Upload documents
+          return documents.some((doc: any) => 
+            doc.stepId === 5 &&
+            doc.category === 'BUYER_UPLOAD' &&
+            doc.status === 'COMPLETED'
+          );
           
-        case 5: // Upload documents - should be tied to specific listing
-          if (!listingId) return false;
-          const uploadDoc = await getPrisma().document.findFirst({
-            where: { 
-              buyerId, 
-              listingId,
-              stepId: 5, 
-              category: 'BUYER_UPLOAD',
-              status: 'COMPLETED'
-            }
-          });
-          return !!uploadDoc;
-          
-        case 6: // Download purchase contract - should be tied to specific listing
-          if (!listingId) return false;
-          const purchaseDoc = await getPrisma().document.findFirst({
-            where: { 
-              buyerId, 
-              listingId, // Make sure it's for this specific listing
-              stepId: 6, 
-              type: 'PURCHASE_CONTRACT',
-              operationType: 'UPLOAD',
-              category: 'BUYER_UPLOAD',
-              status: 'COMPLETED'
-            }
-          });
-          return !!purchaseDoc;
+        case 6: // Download purchase contract
+          return documents.some((doc: any) => 
+            doc.stepId === 6 &&
+            doc.type === 'PURCHASE_CONTRACT' &&
+            doc.operationType === 'UPLOAD' &&
+            doc.category === 'BUYER_UPLOAD' &&
+            doc.status === 'COMPLETED'
+          );
           
         case 7: // Due diligence step - automatically completed when buyer reaches this step
-          // Step 7 is considered complete as soon as the buyer can access it
-          // (i.e., when all previous steps are completed)
-          if (!listingId) return false;
-          
           // Check if all previous steps (0-6) are completed
           for (let i = 0; i < 7; i++) {
-            const previousStepCompleted = await checkBuyerStepCompletionInternal(buyerId, i, listingId);
-            if (!previousStepCompleted) {
+            if (!checkBuyerStepCompletionOptimized(i)) {
               return false;
             }
           }
-          return true; // Automatically complete step 7 when buyer reaches it
+          return true;
           
         default:
           return false;
       }
     };
 
-    // Check each step individually
+    // Check each step using optimized function
     let currentStep = 0;
     const completedSteps: number[] = [];
     
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
-      // Use the URL listingId for step completion check to see buyer's progress on THIS listing
-      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, checkListingId);
+      const isCompleted = checkBuyerStepCompletionOptimized(step.id);
       step.completed = isCompleted;
       
       if (isCompleted) {
@@ -1678,6 +1618,7 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
       const stepDoc = BUYER_STEP_DOCUMENT_REQUIREMENTS[step.id as keyof typeof BUYER_STEP_DOCUMENT_REQUIREMENTS];
       if (stepDoc) {
         (step as any).documentRequirement = stepDoc;
+        (step as any).documents = documents.filter((doc: any) => doc.stepId === step.id);
       }
     });
 

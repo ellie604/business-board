@@ -103,8 +103,8 @@ const loginHandler = async (req, res) => {
             userId: typedReq.session.user.id,
             cookieSettings: {
                 httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/',
                 maxAge: '7 days'
             }
@@ -1002,6 +1002,72 @@ ${isVisitor ? 'This message is from a website visitor (not a registered user).' 
         });
     }
 };
+// 重置密码处理函数 - 简单版本，无需验证
+const resetPasswordHandler = async (req, res) => {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+        res.status(400).json({ message: 'Email and new password are required' });
+        return;
+    }
+    // 验证密码长度
+    if (newPassword.length < 6) {
+        res.status(400).json({ message: 'Password must be at least 6 characters long' });
+        return;
+    }
+    try {
+        // 查找用户
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email.toLowerCase()
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                isActive: true
+            }
+        });
+        if (!user) {
+            res.status(404).json({ message: 'No account found with this email address' });
+            return;
+        }
+        if (!user.isActive) {
+            res.status(403).json({ message: 'Account is inactive' });
+            return;
+        }
+        // 更新密码
+        await prisma.user.update({
+            where: {
+                email: email.toLowerCase()
+            },
+            data: {
+                password: newPassword
+            }
+        });
+        console.log('🔑 Password reset successful for user:', {
+            userId: user.id,
+            email: user.email,
+            role: user.role
+        });
+        res.json({
+            message: 'Password reset successful. You can now login with your new password.',
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role
+            }
+        });
+    }
+    catch (error) {
+        console.error('Password reset error:', error);
+        res.status(500).json({
+            message: 'Failed to reset password. Please try again.',
+            error: 'Internal server error'
+        });
+    }
+};
 // 测试路由 - 用于验证数据库连接
 const testUsersHandler = async (req, res) => {
     try {
@@ -1041,6 +1107,7 @@ router.post('/register', registerHandler);
 router.post('/nda-submit', ndaSubmitHandler);
 router.get('/available-listings', getAvailableListingsHandler); // Add public listings endpoint
 router.post('/contact-message', contactMessageHandler); // Add contact form endpoint
+router.post('/reset-password', resetPasswordHandler); // Add password reset endpoint
 router.post('/restore-session', restoreSessionHandler);
 router.post('/logout', async (req, res) => {
     const typedReq = req;

@@ -81,12 +81,26 @@ router.post('/', auth_1.authenticateBroker, async (req, res, next) => {
         }
         // 在函数内部获取 prisma 实例
         const prisma = (0, database_1.getPrisma)();
-        const { title, description, price, status, sellerId, buyerIds, agentId } = req.body;
-        console.log('Creating listing with data:', { title, description, price, status, sellerId, buyerIds, agentId });
+        const { title, description, price, status, sellerId, buyerIds, agentId, privateSeller } = req.body;
+        console.log('Creating listing with data:', { title, description, price, status, sellerId, buyerIds, agentId, privateSeller });
         // 验证必填字段
-        if (!title || !description || !price || !status || !sellerId) {
+        if (!title || !description || !price || !status) {
             res.status(400).json({
-                message: 'Missing required fields: title, description, price, status, sellerId are required'
+                message: 'Missing required fields: title, description, price, status are required'
+            });
+            return;
+        }
+        // 验证要么有sellerId，要么有privateSeller信息
+        if (!sellerId && !privateSeller) {
+            res.status(400).json({
+                message: 'Either sellerId or privateSeller information is required'
+            });
+            return;
+        }
+        // 如果是private seller，验证必需的private seller字段
+        if (privateSeller && (!privateSeller.name || !privateSeller.email)) {
+            res.status(400).json({
+                message: 'Private seller name and email are required'
             });
             return;
         }
@@ -103,17 +117,36 @@ router.post('/', auth_1.authenticateBroker, async (req, res, next) => {
             return;
         }
         // 验证卖家
-        const seller = await prisma.user.findUnique({
-            where: { id: sellerId },
-            include: { managedBy: true }
-        });
-        if (!seller) {
-            res.status(400).json({ message: 'Invalid seller ID' });
-            return;
+        let seller = null; // Changed type to any to accommodate privateSeller
+        if (sellerId) {
+            seller = await prisma.user.findUnique({
+                where: { id: sellerId },
+                include: { managedBy: true }
+            });
+            if (!seller) {
+                res.status(400).json({ message: 'Invalid seller ID' });
+                return;
+            }
+            if (seller.role !== 'SELLER') {
+                res.status(400).json({ message: 'Selected user is not a seller' });
+                return;
+            }
         }
-        if (seller.role !== 'SELLER') {
-            res.status(400).json({ message: 'Selected user is not a seller' });
-            return;
+        else if (privateSeller) {
+            // 创建私人卖家
+            // 生成临时密码
+            const tempPassword = `temp_${Math.random().toString(36).substring(2, 15)}${Date.now().toString().slice(-4)}`;
+            const newSeller = await prisma.user.create({
+                data: {
+                    name: privateSeller.name,
+                    email: privateSeller.email,
+                    role: 'SELLER',
+                    managerId: typedReq.user.id, // 经纪人管理私人卖家
+                    password: tempPassword // 临时密码，之后需要重置
+                }
+            });
+            seller = newSeller;
+            console.log(`Created private seller ${privateSeller.name} with temporary password: ${tempPassword}`);
         }
         // 验证代理
         if (agentId) {
@@ -124,14 +157,16 @@ router.post('/', auth_1.authenticateBroker, async (req, res, next) => {
                 res.status(400).json({ message: 'Invalid agent ID' });
                 return;
             }
-            if (agent.role !== 'AGENT') {
-                res.status(400).json({ message: 'Selected user is not an agent' });
+            if (agent.role !== 'AGENT' && agent.role !== 'BROKER') { // Allow both AGENT and BROKER roles
+                res.status(400).json({ message: 'Selected user is not an agent or broker' });
                 return;
             }
-            if (agent.managerId !== typedReq.user.id) {
+            // 验证权限：对于AGENT需要检查managerId，对于BROKER可以直接分配
+            if (agent.role === 'AGENT' && agent.managerId !== typedReq.user.id) {
                 res.status(403).json({ message: 'You do not have permission to assign this agent' });
                 return;
             }
+            // BROKER可以分配自己或其他broker（如果是其他broker的话）
         }
         // 验证买家
         if (buyerIds && buyerIds.length > 0) {
@@ -151,7 +186,7 @@ router.post('/', auth_1.authenticateBroker, async (req, res, next) => {
             // 如果提供了 agentId，先更新卖家的 managedBy
             if (agentId) {
                 await tx.user.update({
-                    where: { id: sellerId },
+                    where: { id: sellerId || seller?.id }, // 使用 seller?.id 确保更新成功
                     data: { managerId: agentId }
                 });
                 // 如果有买家，更新买家的 managedBy
@@ -169,7 +204,7 @@ router.post('/', auth_1.authenticateBroker, async (req, res, next) => {
                     description,
                     price: numericPrice,
                     status,
-                    sellerId,
+                    sellerId: seller?.id, // 使用 seller?.id 确保创建成功
                     buyers: {
                         connect: buyerIds?.map((id) => ({ id })) || []
                     }

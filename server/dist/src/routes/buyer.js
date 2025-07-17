@@ -105,7 +105,7 @@ const getListings = async (req, res, next) => {
                 createdAt: 'desc'
             }
         });
-        res.json(listings);
+        res.json({ listings }); // 修改：使用包装格式以保持与broker.ts一致
     }
     catch (error) {
         console.error('Error fetching listings:', error);

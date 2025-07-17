@@ -387,24 +387,42 @@ const getBuyerProgress = async (req, res, next) => {
             res.status(401).json({ message: 'Unauthorized' });
             return;
         }
-        // First, get the buyer and verify access
-        const buyer = await (0, database_1.getPrisma)().user.findFirst({
-            where: {
-                id: buyerId,
-                role: 'BUYER'
-            }
-        });
+        // Batch fetch all required data to avoid N+1 queries
+        const [buyer, listing, buyerProgress, documents, messages] = await Promise.all([
+            // Get buyer info
+            (0, database_1.getPrisma)().user.findFirst({
+                where: {
+                    id: buyerId,
+                    role: 'BUYER'
+                }
+            }),
+            // Get listing and verify it belongs to a seller managed by this agent
+            (0, database_1.getPrisma)().listing.findFirst({
+                where: { id: listingId },
+                include: {
+                    seller: true
+                }
+            }),
+            // Get buyer progress
+            (0, database_1.getPrisma)().buyerProgress.findFirst({
+                where: { buyerId }
+            }),
+            // Get all documents for this buyer and listing
+            (0, database_1.getPrisma)().document.findMany({
+                where: {
+                    buyerId,
+                    listingId: listingId
+                }
+            }),
+            // Get messages for this buyer
+            (0, database_1.getPrisma)().message.findFirst({
+                where: { senderId: buyerId }
+            })
+        ]);
         if (!buyer) {
             res.status(404).json({ message: 'Buyer not found' });
             return;
         }
-        // Get the listing and verify it belongs to a seller managed by this agent
-        const listing = await (0, database_1.getPrisma)().listing.findFirst({
-            where: { id: listingId },
-            include: {
-                seller: true
-            }
-        });
         if (!listing) {
             res.status(404).json({ message: 'Listing not found' });
             return;
@@ -414,13 +432,10 @@ const getBuyerProgress = async (req, res, next) => {
             res.status(403).json({ message: 'Access denied - listing not under your management' });
             return;
         }
-        // Get buyer's progress
-        let buyerProgress = await (0, database_1.getPrisma)().buyerProgress.findFirst({
-            where: { buyerId }
-        });
-        if (!buyerProgress) {
-            // Create default progress if none exists
-            buyerProgress = await (0, database_1.getPrisma)().buyerProgress.create({
+        // Create buyer progress if none exists
+        let finalBuyerProgress = buyerProgress;
+        if (!finalBuyerProgress) {
+            finalBuyerProgress = await (0, database_1.getPrisma)().buyerProgress.create({
                 data: {
                     buyerId,
                     currentStep: 0,
@@ -429,9 +444,8 @@ const getBuyerProgress = async (req, res, next) => {
                 }
             });
         }
-        const actualSelectedListingId = buyerProgress.selectedListingId;
+        const actualSelectedListingId = finalBuyerProgress.selectedListingId;
         const isViewingSelectedListing = actualSelectedListingId === listingId;
-        // Import the step definitions and completion logic from buyer routes
         const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
             0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
             1: { type: 'EMAIL_AGENT', operationType: 'BOTH', description: 'Email communication with agent' },
@@ -458,12 +472,66 @@ const getBuyerProgress = async (req, res, next) => {
             { id: 9, title: 'Download Closing document once we are closed', completed: false, accessible: false },
             { id: 10, title: 'After the Sale: Tips to make your transition smoother', completed: false, accessible: false }
         ];
-        // Optimized buyer step completion check using batched data
+        // Optimized step completion check using batched data
+        const checkBuyerStepCompletionOptimized = (stepId) => {
+            // For steps 8, 9, 10, check the buyer's completedSteps from database
+            if (stepId === 8 || stepId === 9 || stepId === 10) {
+                const completedStepsFromDB = finalBuyerProgress.completedSteps || [];
+                return completedStepsFromDB.includes(stepId);
+            }
+            switch (stepId) {
+                case 0: // Select listing
+                    return !!listingId;
+                case 1: // Email agent - check if buyer has selected this listing and sent messages
+                    if (!listingId)
+                        return false;
+                    // Check if buyer has selected this specific listing
+                    const hasSelectedThisListing = actualSelectedListingId === listingId;
+                    const hasSentMessages = !!messages;
+                    return hasSelectedThisListing && hasSentMessages;
+                case 2: // Fill out NDA
+                    return documents.some((doc) => doc.stepId === 2 &&
+                        doc.type === 'NDA' &&
+                        doc.category === 'BUYER_UPLOAD' &&
+                        doc.operationType === 'UPLOAD' &&
+                        doc.status === 'COMPLETED');
+                case 3: // Fill out financial statement
+                    return documents.some((doc) => doc.stepId === 3 &&
+                        doc.category === 'BUYER_UPLOAD' &&
+                        doc.status === 'COMPLETED');
+                case 4: // Download CBR/CIM
+                    return documents.some((doc) => doc.stepId === 4 &&
+                        doc.type === 'CBR_CIM' &&
+                        doc.operationType === 'DOWNLOAD' &&
+                        doc.downloadedAt);
+                case 5: // Upload documents
+                    return documents.some((doc) => doc.stepId === 5 &&
+                        doc.category === 'BUYER_UPLOAD' &&
+                        doc.status === 'COMPLETED');
+                case 6: // Download purchase contract
+                    return documents.some((doc) => doc.stepId === 6 &&
+                        doc.type === 'PURCHASE_CONTRACT' &&
+                        doc.operationType === 'UPLOAD' &&
+                        doc.category === 'BUYER_UPLOAD' &&
+                        doc.status === 'COMPLETED');
+                case 7: // Due diligence step - automatically completed when buyer reaches this step
+                    // Check if all previous steps (0-6) are completed
+                    for (let i = 0; i < 7; i++) {
+                        if (!checkBuyerStepCompletionOptimized(i)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                default:
+                    return false;
+            }
+        };
+        // Check each step using optimized function
         let currentStep = 0;
         const completedSteps = [];
         for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
-            const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, listingId);
+            const isCompleted = checkBuyerStepCompletionOptimized(step.id);
             step.completed = isCompleted;
             if (isCompleted) {
                 completedSteps.push(step.id);
@@ -490,6 +558,7 @@ const getBuyerProgress = async (req, res, next) => {
             const stepDoc = BUYER_STEP_DOCUMENT_REQUIREMENTS[step.id];
             if (stepDoc) {
                 step.documentRequirement = stepDoc;
+                step.documents = documents.filter((doc) => doc.stepId === step.id);
             }
         });
         res.json({
@@ -524,6 +593,14 @@ const checkBuyerStepCompletion = async (buyerId, stepId, listingId) => {
 };
 // Internal function to check buyer step completion without considering dependencies
 const checkBuyerStepCompletionInternal = async (buyerId, stepId, listingId) => {
+    // For steps 8, 9, 10, check the buyer's completedSteps from database like buyer route does
+    if (stepId === 8 || stepId === 9 || stepId === 10) {
+        const buyerProgress = await (0, database_1.getPrisma)().buyerProgress.findFirst({
+            where: { buyerId }
+        });
+        const completedStepsFromDB = buyerProgress?.completedSteps || [];
+        return completedStepsFromDB.includes(stepId);
+    }
     switch (stepId) {
         case 0: // Select listing
             return !!listingId;
@@ -560,17 +637,16 @@ const checkBuyerStepCompletionInternal = async (buyerId, stepId, listingId) => {
                 }
             });
             return !!ndaDoc;
-        case 3: // Fill out financial statement - should be tied to specific listing
+        case 3: // Fill out financial statement
             if (!listingId)
                 return false;
             const financialDoc = await (0, database_1.getPrisma)().document.findFirst({
                 where: {
                     buyerId,
-                    listingId, // Make sure it's for this specific listing
                     stepId: 3,
-                    type: 'FINANCIAL_STATEMENT',
-                    operationType: 'UPLOAD',
-                    status: 'COMPLETED'
+                    category: 'BUYER_UPLOAD',
+                    status: 'COMPLETED',
+                    listingId: listingId
                 }
             });
             return !!financialDoc;
@@ -580,7 +656,7 @@ const checkBuyerStepCompletionInternal = async (buyerId, stepId, listingId) => {
             const cbrDoc = await (0, database_1.getPrisma)().document.findFirst({
                 where: {
                     buyerId,
-                    listingId, // Make sure it's for this specific listing
+                    listingId,
                     stepId: 4,
                     type: 'CBR_CIM',
                     operationType: 'DOWNLOAD',
@@ -588,18 +664,19 @@ const checkBuyerStepCompletionInternal = async (buyerId, stepId, listingId) => {
                 }
             });
             return !!cbrDoc;
-        case 5: // Upload documents - already correctly tied to listing
+        case 5: // Upload documents - should be tied to specific listing
             if (!listingId)
                 return false;
-            const uploadedDocs = await (0, database_1.getPrisma)().document.findMany({
+            const uploadDoc = await (0, database_1.getPrisma)().document.findFirst({
                 where: {
                     buyerId,
                     listingId,
+                    stepId: 5,
                     category: 'BUYER_UPLOAD',
-                    type: 'UPLOADED_DOC'
+                    status: 'COMPLETED'
                 }
             });
-            return uploadedDocs.length > 0;
+            return !!uploadDoc;
         case 6: // Download purchase contract - should be tied to specific listing
             if (!listingId)
                 return false;
@@ -609,8 +686,9 @@ const checkBuyerStepCompletionInternal = async (buyerId, stepId, listingId) => {
                     listingId, // Make sure it's for this specific listing
                     stepId: 6,
                     type: 'PURCHASE_CONTRACT',
-                    operationType: 'DOWNLOAD',
-                    downloadedAt: { not: null }
+                    operationType: 'UPLOAD',
+                    category: 'BUYER_UPLOAD',
+                    status: 'COMPLETED'
                 }
             });
             return !!purchaseDoc;
@@ -627,12 +705,6 @@ const checkBuyerStepCompletionInternal = async (buyerId, stepId, listingId) => {
                 }
             }
             return true; // Automatically complete step 7 when buyer reaches it
-        case 8: // Complete pre-closing checklist
-            return false;
-        case 9: // Download closing docs
-            return false;
-        case 10: // After sale
-            return false;
         default:
             return false;
     }
