@@ -4,8 +4,10 @@ import { sellerService } from '../../services/seller';
 import { authService } from '../../services/auth';
 import type { DashboardStats, Listing, SellerProgress } from '../../services/seller';
 import ProgressBar from '../../components/ProgressBar';
+import { useSellerProgress } from '../../hooks/useSellerProgress';
 import logo from '../../assets/california-business-sales-logo.png';
 
+// 本地类型定义
 interface Buyer {
   id: string;
   name: string;
@@ -44,7 +46,10 @@ const SellerDashboard: React.FC = () => {
   const { showNotification } = useNotification();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [listings, setListings] = useState<ExtendedListing[]>([]);
-  const [progress, setProgress] = useState<SellerProgress | null>(null);
+  // Use global progress hook instead of local state
+  const { progress, loading: progressLoading } = useSellerProgress({
+    autoRefreshOnStepChange: true
+  });
   const [currentListing, setCurrentListing] = useState<ExtendedListing | null>(null);
   const [needsSelection, setNeedsSelection] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -95,17 +100,16 @@ const SellerDashboard: React.FC = () => {
     try {
       setLoading(true);
       
-      // Load all data: stats, listings, progress, and current selection
-      const [statsRes, listingsRes, progressRes, currentListingData] = await Promise.all([
+      // Load all data: stats, listings, and current selection (progress is managed by hook)
+      const [statsRes, listingsRes, currentListingData] = await Promise.all([
         sellerService.getDashboardStats(),
         sellerService.getListings(),
-        sellerService.getProgress(),
         sellerService.getCurrentListing()
       ]);
       
       setStats(statsRes);
       setListings(listingsRes.listings || []); // 修改：处理包装格式的响应
-      setProgress(progressRes.progress);
+      // setProgress(progressRes.progress); // This line is removed as progress is now a hook
       
       const currentData = currentListingData as CurrentListingResponse;
       setCurrentListing(currentData.listing);
@@ -238,6 +242,13 @@ const SellerDashboard: React.FC = () => {
         </button>
       </div>
 
+      {/* Progress Refresh Notice */}
+      <div className="px-6 py-3 bg-yellow-50 border-b border-yellow-200">
+        <p className="text-xs text-yellow-700 text-center">
+          💡 Please refresh the page after each step
+        </p>
+      </div>
+
       {/* Navigation Menu */}
       <nav className="mt-6">
         {menuItems.map((item, index) => {
@@ -251,7 +262,7 @@ const SellerDashboard: React.FC = () => {
             <button
               key={index}
               onClick={() => handleMenuClick(item)}
-              className={`block w-full px-6 py-4 text-base text-left relative hover:bg-gray-50 ${
+              className={`block w-full px-6 py-4 text-base text-left relative hover:bg-gray-50 transition-colors ${
                 location.pathname === item.path
                   ? 'bg-blue-100 text-blue-800 font-medium'
                   : isCompleted

@@ -576,6 +576,15 @@ const checkBuyerStepCompletion = async (buyerId: string, stepId: number, listing
 
 // Internal function to check buyer step completion without considering dependencies
 const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number, listingId?: string | null): Promise<boolean> => {
+  // For steps 8, 9, 10, check the buyer's completedSteps from database like buyer route does
+  if (stepId === 8 || stepId === 9 || stepId === 10) {
+    const buyerProgress = await getPrisma().buyerProgress.findFirst({
+      where: { buyerId }
+    });
+    const completedStepsFromDB = buyerProgress?.completedSteps as number[] || [];
+    return completedStepsFromDB.includes(stepId);
+  }
+
   switch (stepId) {
     case 0: // Select listing
       return !!listingId;
@@ -615,16 +624,15 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return !!ndaDoc;
       
-    case 3: // Fill out financial statement - should be tied to specific listing
+    case 3: // Fill out financial statement
       if (!listingId) return false;
       const financialDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
-          listingId, // Make sure it's for this specific listing
           stepId: 3, 
-          type: 'FINANCIAL_STATEMENT',
-          operationType: 'UPLOAD',
-          status: 'COMPLETED'
+          category: 'BUYER_UPLOAD',
+          status: 'COMPLETED',
+          listingId: listingId
         }
       });
       return !!financialDoc;
@@ -634,7 +642,7 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       const cbrDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
-          listingId, // Make sure it's for this specific listing
+          listingId,
           stepId: 4, 
           type: 'CBR_CIM',
           operationType: 'DOWNLOAD',
@@ -643,17 +651,18 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
       });
       return !!cbrDoc;
       
-    case 5: // Upload documents - already correctly tied to listing
+    case 5: // Upload documents - should be tied to specific listing
       if (!listingId) return false;
-      const uploadedDocs = await getPrisma().document.findMany({
+      const uploadDoc = await getPrisma().document.findFirst({
         where: { 
           buyerId, 
           listingId,
+          stepId: 5, 
           category: 'BUYER_UPLOAD',
-          type: 'UPLOADED_DOC'
+          status: 'COMPLETED'
         }
       });
-      return uploadedDocs.length > 0;
+      return !!uploadDoc;
       
     case 6: // Download purchase contract - should be tied to specific listing
       if (!listingId) return false;
@@ -663,8 +672,9 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
           listingId, // Make sure it's for this specific listing
           stepId: 6, 
           type: 'PURCHASE_CONTRACT',
-          operationType: 'DOWNLOAD',
-          downloadedAt: { not: null }
+          operationType: 'UPLOAD',
+          category: 'BUYER_UPLOAD',
+          status: 'COMPLETED'
         }
       });
       return !!purchaseDoc;
@@ -682,15 +692,6 @@ const checkBuyerStepCompletionInternal = async (buyerId: string, stepId: number,
         }
       }
       return true; // Automatically complete step 7 when buyer reaches it
-      
-    case 8: // Complete pre-closing checklist
-      return false;
-      
-    case 9: // Download closing docs
-      return false;
-      
-    case 10: // After sale
-      return false;
       
     default:
       return false;
