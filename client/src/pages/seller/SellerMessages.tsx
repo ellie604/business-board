@@ -5,6 +5,7 @@ import MessageCompose from '../../components/messages/MessageCompose';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
 import { apiGet, apiPost, apiPut, makeAuthenticatedRequest } from '../../utils/apiHelper';
+import { useSellerProgress } from '../../hooks/useSellerProgress';
 
 import { API_BASE_URL } from '../../config';
 import { sellerService } from '../../services/seller';
@@ -20,8 +21,13 @@ interface User {
 const SellerMessages: React.FC = () => {
   const [isComposing, setIsComposing] = useState(false);
   const [activeTab, setActiveTab] = useState<'inbox' | 'sent'>('inbox');
-  const [progress, setProgress] = useState<SellerProgress | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Use the custom hook for automatic progress management
+  const { progress, loading: progressLoading, error: progressError, refreshProgress } = useSellerProgress({
+    stepId: 1, // Messages step
+    autoMarkVisited: true // Automatically mark this page as visited
+  });
+  
   const queryClient = useQueryClient();
 
   const steps = [
@@ -38,21 +44,7 @@ const SellerMessages: React.FC = () => {
     'After The Sale'
   ];
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        const progressRes = await sellerService.getProgress();
-        console.log('SellerMessages - Progress data received:', JSON.stringify(progressRes, null, 2));
-        setProgress(progressRes.progress);
-      } catch (err) {
-        console.error('Failed to fetch progress:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProgress();
-  }, []);
+  // Remove the original progress useEffect since it's now handled by useSellerProgress hook
 
   // Fetch inbox messages
   const { data: inboxMessages, isLoading: isLoadingInbox, error: inboxError } = useQuery({
@@ -147,11 +139,10 @@ const SellerMessages: React.FC = () => {
       
       // Update step progress - mark step 1 (Messages) as completed
       try {
-        await sellerService.updateStep(1, true);
+        await sellerService.updateStep(1);
         
-        // Refresh progress data
-        const progressRes = await sellerService.getProgress();
-        setProgress(progressRes.progress);
+        // Refresh progress data using hook
+        await refreshProgress();
         
         console.log('Step 1 (Messages) marked as completed');
       } catch (error) {
@@ -205,13 +196,15 @@ const SellerMessages: React.FC = () => {
     await sendMessageMutation.mutateAsync(data);
   };
 
-  if (isLoadingInbox || isLoadingSent || isLoadingContacts) {
+  if (isLoadingInbox || isLoadingSent || isLoadingContacts || progressLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
+  
+  if (progressError) return <div className="p-8 text-red-500">{progressError}</div>;
 
   const stepCompleted = progress?.steps[1]?.completed || false;
   const currentStepIndex = progress?.currentStep || 0;

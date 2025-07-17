@@ -253,6 +253,11 @@ export const sellerService = {
     body: JSON.stringify({ stepId })
   }),
   
+  markPageVisited: (stepId: number) => makeRequest('/seller/mark-page-visited', {
+    method: 'POST',
+    body: JSON.stringify({ stepId })
+  }),
+  
   // 尽职调查相关
   getDueDiligenceRequests: (listingId: string) => makeRequest(`/seller/listings/${listingId}/due-diligence/requests`),
   

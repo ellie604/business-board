@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sellerService } from '../../services/seller';
-import type { SellerProgress } from '../../services/seller';
+import { useSellerProgress } from '../../hooks/useSellerProgress';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
 
@@ -22,7 +22,12 @@ interface BuyerActivityData {
 }
 
 const SellerBuyerActivity: React.FC = () => {
-  const [progress, setProgress] = useState<SellerProgress | null>(null);
+  // Use the custom hook for automatic progress management
+  const { progress, loading: progressLoading, refreshProgress } = useSellerProgress({
+    stepId: 5, // Buyer Activity step
+    autoMarkVisited: true // Automatically mark this page as visited
+  });
+  
   const [loading, setLoading] = useState(true);
   const [realBuyers, setRealBuyers] = useState<any[]>([]);
   const [buyerActivityData, setBuyerActivityData] = useState<BuyerActivityData[]>([]);
@@ -127,54 +132,14 @@ const SellerBuyerActivity: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [progressRes, buyersRes] = await Promise.all([
-          sellerService.getProgress(),
-          sellerService.getListingBuyers()
-        ]);
-        
-        setProgress(progressRes.progress);
+        // Only fetch buyers data since progress is handled by useSellerProgress hook
+        const buyersRes = await sellerService.getListingBuyers();
         setRealBuyers(buyersRes);
         
         // 生成包含真实买家和mock数据的完整数据集
         const mockData = generateMockData(buyersRes);
         setBuyerActivityData(mockData);
         
-        // 界面成功加载后，自动标记步骤6为完成
-        const currentStepIndex = progressRes.progress?.currentStep || 0;
-        const step6Completed = progressRes.progress?.steps[5]?.completed;
-        
-        console.log('Buyer Activity - Debug Info:', {
-          currentStepIndex,
-          step6Completed,
-          totalSteps: progressRes.progress?.steps?.length,
-          allSteps: progressRes.progress?.steps?.map(s => ({ id: s.id, title: s.title, completed: s.completed }))
-        });
-        
-        // 如果当前步骤是6或更高，且步骤6还未完成，则标记为完成
-        if (currentStepIndex >= 5 && !step6Completed) {
-          console.log('Attempting to mark step 6 as completed...');
-          try {
-            await sellerService.updateStep(5); // 步骤6的索引是5
-            console.log('Step 6 (Buyer Activity) marked as completed successfully');
-            
-            // 重新获取更新后的进度
-            const updatedProgressRes = await sellerService.getProgress();
-            setProgress(updatedProgressRes.progress);
-            
-            console.log('Updated progress:', {
-              newCurrentStep: updatedProgressRes.progress?.currentStep,
-              newStep6Completed: updatedProgressRes.progress?.steps[5]?.completed
-            });
-          } catch (updateError) {
-            console.error('Failed to update step 6:', updateError);
-          }
-        } else {
-          console.log('Step 6 completion skipped:', {
-            reason: currentStepIndex < 5 ? 'Current step is too low' : 'Step 6 already completed',
-            currentStepIndex,
-            step6Completed
-          });
-        }
       } catch (err) {
         console.error('Failed to fetch data:', err);
       } finally {
@@ -308,7 +273,8 @@ const SellerBuyerActivity: React.FC = () => {
                         }))
                       });
                       
-                      setProgress(updatedProgress.progress);
+                      // setProgress(updatedProgress.progress); // This line is removed
+                      refreshProgress(); // Use refreshProgress from useSellerProgress
                       console.log('Manual completion successful - UI should update now');
                     } catch (error) {
                       console.error('Manual completion failed:', error);
