@@ -293,7 +293,19 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
 
     // 级联删除：先处理相关的数据，避免外键约束冲突
     await getPrisma().$transaction(async (prisma: any) => {
-      // 1. 删除agent发送和接收的所有消息
+      // 1. 先删除MessageAttachment（必须先于Message删除）
+      await prisma.messageAttachment.deleteMany({
+        where: {
+          message: {
+            OR: [
+              { senderId: agentId },
+              { receiverId: agentId }
+            ]
+          }
+        }
+      });
+      
+      // 2. 删除agent发送和接收的所有消息
       await prisma.message.deleteMany({
         where: {
           OR: [
@@ -303,29 +315,29 @@ const deleteAgent: RequestHandler = async (req, res, next) => {
         }
       });
       
-      // 2. 删除agent的所有活动记录
+      // 3. 删除agent的所有活动记录
       await prisma.activity.deleteMany({
         where: { userId: agentId }
       });
       
-      // 3. 删除agent作为lastUpdatedBy的checklist记录
+      // 4. 删除agent作为lastUpdatedBy的checklist记录
       await prisma.preCloseChecklist.updateMany({
         where: { lastUpdatedBy: agentId },
         data: { lastUpdatedBy: null }
       });
       
-      // 4. 删除agent上传的所有文档
+      // 5. 删除agent上传的所有文档
       await prisma.document.deleteMany({
         where: { uploadedBy: agentId }
       });
       
-      // 5. 将agent管理的所有用户的managerId设为null（解除管理关系）
+      // 6. 将agent管理的所有用户的managerId设为null（解除管理关系）
       await prisma.user.updateMany({
         where: { managerId: agentId },
         data: { managerId: null }
       });
       
-      // 6. 最后删除agent
+      // 7. 最后删除agent
       await prisma.user.delete({
         where: { id: agentId }
       });
@@ -365,7 +377,19 @@ const deleteSeller: RequestHandler = async (req, res, next) => {
 
     // 级联删除：先删除相关的数据，避免外键约束冲突
     await getPrisma().$transaction(async (prisma: any) => {
-      // 1. 删除seller发送和接收的所有消息
+      // 1. 先删除MessageAttachment（必须先于Message删除）
+      await prisma.messageAttachment.deleteMany({
+        where: {
+          message: {
+            OR: [
+              { senderId: sellerId },
+              { receiverId: sellerId }
+            ]
+          }
+        }
+      });
+      
+      // 2. 删除seller发送和接收的所有消息
       await prisma.message.deleteMany({
         where: {
           OR: [
@@ -375,38 +399,38 @@ const deleteSeller: RequestHandler = async (req, res, next) => {
         }
       });
       
-      // 2. 删除seller的所有活动记录
+      // 3. 删除seller的所有活动记录
       await prisma.activity.deleteMany({
         where: { userId: sellerId }
       });
       
-      // 3. 删除seller作为lastUpdatedBy的checklist记录
+      // 4. 删除seller作为lastUpdatedBy的checklist记录
       await prisma.preCloseChecklist.updateMany({
         where: { lastUpdatedBy: sellerId },
         data: { lastUpdatedBy: null }
       });
       
-      // 4. 删除seller上传的所有文档
+      // 5. 删除seller上传的所有文档
       await prisma.document.deleteMany({
         where: { uploadedBy: sellerId }
       });
       
-      // 5. 删除seller的所有listings
+      // 6. 删除seller的所有listings
       await prisma.listing.deleteMany({
         where: { sellerId }
       });
       
-      // 6. 删除seller的progress记录
+      // 7. 删除seller的progress记录
       await prisma.sellerProgress.deleteMany({
         where: { sellerId }
       });
       
-      // 7. 删除seller的questionnaire记录
+      // 8. 删除seller的questionnaire记录
       await prisma.sellerQuestionnaire.deleteMany({
         where: { sellerId }
       });
       
-      // 8. 删除seller相关的documents（作为seller或buyer）
+      // 9. 删除seller相关的documents（作为seller或buyer）
       await prisma.document.deleteMany({
         where: {
           OR: [
@@ -416,13 +440,13 @@ const deleteSeller: RequestHandler = async (req, res, next) => {
         }
       });
       
-      // 9. 将seller管理的所有用户的managerId设为null（解除管理关系）
+      // 10. 将seller管理的所有用户的managerId设为null（解除管理关系）
       await prisma.user.updateMany({
         where: { managerId: sellerId },
         data: { managerId: null }
       });
       
-      // 10. 最后删除seller
+      // 11. 最后删除seller
       await prisma.user.delete({
         where: { id: sellerId }
       });
@@ -462,7 +486,19 @@ const deleteBuyer: RequestHandler = async (req, res, next) => {
 
     // 级联删除：先删除相关的数据，避免外键约束冲突
     await getPrisma().$transaction(async (prisma: any) => {
-      // 1. 删除buyer发送和接收的所有消息
+      // 1. 先删除MessageAttachment（必须先于Message删除）
+      await prisma.messageAttachment.deleteMany({
+        where: {
+          message: {
+            OR: [
+              { senderId: buyerId },
+              { receiverId: buyerId }
+            ]
+          }
+        }
+      });
+      
+      // 2. 删除buyer发送和接收的所有消息
       await prisma.message.deleteMany({
         where: {
           OR: [
@@ -472,54 +508,54 @@ const deleteBuyer: RequestHandler = async (req, res, next) => {
         }
       });
       
-      // 2. 删除buyer的所有活动记录
+      // 3. 删除buyer的所有活动记录
       await prisma.activity.deleteMany({
         where: { userId: buyerId }
       });
       
-      // 3. 删除buyer作为lastUpdatedBy的checklist记录
+      // 4. 删除buyer作为lastUpdatedBy的checklist记录
       await prisma.preCloseChecklist.updateMany({
         where: { lastUpdatedBy: buyerId },
         data: { lastUpdatedBy: null }
       });
       
-      // 4. 删除buyer上传的所有文档
+      // 5. 删除buyer上传的所有文档
       await prisma.document.deleteMany({
         where: { uploadedBy: buyerId }
       });
       
-      // 5. 删除buyer的progress记录
+      // 6. 删除buyer的progress记录
       await prisma.buyerProgress.deleteMany({
         where: { buyerId }
       });
       
-      // 6. 删除buyer相关的documents（作为buyer）
+      // 7. 删除buyer相关的documents（作为buyer）
       await prisma.document.deleteMany({
         where: { buyerId }
       });
       
-      // 7. 删除buyer的NDA记录
+      // 8. 删除buyer的NDA记录
       await prisma.buyerNDA.deleteMany({
         where: { buyerId }
       });
       
-      // 8. 删除buyer的financial statement记录
+      // 9. 删除buyer的financial statement记录
       await prisma.buyerFinancialStatement.deleteMany({
         where: { buyerId }
       });
       
-      // 9. 删除buyer的due diligence requests
+      // 10. 删除buyer的due diligence requests
       await prisma.dueDiligenceRequest.deleteMany({
         where: { buyerId }
       });
       
-      // 10. 将buyer管理的所有用户的managerId设为null（解除管理关系）
+      // 11. 将buyer管理的所有用户的managerId设为null（解除管理关系）
       await prisma.user.updateMany({
         where: { managerId: buyerId },
         data: { managerId: null }
       });
       
-      // 11. 最后删除buyer
+      // 12. 最后删除buyer
       await prisma.user.delete({
         where: { id: buyerId }
       });
