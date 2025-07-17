@@ -1466,6 +1466,10 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
     // If buyer hasn't selected this specific listing, they may be at step 0 or working on a different listing
     const isViewingSelectedListing = actualSelectedListingId === listingId;
 
+    // For step completion checks, we need to check if buyer has done activities for THIS specific listing
+    // Even if buyer has selected a different listing, we want to see their progress on this one
+    const checkListingId = listingId; // Always use the URL listingId for checking progress
+
     // Import the step definitions and completion logic from buyer routes
     const BUYER_STEP_DOCUMENT_REQUIREMENTS = {
       0: { type: 'LISTING_SELECTION', operationType: 'NONE', description: 'Select listing you are interested in' },
@@ -1641,9 +1645,8 @@ const getBuyerProgress: RequestHandler = async (req, res, next) => {
     
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
-      // FIXED: Use the URL listingId for step completion check, not buyer's selectedListingId
-      // This allows broker to see buyer's progress on ANY listing, not just the one buyer selected
-      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, listingId);
+      // Use the URL listingId for step completion check to see buyer's progress on THIS listing
+      const isCompleted = await checkBuyerStepCompletion(buyerId, step.id, checkListingId);
       step.completed = isCompleted;
       
       if (isCompleted) {

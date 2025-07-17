@@ -1,18 +1,24 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buyerService } from '../../services/buyer';
+import { useBuyerProgress } from '../../hooks/useBuyerProgress';
 import ProgressBar from '../../components/ProgressBar';
 import StepGuard from '../../components/StepGuard';
 import { API_BASE_URL } from '../../config';
 
 const BuyerPurchaseContract: React.FC = () => {
+  // Use the custom hook for automatic progress management
+  const { progress: progressData, loading: progressLoading, updateStep } = useBuyerProgress({
+    stepId: 6, // Purchase Contract step
+    autoRefreshOnStepChange: true
+  });
+  
   const [downloading, setDownloading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [downloadMessage, setDownloadMessage] = useState<string>('');
   const [uploadMessage, setUploadMessage] = useState<string>('');
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [uploadMessageType, setUploadMessageType] = useState<'success' | 'error' | ''>('');
-  const [progressData, setProgressData] = useState<any>(null);
   const [contractDocuments, setContractDocuments] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,15 +45,15 @@ const BuyerPurchaseContract: React.FC = () => {
       setLoading(true);
       
       // 获取进度数据
-      const progressRes = await buyerService.getProgress();
-      setProgressData(progressRes.progress);
+      // const progressRes = await buyerService.getProgress(); // This line is no longer needed
+      // setProgressData(progressRes.progress);
 
       // 如果有选中的listing，获取购买合同文档和已上传文件
-      if (progressRes.progress?.selectedListingId) {
+      if (progressData?.selectedListingId) {
         setDocumentsLoading(true);
         
         // 获取broker/agent上传的购买合同文档
-        const response = await fetch(`${API_BASE_URL}/buyer/listings/${progressRes.progress.selectedListingId}/agent-documents`, {
+        const response = await fetch(`${API_BASE_URL}/buyer/listings/${progressData.selectedListingId}/agent-documents`, {
           method: 'GET',
           credentials: 'include'
         });
@@ -72,7 +78,7 @@ const BuyerPurchaseContract: React.FC = () => {
         }
 
         // 获取buyer已上传的签完字的购买合同文件
-        await refreshUploadedFiles(progressRes.progress.selectedListingId);
+        await refreshUploadedFiles(progressData.selectedListingId);
         setDocumentsLoading(false);
       }
     } catch (error) {
@@ -82,7 +88,7 @@ const BuyerPurchaseContract: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [progressData]); // Changed dependency to progressData
 
   const refreshUploadedFiles = useCallback(async (selectedListingId: string) => {
     try {
@@ -228,11 +234,11 @@ const BuyerPurchaseContract: React.FC = () => {
       await refreshUploadedFiles(progressData.selectedListingId);
       
       // Mark step as completed after successful upload
-      await buyerService.updateStep(6, true);
+      await updateStep(6, true); // Use updateStep from hook
       
       // Refresh progress
-      const progressRes = await buyerService.getProgress();
-      setProgressData(progressRes.progress);
+      // const progressRes = await buyerService.getProgress(); // This line is no longer needed
+      // setProgressData(progressRes.progress);
       
       setUploadMessage('Signed Purchase Contract uploaded successfully!');
       setUploadMessageType('success');
@@ -273,8 +279,8 @@ const BuyerPurchaseContract: React.FC = () => {
 
       // Refresh file list and progress
       await refreshUploadedFiles(progressData.selectedListingId);
-      const progressRes = await buyerService.getProgress();
-      setProgressData(progressRes.progress);
+      // const progressRes = await buyerService.getProgress(); // This line is no longer needed
+      // setProgressData(progressRes.progress);
       
       alert('File deleted successfully');
     } catch (err) {
@@ -305,7 +311,7 @@ const BuyerPurchaseContract: React.FC = () => {
     return { stepCompleted, currentStepIndex, isStepFinished, isCurrentStep, isAccessible };
   }, [progressData]);
 
-  if (loading) {
+  if (loading || progressLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -364,6 +370,22 @@ const BuyerPurchaseContract: React.FC = () => {
             <p>Uploaded Files: {uploadedFiles.length}</p>
           </div>
         )}
+
+        {/* Important Information Notice */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <div className="flex items-start">
+            <svg className="h-6 w-6 text-blue-600 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h4 className="font-medium text-blue-900 mb-2">How Purchase Contracts Work</h4>
+              <p className="text-sm text-blue-700">
+                The purchase contract will be drafted by the broker based on your offer. Once signed by both parties, 
+                it will be available for download and submitted to a title company to open escrow.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Purchase Contract Overview */}
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-6">
